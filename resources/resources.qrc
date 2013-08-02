@@ -1,0 +1,10 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file>fonts/LucidaGrande.ttc</file>
+    <file>icons/arrows.png</file>
+    <file>icons/gear.png</file>
+    <file>icons/magnifier.png</file>
+    <file>images/logo.png</file>
+  </qresource>
+</RCC>
