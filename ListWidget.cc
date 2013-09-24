@@ -20,14 +20,14 @@ ListWidget::ListWidget(QWidget* parent):
   _scroll(new SmoothScrollBar(this)),
   _wheel_event(false),
   _keyboard_index(0),
-  _search_field(nullptr)
+  _mate(nullptr)
 {
   _scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
   this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 }
 
-ListWidget::ListWidget(QWidget* parent, QLineEdit** searchfield):
+ListWidget::ListWidget(QWidget* parent, QWidget* mate):
   Super(parent),
   _height_hint(0),
   _width_hint(0),
@@ -35,7 +35,7 @@ ListWidget::ListWidget(QWidget* parent, QLineEdit** searchfield):
   _scroll(new SmoothScrollBar(this)),
   _wheel_event(false),
   _keyboard_index(0),
-  _search_field(searchfield)
+  _mate(mate)
 {
   _scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
@@ -79,6 +79,12 @@ ListWidget::minimumSizeHint() const
 {
   // FIXME: minimum height when items are present.
   return QSize(this->_width_hint, 0);
+}
+
+void
+ListWidget::set_mate(QWidget* mate)
+{
+  this->_mate = mate;
 }
 
 void
@@ -157,7 +163,7 @@ ListWidget::keyPressEvent(QKeyEvent* event)
     _widgets[_widgets.size() - _keyboard_index]->trigger();
 
   if (_keyboard_index == 0)
-    (*_search_field)->setFocus();
+    _mate->setFocus();
   else
   {
     if (old_index > 0)

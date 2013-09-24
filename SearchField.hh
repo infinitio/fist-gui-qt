@@ -14,7 +14,7 @@ class SearchField:
 | Construction |
 `-------------*/
 public:
-  SearchField(QWidget* owner, ListWidget* list);
+  SearchField(QWidget* owner, ListWidget** list);
 
 /*--------.
 | Display |
@@ -45,7 +45,7 @@ public:
   paintEvent(QPaintEvent* event);
 
 private:
-  ListWidget* _list;
+  ListWidget** _list;
 };
 
 

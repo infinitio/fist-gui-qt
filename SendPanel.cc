@@ -38,8 +38,9 @@ SendPanel::SendPanel():
   _search(nullptr),
   _users(nullptr)
 {
-  this->_users = new ListWidget(this, &this->_search);
-  auto search = new SearchField(this, this->_users);
+  this->_users = new ListWidget(this);
+  auto search = new SearchField(this, &this->_users);
+  this->_users->set_mate(search);
   this->_search = search;
   search->setIcon(QPixmap(":/icons/magnifier.png"));
   new SendFooter(this);

@@ -22,7 +22,7 @@ public:
 `-------------*/
 public:
   ListWidget(QWidget* parent = nullptr);
-  ListWidget(QWidget* parent, QLineEdit** searchfield);
+  ListWidget(QWidget* parent, QWidget* mate);
 
 /*--------.
 | Widgets |
@@ -46,6 +46,10 @@ public:
     virtual
     QSize
     minimumSizeHint() const override;
+
+public:
+    void
+    set_mate(QWidget* mate);
 
   public:
     Q_OBJECT;
@@ -79,7 +83,7 @@ protected:
   void
   keyPressEvent(QKeyEvent* event) override;
   size_t _keyboard_index;
-  QLineEdit** _search_field;
+  QWidget* _mate;
 
 /*---------.
 | Paitning |

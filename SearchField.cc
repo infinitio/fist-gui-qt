@@ -4,7 +4,7 @@
 
 static int const margin = 10;
 
-SearchField::SearchField(QWidget* owner, ListWidget* list):
+SearchField::SearchField(QWidget* owner, ListWidget** list):
   QLineEdit(owner),
   _list(list)
 {
@@ -32,7 +32,7 @@ void
 SearchField::keyPressEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Up)
-    _list->setFocus();
+    (*_list)->setFocus();
   else
     QLineEdit::keyPressEvent(event);
 }
