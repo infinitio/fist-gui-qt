@@ -2,8 +2,10 @@
 # define SEARCHFIELD_HH
 
 # include <QLineEdit>
+# include <QKeyEvent>
 
 # include "utils.hh"
+# include "ListWidget.hh"
 
 class SearchField:
   public QLineEdit
@@ -12,7 +14,7 @@ class SearchField:
 | Construction |
 `-------------*/
 public:
-  SearchField(QWidget* owner = nullptr);
+  SearchField(QWidget* owner, ListWidget* list);
 
 /*--------.
 | Display |
@@ -23,6 +25,9 @@ public:
 public:
   void
   setIcon(QPixmap const& pixmap);
+
+protected:
+  void keyPressEvent(QKeyEvent* event);
 
 /*-------.
 | Layout |
@@ -38,6 +43,9 @@ public:
 public:
   void
   paintEvent(QPaintEvent* event);
+
+private:
+  ListWidget* _list;
 };
 
 

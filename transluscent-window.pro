@@ -15,6 +15,7 @@ SOURCES +=                                      \
     Footer.cc                                   \
     IconButton.cc                               \
     InfinitDock.cc                              \
+    ListItem.cc                                 \
     ListWidget.cc                               \
     RoundShadowWidget.cc                        \
     SearchField.cc                              \
@@ -24,6 +25,7 @@ SOURCES +=                                      \
     TransactionList.cc                          \
     TransactionPanel.cc                         \
     TransactionWidget.cc                        \
+    UserWidget.cc                               \
     main.cc                                     \
 
 HEADERS +=                                      \
@@ -32,6 +34,7 @@ HEADERS +=                                      \
     Footer.hh                                   \
     IconButton.hh                               \
     InfinitDock.hh                              \
+    ListItem.cc                                 \
     ListWidget.hh                               \
     RoundShadowWidget.hh                        \
     SearchField.hh                              \
@@ -41,6 +44,7 @@ HEADERS +=                                      \
     TransactionList.hh                          \
     TransactionPanel.hh                         \
     TransactionWidget.hh                        \
+    UserWidget.hh                               \
 
 RESOURCES += resources/resources.qrc
 

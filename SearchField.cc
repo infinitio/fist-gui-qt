@@ -4,8 +4,9 @@
 
 static int const margin = 10;
 
-SearchField::SearchField(QWidget* owner):
-  QLineEdit(owner)
+SearchField::SearchField(QWidget* owner, ListWidget* list):
+  QLineEdit(owner),
+  _list(list)
 {
   this->setFrame(false);
   QFont font("Lucida Grande");
@@ -25,6 +26,15 @@ SearchField::setIcon(QPixmap const& pixmap)
     padding += margin + this->_icon.width();
   this->setContentsMargins(padding, 0, 0, 0);
   repaint();
+}
+
+void
+SearchField::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Up)
+    _list->setFocus();
+  else
+    QLineEdit::keyPressEvent(event);
 }
 
 QSize

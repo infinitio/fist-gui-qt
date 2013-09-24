@@ -81,3 +81,8 @@ TransactionWidget::minimumSizeHint() const
 {
   return this->sizeHint();
 }
+
+void
+TransactionWidget::trigger()
+{
+}

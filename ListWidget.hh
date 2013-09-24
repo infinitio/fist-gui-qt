@@ -2,8 +2,10 @@
 # define LISTWIDGET_HH
 
 # include <QWidget>
+# include <QLineEdit>
 
 # include "SmoothScrollBar.hh"
+# include "ListItem.hh"
 
 class ListWidget:
   public QWidget
@@ -20,15 +22,19 @@ public:
 `-------------*/
 public:
   ListWidget(QWidget* parent = nullptr);
+  ListWidget(QWidget* parent, QLineEdit** searchfield);
 
 /*--------.
 | Widgets |
 `--------*/
 public:
     void
-    addWidget(QWidget* widget);
+    addWidget(ListItem* widget);
     void
     clearWidgets();
+
+    void
+    setFocus();
 
 /*-------.
 | Layout |
@@ -55,7 +61,7 @@ public:
     int _height_hint;
     int _width_hint;
     int _offset;
-    std::vector<QWidget*> _widgets;
+    std::vector<ListItem*> _widgets;
     SmoothScrollBar* _scroll;
 
 /*-------.
@@ -69,6 +75,11 @@ protected:
   void
   wheelEvent(QWheelEvent* event) override;
   bool _wheel_event;
+
+  void
+  keyPressEvent(QKeyEvent* event) override;
+  size_t _keyboard_index;
+  QLineEdit** _search_field;
 
 /*---------.
 | Paitning |

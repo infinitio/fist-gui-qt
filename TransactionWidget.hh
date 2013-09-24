@@ -4,9 +4,10 @@
 # include <QWidget>
 
 # include "fwd.hh"
+# include "ListItem.hh"
 
 class TransactionWidget:
-  public QWidget
+  public ListItem
 {
 public:
   TransactionWidget(QPixmap const& avatar);
@@ -44,6 +45,10 @@ public:
   virtual
   QSize
   minimumSizeHint() const override;
+
+  virtual
+  void
+  trigger();
 
 private:
   AvatarWidget* _avatar;

@@ -18,7 +18,24 @@ ListWidget::ListWidget(QWidget* parent):
   _width_hint(0),
   _offset(0),
   _scroll(new SmoothScrollBar(this)),
-  _wheel_event(false)
+  _wheel_event(false),
+  _keyboard_index(0),
+  _search_field(nullptr)
+{
+  _scroll->hide();
+  connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
+  this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+}
+
+ListWidget::ListWidget(QWidget* parent, QLineEdit** searchfield):
+  Super(parent),
+  _height_hint(0),
+  _width_hint(0),
+  _offset(0),
+  _scroll(new SmoothScrollBar(this)),
+  _wheel_event(false),
+  _keyboard_index(0),
+  _search_field(searchfield)
 {
   _scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
@@ -30,7 +47,7 @@ ListWidget::ListWidget(QWidget* parent):
 `--------*/
 
 void
-ListWidget::addWidget(QWidget* widget)
+ListWidget::addWidget(ListItem* widget)
 {
   this->_widgets.push_back(widget);
   widget->setParent(this);
@@ -125,6 +142,41 @@ ListWidget::wheelEvent(QWheelEvent* event)
     QCoreApplication::sendEvent(this->_scroll, event);
     this->_wheel_event = false;
   }
+}
+
+void
+ListWidget::keyPressEvent(QKeyEvent* event)
+{
+  size_t old_index = _keyboard_index;
+
+  if (event->key() == Qt::Key_Down && _keyboard_index > 0)
+    _keyboard_index -= 1;
+  else if (event->key() == Qt::Key_Up && _keyboard_index < _widgets.size())
+    _keyboard_index += 1;
+  else if (event->key() == Qt::Key_Return)
+    _widgets[_widgets.size() - _keyboard_index]->trigger();
+
+  if (_keyboard_index == 0)
+    (*_search_field)->setFocus();
+  else
+  {
+    if (old_index > 0)
+    {
+      ListItem* old = _widgets[_widgets.size() - old_index];
+      old->setStyleSheet("background-color:white;");
+    }
+
+    ListItem* item = _widgets[_widgets.size() - _keyboard_index];
+    item->setStyleSheet("background-color:pink;");
+  }
+}
+
+void
+ListWidget::setFocus()
+{
+  QWidget::setFocus();
+  ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
+  item->setStyleSheet("background-color:pink;");
 }
 
 void

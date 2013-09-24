@@ -38,8 +38,8 @@ SendPanel::SendPanel():
   _search(nullptr),
   _users(nullptr)
 {
-  this->_users = new ListWidget(this);
-  auto search = new SearchField(this);
+  this->_users = new ListWidget(this, &this->_search);
+  auto search = new SearchField(this, this->_users);
   this->_search = search;
   search->setIcon(QPixmap(":/icons/magnifier.png"));
   new SendFooter(this);
@@ -115,7 +115,7 @@ SendPanel::setUsers(QStringList const& users)
   this->_users->clearWidgets();
   for (auto const& user: users)
   {
-    auto widget = new QWidget;
+    auto widget = new UserWidget(user, this);
     auto layout = new QHBoxLayout(widget);
     layout->addWidget(new AvatarIcon(QPixmap("resources/avatar3.png")));
     layout->addWidget(new QLabel(user));

@@ -5,6 +5,7 @@
 # include <QWidget>
 
 # include "SmoothLayout.hh"
+# include "UserWidget.hh"
 # include "fwd.hh"
 
 class SendPanel:
