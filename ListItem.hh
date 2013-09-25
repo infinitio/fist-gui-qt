@@ -8,6 +8,7 @@ class ListItem:
 {
 public:
   ListItem(QWidget* parent = nullptr);
+  void mousePressEvent(QMouseEvent* e) override;
 
 public:
   virtual void trigger() = 0;

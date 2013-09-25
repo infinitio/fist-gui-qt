@@ -20,7 +20,7 @@ ListWidget::ListWidget(QWidget* parent):
   _scroll(new SmoothScrollBar(this)),
   _wheel_event(false),
   _keyboard_index(0),
-  _mate(nullptr)
+  _mate(parent)
 {
   _scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
@@ -162,6 +162,8 @@ ListWidget::keyPressEvent(QKeyEvent* event)
   else if (event->key() == Qt::Key_Return)
     _widgets[_widgets.size() - _keyboard_index]->trigger();
 
+  std::cout << _widgets.size() << " " << _keyboard_index << std::endl;
+
   if (_keyboard_index == 0)
     _mate->setFocus();
   else
@@ -181,8 +183,12 @@ void
 ListWidget::setFocus()
 {
   QWidget::setFocus();
-  ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
-  item->setStyleSheet("background-color:pink;");
+
+  if (_widgets.size() != 0)
+  {
+    ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
+    item->setStyleSheet("background-color:pink;");
+  }
 }
 
 void

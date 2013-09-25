@@ -2,6 +2,8 @@
 # define TRANSACTIONLIST_HH
 
 # include <QWidget>
+# include <QKeyEvent>
+# include "Models.hh"
 
 # include "fwd.hh"
 
@@ -13,7 +15,10 @@ class TransactionList:
 
   public Q_SLOTS:
     TransactionWidget*
-    addTransaction(QString const& avatar);
+    addTransaction(Transaction const& t);
+
+    void setFocus();
+    void keyPressEvent(QKeyEvent* event);
 
   public:
     TransactionList();

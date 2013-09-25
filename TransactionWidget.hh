@@ -1,16 +1,19 @@
 #ifndef TRANSACTIONWIDGET_HH
 # define TRANSACTIONWIDGET_HH
 
+# include <iostream>
 # include <QWidget>
 
 # include "fwd.hh"
 # include "ListItem.hh"
+# include "TransactionWindow.hh"
+# include "Models.hh"
 
 class TransactionWidget:
   public ListItem
 {
 public:
-  TransactionWidget(QPixmap const& avatar);
+  TransactionWidget(Transaction const& t);
   Q_OBJECT;
 
 /*-----------.
@@ -51,6 +54,7 @@ public:
   trigger();
 
 private:
+  Transaction const& _transaction;
   AvatarWidget* _avatar;
   QLayout* _layout;
 };

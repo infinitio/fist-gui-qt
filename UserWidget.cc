@@ -6,12 +6,6 @@ UserWidget::UserWidget(QString const& user, QWidget* parent = nullptr):
 {}
 
 void
-UserWidget::mousePressEvent(QMouseEvent*)
-{
-  trigger();
-}
-
-void
 UserWidget::trigger()
 {
   std::cout << _user.toStdString() << std::endl;

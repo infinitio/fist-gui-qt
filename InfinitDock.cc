@@ -60,6 +60,7 @@ InfinitDock::InfinitDock():
   connect(this->_send_panel, SIGNAL(onSearchChanged(QString const&)),
           SLOT(_search(QString const&)));
   this->setAcceptDrops(true);
+  this->_transaction_panel->setFocus();
 }
 
 /*------.

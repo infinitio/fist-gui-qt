@@ -4,13 +4,14 @@
 #include "AvatarWidget.hh"
 #include "TransactionWidget.hh"
 
-TransactionWidget::TransactionWidget(QPixmap const& avatar):
+TransactionWidget::TransactionWidget(Transaction const& t):
+  _transaction(t),
   _avatar(new AvatarWidget),
   _layout(nullptr)
 {
   static int const padding = 5;
 
-  this->_avatar->setPicture(avatar);
+  this->_avatar->setPicture(t.user.avatar);
 
   auto layout = new QHBoxLayout(this);
   this->_layout = layout;
@@ -21,7 +22,7 @@ TransactionWidget::TransactionWidget(QPixmap const& avatar):
     texts->setContentsMargins(5, 12, 5, 12);
     layout->addLayout(texts);
     {
-      auto username = new QLabel("mefyl");
+      auto username = new QLabel(t.user.name);
       QFont font;
       font.setBold(true);
       username->setFont(font);
@@ -29,7 +30,7 @@ TransactionWidget::TransactionWidget(QPixmap const& avatar):
       texts->addWidget(username);
     }
     {
-      auto filename = new QLabel("WOL.csv");
+      auto filename = new QLabel(t.filename);
       QFont font;
       filename->setFont(font);
       QPalette palette;
@@ -43,6 +44,7 @@ TransactionWidget::TransactionWidget(QPixmap const& avatar):
 
   setSizePolicy(QSizePolicy::MinimumExpanding,
                 QSizePolicy::Fixed);
+  adjustSize();
 
   connect(this->_avatar,
           SIGNAL(onProgressChanged(float)),
@@ -85,4 +87,7 @@ TransactionWidget::minimumSizeHint() const
 void
 TransactionWidget::trigger()
 {
+  std::cout << "trigger transaction" << std::endl;
+  auto win = new TransactionWindow(_transaction, this);
+  win->show();
 }

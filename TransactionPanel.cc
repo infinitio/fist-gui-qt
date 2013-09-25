@@ -31,8 +31,14 @@ TransactionPanel::TransactionPanel():
   layout->addWidget(new TransactionFooter);
 }
 
-TransactionWidget*
-TransactionPanel::addTransaction(QString const& avatar)
+void
+TransactionPanel::setFocus()
 {
-  return this->_list->addTransaction(avatar);
+  this->_list->setFocus();
+}
+
+TransactionWidget*
+TransactionPanel::addTransaction(Transaction const& t)
+{
+  return this->_list->addTransaction(t);
 }

@@ -37,10 +37,12 @@ main(int argc, char** argv)
 
   auto& transaction_panel = dock.transactionPanel();
   transaction_panel.connect(debug,
-                            SIGNAL(addTransaction(QString const&)),
-                            SLOT(addTransaction(QString const&)));
+                            SIGNAL(addTransaction(Transaction const&)),
+                            SLOT(addTransaction(Transaction const&)));
   // list->addTransaction("resources/avatar1.png");
-  auto t = transaction_panel.addTransaction("resources/avatar2.png");
+  User* u = new User(QString("MyCure"), QString("resources/avatar3.png"));
+  Transaction* trans = new Transaction(QString("firstfile.txt"), *u);
+  auto t = transaction_panel.addTransaction(*trans);
   // list->addTransaction("resources/avatar3.png");
   t->connect(debug,
              SIGNAL(onProgressChanged(float)),

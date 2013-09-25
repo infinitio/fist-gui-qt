@@ -11,7 +11,9 @@ public:
 
 public Q_SLOTS:
   TransactionWidget*
-  addTransaction(QString const& name);
+  addTransaction(Transaction const& t);
+
+  void setFocus();
 
 private:
   TransactionList* _list;

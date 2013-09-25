@@ -11,7 +11,6 @@ public:
   UserWidget(QString const& user, QWidget* parent);
 
 public:
-  void mousePressEvent(QMouseEvent* e) override;
   virtual void trigger();
 
 private:
