@@ -87,7 +87,7 @@ TransactionWidget::minimumSizeHint() const
 void
 TransactionWidget::trigger()
 {
-  std::cout << "trigger transaction" << std::endl;
-  auto win = new TransactionWindow(_transaction, this);
-  win->show();
+  auto pop = new QWidget(parentWidget());
+  parentWidget()->hide();
+  pop->show();
 }
