@@ -4,9 +4,15 @@
 
 CONFIG += debug
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . ../infinit/ ../infinit/_build/linux64/
 TEMPLATE = app
 TARGET =
+
+LIBS += -L../infinit/_build/linux64/lib/
+LIBS += -lgap -lreactor -lplasma -letoile -lnucleus -lelle
+LIBS += -llune -lpapier -lstation -lfrete -lmetrics -lcrash
+LIBS += -lprotocol -lcurly -lcurly_asio -lcurly_sched -lcryptography
+LIBS += -lboost_signals -lboost_thread -lboost_filesystem
 
 # Input
 SOURCES +=                                      \

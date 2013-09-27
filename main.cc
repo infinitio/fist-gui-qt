@@ -21,9 +21,18 @@
 #include "TransactionWidget.hh"
 #include "utils.hh"
 
+#include <surface/gap/gap.h>
+
 int
 main(int argc, char** argv)
 {
+  gap_State* state = gap_new();
+  std::cerr << state << std::endl;
+
+  gap_Status status = gap_login(state, "dimrok@infinit.io", "bitebite");
+  std::cerr << status << std::endl;
+
+#if 0
   QApplication app(argc, argv);
 
   if (QFontDatabase::addApplicationFont(":/fonts/LucidaGrande.ttc") < 0)
@@ -48,4 +57,5 @@ main(int argc, char** argv)
              SIGNAL(onProgressChanged(float)),
              SLOT(setProgress(float)));
   return app.exec();
+#endif
 }
