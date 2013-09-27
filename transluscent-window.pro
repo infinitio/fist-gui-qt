@@ -30,7 +30,6 @@ SOURCES +=                                      \
     TransactionList.cc                          \
     TransactionPanel.cc                         \
     TransactionWidget.cc                        \
-    TransactionWindow.cc                        \
     UserWidget.cc                               \
     main.cc                                     \
 
@@ -51,7 +50,6 @@ HEADERS +=                                      \
     TransactionList.hh                          \
     TransactionPanel.hh                         \
     TransactionWidget.hh                        \
-    TransactionWindow.hh                        \
     UserWidget.hh                               \
 
 RESOURCES += resources/resources.qrc

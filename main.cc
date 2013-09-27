@@ -26,13 +26,17 @@
 int
 main(int argc, char** argv)
 {
+  const char* email = "dimrok@infinit.io";
+  const char* pw = "bitebite";
+
   gap_State* state = gap_new();
-  std::cerr << state << std::endl;
 
-  gap_Status status = gap_login(state, "dimrok@infinit.io", "bitebite");
-  std::cerr << status << std::endl;
+  char* hash = gap_hash_password(state, email, pw);
+  gap_Status status = gap_login(state, email, hash);
+  gap_hash_free(hash);
 
-#if 0
+  gap_free(state);
+
   QApplication app(argc, argv);
 
   if (QFontDatabase::addApplicationFont(":/fonts/LucidaGrande.ttc") < 0)
@@ -57,5 +61,4 @@ main(int argc, char** argv)
              SIGNAL(onProgressChanged(float)),
              SLOT(setProgress(float)));
   return app.exec();
-#endif
 }

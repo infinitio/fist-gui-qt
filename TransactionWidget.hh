@@ -6,7 +6,6 @@
 
 # include "fwd.hh"
 # include "ListItem.hh"
-# include "TransactionWindow.hh"
 # include "Models.hh"
 
 class TransactionWidget:
