@@ -4,14 +4,16 @@
 #include "AvatarWidget.hh"
 #include "TransactionWidget.hh"
 
-TransactionWidget::TransactionWidget(Transaction const& t):
-  _transaction(t),
+TransactionWidget::TransactionWidget(uint32_t tid):
+  _tid(tid),
   _avatar(new AvatarWidget),
   _layout(nullptr)
 {
   static int const padding = 5;
 
-  this->_avatar->setPicture(t.user.avatar);
+  // TODO: retrieve avatar from gap
+  auto tmp_avatar = QPixmap(QString("resources/avatar2.png"));
+  this->_avatar->setPicture(tmp_avatar);
 
   auto layout = new QHBoxLayout(this);
   this->_layout = layout;
@@ -22,7 +24,7 @@ TransactionWidget::TransactionWidget(Transaction const& t):
     texts->setContentsMargins(5, 12, 5, 12);
     layout->addLayout(texts);
     {
-      auto username = new QLabel(t.user.name);
+      auto username = new QLabel(QString("tmp_username_hehe"));
       QFont font;
       font.setBold(true);
       username->setFont(font);
@@ -30,7 +32,7 @@ TransactionWidget::TransactionWidget(Transaction const& t):
       texts->addWidget(username);
     }
     {
-      auto filename = new QLabel(t.filename);
+      auto filename = new QLabel(QString("tmp_filename_hehe"));
       QFont font;
       filename->setFont(font);
       QPalette palette;

@@ -2,7 +2,6 @@
 # define DEBUGWINDOW_HH
 
 # include <QMainWindow>
-# include "Models.hh"
 
 class DebugWindow:
   public QMainWindow
@@ -14,7 +13,7 @@ public:
   DebugWindow();
 
 Q_SIGNALS:
-  void addTransaction(Transaction const& t);
+  void addTransaction(uint32_t tid);
   void onProgressChanged(float progress);
 
 private Q_SLOTS:

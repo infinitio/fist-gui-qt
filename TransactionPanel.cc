@@ -38,7 +38,7 @@ TransactionPanel::setFocus()
 }
 
 TransactionWidget*
-TransactionPanel::addTransaction(Transaction const& t)
+TransactionPanel::addTransaction(uint32_t tid)
 {
-  return this->_list->addTransaction(t);
+  return this->_list->addTransaction(tid);
 }

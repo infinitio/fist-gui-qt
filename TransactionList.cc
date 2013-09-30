@@ -14,9 +14,9 @@ TransactionList::TransactionList():
 }
 
 TransactionWidget*
-TransactionList::addTransaction(Transaction const& t)
+TransactionList::addTransaction(uint32_t tid)
 {
-  auto widget = new TransactionWidget(t);
+  auto widget = new TransactionWidget(tid);
   this->_list->addWidget(widget);
   return widget;
 }

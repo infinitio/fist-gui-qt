@@ -21,7 +21,6 @@ SOURCES +=                                      \
     InfinitDock.cc                              \
     ListItem.cc                                 \
     ListWidget.cc                               \
-    Models.cc                                   \
     RoundShadowWidget.cc                        \
     SearchField.cc                              \
     SendPanel.cc                                \
@@ -41,7 +40,6 @@ HEADERS +=                                      \
     InfinitDock.hh                              \
     ListItem.cc                                 \
     ListWidget.hh                               \
-    Models.hh                                   \
     RoundShadowWidget.hh                        \
     SearchField.hh                              \
     SendPanel.hh                                \

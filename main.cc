@@ -45,20 +45,19 @@ main(int argc, char** argv)
   InfinitDock dock;
   dock.show();
 
+  auto& transaction_panel = dock.transactionPanel();
+  auto t = transaction_panel.addTransaction(7);
+
+#if 0
   auto debug = new DebugWindow;
   debug->show();
-
-  auto& transaction_panel = dock.transactionPanel();
   transaction_panel.connect(debug,
                             SIGNAL(addTransaction(Transaction const&)),
                             SLOT(addTransaction(Transaction const&)));
-  // list->addTransaction("resources/avatar1.png");
-  User* u = new User(QString("MyCure"), QString("resources/avatar3.png"));
-  Transaction* trans = new Transaction(QString("firstfile.txt"), *u);
-  auto t = transaction_panel.addTransaction(*trans);
-  // list->addTransaction("resources/avatar3.png");
   t->connect(debug,
              SIGNAL(onProgressChanged(float)),
              SLOT(setProgress(float)));
+#endif
+
   return app.exec();
 }

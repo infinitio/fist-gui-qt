@@ -6,13 +6,12 @@
 
 # include "fwd.hh"
 # include "ListItem.hh"
-# include "Models.hh"
 
 class TransactionWidget:
   public ListItem
 {
 public:
-  TransactionWidget(Transaction const& t);
+  TransactionWidget(uint32_t tid);
   Q_OBJECT;
 
 /*-----------.
@@ -53,7 +52,7 @@ public:
   trigger();
 
 private:
-  Transaction const& _transaction;
+  uint32_t _tid;
   AvatarWidget* _avatar;
   QLayout* _layout;
 };

@@ -25,9 +25,7 @@ DebugWindow::DebugWindow()
 void
 DebugWindow::_add_transaction()
 {
-  User* u = new User(QString("mefyl"), "resources/avatar2.png");
-  Transaction* t = new Transaction(QString("kikoo.jpg"), *u);
-  Q_EMIT addTransaction(*t);
+  Q_EMIT addTransaction(0);
 }
 
 void

@@ -11,7 +11,7 @@ public:
 
 public Q_SLOTS:
   TransactionWidget*
-  addTransaction(Transaction const& t);
+  addTransaction(uint32_t tid);
 
   void setFocus();
 

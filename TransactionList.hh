@@ -3,7 +3,6 @@
 
 # include <QWidget>
 # include <QKeyEvent>
-# include "Models.hh"
 
 # include "fwd.hh"
 
@@ -15,7 +14,7 @@ class TransactionList:
 
   public Q_SLOTS:
     TransactionWidget*
-    addTransaction(Transaction const& t);
+    addTransaction(uint32_t tid);
 
     void setFocus();
     void keyPressEvent(QKeyEvent* event);
