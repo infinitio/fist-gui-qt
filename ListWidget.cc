@@ -13,19 +13,8 @@ static int const separator = 1;
 `-------------*/
 
 ListWidget::ListWidget(QWidget* parent):
-  Super(parent),
-  _height_hint(0),
-  _width_hint(0),
-  _offset(0),
-  _scroll(new SmoothScrollBar(this)),
-  _wheel_event(false),
-  _keyboard_index(0),
-  _mate(parent)
-{
-  _scroll->hide();
-  connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
-  this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-}
+  ListWidget(parent, parent)
+{}
 
 ListWidget::ListWidget(QWidget* parent, QWidget* mate):
   Super(parent),
