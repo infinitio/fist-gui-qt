@@ -106,7 +106,6 @@ SmoothLayout::_child_widgets() const
 void
 SmoothLayout::_layout()
 {
-  std::cerr << "layout" << std::endl;
   auto widgets = this->_child_widgets();
 
   int height = 0;
