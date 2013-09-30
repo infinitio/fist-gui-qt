@@ -26,7 +26,7 @@ ListWidget::ListWidget(QWidget* parent, QWidget* mate):
   _keyboard_index(0),
   _mate(mate)
 {
-  _scroll->hide();
+  this->_scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
   this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 }
@@ -80,16 +80,14 @@ void
 ListWidget::_layout()
 {
   int height = 0;
-  int y = 0;
   this->_width_hint = 0;
   for (auto widget: this->_widgets)
     this->_width_hint = std::max(this->_width_hint, widget->sizeHint().width());
   for (auto widget: this->_widgets)
   {
     int widget_height = widget->sizeHint().height();
-    QRect geometry(0, y - this->_offset, this->width(), widget_height);
+    QRect geometry(0, height - this->_offset, this->width(), widget_height);
     widget->setGeometry(geometry);
-    y += widget_height + separator;
     height += widget_height + separator;
   }
   this->_width_hint += 5 + this->_scroll->sizeHint().width();
@@ -99,12 +97,12 @@ ListWidget::_layout()
   // animation->setDuration(200);
   // animation->setEndValue(height);
   // animation->start();
-  if (y > height)
+  if (this->height() < height)
   {
     this->_scroll->show();
     this->_scroll->setMinimum(0);
-    this->_scroll->setMaximum(y);
-    this->_scroll->setPageSize(height);
+    this->_scroll->setMaximum(height);
+    this->_scroll->setPageSize(this->height());
     this->_scroll->setStep(height / 5);
   }
   else
@@ -188,11 +186,7 @@ ListWidget::resizeEvent(QResizeEvent*)
     _scroll->setGeometry(this->width() - size.width(), 0,
                          size.width(), this->height());
   }
-  int height = 0;
-  for (auto widget: this->_widgets)
-  {
-    height += widget->sizeHint().height();
-  }
+  this->_layout();
 }
 
 /*---------.
