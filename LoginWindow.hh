@@ -1,6 +1,7 @@
 #ifndef LOGINWINDOW_HH
 # define LOGINWINDOW_HH
 
+# include <QLabel>
 # include <QKeyEvent>
 # include <QPushButton>
 # include <QVBoxLayout>
@@ -9,6 +10,7 @@
 
 # include <surface/gap/gap.h>
 # include "InfinitDock.hh"
+#include <iostream>
 
 class LoginWindow:
   public QMainWindow
@@ -26,6 +28,8 @@ private:
   QLineEdit* _login;
   QLineEdit* _pw;
   QPushButton* _button;
+  QLabel* _msg;
+  QVBoxLayout* _layout;
 
   gap_State* _state;
 };

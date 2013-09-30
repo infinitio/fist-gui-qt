@@ -2,20 +2,21 @@
 
 LoginWindow::LoginWindow(gap_State* state):
   QMainWindow(),
+  _msg(nullptr),
   _state(state)
 {
   this->resize(180, 130);
 
-  auto layout = new QVBoxLayout;
-  layout->addWidget(this->_login = new QLineEdit(this));
-  layout->addWidget(this->_pw = new QLineEdit(this));
-  layout->addWidget(this->_button = new QPushButton("Login", this));
+  this->_layout = new QVBoxLayout;
+  this->_layout->addWidget(this->_login = new QLineEdit(this));
+  this->_layout->addWidget(this->_pw = new QLineEdit(this));
+  this->_layout->addWidget(this->_button = new QPushButton("Login", this));
 
   this->_login->setPlaceholderText("E-mail...");
   this->_pw->setPlaceholderText("Password...");
 
   auto widget = new QWidget;
-  widget->setLayout(layout);
+  widget->setLayout(this->_layout);
   setCentralWidget(widget);
 
   connect(this->_button, SIGNAL(clicked()), this, SLOT(login()));
@@ -43,10 +44,15 @@ LoginWindow::login()
     delete[] pw;
   }
 
-  auto dock = new InfinitDock;
-  dock->show();
+  if (status == gap_ok)
+  {
+    auto dock = new InfinitDock;
+    dock->show();
 
-  delete this;
+    delete this;
+  }
+  else if (_msg == nullptr)
+    this->_layout->addWidget(_msg = new QLabel("Wrong username/password."));
 }
 
 void
