@@ -46,7 +46,7 @@ LoginWindow::login()
 
   if (status == gap_ok)
   {
-    auto dock = new InfinitDock;
+    auto dock = new InfinitDock(_state);
     dock->show();
 
     delete this;

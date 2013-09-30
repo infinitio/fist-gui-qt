@@ -4,6 +4,8 @@
 # include <QMainWindow>
 # include <QWidget>
 
+# include <surface/gap/gap.h>
+
 # include "fwd.hh"
 
 class InfinitDock:
@@ -19,7 +21,7 @@ public:
 | Construction |
 `-------------*/
 public:
-  InfinitDock();
+  InfinitDock(gap_State* state);
 
 /*------.
 | Panel |

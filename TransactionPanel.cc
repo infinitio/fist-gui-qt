@@ -21,7 +21,7 @@ public:
   }
 };
 
-TransactionPanel::TransactionPanel():
+TransactionPanel::TransactionPanel(gap_State* state):
   _list(nullptr)
 {
   auto layout = new QVBoxLayout(this);
@@ -29,6 +29,11 @@ TransactionPanel::TransactionPanel():
   this->_list = new TransactionList;
   layout->addWidget(this->_list);
   layout->addWidget(new TransactionFooter);
+
+  auto trs = gap_transactions(state);
+  for (uint32_t i = 0; trs[i] != 0; i += 1)
+    addTransaction(state, trs[i]);
+  gap_transactions_free(trs);
 }
 
 void

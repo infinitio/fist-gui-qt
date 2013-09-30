@@ -11,7 +11,7 @@ class TransactionPanel:
   public QWidget
 {
 public:
-  TransactionPanel();
+  TransactionPanel(gap_State* state);
 
 public Q_SLOTS:
   TransactionWidget*

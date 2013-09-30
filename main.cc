@@ -25,6 +25,24 @@
 
 #include <surface/gap/gap.h>
 
+static
+void
+center_window(QWidget* widget)
+{
+  int width = widget->frameGeometry().width();
+  int height = widget->frameGeometry().height();
+
+  QDesktopWidget wid;
+
+  int screenWidth = wid.screen()->width();
+  int screenHeight = wid.screen()->height();
+
+  widget->setGeometry((screenWidth / 2) - (width / 2),
+                      (screenHeight / 2) - (height / 2),
+                      width,
+                      height);
+}
+
 int
 main(int argc, char** argv)
 {
@@ -38,20 +56,7 @@ main(int argc, char** argv)
 
   // Open login window, which will trigger the InfinitDock later on.
   auto login = new LoginWindow(state);
-
-  int width = login->frameGeometry().width();
-  int height = login->frameGeometry().height();
-
-  QDesktopWidget wid;
-
-  int screenWidth = wid.screen()->width();
-  int screenHeight = wid.screen()->height();
-
-  login->setGeometry((screenWidth / 2) - (width / 2),
-                     (screenHeight / 2) - (height / 2),
-                     width,
-                     height);
-
+  center_window(login);
   login->show();
 
   return app.exec();

@@ -16,8 +16,8 @@
 
 static int const dock_size = 60;
 
-InfinitDock::InfinitDock():
-  _transaction_panel(new TransactionPanel),
+InfinitDock::InfinitDock(gap_State* state):
+  _transaction_panel(new TransactionPanel(state)),
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel),
   _logo(":/images/logo.png"),
