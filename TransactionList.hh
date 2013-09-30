@@ -3,6 +3,7 @@
 
 # include <QWidget>
 # include <QKeyEvent>
+# include <surface/gap/gap.h>
 
 # include "fwd.hh"
 
@@ -14,7 +15,7 @@ class TransactionList:
 
   public Q_SLOTS:
     TransactionWidget*
-    addTransaction(uint32_t tid);
+    addTransaction(gap_State* state, uint32_t tid);
 
     void setFocus();
     void keyPressEvent(QKeyEvent* event);

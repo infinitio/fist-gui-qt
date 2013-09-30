@@ -3,15 +3,17 @@
 
 # include <iostream>
 # include <QWidget>
+# include <surface/gap/gap.h>
 
 # include "fwd.hh"
 # include "ListItem.hh"
+# include "TransactionWindow.hh"
 
 class TransactionWidget:
   public ListItem
 {
 public:
-  TransactionWidget(uint32_t tid);
+  TransactionWidget(gap_State* state, uint32_t tid);
   Q_OBJECT;
 
 /*-----------.
@@ -53,6 +55,7 @@ public:
 
 private:
   uint32_t _tid;
+  gap_State* _state;
   AvatarWidget* _avatar;
   QLayout* _layout;
 };

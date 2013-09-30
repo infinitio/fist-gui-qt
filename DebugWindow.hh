@@ -2,6 +2,7 @@
 # define DEBUGWINDOW_HH
 
 # include <QMainWindow>
+# include <surface/gap/gap.h>
 
 class DebugWindow:
   public QMainWindow
@@ -13,7 +14,7 @@ public:
   DebugWindow();
 
 Q_SIGNALS:
-  void addTransaction(uint32_t tid);
+  void addTransaction(gap_State* state, uint32_t tid);
   void onProgressChanged(float progress);
 
 private Q_SLOTS:

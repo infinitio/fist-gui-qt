@@ -25,7 +25,7 @@ DebugWindow::DebugWindow()
 void
 DebugWindow::_add_transaction()
 {
-  Q_EMIT addTransaction(0);
+  Q_EMIT addTransaction(nullptr, 0);
 }
 
 void

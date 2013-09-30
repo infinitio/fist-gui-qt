@@ -3,13 +3,26 @@
 
 #include "AvatarWidget.hh"
 #include "TransactionWidget.hh"
+#include "TransactionWindow.hh"
 
-TransactionWidget::TransactionWidget(uint32_t tid):
+TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   _tid(tid),
+  _state(state),
   _avatar(new AvatarWidget),
   _layout(nullptr)
 {
   static int const padding = 5;
+
+  // Retrieve information from gap layer.
+  // TODO: Error checking.
+  char** file_names = gap_transaction_files(state, tid);
+  const char* first_file_name = *file_names;
+
+  const char* corresp_name;
+  if (gap_self_id(state) == gap_transaction_recipient_id(state, tid))
+    corresp_name = gap_transaction_sender_fullname(state, tid);
+  else
+    corresp_name = gap_transaction_recipient_fullname(state, tid);
 
   // TODO: retrieve avatar from gap
   auto tmp_avatar = QPixmap(QString("resources/avatar2.png"));
@@ -24,7 +37,7 @@ TransactionWidget::TransactionWidget(uint32_t tid):
     texts->setContentsMargins(5, 12, 5, 12);
     layout->addLayout(texts);
     {
-      auto username = new QLabel(QString("tmp_username_hehe"));
+      auto username = new QLabel(QString(corresp_name));
       QFont font;
       font.setBold(true);
       username->setFont(font);
@@ -32,7 +45,7 @@ TransactionWidget::TransactionWidget(uint32_t tid):
       texts->addWidget(username);
     }
     {
-      auto filename = new QLabel(QString("tmp_filename_hehe"));
+      auto filename = new QLabel(QString(first_file_name));
       QFont font;
       filename->setFont(font);
       QPalette palette;
@@ -89,7 +102,9 @@ TransactionWidget::minimumSizeHint() const
 void
 TransactionWidget::trigger()
 {
-  auto pop = new QWidget(parentWidget());
+  auto pop = new TransactionWindow(parentWidget());
   parentWidget()->hide();
+
   pop->show();
+  pop->setFocus();
 }

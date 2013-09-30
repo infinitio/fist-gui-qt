@@ -3,7 +3,6 @@
 
 # include <QWidget>
 # include <QLineEdit>
-# include <QMainWindow>
 
 # include "SmoothScrollBar.hh"
 # include "ListItem.hh"

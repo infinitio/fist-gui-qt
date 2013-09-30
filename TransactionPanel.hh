@@ -1,6 +1,10 @@
 #ifndef TRANSACTIONPANEL_HH
 # define TRANSACTIONPANEL_HH
 
+# include <QScrollArea>
+# include <QFrame>
+# include <surface/gap/gap.h>
+
 # include "TransactionList.hh"
 
 class TransactionPanel:
@@ -11,7 +15,7 @@ public:
 
 public Q_SLOTS:
   TransactionWidget*
-  addTransaction(uint32_t tid);
+  addTransaction(gap_State* state, uint32_t tid);
 
   void setFocus();
 
