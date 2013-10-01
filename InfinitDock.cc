@@ -121,9 +121,8 @@ InfinitDock::_search(QString const& search)
 
   if (search.size() != 0)
   {
-    char const* text = strdup(search.toStdString().c_str());
-    uint32_t* uids = gap_search_users(_state, text);
-    delete[] text;
+    std::string text(strdup(search.toStdString());
+    uint32_t* uids = gap_search_users(_state, text.c_str());
 
     for (uint32_t i = 0; uids[i] != 0; i += 1)
       res.append(QString(gap_user_fullname(_state, uids[i])));
@@ -131,20 +130,6 @@ InfinitDock::_search(QString const& search)
     gap_search_users_free(uids);
   }
 
-#if 0
-  if (search == "")
-  {
-    this->_send_panel->clearUsers();
-    return;
-  }
-  QRegExp re(search, Qt::CaseInsensitive);
-  QStringList res;
-  for (auto const& user: users)
-  {
-    if (re.indexIn(user) != -1)
-      res.append(user);
-  }
-#endif
   this->_send_panel->setUsers(res);
 }
 
