@@ -31,8 +31,23 @@ TransactionPanel::TransactionPanel(gap_State* state):
   layout->addWidget(new TransactionFooter);
 
   auto trs = gap_transactions(state);
+
   for (uint32_t i = 0; trs[i] != 0; i += 1)
-    addTransaction(state, trs[i]);
+  {
+    uint32_t uid;
+
+    if (gap_self_id(state) == gap_transaction_recipient_id(state, trs[i]))
+      uid = gap_transaction_sender_id(state, trs[i]);
+    else
+      uid = gap_transaction_recipient_id(state, trs[i]);
+
+    if (std::find(_uids.begin(), _uids.end(), uid) == _uids.end())
+    {
+      _uids.push_back(uid);
+      addTransaction(state, trs[i]);
+    }
+  }
+
   gap_transactions_free(trs);
 }
 

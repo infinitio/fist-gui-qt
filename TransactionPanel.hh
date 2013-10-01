@@ -5,6 +5,9 @@
 # include <QFrame>
 # include <surface/gap/gap.h>
 
+# include <vector>
+# include <algorithm>
+
 # include "TransactionList.hh"
 
 class TransactionPanel:
@@ -21,6 +24,7 @@ public Q_SLOTS:
 
 private:
   TransactionList* _list;
+  std::vector<uint32_t> _uids;
   Q_OBJECT;
 };
 
