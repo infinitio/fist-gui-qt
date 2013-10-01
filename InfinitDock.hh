@@ -2,6 +2,7 @@
 # define INFINITDOCK_HH
 
 # include <QMainWindow>
+# include <QTimer>
 # include <QWidget>
 
 # include <surface/gap/gap.h>
@@ -22,6 +23,10 @@ public:
 `-------------*/
 public:
   InfinitDock(gap_State* state);
+  static void connection_status_cb(gap_UserStatus const status);
+
+public slots:
+  void update();
 
 /*------.
 | Panel |
@@ -71,6 +76,7 @@ protected:
 private:
   QPixmap _logo;
   QPixmap _background;
+  gap_State* _state;
   Q_OBJECT;
 };
 

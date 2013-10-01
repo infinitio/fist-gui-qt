@@ -49,6 +49,9 @@ LoginWindow::login()
     auto dock = new InfinitDock(_state);
     dock->show();
 
+    // Register gap callbacks.
+    gap_connection_callback(_state, InfinitDock::connection_status_cb);
+
     delete this;
   }
   else if (_msg == nullptr)

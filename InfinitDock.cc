@@ -21,7 +21,8 @@ InfinitDock::InfinitDock(gap_State* state):
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel),
   _logo(":/images/logo.png"),
-  _background(dock_size, dock_size)
+  _background(dock_size, dock_size),
+  _state(state)
 {
   // Cache background
   {
@@ -61,6 +62,10 @@ InfinitDock::InfinitDock(gap_State* state):
           SLOT(_search(QString const&)));
   this->setAcceptDrops(true);
   this->_transaction_panel->setFocus();
+
+  QTimer *timer = new QTimer;
+  connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+  timer->start(1000);
 }
 
 /*------.
@@ -111,18 +116,22 @@ InfinitDock::_position_panel()
 void
 InfinitDock::_search(QString const& search)
 {
-  QStringList users;
-  users.append("Chris");
-  users.append("Chris");
-  users.append("Dimrok");
-  users.append("Dimrok");
-  users.append("MyCure");
-  users.append("MyCure");
-  users.append("Raph");
-  users.append("Raph");
-  users.append("mefyl");
-  users.append("mefyl");
 
+  QStringList res;
+
+  if (search.size() != 0)
+  {
+    char const* text = strdup(search.toStdString().c_str());
+    uint32_t* uids = gap_search_users(_state, text);
+    delete[] text;
+
+    for (uint32_t i = 0; uids[i] != 0; i += 1)
+      res.append(QString(gap_user_fullname(_state, uids[i])));
+
+    gap_search_users_free(uids);
+  }
+
+#if 0
   if (search == "")
   {
     this->_send_panel->clearUsers();
@@ -135,6 +144,7 @@ InfinitDock::_search(QString const& search)
     if (re.indexIn(user) != -1)
       res.append(user);
   }
+#endif
   this->_send_panel->setUsers(res);
 }
 
@@ -195,4 +205,17 @@ InfinitDock::paintEvent(QPaintEvent*)
   painter.setRenderHints(QPainter::Antialiasing |
                          QPainter::SmoothPixmapTransform);
   painter.drawPixmap(QPoint(0, 0), this->_background);
+}
+
+void
+InfinitDock::connection_status_cb(gap_UserStatus const status)
+{
+  if (status == gap_user_status_offline)
+    std::cout << "we are now offline." << std::endl;
+}
+
+void
+InfinitDock::update()
+{
+  std::cout << gap_poll(_state) << std::endl;
 }
