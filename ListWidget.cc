@@ -207,3 +207,14 @@ ListWidget::paintEvent(QPaintEvent*)
     height += separator;
   }
 }
+
+
+ListItem*
+ListWidget::get(const uint32_t id)
+{
+  for (auto widget : _widgets)
+    if (widget->compare_id(id))
+      return widget;
+
+  return nullptr;
+}

@@ -51,6 +51,8 @@ public:
     void
     set_mate(QWidget* mate);
 
+    ListItem* get(const uint32_t id);
+
   public:
     Q_OBJECT;
     Q_PROPERTY(int offset READ offset WRITE setOffset);

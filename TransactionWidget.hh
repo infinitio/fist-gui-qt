@@ -54,6 +54,13 @@ public:
   void
   trigger();
 
+  virtual
+  bool
+  compare_id(const uint32_t tid);
+
+  void
+  update();
+
 public slots:
   void accept();
 

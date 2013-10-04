@@ -38,3 +38,11 @@ TransactionList::event(QEvent* event)
 {
   return QWidget::event(event);
 }
+
+void
+TransactionList::updateTransaction(gap_State* state, uint32_t tid)
+{
+  TransactionWidget* widget;
+  if ((widget = dynamic_cast<TransactionWidget*>(this->_list->get(tid))))
+    widget->update();
+}

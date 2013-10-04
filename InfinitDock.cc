@@ -226,5 +226,6 @@ InfinitDock::connection_status_cb(gap_UserStatus const status)
 void
 InfinitDock::update()
 {
-  std::cout << gap_poll(_state) << std::endl;
+  if (not gap_poll(_state))
+    std::cout << "Error while polling" << std::endl;
 }

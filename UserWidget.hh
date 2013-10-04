@@ -11,9 +11,11 @@ public:
   UserWidget(QString const& user, QWidget* parent);
 
 public:
+  virtual bool compare_id(const uint32_t uid);
   virtual void trigger();
 
 private:
+  uint32_t _uid;
   QString const _user;
 };
 

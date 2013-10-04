@@ -117,6 +117,18 @@ TransactionWidget::trigger()
 }
 
 
+bool
+TransactionWidget::compare_id(const uint32_t tid)
+{
+  return tid == _tid;
+}
+
+void
+TransactionWidget::update()
+{
+  std::cout << "UPDATING TRANSACTION WIDGET" << std::endl;
+}
+
 void
 TransactionWidget::accept()
 {

@@ -17,6 +17,9 @@ class TransactionList:
     TransactionWidget*
     addTransaction(gap_State* state, uint32_t tid);
 
+    void
+    updateTransaction(gap_State* state, uint32_t tid);
+
     void setFocus();
     void keyPressEvent(QKeyEvent* event);
 

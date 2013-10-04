@@ -11,6 +11,7 @@ public:
   void mousePressEvent(QMouseEvent* e) override;
 
 public:
+  virtual bool compare_id(const uint32_t id) = 0;
   virtual void trigger() = 0;
 };
 
