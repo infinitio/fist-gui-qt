@@ -27,6 +27,7 @@ public:
 
 public slots:
   void update();
+  void switch_panel();
 
 /*------.
 | Panel |

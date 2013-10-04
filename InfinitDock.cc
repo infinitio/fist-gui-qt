@@ -70,6 +70,8 @@ InfinitDock::InfinitDock(gap_State* state):
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
   timer->start(1000);
+
+  connect(_send_panel, SIGNAL(switch_signal()), this, SLOT(switch_panel()));
 }
 
 /*------.
@@ -195,6 +197,23 @@ InfinitDock::paintEvent(QPaintEvent*)
   painter.setRenderHints(QPainter::Antialiasing |
                          QPainter::SmoothPixmapTransform);
   painter.drawPixmap(QPoint(0, 0), this->_background);
+}
+
+void
+InfinitDock::switch_panel()
+{
+  if (this->_panel->centralWidget() == this->_send_panel)
+  {
+    this->_panel->centralWidget()->setParent(0);
+    this->_panel->setCentralWidget(this->_transaction_panel);
+  }
+  else
+  {
+    this->_panel->centralWidget()->setParent(0);
+    this->_panel->setCentralWidget(this->_send_panel);
+  }
+
+  this->showPanel();
 }
 
 void

@@ -47,6 +47,7 @@ public:
   clearUsers();
 Q_SIGNALS:
   void onSearchChanged(QString const& search);
+  void switch_signal();
 private:
   QLineEdit* _search;
   QPushButton* _send;

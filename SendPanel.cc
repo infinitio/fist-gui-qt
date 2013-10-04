@@ -145,6 +145,8 @@ SendPanel::send()
   gap_send_files(_state, uids[0], filenames, "hehe this is zshrc");
 
   gap_search_users_free(uids);
+
+  emit switch_signal();
 }
 
 /*-------.
