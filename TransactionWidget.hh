@@ -69,6 +69,7 @@ private:
   gap_State* _state;
   AvatarWidget* _avatar;
   QLayout* _layout;
+  QPushButton* _accept_button;
 };
 
 #endif

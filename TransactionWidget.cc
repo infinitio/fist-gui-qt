@@ -9,7 +9,8 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   _tid(tid),
   _state(state),
   _avatar(new AvatarWidget),
-  _layout(nullptr)
+  _layout(nullptr),
+  _accept_button(nullptr)
 {
   static int const padding = 5;
 
@@ -59,9 +60,9 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
 
   if (gap_transaction_status(state, tid) == gap_transaction_waiting_for_accept)
   {
-    auto button = new QPushButton(QString("Accept"), this);
-    connect(button, SIGNAL(clicked()), this, SLOT(accept()));
-    button->move(this->_avatar->width() + padding, padding);
+    _accept_button = new QPushButton(QString("Accept"), this);
+    connect(_accept_button, SIGNAL(clicked()), this, SLOT(accept()));
+    _accept_button->move(this->_avatar->width() + padding, padding);
   }
 
   setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -126,7 +127,13 @@ TransactionWidget::compare_id(const uint32_t tid)
 void
 TransactionWidget::update()
 {
-  std::cout << "UPDATING TRANSACTION WIDGET" << std::endl;
+  if (this->_accept_button != nullptr and
+      gap_transaction_status(_state, _tid) !=
+      gap_transaction_waiting_for_accept)
+  {
+    delete this->_accept_button;
+    this->_accept_button = nullptr;
+  }
 }
 
 void
