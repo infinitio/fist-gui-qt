@@ -7,6 +7,7 @@
 
 # include <vector>
 # include <algorithm>
+# include <cassert>
 
 # include "TransactionList.hh"
 
@@ -14,7 +15,9 @@ class TransactionPanel:
   public QWidget
 {
 public:
-  TransactionPanel(gap_State* state);
+  TransactionPanel(gap_State* state, QWidget* parent = nullptr);
+  ~TransactionPanel();
+  static void transaction_cb(uint32_t id, gap_TransactionStatus status);
 
 public Q_SLOTS:
   TransactionWidget*
@@ -24,7 +27,7 @@ public Q_SLOTS:
 
 private:
   TransactionList* _list;
-  std::vector<uint32_t> _uids;
+  gap_State* _state;
   Q_OBJECT;
 };
 

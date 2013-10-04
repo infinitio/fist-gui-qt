@@ -33,10 +33,12 @@ public:
 | Construction |
 `-------------*/
 
-SendPanel::SendPanel():
+SendPanel::SendPanel(gap_State* state):
   Super(),
   _search(nullptr),
-  _users(nullptr)
+  _send(new QPushButton("Send", this)),
+  _users(nullptr),
+  _state(state)
 {
   this->_users = new ListWidget(this);
   auto search = new SearchField(this, &this->_users);
@@ -44,6 +46,8 @@ SendPanel::SendPanel():
   this->_search = search;
   search->setIcon(QPixmap(":/icons/magnifier.png"));
   new SendFooter(this);
+
+  connect(this->_send, SIGNAL(clicked()), this, SLOT(send()));
 
   this->connect(this->_search, SIGNAL(textChanged(QString const&)),
                 SIGNAL(onSearchChanged(QString const&)));
@@ -128,6 +132,19 @@ void
 SendPanel::clearUsers()
 {
   this->setUsers(QStringList());
+}
+
+void
+SendPanel::send()
+{
+  std::string text(this->_search->text().toStdString());
+  uint32_t* uids = gap_search_users(_state, text.c_str());
+
+  char const* const filenames[2] = { "/home/manny/.vimrc", };
+
+  gap_send_files(_state, uids[0], filenames, "hehe this is zshrc");
+
+  gap_search_users_free(uids);
 }
 
 /*-------.

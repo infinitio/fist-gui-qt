@@ -19,11 +19,15 @@ static int const dock_size = 60;
 InfinitDock::InfinitDock(gap_State* state):
   _transaction_panel(new TransactionPanel(state)),
   _panel(new RoundShadowWidget),
-  _send_panel(new SendPanel),
+  _send_panel(new SendPanel(state)),
   _logo(":/images/logo.png"),
   _background(dock_size, dock_size),
   _state(state)
 {
+
+  // Register gap callback.
+  gap_connection_callback(_state, InfinitDock::connection_status_cb);
+
   // Cache background
   {
   this->_background.fill(Qt::transparent);
@@ -121,7 +125,7 @@ InfinitDock::_search(QString const& search)
 
   if (search.size() != 0)
   {
-    std::string text(strdup(search.toStdString());
+    std::string text(search.toStdString());
     uint32_t* uids = gap_search_users(_state, text.c_str());
 
     for (uint32_t i = 0; uids[i] != 0; i += 1)
@@ -159,6 +163,7 @@ InfinitDock::dropEvent(QDropEvent *event)
         event->acceptProposedAction();
         this->_send_panel->addFile(url.toLocalFile());
       }
+  this->_panel->centralWidget()->setParent(0);
   this->_panel->setCentralWidget(this->_send_panel);
   this->showPanel();
 }
@@ -196,7 +201,7 @@ void
 InfinitDock::connection_status_cb(gap_UserStatus const status)
 {
   if (status == gap_user_status_offline)
-    std::cout << "we are now offline." << std::endl;
+    std::cout << "callback: offline mode" << std::endl;
 }
 
 void

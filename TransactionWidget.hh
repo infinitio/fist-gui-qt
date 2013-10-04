@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <QWidget>
+# include <QPushButton>
 # include <surface/gap/gap.h>
 
 # include "fwd.hh"
@@ -52,6 +53,9 @@ public:
   virtual
   void
   trigger();
+
+public slots:
+  void accept();
 
 private:
   uint32_t _tid;

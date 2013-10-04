@@ -57,6 +57,13 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
     }
   }
 
+  if (gap_transaction_status(state, tid) == gap_transaction_waiting_for_accept)
+  {
+    auto button = new QPushButton(QString("Accept"), this);
+    connect(button, SIGNAL(clicked()), this, SLOT(accept()));
+    button->move(this->_avatar->width() + padding, padding);
+  }
+
   setSizePolicy(QSizePolicy::MinimumExpanding,
                 QSizePolicy::Fixed);
   adjustSize();
@@ -107,4 +114,12 @@ TransactionWidget::trigger()
 
   pop->show();
   pop->setFocus();
+}
+
+
+void
+TransactionWidget::accept()
+{
+  gap_accept_transaction(this->_state, this->_tid);
+  std::cout << "accepted " << this << std::endl;
 }

@@ -5,6 +5,8 @@
 #include "TransactionPanel.hh"
 #include "TransactionWidget.hh"
 
+static TransactionPanel* g_panel = nullptr;
+
 class TransactionFooter:
   public Footer
 {
@@ -21,8 +23,10 @@ public:
   }
 };
 
-TransactionPanel::TransactionPanel(gap_State* state):
-  _list(nullptr)
+TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
+  QWidget(parent),
+  _list(nullptr),
+  _state(state)
 {
   auto layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -30,23 +34,14 @@ TransactionPanel::TransactionPanel(gap_State* state):
   layout->addWidget(this->_list);
   layout->addWidget(new TransactionFooter);
 
+  // Register gap callback.
+  g_panel = this;
+  gap_transaction_callback(state, TransactionPanel::transaction_cb);
+
   auto trs = gap_transactions(state);
 
   for (uint32_t i = 0; trs[i] != 0; i += 1)
-  {
-    uint32_t uid;
-
-    if (gap_self_id(state) == gap_transaction_recipient_id(state, trs[i]))
-      uid = gap_transaction_sender_id(state, trs[i]);
-    else
-      uid = gap_transaction_recipient_id(state, trs[i]);
-
-    if (std::find(_uids.begin(), _uids.end(), uid) == _uids.end())
-    {
-      _uids.push_back(uid);
-      addTransaction(state, trs[i]);
-    }
-  }
+    addTransaction(state, trs[i]);
 
   gap_transactions_free(trs);
 }
@@ -61,4 +56,16 @@ TransactionWidget*
 TransactionPanel::addTransaction(gap_State* state, uint32_t tid)
 {
   return this->_list->addTransaction(state, tid);
+}
+
+void
+TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
+{
+  g_panel->addTransaction(g_panel->_state, id);
+}
+
+
+TransactionPanel::~TransactionPanel()
+{
+  std::cerr << "Error: TransactionPanel destructor called" << std::endl;
 }

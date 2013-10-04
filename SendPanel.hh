@@ -2,7 +2,10 @@
 # define SENDPANEL_HH
 
 # include <QLineEdit>
+# include <QPushButton>
 # include <QWidget>
+
+# include <surface/gap/gap.h>
 
 # include "SmoothLayout.hh"
 # include "UserWidget.hh"
@@ -22,7 +25,7 @@ public:
 | Construction |
 `-------------*/
 public:
-  SendPanel();
+  SendPanel(gap_State* state);
 
 /*------.
 | Files |
@@ -30,6 +33,9 @@ public:
 public:
   void
   addFile(const QString& path);
+
+public slots:
+  void send();
 
 /*------.
 | Users |
@@ -43,7 +49,9 @@ Q_SIGNALS:
   void onSearchChanged(QString const& search);
 private:
   QLineEdit* _search;
+  QPushButton* _send;
   ListWidget* _users;
+  gap_State* _state;
 
 /*-------.
 | Layout |

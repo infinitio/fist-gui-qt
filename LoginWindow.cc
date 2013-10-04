@@ -25,34 +25,25 @@ LoginWindow::LoginWindow(gap_State* state):
 void
 LoginWindow::login()
 {
-  const char* email = "dimrok@infinit.io";
-  const char* pw = "bitebite";
+  std::string email("dimrok@infinit.io");
+  std::string pw("bitebite");
 
   if (this->_login->text().toStdString().size() != 0)
   {
-    email = strdup(this->_login->text().toStdString().c_str());
-    pw = strdup(this->_pw->text().toStdString().c_str());
+    email = std::string(this->_login->text().toStdString());
+    pw = std::string(this->_pw->text().toStdString());
   }
 
-  char* hash = gap_hash_password(_state, email, pw);
-  gap_Status status = gap_login(_state, email, hash);
+  char* hash = gap_hash_password(_state, email.c_str(), pw.c_str());
+  gap_Status status = gap_login(_state, email.c_str(), hash);
   gap_hash_free(hash);
-
-  if (this->_login->text().toStdString().size() != 0)
-  {
-    delete[] email;
-    delete[] pw;
-  }
 
   if (status == gap_ok)
   {
     auto dock = new InfinitDock(_state);
     dock->show();
 
-    // Register gap callbacks.
-    gap_connection_callback(_state, InfinitDock::connection_status_cb);
-
-    delete this;
+    this->deleteLater();
   }
   else if (_msg == nullptr)
     this->_layout->addWidget(_msg = new QLabel("Wrong username/password."));
@@ -62,7 +53,7 @@ void
 LoginWindow::keyPressEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Escape)
-    delete this;
+    this->deleteLater();
   else if (event->key() == Qt::Key_Return)
     login();
 }
