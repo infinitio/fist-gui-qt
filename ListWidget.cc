@@ -38,7 +38,7 @@ ListWidget::ListWidget(QWidget* parent, QWidget* mate):
 void
 ListWidget::addWidget(ListItem* widget)
 {
-  this->_widgets.push_back(widget);
+  this->_widgets.insert(this->_widgets.begin(), widget);
   widget->setParent(this);
   widget->show();
   this->_layout();
