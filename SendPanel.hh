@@ -62,7 +62,7 @@ public:
   QSize
   sizeHint() const override;
 private:
-  QSize _size;
+  std::string _file_path;
 
 private:
   Q_OBJECT;

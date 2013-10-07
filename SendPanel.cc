@@ -59,9 +59,9 @@ SendPanel::SendPanel(gap_State* state):
 `------*/
 
 void
-SendPanel::addFile(QString const&)
+SendPanel::addFile(QString const& path)
 {
-
+  _file_path = std::string(path.toStdString());
 }
 
 /*------.
@@ -140,9 +140,10 @@ SendPanel::send()
   std::string text(this->_search->text().toStdString());
   uint32_t* uids = gap_search_users(_state, text.c_str());
 
-  char const* const filenames[2] = { "/home/manny/.vimrc", };
+  const char* filenames[2] = { 0 };
+  filenames[0] = _file_path.c_str();
 
-  gap_send_files(_state, uids[0], filenames, "hehe this is zshrc");
+  gap_send_files(_state, uids[0], filenames, "Basic comment");
 
   gap_search_users_free(uids);
 

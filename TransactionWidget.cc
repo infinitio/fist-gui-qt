@@ -127,9 +127,10 @@ TransactionWidget::compare_id(const uint32_t tid)
 void
 TransactionWidget::update()
 {
+  gap_TransactionStatus status = gap_transaction_status(_state, _tid);
+
   if (this->_accept_button != nullptr and
-      gap_transaction_status(_state, _tid) !=
-      gap_transaction_waiting_for_accept)
+      status != gap_transaction_waiting_for_accept)
   {
     delete this->_accept_button;
     this->_accept_button = nullptr;

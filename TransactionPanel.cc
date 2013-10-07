@@ -5,6 +5,8 @@
 #include "TransactionPanel.hh"
 #include "TransactionWidget.hh"
 
+#define MAX_TRANSAS 15
+
 static TransactionPanel* g_panel = nullptr;
 
 class TransactionFooter:
@@ -40,7 +42,7 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 
   auto trs = gap_transactions(state);
 
-  for (uint32_t i = 0; trs[i] != 0; i += 1)
+  for (uint32_t i = 0; trs[i] != 0 && i <= MAX_TRANSAS; i += 1)
     addTransaction(state, trs[i]);
 
   gap_transactions_free(trs);
