@@ -48,7 +48,6 @@ main(int argc, char** argv)
 {
   // Connect to gap.
   gap_State* state = gap_new();
-  std::cout << "LOL: " << state << std::endl;
 
   // Open qt application.
   QApplication app(argc, argv);

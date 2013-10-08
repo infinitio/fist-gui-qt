@@ -19,15 +19,32 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   char** file_names = gap_transaction_files(state, tid);
   const char* first_file_name = *file_names;
 
+  uint32_t oid;
   const char* corresp_name;
   if (gap_self_id(state) == gap_transaction_recipient_id(state, tid))
+  {
     corresp_name = gap_transaction_sender_fullname(state, tid);
+    oid = gap_transaction_sender_id(state, tid);
+  }
   else
+  {
     corresp_name = gap_transaction_recipient_fullname(state, tid);
+    oid = gap_transaction_recipient_id(state, tid);
+  }
 
-  // TODO: retrieve avatar from gap
-  auto tmp_avatar = QPixmap(QString("resources/avatar2.png"));
-  this->_avatar->setPicture(tmp_avatar);
+  // Start requesting the avatar.
+  QNetworkAccessManager* m_netwManager = new QNetworkAccessManager(this);
+  connect(m_netwManager,
+          SIGNAL(finished(QNetworkReply*)),
+          this,
+          SLOT(slot_netwManagerFinished(QNetworkReply*)));
+
+  const char* protocol = "http://";
+  _avatar_url_str = gap_user_avatar_url(_state, oid);
+  std::string stdurl = std::string(protocol) + std::string(_avatar_url_str);
+  QUrl url(stdurl.c_str());
+  QNetworkRequest request(url);
+  m_netwManager->get(request);
 
   auto layout = new QHBoxLayout(this);
   this->_layout = layout;
@@ -58,7 +75,8 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
     }
   }
 
-  if (gap_transaction_status(state, tid) == gap_transaction_waiting_for_accept)
+  if (gap_transaction_recipient_id(_state, _tid) == gap_self_id(_state) and
+      gap_transaction_status(state, tid) == gap_transaction_waiting_for_accept)
   {
     _accept_button = new QPushButton(QString("Accept"), this);
     connect(_accept_button, SIGNAL(clicked()), this, SLOT(accept()));
@@ -72,6 +90,26 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   connect(this->_avatar,
           SIGNAL(onProgressChanged(float)),
           SIGNAL(onProgressChanged(float)));
+}
+
+void
+TransactionWidget::slot_netwManagerFinished(QNetworkReply *reply)
+{
+  std::cout << "avatar: " << reply->error() << std::endl;
+  if (reply->error() == QNetworkReply::NoError)
+  {
+    QByteArray jpegData = reply->readAll();
+    QPixmap pixmap;
+    pixmap.loadFromData(jpegData);
+    this->_avatar->setPicture(pixmap);
+    std::cerr << _avatar_url_str << std::endl;
+    gap_free_user_avatar_url(_avatar_url_str);
+  }
+  else
+  {
+    std::cerr << "avatar: error" << std::endl;
+    this->_avatar->setPicture(QPixmap(QString("resources/avatar1.png")));
+  }
 }
 
 /*-----------.

@@ -4,6 +4,14 @@
 # include <iostream>
 # include <QWidget>
 # include <QPushButton>
+
+# include <QtNetwork/QNetworkAccessManager>
+# include <QtNetwork/QNetworkRequest>
+# include <QtNetwork/QNetworkReply>
+# include <QByteArray>
+# include <QPixmap>
+# include <QUrl>
+
 # include <surface/gap/gap.h>
 
 # include "fwd.hh"
@@ -63,6 +71,7 @@ public:
 
 public slots:
   void accept();
+  void slot_netwManagerFinished(QNetworkReply *reply);
 
 private:
   uint32_t _tid;
@@ -70,6 +79,7 @@ private:
   AvatarWidget* _avatar;
   QLayout* _layout;
   QPushButton* _accept_button;
+  const char* _avatar_url_str;
 };
 
 #endif
