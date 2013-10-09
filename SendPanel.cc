@@ -115,12 +115,19 @@ private:
 };
 
 void
-SendPanel::setUsers(QStringList const& users)
+SendPanel::setUsers(QStringList const& users, uint32_t* uids)
 {
   this->_users->clearWidgets();
+
+  if (uids == nullptr)
+    return;
+
+  uint32_t i = 0;
   for (auto const& user: users)
   {
-    auto widget = new UserWidget(user, this);
+    auto widget = new UserWidget(user, uids[i++], this);
+    connect(widget, SIGNAL(clicked_signal(uint32_t)), this, SLOT(send(uint32_t)));
+
     auto layout = new QHBoxLayout(widget);
     layout->addWidget(new AvatarIcon(QPixmap("resources/avatar3.png")));
     layout->addWidget(new QLabel(user));
@@ -135,17 +142,20 @@ SendPanel::clearUsers()
 }
 
 void
-SendPanel::send()
+SendPanel::send(uint32_t uid)
 {
-  std::string text(this->_search->text().toStdString());
-  uint32_t* uids = gap_search_users(_state, text.c_str());
+  if (uid == 0)
+  {
+    std::string text(this->_search->text().toStdString());
+    uint32_t* uids = gap_search_users(_state, text.c_str());
+    uid = uids[0];
+    gap_search_users_free(uids);
+  }
 
   const char* filenames[2] = { 0 };
   filenames[0] = _file_path.c_str();
 
-  gap_send_files(_state, uids[0], filenames, "Basic comment");
-
-  gap_search_users_free(uids);
+  gap_send_files(_state, uid, filenames, "Basic comment");
 
   emit switch_signal();
 }

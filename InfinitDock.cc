@@ -133,10 +133,12 @@ InfinitDock::_search(QString const& search)
     for (uint32_t i = 0; uids[i] != 0; i += 1)
       res.append(QString(gap_user_fullname(_state, uids[i])));
 
+    this->_send_panel->setUsers(res, uids);
     gap_search_users_free(uids);
   }
+  else
+    this->_send_panel->clearUsers();
 
-  this->_send_panel->setUsers(res);
 }
 
 /*--------------.

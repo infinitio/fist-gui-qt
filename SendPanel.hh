@@ -35,14 +35,14 @@ public:
   addFile(const QString& path);
 
 public slots:
-  void send();
+  void send(uint32_t uid = 0);
 
 /*------.
 | Users |
 `------*/
 public:
   void
-  setUsers(QStringList const& users);
+  setUsers(QStringList const& users, uint32_t* uids = nullptr);
   void
   clearUsers();
 Q_SIGNALS:

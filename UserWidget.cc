@@ -1,15 +1,16 @@
 #include "UserWidget.hh"
 
-UserWidget::UserWidget(QString const& user, QWidget* parent = nullptr):
+UserWidget::UserWidget(QString const& user, uint32_t uid, QWidget* parent):
   ListItem(parent),
-  _user(user)
+  _user(user),
+  _uid(uid)
 {}
 
 void
 UserWidget::trigger()
 {
   std::cout << _user.toStdString() << std::endl;
-  this->setStyleSheet("background-color:red;");
+  emit clicked_signal(_uid);
 }
 
 bool

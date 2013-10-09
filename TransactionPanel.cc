@@ -40,10 +40,14 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
   g_panel = this;
   gap_transaction_callback(state, TransactionPanel::transaction_cb);
 
-  auto trs = gap_transactions(state);
+  //TODO: kill this abomination with a gap_transactions already sorted.
+  uint32_t* trs = gap_transactions(state);
 
-  for (uint32_t i = 0; trs[i] != 0 && i <= MAX_TRANSAS; i += 1)
-    addTransaction(state, trs[i]);
+  uint32_t i;
+  for (i = 0; trs[i] != 0; i += 1);
+
+  for (uint32_t v = i - 1; v >= i - 15 && v > 0; v -= 1)
+    addTransaction(state, trs[v]);
 
   gap_transactions_free(trs);
 }

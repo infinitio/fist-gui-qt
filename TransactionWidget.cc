@@ -148,11 +148,13 @@ TransactionWidget::minimumSizeHint() const
 void
 TransactionWidget::trigger()
 {
+#if 0
   auto pop = new TransactionWindow(parentWidget());
   parentWidget()->hide();
 
   pop->show();
   pop->setFocus();
+#endif
 }
 
 

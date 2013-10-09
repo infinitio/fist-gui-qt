@@ -138,8 +138,12 @@ ListWidget::wheelEvent(QWheelEvent* event)
 }
 
 void
-ListWidget::keyPressEvent(QKeyEvent* event)
+ListWidget::keyPressEvent(QKeyEvent*)
 {
+  return;
+
+  // Problematic with the transactions list ATM.
+#if 0
   size_t old_index = _keyboard_index;
 
   if (event->key() == Qt::Key_Down && _keyboard_index > 0)
@@ -164,6 +168,7 @@ ListWidget::keyPressEvent(QKeyEvent* event)
     ListItem* item = _widgets[_widgets.size() - _keyboard_index];
     item->setStyleSheet("background-color:pink;");
   }
+#endif
 }
 
 void
@@ -174,7 +179,9 @@ ListWidget::setFocus()
   if (_widgets.size() != 0)
   {
     ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
+#if 0
     item->setStyleSheet("background-color:pink;");
+#endif
   }
 }
 
