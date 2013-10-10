@@ -5,13 +5,6 @@
 # include <QWidget>
 # include <QPushButton>
 
-# include <QtNetwork/QNetworkAccessManager>
-# include <QtNetwork/QNetworkRequest>
-# include <QtNetwork/QNetworkReply>
-# include <QByteArray>
-# include <QPixmap>
-# include <QUrl>
-
 # include <surface/gap/gap.h>
 
 # include "fwd.hh"
@@ -71,7 +64,6 @@ public:
 
 public slots:
   void accept();
-  void slot_netwManagerFinished(QNetworkReply *reply);
 
 private:
   uint32_t _tid;

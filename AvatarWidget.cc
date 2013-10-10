@@ -22,6 +22,8 @@ static int const progress_value = 250;
 static QColor const progress_color(
   QColor::fromHsv(progress_hue, progress_saturation, progress_value));
 
+static std::map<uint32_t, QPixmap> g_avatars;
+
 AvatarWidget::AvatarWidget():
   _picture(total_size, total_size),
   _transaction_count(0),
@@ -29,6 +31,38 @@ AvatarWidget::AvatarWidget():
 {
   this->setMinimumSize(total_size, total_size);
   this->setMaximumSize(total_size, total_size);
+}
+
+AvatarWidget::AvatarWidget(gap_State* state, uint32_t uid):
+  AvatarWidget()
+{
+  this->_uid = uid;
+
+  // Look for the avatar in the avatars already loaded.
+  auto avatar = g_avatars.find(uid);
+
+  if (avatar == g_avatars.end())
+  {
+    // Start requesting the avatar.
+    QNetworkAccessManager* m_netwManager = new QNetworkAccessManager(this);
+    connect(m_netwManager,
+            SIGNAL(finished(QNetworkReply*)),
+            this,
+            SLOT(slot_netwManagerFinished(QNetworkReply*)));
+
+    // Setup request string.
+    const char* protocol = "http://";
+    const char* url = gap_user_avatar_url(state, uid);
+    std::string stdurl = std::string(protocol) + std::string(url);
+    gap_free_user_avatar_url(url);
+
+    // Request the image at address stdurl.
+    QUrl qurl(stdurl.c_str());
+    QNetworkRequest request(qurl);
+    m_netwManager->get(request);
+  }
+  else
+    this->setPicture(g_avatars[uid]);
 }
 
 AvatarWidget::AvatarWidget(QString const& picture):
@@ -236,5 +270,24 @@ AvatarWidget::paintEvent(QPaintEvent*)
                        QString::number(this->transactionCount()));
       painter.restore();
     }
+  }
+}
+
+void
+AvatarWidget::slot_netwManagerFinished(QNetworkReply *reply)
+{
+  std::cout << "avatar: " << reply->error() << std::endl;
+  if (reply->error() == QNetworkReply::NoError)
+  {
+    QByteArray jpegData = reply->readAll();
+    QPixmap pixmap;
+    pixmap.loadFromData(jpegData);
+    this->setPicture(pixmap);
+    //g_avatars.insert(std::pair<uint32_t, QPixmap>(_uid, pixmap));
+  }
+  else
+  {
+    this->setPicture(QPixmap(QString("resources/avatar1.png")));
+    std::cerr << "avatar: error" << std::endl;
   }
 }

@@ -8,7 +8,6 @@
 TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   _tid(tid),
   _state(state),
-  _avatar(new AvatarWidget),
   _layout(nullptr),
   _accept_button(nullptr)
 {
@@ -32,19 +31,7 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
     oid = gap_transaction_recipient_id(state, tid);
   }
 
-  // Start requesting the avatar.
-  QNetworkAccessManager* m_netwManager = new QNetworkAccessManager(this);
-  connect(m_netwManager,
-          SIGNAL(finished(QNetworkReply*)),
-          this,
-          SLOT(slot_netwManagerFinished(QNetworkReply*)));
-
-  const char* protocol = "http://";
-  _avatar_url_str = gap_user_avatar_url(_state, oid);
-  std::string stdurl = std::string(protocol) + std::string(_avatar_url_str);
-  QUrl url(stdurl.c_str());
-  QNetworkRequest request(url);
-  m_netwManager->get(request);
+  this->_avatar = new AvatarWidget(state, oid);
 
   auto layout = new QHBoxLayout(this);
   this->_layout = layout;
@@ -90,26 +77,6 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   connect(this->_avatar,
           SIGNAL(onProgressChanged(float)),
           SIGNAL(onProgressChanged(float)));
-}
-
-void
-TransactionWidget::slot_netwManagerFinished(QNetworkReply *reply)
-{
-  std::cout << "avatar: " << reply->error() << std::endl;
-  if (reply->error() == QNetworkReply::NoError)
-  {
-    QByteArray jpegData = reply->readAll();
-    QPixmap pixmap;
-    pixmap.loadFromData(jpegData);
-    this->_avatar->setPicture(pixmap);
-    std::cerr << _avatar_url_str << std::endl;
-    gap_free_user_avatar_url(_avatar_url_str);
-  }
-  else
-  {
-    std::cerr << "avatar: error" << std::endl;
-    this->_avatar->setPicture(QPixmap(QString("resources/avatar1.png")));
-  }
 }
 
 /*-----------.
