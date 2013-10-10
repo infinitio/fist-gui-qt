@@ -4,6 +4,7 @@
 # include <iostream>
 # include <QWidget>
 # include <QPushButton>
+# include <QLabel>
 
 # include <surface/gap/gap.h>
 
@@ -71,7 +72,7 @@ private:
   AvatarWidget* _avatar;
   QLayout* _layout;
   QPushButton* _accept_button;
-  const char* _avatar_url_str;
+  QLabel* _status;
 };
 
 #endif

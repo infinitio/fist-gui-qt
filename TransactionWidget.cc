@@ -5,11 +5,28 @@
 #include "TransactionWidget.hh"
 #include "TransactionWindow.hh"
 
+std::map<gap_TransactionStatus, QString> g_statuses =
+{
+  { gap_transaction_none, "None" },
+  { gap_transaction_pending, "Pending" },
+  { gap_transaction_copying, "Copying" },
+  { gap_transaction_waiting_for_accept, "Waiting for accept" },
+  { gap_transaction_accepted, "Accepted" },
+  { gap_transaction_preparing, "Preparing" },
+  { gap_transaction_running, "In progress" },
+  { gap_transaction_cleaning, "Cleaning" },
+  { gap_transaction_finished, "Done" },
+  { gap_transaction_failed, "Failed" },
+  { gap_transaction_canceled, "Canceled" },
+  { gap_transaction_rejected, "Rejected" },
+};
+
 TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   _tid(tid),
   _state(state),
   _layout(nullptr),
-  _accept_button(nullptr)
+  _accept_button(nullptr),
+  _status(new QLabel(g_statuses[gap_transaction_status(state, tid)]))
 {
   static int const padding = 5;
 
@@ -60,6 +77,8 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
                      this->_avatar->height() - filename->height() - padding);
       texts->addWidget(filename);
     }
+
+    layout->addWidget(this->_status);
   }
 
   if (gap_transaction_recipient_id(_state, _tid) == gap_self_id(_state) and
@@ -136,12 +155,14 @@ TransactionWidget::update()
 {
   gap_TransactionStatus status = gap_transaction_status(_state, _tid);
 
-  if (this->_accept_button != nullptr and
-      status != gap_transaction_waiting_for_accept)
+  if (status != gap_transaction_waiting_for_accept &&
+      this->_accept_button != nullptr)
   {
     delete this->_accept_button;
     this->_accept_button = nullptr;
   }
+
+  this->_status->setText(g_statuses[status]);
 }
 
 void
