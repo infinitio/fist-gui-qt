@@ -283,7 +283,7 @@ AvatarWidget::slot_netwManagerFinished(QNetworkReply *reply)
     QPixmap pixmap;
     pixmap.loadFromData(jpegData);
     this->setPicture(pixmap);
-    //g_avatars.insert(std::pair<uint32_t, QPixmap>(_uid, pixmap));
+    g_avatars.insert(std::pair<uint32_t, QPixmap>(_uid, pixmap));
   }
   else
   {
