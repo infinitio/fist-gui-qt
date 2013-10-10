@@ -32,7 +32,6 @@ public:
 
 public:
   float progress() const;
-  void update_progress();
 
 public Q_SLOTS:
   void setProgress(float value);
@@ -67,6 +66,7 @@ public:
 
 public slots:
   void accept();
+  void update_progress();
 
 private:
   uint32_t _tid;

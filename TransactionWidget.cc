@@ -99,13 +99,27 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   else
     infos->addWidget(new QLabel());
 
+  if (gap_transaction_status(_state, _tid) == gap_transaction_running)
+  {
+    _timer = new QTimer;
+    connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
+    _timer->start(1000);
+
+    connect(this,
+            SIGNAL(onProgressChanged(float)),
+            this->_avatar,
+            SLOT(setProgress(float)));
+  }
+
   setSizePolicy(QSizePolicy::MinimumExpanding,
                 QSizePolicy::Fixed);
   adjustSize();
 
+#if 0
   connect(this->_avatar,
           SIGNAL(onProgressChanged(float)),
           SIGNAL(onProgressChanged(float)));
+#endif
 }
 
 /*-----------.
@@ -173,20 +187,24 @@ TransactionWidget::update()
     this->_accept_button = nullptr;
   }
 
-  // Timer update.
-#if 0
-  if (status != gap_transaction_running && this->_timer != nullptr)
-  {
-    delete this->_timer;
-    this->_timer = nullptr;
-  }
-  else if (status == gap_transaction_running && this->_timer == nullptr)
+
+  if (status == gap_transaction_running && this->_timer == nullptr)
   {
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
     _timer->start(1000);
+
+    connect(this,
+            SIGNAL(onProgressChanged(float)),
+            this->_avatar,
+            SLOT(setProgress(float)));
   }
-#endif
+  else if (status != gap_transaction_running && this->_timer != nullptr)
+  {
+    setProgress(0);
+    delete this->_timer;
+    this->_timer = nullptr;
+  }
 
   this->_status->setText(g_statuses[status]);
 }
