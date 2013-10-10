@@ -148,5 +148,4 @@ void
 TransactionWidget::accept()
 {
   gap_accept_transaction(this->_state, this->_tid);
-  std::cout << "accepted " << this << std::endl;
 }

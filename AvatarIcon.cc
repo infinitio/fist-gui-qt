@@ -87,16 +87,12 @@ AvatarIcon::AvatarIcon(gap_State* state, uint32_t uid):
 void
 AvatarIcon::slot_netwManagerFinished(QNetworkReply *reply)
 {
-  std::cout << "SLOT NETWORKMANAGER" << std::endl;
-
   QPainter painter(&this->_pixmap);
   painter.setRenderHints(QPainter::Antialiasing |
                           QPainter::SmoothPixmapTransform);
 
-  std::cout << "avatar: " << reply->error() << std::endl;
   if (reply->error() == QNetworkReply::NoError)
   {
-  std::cout << "NO ERROR" << std::endl;
     QByteArray jpegData = reply->readAll();
     QPixmap pixmap;
     pixmap.loadFromData(jpegData);
@@ -109,11 +105,9 @@ AvatarIcon::slot_netwManagerFinished(QNetworkReply *reply)
   }
   else
   {
-  std::cout << "ERROR" << std::endl;
     painter.drawPixmap(_geometry, QPixmap(QString("resources/avatar1.png")));
     painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
     painter.drawPixmap(_geometry, _mask);
-    std::cerr << "avatar: error" << std::endl;
   }
 }
 

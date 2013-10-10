@@ -67,8 +67,6 @@ TransactionPanel::addTransaction(gap_State* state, uint32_t tid)
 void
 TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
-  std::cout << "transaction_cb appellee " << status << std::endl;
-
   if (status == gap_transaction_waiting_for_accept)
     g_panel->addTransaction(g_panel->_state, id);
   else

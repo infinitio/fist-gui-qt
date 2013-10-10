@@ -276,7 +276,6 @@ AvatarWidget::paintEvent(QPaintEvent*)
 void
 AvatarWidget::slot_netwManagerFinished(QNetworkReply *reply)
 {
-  std::cout << "avatar: " << reply->error() << std::endl;
   if (reply->error() == QNetworkReply::NoError)
   {
     QByteArray jpegData = reply->readAll();
@@ -288,8 +287,5 @@ AvatarWidget::slot_netwManagerFinished(QNetworkReply *reply)
   else
   {
     this->setPicture(QPixmap(QString("resources/avatar1.png")));
-    std::cerr << "avatar: error" << std::endl;
   }
 }
-
-// AvatarIcon
