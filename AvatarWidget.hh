@@ -15,6 +15,8 @@
 
 # include "utils.hh"
 
+extern std::map<uint32_t, QPixmap> g_avatars;
+
 class AvatarWidget:
   public QWidget
 {

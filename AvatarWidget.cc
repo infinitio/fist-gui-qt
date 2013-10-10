@@ -22,7 +22,7 @@ static int const progress_value = 250;
 static QColor const progress_color(
   QColor::fromHsv(progress_hue, progress_saturation, progress_value));
 
-static std::map<uint32_t, QPixmap> g_avatars;
+std::map<uint32_t, QPixmap> g_avatars;
 
 AvatarWidget::AvatarWidget():
   _picture(total_size, total_size),
@@ -291,3 +291,5 @@ AvatarWidget::slot_netwManagerFinished(QNetworkReply *reply)
     std::cerr << "avatar: error" << std::endl;
   }
 }
+
+// AvatarIcon

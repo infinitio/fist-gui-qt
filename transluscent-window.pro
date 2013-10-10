@@ -16,6 +16,7 @@ LIBS += -lgap
 # Input
 SOURCES +=                                      \
     AvatarWidget.cc                             \
+    AvatarIcon.cc                               \
     DebugWindow.cc                              \
     Footer.cc                                   \
     IconButton.cc                               \
@@ -37,6 +38,7 @@ SOURCES +=                                      \
 
 HEADERS +=                                      \
     AvatarWidget.hh                             \
+    AvatarIcon.hh                               \
     DebugWindow.hh                              \
     Footer.hh                                   \
     IconButton.hh                               \

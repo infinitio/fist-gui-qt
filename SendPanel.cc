@@ -68,52 +68,6 @@ SendPanel::addFile(QString const& path)
 | Users |
 `------*/
 
-class AvatarIcon:
-  public QWidget
-{
-public:
-  AvatarIcon(QPixmap const& pixmap):
-    _pixmap(QSize(30, 30))
-  {
-    QSize size(30, 30);
-    this->setMinimumSize(size);
-    this->setMaximumSize(size);
-    QRect geometry(QPoint(0, 0), size);
-    this->_pixmap.fill(Qt::transparent);
-    QPixmap mask(size);
-    {
-      mask.fill(Qt::transparent);
-      QPainter painter(&mask);
-      painter.setRenderHints(QPainter::Antialiasing |
-                             QPainter::SmoothPixmapTransform);
-      painter.setPen(Qt::NoPen);
-      painter.setBrush(Qt::black);
-      painter.drawEllipse(geometry);
-    }
-    QPainter painter(&this->_pixmap);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    painter.drawPixmap(geometry, pixmap);
-    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    painter.drawPixmap(geometry, mask);
-  }
-
-protected:
-  virtual
-  void
-  paintEvent(QPaintEvent*) override
-  {
-    QRect geometry(QPoint(0, 0), this->size());
-    QPainter painter(this);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    painter.drawPixmap(geometry, this->_pixmap);
-  }
-
-private:
-  QPixmap _pixmap;
-};
-
 void
 SendPanel::setUsers(QStringList const& users, uint32_t* uids)
 {
@@ -125,11 +79,11 @@ SendPanel::setUsers(QStringList const& users, uint32_t* uids)
   uint32_t i = 0;
   for (auto const& user: users)
   {
-    auto widget = new UserWidget(user, uids[i++], this);
+    auto widget = new UserWidget(user, uids[i], this);
     connect(widget, SIGNAL(clicked_signal(uint32_t)), this, SLOT(send(uint32_t)));
 
     auto layout = new QHBoxLayout(widget);
-    layout->addWidget(new AvatarIcon(QPixmap("resources/avatar3.png")));
+    layout->addWidget(new AvatarIcon(_state, uids[i++]));
     layout->addWidget(new QLabel(user));
     this->_users->addWidget(widget);
   }

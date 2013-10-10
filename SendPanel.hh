@@ -9,6 +9,7 @@
 
 # include "SmoothLayout.hh"
 # include "UserWidget.hh"
+# include "AvatarIcon.hh"
 # include "fwd.hh"
 
 class SendPanel:
