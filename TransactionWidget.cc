@@ -26,7 +26,8 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   _state(state),
   _layout(nullptr),
   _accept_button(nullptr),
-  _status(new QLabel(g_statuses[gap_transaction_status(state, tid)]))
+  _status(new QLabel(g_statuses[gap_transaction_status(state, tid)])),
+  _timer(nullptr)
 {
   static int const padding = 5;
 
@@ -186,7 +187,6 @@ TransactionWidget::update()
     delete this->_accept_button;
     this->_accept_button = nullptr;
   }
-
 
   if (status == gap_transaction_running && this->_timer == nullptr)
   {
