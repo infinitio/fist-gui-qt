@@ -4,6 +4,7 @@
 # include <iostream>
 # include <QWidget>
 # include <QPushButton>
+# include <QTimer>
 # include <QLabel>
 
 # include <surface/gap/gap.h>
@@ -31,6 +32,7 @@ public:
 
 public:
   float progress() const;
+  void update_progress();
 
 public Q_SLOTS:
   void setProgress(float value);
@@ -73,6 +75,7 @@ private:
   QLayout* _layout;
   QPushButton* _accept_button;
   QLabel* _status;
+  QTimer* _timer;
 };
 
 #endif

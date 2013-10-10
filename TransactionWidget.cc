@@ -54,32 +54,38 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   this->_layout = layout;
   layout->addWidget(this->_avatar);
 
-  {
-    auto texts = new QVBoxLayout;
-    texts->setContentsMargins(5, 12, 5, 12);
-    layout->addLayout(texts);
-    {
-      auto username = new QLabel(QString(corresp_name));
-      QFont font;
-      font.setBold(true);
-      username->setFont(font);
-      username->move(this->_avatar->width() + padding, padding);
-      texts->addWidget(username);
-    }
-    {
-      auto filename = new QLabel(QString(first_file_name));
-      QFont font;
-      filename->setFont(font);
-      QPalette palette;
-      palette.setColor(QPalette::WindowText, QColor(150, 150, 150));
-      filename->setPalette(palette);
-      filename->move(this->_avatar->width() + padding,
-                     this->_avatar->height() - filename->height() - padding);
-      texts->addWidget(filename);
-    }
+  auto texts = new QVBoxLayout;
+  texts->setContentsMargins(5, 12, 5, 12);
+  layout->addLayout(texts);
 
-    layout->addWidget(this->_status);
+  auto username = new QLabel(QString(corresp_name));
+  auto filename = new QLabel(QString(first_file_name));
+
+  {
+    username->setFixedWidth(120);
+    QFont font;
+    font.setBold(true);
+    username->setFont(font);
+    username->move(this->_avatar->width() + padding, padding);
+    texts->addWidget(username);
   }
+
+  {
+    filename->setFixedWidth(120);
+    QFont font;
+    filename->setFont(font);
+    QPalette palette;
+    palette.setColor(QPalette::WindowText, QColor(150, 150, 150));
+    filename->setPalette(palette);
+    filename->move(this->_avatar->width() + padding,
+                    this->_avatar->height() - filename->height() - padding);
+    texts->addWidget(filename);
+  }
+
+  auto infos = new QVBoxLayout;
+  infos->setContentsMargins(5, 12, 5, 12);
+  layout->addLayout(infos);
+  infos->addWidget(this->_status);
 
   if (gap_transaction_recipient_id(_state, _tid) == gap_self_id(_state) and
       gap_transaction_status(state, tid) == gap_transaction_waiting_for_accept)
@@ -87,7 +93,11 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
     _accept_button = new QPushButton(QString("Accept"), this);
     connect(_accept_button, SIGNAL(clicked()), this, SLOT(accept()));
     _accept_button->move(this->_avatar->width() + padding, padding);
+
+    infos->addWidget(_accept_button);
   }
+  else
+    infos->addWidget(new QLabel());
 
   setSizePolicy(QSizePolicy::MinimumExpanding,
                 QSizePolicy::Fixed);
@@ -155,6 +165,7 @@ TransactionWidget::update()
 {
   gap_TransactionStatus status = gap_transaction_status(_state, _tid);
 
+  // Accept button update.
   if (status != gap_transaction_waiting_for_accept &&
       this->_accept_button != nullptr)
   {
@@ -162,7 +173,29 @@ TransactionWidget::update()
     this->_accept_button = nullptr;
   }
 
+  // Timer update.
+#if 0
+  if (status != gap_transaction_running && this->_timer != nullptr)
+  {
+    delete this->_timer;
+    this->_timer = nullptr;
+  }
+  else if (status == gap_transaction_running && this->_timer == nullptr)
+  {
+    _timer = new QTimer;
+    connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
+    _timer->start(1000);
+  }
+#endif
+
   this->_status->setText(g_statuses[status]);
+}
+
+void
+TransactionWidget::update_progress()
+{
+  float progress = gap_transaction_progress(_state, _tid);
+  emit onProgressChanged(progress);
 }
 
 void

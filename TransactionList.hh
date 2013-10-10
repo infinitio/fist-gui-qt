@@ -25,6 +25,7 @@ class TransactionList:
 
   public:
     TransactionList();
+
   protected:
     virtual
     bool

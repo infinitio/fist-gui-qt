@@ -41,6 +41,8 @@ SendPanel::SendPanel(gap_State* state):
   _state(state)
 {
   this->_users = new ListWidget(this);
+
+  auto layout = new QHBoxLayout(this);
   auto search = new SearchField(this, &this->_users);
   this->_users->set_mate(search);
   this->_search = search;
@@ -80,7 +82,10 @@ SendPanel::setUsers(QStringList const& users, uint32_t* uids)
   for (auto const& user: users)
   {
     auto widget = new UserWidget(user, uids[i], this);
-    connect(widget, SIGNAL(clicked_signal(uint32_t)), this, SLOT(send(uint32_t)));
+    connect(widget,
+            SIGNAL(clicked_signal(uint32_t)),
+            this,
+            SLOT(send(uint32_t)));
 
     auto layout = new QHBoxLayout(widget);
     layout->addWidget(new AvatarIcon(_state, uids[i++]));

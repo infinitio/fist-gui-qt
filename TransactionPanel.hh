@@ -15,7 +15,6 @@ class TransactionPanel:
 {
 public:
   TransactionPanel(gap_State* state, QWidget* parent = nullptr);
-  ~TransactionPanel();
   static void transaction_cb(uint32_t id, gap_TransactionStatus status);
 
 public Q_SLOTS:

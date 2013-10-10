@@ -72,9 +72,3 @@ TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
   else
     g_panel->_list->updateTransaction(g_panel->_state, id);
 }
-
-
-TransactionPanel::~TransactionPanel()
-{
-  std::cerr << "Error: TransactionPanel destructor called" << std::endl;
-}

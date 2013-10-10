@@ -69,7 +69,7 @@ InfinitDock::InfinitDock(gap_State* state):
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-  timer->start(1000);
+  timer->start(2000);
 
   connect(_send_panel, SIGNAL(switch_signal()), this, SLOT(switch_panel()));
 }
