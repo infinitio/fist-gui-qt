@@ -8,6 +8,7 @@
 #define MAX_TRANSAS 15
 
 static TransactionPanel* g_panel = nullptr;
+static gap_State* g_state = nullptr;
 
 class TransactionFooter:
   public Footer
@@ -43,13 +44,30 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
   //TODO: kill this abomination with a gap_transactions already sorted.
   uint32_t* trs = gap_transactions(state);
 
-  uint32_t i;
-  for (i = 0; trs[i] != 0; i += 1);
+  g_state = state;
+  struct trs_compare
+  {
+    bool
+    operator() (const uint32_t& first, const uint32_t& second)
+    {
+      double first_mtime = gap_transaction_mtime(g_state, first);
+      double second_mtime = gap_transaction_mtime(g_state, second);
 
-  for (uint32_t v = i - 1; v >= i - 15 && v > 0; v -= 1)
-    addTransaction(state, trs[v]);
+      return first_mtime > second_mtime;
+    }
+  };
 
+  std::set<uint32_t, trs_compare> transactions_list;
+
+  for (uint32_t v = 0; trs[v] != 0; v += 1)
+    transactions_list.insert(trs[v]);
   gap_transactions_free(trs);
+
+  auto iter = transactions_list.begin();
+  uint32_t i = 0;
+  for ( ; i < 15 && iter != transactions_list.end(); i += 1, iter++);
+  for ( ; iter != transactions_list.begin(); iter--)
+    addTransaction(state, *iter);
 }
 
 void

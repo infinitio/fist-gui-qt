@@ -5,7 +5,7 @@
 # include <QFrame>
 # include <surface/gap/gap.h>
 
-# include <vector>
+# include <set>
 # include <algorithm>
 
 # include "TransactionList.hh"
