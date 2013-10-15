@@ -15,6 +15,7 @@
 `-------------*/
 
 static int const dock_size = 60;
+static InfinitDock* g_dock = nullptr;
 
 InfinitDock::InfinitDock(gap_State* state):
   _transaction_panel(new TransactionPanel(state)),
@@ -26,7 +27,9 @@ InfinitDock::InfinitDock(gap_State* state):
 {
 
   // Register gap callback.
+  g_dock = this;
   gap_connection_callback(_state, InfinitDock::connection_status_cb);
+  gap_user_status_callback(_state, InfinitDock::user_status_cb);
 
   // Cache background
   {
@@ -193,6 +196,15 @@ InfinitDock::mouseReleaseEvent(QMouseEvent* event)
 }
 
 void
+InfinitDock::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Return)
+    this->togglePanel();
+  else if (event->key() == Qt::Key_Escape)
+    this->deleteLater();
+}
+
+void
 InfinitDock::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
@@ -223,6 +235,13 @@ InfinitDock::connection_status_cb(gap_UserStatus const status)
 {
   if (status == gap_user_status_offline)
     std::cout << "callback: offline mode" << std::endl;
+}
+
+void
+InfinitDock::user_status_cb(uint32_t id, gap_UserStatus const status)
+{
+  std::cerr << "User status changed" << std::endl;
+  //g_dock->_send_panel->update_list(id, status);
 }
 
 void

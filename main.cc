@@ -59,5 +59,7 @@ main(int argc, char** argv)
   center_window(login);
   login->show();
 
-  return app.exec();
+  char ret = app.exec();
+  gap_free(state);
+  return ret;
 }

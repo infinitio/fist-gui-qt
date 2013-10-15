@@ -24,6 +24,7 @@ public:
 public:
   InfinitDock(gap_State* state);
   static void connection_status_cb(gap_UserStatus const status);
+  static void user_status_cb(uint32_t id, gap_UserStatus const status);
 
 public slots:
   void update();
@@ -62,6 +63,10 @@ protected:
   virtual
   void
   dropEvent(QDropEvent *event) override;
+
+  virtual
+  void
+  keyPressEvent(QKeyEvent* event) override;
 
 protected:
   virtual
