@@ -47,13 +47,17 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
   g_state = state;
   struct trs_compare
   {
-    bool
-    operator() (const uint32_t& first, const uint32_t& second)
-    {
-      double first_mtime = gap_transaction_mtime(g_state, first);
-      double second_mtime = gap_transaction_mtime(g_state, second);
+    std::unordered_map<uint32_t, double> mmap;
 
-      return first_mtime > second_mtime;
+    bool
+    operator() (const uint32_t& lhs, const uint32_t& rhs)
+    {
+      if (mmap.find(lhs) == mmap.end())
+        mmap.insert({lhs, gap_transaction_mtime(g_state, lhs)});
+      if (mmap.find(rhs) == mmap.end())
+        mmap.insert({rhs, gap_transaction_mtime(g_state, rhs)});
+
+      return mmap[lhs] > mmap[rhs];
     }
   };
 

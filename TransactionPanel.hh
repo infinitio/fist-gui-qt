@@ -6,6 +6,7 @@
 # include <surface/gap/gap.h>
 
 # include <set>
+# include <unordered_map>
 # include <algorithm>
 
 # include "TransactionList.hh"
