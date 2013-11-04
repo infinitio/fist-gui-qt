@@ -27,13 +27,7 @@ public slots:
   void login();
 
 private:
-  QLineEdit* _login;
-  QLineEdit* _pw;
-  QPushButton* _button;
-  QLabel* _msg;
-  QVBoxLayout* _layout;
-
-  gap_State* _state;
+  Q_OBJECT
 };
 
 #endif // !LOGINWINDOW_HH
