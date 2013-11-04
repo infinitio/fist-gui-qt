@@ -4,6 +4,8 @@
 # include <QMainWindow>
 # include <QTimer>
 # include <QWidget>
+# include <QSystemTrayIcon>
+# include <QFileDialog>
 
 # include <surface/gap/gap.h>
 
@@ -30,12 +32,15 @@ public slots:
   void update();
   void switch_panel();
 
+public slots:
+  void _systray_activated(QSystemTrayIcon::ActivationReason reason);
+
+
 /*------.
 | Panel |
 `------*/
 public Q_SLOTS:
-  TransactionPanel&
-  transactionPanel();
+  TransactionPanel& transactionPanel();
   void hidePanel();
   void showPanel();
   void togglePanel();
@@ -75,15 +80,16 @@ protected:
   virtual
   void
   mouseReleaseEvent(QMouseEvent* event) override;
-  virtual
-  void
-  paintEvent(QPaintEvent* event) override;
 
 private:
   QPixmap _logo;
-  QPixmap _background;
+  QSystemTrayIcon* _systray;
+  QMenu* _systray_menu;
+  QAction* _send_files;
+  QFileDialog* _choose_files;
+  QAction* _quit;
   gap_State* _state;
-  Q_OBJECT;
+  Q_OBJECT
 };
 
 #endif

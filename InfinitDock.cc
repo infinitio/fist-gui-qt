@@ -1,8 +1,12 @@
 #include <QApplication>
+#include <QFileDialog>
 #include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QSystemTrayIcon>
 #include <QUrl>
+#include <QMenu>
+#include <QAction>
 
 #include "InfinitDock.hh"
 #include "RoundShadowWidget.hh"
@@ -22,44 +26,29 @@ InfinitDock::InfinitDock(gap_State* state):
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel(state)),
   _logo(":/images/logo.png"),
-  _background(dock_size, dock_size),
+  _systray(new QSystemTrayIcon(this)),
+  _systray_menu(new QMenu(this)),
+  _send_files(new QAction(tr("&Send files..."), this)),
+  _choose_files(new QFileDialog(this)),
+  _quit(new QAction(tr("&Quit"), this)),
   _state(state)
 {
+  this->_choose_files->setFileMode(QFileDialog::ExistingFiles);
+
+  this->_systray_menu->addAction(_send_files);
+  this->_systray_menu->addAction(_quit);
+  this->_systray->setContextMenu(_systray_menu);
+
 
   // Register gap callback.
   g_dock = this;
   gap_connection_callback(_state, InfinitDock::connection_status_cb);
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
 
-  // Cache background
-  {
-  this->_background.fill(Qt::transparent);
-  QPainter painter(&this->_background);
-  painter.setRenderHints(QPainter::Antialiasing |
-                         QPainter::SmoothPixmapTransform);
-  painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-  painter.setBrush(Qt::black);
-  painter.setPen(Qt::NoPen);
-  int const logo_size = dock_size / 2;//sqrt(2);
-  QPixmap logo_white(logo_size, logo_size);
-  {
-    logo_white.fill(Qt::transparent);
-    logo_white.fill(Qt::white);
-    QPainter painter(&logo_white);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    painter.drawPixmap(QRect(0, 0, logo_size, logo_size), this->_logo);
-  }
-  painter.setOpacity(0.5);
-  painter.drawEllipse(QRect(QPoint(0, 0), QSize(dock_size, dock_size)));
-  painter.setOpacity(1.);
-  painter.drawPixmap(QPoint((dock_size - logo_size) / 2,
-                            (dock_size - logo_size) / 2), logo_white);
-  }
   this->_panel->setCentralWidget(this->_transaction_panel);
   this->resize(dock_size, dock_size);
-  this->setWindowFlags(Qt::FramelessWindowHint);
+  //
+  this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
   QRect const rect(QApplication::desktop()->rect());
   this->move(rect.width() - 100, rect.height() - 100);
@@ -75,6 +64,36 @@ InfinitDock::InfinitDock(gap_State* state):
   timer->start(2000);
 
   connect(_send_panel, SIGNAL(switch_signal()), this, SLOT(switch_panel()));
+  QIcon icon(this->_logo);
+  this->setWindowIcon(icon);
+  _systray->setIcon(icon);
+
+  _systray->setVisible(true);
+
+  connect(_systray,
+          SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+          this,
+          SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
+  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(chooseFiles()));
+  this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
+}
+
+void
+InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
+{
+    printf("Systray\n");
+    switch (reason)
+    {
+    case QSystemTrayIcon::Trigger:
+    case QSystemTrayIcon::DoubleClick:
+    case QSystemTrayIcon::Unknown:
+    case QSystemTrayIcon::MiddleClick:
+      this->togglePanel();
+      break;
+    case QSystemTrayIcon::Context:
+      this->hidePanel();
+      break;
+    }
 }
 
 /*------.
@@ -205,15 +224,6 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
 }
 
 void
-InfinitDock::paintEvent(QPaintEvent*)
-{
-  QPainter painter(this);
-  painter.setRenderHints(QPainter::Antialiasing |
-                         QPainter::SmoothPixmapTransform);
-  painter.drawPixmap(QPoint(0, 0), this->_background);
-}
-
-void
 InfinitDock::switch_panel()
 {
   if (this->_panel->centralWidget() == this->_send_panel)
@@ -233,8 +243,8 @@ InfinitDock::switch_panel()
 void
 InfinitDock::connection_status_cb(gap_UserStatus const status)
 {
-  if (status == gap_user_status_offline)
-    std::cout << "callback: offline mode" << std::endl;
+ // if (status == gap_user_status_offline)
+  std::cout << "Connection status callback: " << status << std::endl;
 }
 
 void
