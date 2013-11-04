@@ -163,6 +163,33 @@ InfinitDock::_search(QString const& search)
 
 }
 
+
+void
+InfinitDock::chooseFiles()
+{
+    this->_choose_files->exec();
+    QStringList selected = this->_choose_files->selectedFiles();
+    if (selected.size())
+    {
+        for (auto file: selected)
+            this->_send_panel->addFile(file);
+        this->_panel->centralWidget()->setParent(0);
+        this->_panel->setCentralWidget(this->_send_panel);
+        this->showPanel();
+    }
+}
+
+void
+InfinitDock::quit()
+{
+    this->_panel->hide();
+    this->_send_panel->hide();
+    this->_transaction_panel->hide();
+    this->_systray->hide();
+    this->_systray_menu->hide();
+    this->deleteLater();
+}
+
 /*--------------.
 | Drag and drop |
 `--------------*/

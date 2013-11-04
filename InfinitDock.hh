@@ -44,7 +44,8 @@ public Q_SLOTS:
   void hidePanel();
   void showPanel();
   void togglePanel();
-private Q_SLOTS:
+  void chooseFiles();
+  void quit();
   void _position_panel();
 private:
   TransactionPanel* _transaction_panel;
