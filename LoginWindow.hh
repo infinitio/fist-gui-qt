@@ -9,14 +9,16 @@
 # include <QMainWindow>
 
 # include <surface/gap/gap.h>
+
+# include "ui_LoginWindow.h"
 # include "InfinitDock.hh"
-#include <iostream>
 
 class LoginWindow:
-  public QMainWindow
+  public QMainWindow,
+  public Ui::LoginWindow
 {
-  Q_OBJECT
-
+private:
+  gap_State* _state;
 public:
   LoginWindow(gap_State* state);
   void keyPressEvent(QKeyEvent* event);

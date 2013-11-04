@@ -1,52 +1,51 @@
 #include "LoginWindow.hh"
 
+#include <QToolTip>
+
+#include <thread>
+#include <iostream>
+
 LoginWindow::LoginWindow(gap_State* state):
   QMainWindow(),
-  _msg(nullptr),
   _state(state)
 {
-  this->resize(180, 130);
-
-  this->_layout = new QVBoxLayout;
-  this->_layout->addWidget(this->_login = new QLineEdit(this));
-  this->_layout->addWidget(this->_pw = new QLineEdit(this));
-  this->_layout->addWidget(this->_button = new QPushButton("Login", this));
-
-  this->_login->setPlaceholderText("E-mail...");
-  this->_pw->setPlaceholderText("Password...");
-
-  auto widget = new QWidget;
-  widget->setLayout(this->_layout);
-  setCentralWidget(widget);
-
-  connect(this->_button, SIGNAL(clicked()), this, SLOT(login()));
+  this->setupUi(this);
 }
 
 void
 LoginWindow::login()
 {
-  std::string email("dimrok@infinit.io");
-  std::string pw("bitebite");
-
-  if (this->_login->text().toStdString().size() != 0)
-  {
-    email = std::string(this->_login->text().toStdString());
-    pw = std::string(this->_pw->text().toStdString());
-  }
-
+  this->login_button->setDisabled(true);
+  std::string email = this->login_field->text().toStdString();
+  std::string pw = this->password_field->text().toStdString();
   char* hash = gap_hash_password(_state, email.c_str(), pw.c_str());
-  gap_Status status = gap_login(_state, email.c_str(), hash);
+  gap_Status status;
+  status = gap_login(_state, email.c_str(), hash);
   gap_hash_free(hash);
 
   if (status == gap_ok)
   {
     auto dock = new InfinitDock(_state);
     dock->show();
-
     this->deleteLater();
+    this->message->setText("");
+    return;
   }
-  else if (_msg == nullptr)
-    this->_layout->addWidget(_msg = new QLabel("Wrong username/password."));
+
+
+  switch (status)
+  {
+#define ERR(case, msg) \
+    case: \
+      this->message->setText(tr(msg)); \
+      break\
+/**/
+    ERR(case gap_network_error, "Not connected to internet");
+    //: While login from login window
+    ERR(case gap_email_password_dont_match, "Wrong login/password");
+    ERR(default, "Internal error");
+  }
+  this->login_button->setDisabled(false);
 }
 
 void

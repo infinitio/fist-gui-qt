@@ -60,3 +60,6 @@ HEADERS +=                                      \
 RESOURCES += resources/resources.qrc
 
 QMAKE_CXXFLAGS += -std=c++11
+
+FORMS += \
+    LoginWindow.ui
