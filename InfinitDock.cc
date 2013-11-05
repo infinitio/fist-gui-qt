@@ -46,18 +46,15 @@ InfinitDock::InfinitDock(gap_State* state):
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
 
   this->_panel->setCentralWidget(this->_transaction_panel);
-  this->resize(dock_size, dock_size);
-  //
+  this->_transaction_panel->setFocus();
+
   this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
-  QRect const rect(QApplication::desktop()->rect());
-  this->move(rect.width() - 100, rect.height() - 100);
+
   connect(this->_panel, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
   connect(this->_send_panel, SIGNAL(onSearchChanged(QString const&)),
           SLOT(_search(QString const&)));
-  this->setAcceptDrops(true);
-  this->_transaction_panel->setFocus();
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -65,23 +62,21 @@ InfinitDock::InfinitDock(gap_State* state):
 
   connect(_send_panel, SIGNAL(switch_signal()), this, SLOT(switch_panel()));
   QIcon icon(this->_logo);
-  this->setWindowIcon(icon);
   _systray->setIcon(icon);
-
   _systray->setVisible(true);
-
   connect(_systray,
           SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
           this,
           SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(chooseFiles()));
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
+  this->show();
+  this->showPanel();
 }
 
 void
 InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
 {
-    printf("Systray\n");
     switch (reason)
     {
     case QSystemTrayIcon::Trigger:
@@ -110,6 +105,7 @@ void
 InfinitDock::showPanel()
 {
   this->_panel->show();
+  this->_panel->setFocus();
   this->_position_panel();
 }
 
@@ -131,9 +127,9 @@ InfinitDock::togglePanel()
 void
 InfinitDock::_position_panel()
 {
-  QPoint pos(this->pos());
-  auto x = pos.x() + this->width() - this->_panel->width();
-  auto y = pos.y() - this->_panel->height();
+  QPoint pos(this->_systray->geometry().topLeft());
+  auto x = pos.x() - this->_panel->width();
+  auto y = pos.y() - this->_panel->height() - 32;
   this->_panel->move(x, y);
 }
 
@@ -188,6 +184,9 @@ InfinitDock::quit()
     this->_systray->hide();
     this->_systray_menu->hide();
     this->deleteLater();
+
+    QApplication::setQuitOnLastWindowClosed(true);
+    QApplication::quit();
 }
 
 /*--------------.

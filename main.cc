@@ -55,6 +55,7 @@ main(int argc, char** argv)
     exit(1);
 
   app.setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
+  app.setQuitOnLastWindowClosed(false);
   // Open login window, which will trigger the InfinitDock later on.
   auto login = new LoginWindow(state);
   center_window(login);
