@@ -4,8 +4,8 @@
 # include <QLineEdit>
 # include <QKeyEvent>
 
-# include "utils.hh"
-# include "ListWidget.hh"
+# include <fist-gui-qt/utils.hh>
+# include <fist-gui-qt/ListWidget.hh>
 
 class SearchField:
   public QLineEdit

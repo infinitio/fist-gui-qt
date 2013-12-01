@@ -4,7 +4,7 @@
 # include <QPainter>
 # include <QPushButton>
 
-# include "utils.hh"
+# include <fist-gui-qt/utils.hh>
 
 class IconButton: public QPushButton
 {

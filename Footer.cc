@@ -1,6 +1,6 @@
 #include <QPainter>
 
-#include "Footer.hh"
+#include <fist-gui-qt/Footer.hh>
 
 Footer::Footer(QWidget* parent):
   QWidget(parent)

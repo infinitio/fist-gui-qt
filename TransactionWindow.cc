@@ -1,9 +1,9 @@
-#include "TransactionWindow.hh"
+#include <fist-gui-qt/TransactionWindow.hh>
 
 TransactionWindow::TransactionWindow(QWidget* parent):
   QWidget(parent)
 {
-  
+
 }
 
 void

@@ -6,7 +6,7 @@
 #include <QResizeEvent>
 #include <QWidget>
 
-#include "SmoothLayout.hh"
+#include <fist-gui-qt/SmoothLayout.hh>
 
 /*-------------.
 | Construction |

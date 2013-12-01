@@ -8,11 +8,11 @@
 #include <QMenu>
 #include <QAction>
 
-#include "InfinitDock.hh"
-#include "RoundShadowWidget.hh"
-#include "SendPanel.hh"
-#include "TransactionPanel.hh"
-#include "utils.hh"
+#include <fist-gui-qt/InfinitDock.hh>
+#include <fist-gui-qt/RoundShadowWidget.hh>
+#include <fist-gui-qt/SendPanel.hh>
+#include <fist-gui-qt/TransactionPanel.hh>
+#include <fist-gui-qt/utils.hh>
 
 /*-------------.
 | Construction |

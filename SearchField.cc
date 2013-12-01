@@ -1,6 +1,6 @@
 #include <QPainter>
 
-#include "SearchField.hh"
+#include <fist-gui-qt/SearchField.hh>
 
 static int const margin = 10;
 

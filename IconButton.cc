@@ -1,4 +1,4 @@
-#include "IconButton.hh"
+#include <fist-gui-qt/IconButton.hh>
 
 IconButton::IconButton(QPixmap const& pixmap, bool shadow):
   _color(Qt::white),

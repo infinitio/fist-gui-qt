@@ -9,9 +9,9 @@
 
 # include <surface/gap/gap.h>
 
-# include "fwd.hh"
-# include "ListItem.hh"
-# include "TransactionWindow.hh"
+# include <fist-gui-qt/fwd.hh>
+# include <fist-gui-qt/ListItem.hh>
+# include <fist-gui-qt/TransactionWindow.hh>
 
 class TransactionWidget:
   public ListItem

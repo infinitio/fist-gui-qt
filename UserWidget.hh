@@ -2,7 +2,7 @@
 # define USERWIDGET_HH
 
 # include <iostream>
-# include "ListItem.hh"
+# include <fist-gui-qt/ListItem.hh>
 
 class UserWidget:
   public ListItem

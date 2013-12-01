@@ -4,12 +4,12 @@
 #include <QPainter>
 #include <QVBoxLayout>
 
-#include "Footer.hh"
-#include "IconButton.hh"
-#include "ListWidget.hh"
-#include "SearchField.hh"
-#include "SendPanel.hh"
-#include "utils.hh"
+#include <fist-gui-qt/Footer.hh>
+#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/ListWidget.hh>
+#include <fist-gui-qt/SearchField.hh>
+#include <fist-gui-qt/SendPanel.hh>
+#include <fist-gui-qt/utils.hh>
 
 class SendFooter:
   public Footer

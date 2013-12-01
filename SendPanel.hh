@@ -7,10 +7,10 @@
 
 # include <surface/gap/gap.h>
 
-# include "SmoothLayout.hh"
-# include "UserWidget.hh"
-# include "AvatarIcon.hh"
-# include "fwd.hh"
+# include <fist-gui-qt/SmoothLayout.hh>
+# include <fist-gui-qt/UserWidget.hh>
+# include <fist-gui-qt/AvatarIcon.hh>
+# include <fist-gui-qt/fwd.hh>
 
 class SendPanel:
   public SmoothLayout

@@ -1,7 +1,7 @@
 #include <QEvent>
 #include <QPainter>
 
-#include "RoundShadowWidget.hh"
+#include <fist-gui-qt/RoundShadowWidget.hh>
 
 /*-------------.
 | Construction |

@@ -13,15 +13,15 @@
 #include <QDesktopWidget>
 #include <QVBoxLayout>
 
-#include "AvatarWidget.hh"
-#include "DebugWindow.hh"
-#include "IconButton.hh"
-#include "InfinitDock.hh"
-#include "LoginWindow.hh"
-#include "ListWidget.hh"
-#include "TransactionPanel.hh"
-#include "TransactionWidget.hh"
-#include "utils.hh"
+#include <fist-gui-qt/AvatarWidget.hh>
+#include <fist-gui-qt/DebugWindow.hh>
+#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/InfinitDock.hh>
+#include <fist-gui-qt/LoginWindow.hh>
+#include <fist-gui-qt/ListWidget.hh>
+#include <fist-gui-qt/TransactionPanel.hh>
+#include <fist-gui-qt/TransactionWidget.hh>
+#include <fist-gui-qt/utils.hh>
 
 #include <surface/gap/gap.h>
 

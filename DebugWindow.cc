@@ -2,7 +2,7 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 
-#include "DebugWindow.hh"
+#include <fist-gui-qt/DebugWindow.hh>
 
 DebugWindow::DebugWindow()
 {

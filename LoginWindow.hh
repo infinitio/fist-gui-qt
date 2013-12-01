@@ -10,8 +10,8 @@
 
 # include <surface/gap/gap.h>
 
-# include "ui_LoginWindow.h"
-# include "InfinitDock.hh"
+# include <fist-gui-qt/ui_LoginWindow.h>
+# include <fist-gui-qt/InfinitDock.hh>
 
 class LoginWindow:
   public QMainWindow,

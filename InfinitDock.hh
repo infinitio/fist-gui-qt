@@ -9,7 +9,7 @@
 
 # include <surface/gap/gap.h>
 
-# include "fwd.hh"
+# include <fist-gui-qt/fwd.hh>
 
 class InfinitDock:
   public QMainWindow

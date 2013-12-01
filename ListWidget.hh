@@ -4,8 +4,8 @@
 # include <QWidget>
 # include <QLineEdit>
 
-# include "SmoothScrollBar.hh"
-# include "ListItem.hh"
+# include <fist-gui-qt/SmoothScrollBar.hh>
+# include <fist-gui-qt/ListItem.hh>
 
 class ListWidget:
   public QWidget

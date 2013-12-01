@@ -1,4 +1,4 @@
-#include "LoginWindow.hh"
+#include <fist-gui-qt/LoginWindow.hh>
 
 #include <QToolTip>
 

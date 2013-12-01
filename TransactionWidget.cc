@@ -1,9 +1,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-#include "AvatarWidget.hh"
-#include "TransactionWidget.hh"
-#include "TransactionWindow.hh"
+#include <fist-gui-qt/AvatarWidget.hh>
+#include <fist-gui-qt/TransactionWidget.hh>
+#include <fist-gui-qt/TransactionWindow.hh>
 
 std::map<gap_TransactionStatus, QString> g_statuses =
 {

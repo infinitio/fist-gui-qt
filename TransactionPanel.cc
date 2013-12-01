@@ -1,9 +1,9 @@
 #include <QHBoxLayout>
 
-#include "Footer.hh"
-#include "IconButton.hh"
-#include "TransactionPanel.hh"
-#include "TransactionWidget.hh"
+#include <fist-gui-qt/Footer.hh>
+#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/TransactionPanel.hh>
+#include <fist-gui-qt/TransactionWidget.hh>
 
 #define MAX_TRANSAS 15
 

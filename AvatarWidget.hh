@@ -13,7 +13,7 @@
 # include <map>
 # include <surface/gap/gap.h>
 
-# include "utils.hh"
+# include <fist-gui-qt/utils.hh>
 
 extern std::map<uint32_t, QPixmap> g_avatars;
 

@@ -3,7 +3,7 @@
 
 # include <QWidget>
 
-# include "utils.hh"
+# include <fist-gui-qt/utils.hh>
 
 class SmoothLayout:
   public QWidget

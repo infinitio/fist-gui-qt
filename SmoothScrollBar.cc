@@ -1,7 +1,7 @@
 #include <QWheelEvent>
 #include <QPainter>
 
-#include "SmoothScrollBar.hh"
+#include <fist-gui-qt/SmoothScrollBar.hh>
 
 SmoothScrollBar::SmoothScrollBar(QWidget* parent):
   QWidget(parent),

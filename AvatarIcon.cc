@@ -1,4 +1,4 @@
-#include "AvatarIcon.hh"
+#include <fist-gui-qt/AvatarIcon.hh>
 
 AvatarIcon::AvatarIcon(QPixmap const& pixmap):
   _uid(0),

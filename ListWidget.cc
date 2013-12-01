@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QWheelEvent>
 
-#include "ListWidget.hh"
+#include <fist-gui-qt/ListWidget.hh>
 
 static int const items = 5;
 static int const separator = 1;

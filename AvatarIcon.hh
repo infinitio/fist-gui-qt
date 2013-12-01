@@ -1,7 +1,7 @@
 #ifndef AVATARICON_HH
 # define AVATARICON_HH
 
-# include "AvatarWidget.hh"
+# include <fist-gui-qt/AvatarWidget.hh>
 
 # include <QPainter>
 

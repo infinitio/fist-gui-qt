@@ -5,12 +5,12 @@
 QT += network
 CONFIG += debug
 DEPENDPATH += .
-INCLUDEPATH += . ../infinit/ ../infinit/_build/linux64/
+INCLUDEPATH += . ../ ../../../
 TEMPLATE = app
 TARGET =
 
-LIBS += -L ../infinit/_build/linux64/lib/
-LIBS += -Wl,-rpath-link,../infinit/_build/linux64/lib/
+LIBS += -L ../lib/
+LIBS += -Wl,-rpath-link,../ clib/
 LIBS += -lgap
 
 # Input

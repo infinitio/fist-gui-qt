@@ -1,4 +1,4 @@
-#include "ListItem.hh"
+#include <fist-gui-qt/ListItem.hh>
 
 ListItem::ListItem(QWidget* parent):
   QWidget(parent)

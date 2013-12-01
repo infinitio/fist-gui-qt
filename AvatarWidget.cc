@@ -1,6 +1,6 @@
 #include <QPainter>
 
-#include "AvatarWidget.hh"
+#include <fist-gui-qt/AvatarWidget.hh>
 
 /*-------------.
 | Construction |

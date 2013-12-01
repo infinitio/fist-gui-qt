@@ -9,7 +9,7 @@
 # include <unordered_map>
 # include <algorithm>
 
-# include "TransactionList.hh"
+# include <fist-gui-qt/TransactionList.hh>
 
 class TransactionPanel:
   public QWidget

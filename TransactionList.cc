@@ -2,9 +2,9 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include "ListWidget.hh"
-#include "TransactionList.hh"
-#include "TransactionWidget.hh"
+#include <fist-gui-qt/ListWidget.hh>
+#include <fist-gui-qt/TransactionList.hh>
+#include <fist-gui-qt/TransactionWidget.hh>
 
 TransactionList::TransactionList():
   _list(new ListWidget(this))
