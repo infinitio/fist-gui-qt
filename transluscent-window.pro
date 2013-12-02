@@ -26,9 +26,11 @@ SOURCES +=                                      \
     LoginWindow.cc                              \
     RoundShadowWidget.cc                        \
     SearchField.cc                              \
+    SendFooter.cc                               \
     SendPanel.cc                                \
     SmoothLayout.cc                             \
     SmoothScrollBar.cc                          \
+    TransactionFooter.cc                        \
     TransactionList.cc                          \
     TransactionPanel.cc                         \
     TransactionWidget.cc                        \
@@ -48,9 +50,11 @@ HEADERS +=                                      \
     LoginWindow.hh                              \
     RoundShadowWidget.hh                        \
     SearchField.hh                              \
+    SendFooter.hh                               \
     SendPanel.hh                                \
     SmoothLayout.hh                             \
     SmoothScrollBar.hh                          \
+    TransactionFooter.hh                        \
     TransactionList.hh                          \
     TransactionPanel.hh                         \
     TransactionWidget.hh                        \
