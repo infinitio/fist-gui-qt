@@ -123,7 +123,7 @@ SmoothLayout::_layout()
     {
       QPropertyAnimation* animation =
         new QPropertyAnimation(this, "heightHint");
-      animation->setDuration(300);
+      animation->setDuration(80);
       animation->setEasingCurve(QEasingCurve::InOutQuad);
       animation->setEndValue(height);
       animation->start();
@@ -132,7 +132,7 @@ SmoothLayout::_layout()
     {
       QPropertyAnimation* animation =
         new QPropertyAnimation(this, "widthHint");
-      animation->setDuration(200);
+      animation->setDuration(120);
       animation->setEndValue(width);
       animation->start();
     }
