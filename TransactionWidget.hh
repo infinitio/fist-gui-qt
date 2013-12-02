@@ -69,8 +69,8 @@ private:
   TransactionModel const& _transaction;
   AvatarWidget* _avatar;
   QLayout* _layout;
-  QLabel* _status;
   QPushButton* _accept_button;
+  QLabel* _status;
   QTimer* _timer;
 };
 
