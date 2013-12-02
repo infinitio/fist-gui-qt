@@ -10,7 +10,7 @@ TEMPLATE = app
 TARGET =
 
 LIBS += -L ../lib/
-LIBS += -Wl,-rpath-link,../ clib/
+LIBS += -Wl,-rpath-link,../lib/
 LIBS += -lgap
 
 # Input

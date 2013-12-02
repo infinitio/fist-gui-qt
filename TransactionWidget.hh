@@ -39,7 +39,6 @@ public Q_SLOTS:
 Q_SIGNALS:
   void onProgressChanged(float);
 
-
 /*-------.
 | Layout |
 `-------*/
@@ -57,12 +56,8 @@ public:
   void
   trigger();
 
-  virtual
-  bool
-  compare_id(const uint32_t tid);
-
   void
-  update();
+  update() override;
 
 public slots:
   void accept();

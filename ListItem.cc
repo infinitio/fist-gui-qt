@@ -9,3 +9,8 @@ ListItem::mousePressEvent(QMouseEvent*)
 {
   trigger();
 }
+
+void
+ListItem::update()
+{
+}

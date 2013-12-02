@@ -14,7 +14,6 @@ Q_SIGNALS:
   void clicked_signal(uint32_t);
 
 public:
-  virtual bool compare_id(const uint32_t uid);
   virtual void trigger();
 
 private:

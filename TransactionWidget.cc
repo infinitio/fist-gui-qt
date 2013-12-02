@@ -168,13 +168,6 @@ TransactionWidget::trigger()
 #endif
 }
 
-
-bool
-TransactionWidget::compare_id(const uint32_t tid)
-{
-  return tid == _tid;
-}
-
 void
 TransactionWidget::update()
 {

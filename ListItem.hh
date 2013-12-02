@@ -9,9 +9,9 @@ class ListItem:
 public:
   ListItem(QWidget* parent = nullptr);
   void mousePressEvent(QMouseEvent* e) override;
+  virtual void update();
 
 public:
-  virtual bool compare_id(const uint32_t id) = 0;
   virtual void trigger() = 0;
 };
 

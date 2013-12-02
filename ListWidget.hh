@@ -30,6 +30,10 @@ public:
 public:
     void
     addWidget(ListItem* widget);
+
+    std::vector<ListItem*>
+    widgets() const;
+
     void
     clearWidgets();
 

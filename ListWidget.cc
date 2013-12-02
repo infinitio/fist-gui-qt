@@ -44,6 +44,12 @@ ListWidget::addWidget(ListItem* widget)
   this->_layout();
 }
 
+std::vector<ListItem*>
+ListWidget::widgets() const
+{
+  return this->_widgets;
+}
+
 void
 ListWidget::clearWidgets()
 {
@@ -213,15 +219,4 @@ ListWidget::paintEvent(QPaintEvent*)
     painter.drawRect(0, height, this->width(), separator - 1);
     height += separator;
   }
-}
-
-
-ListItem*
-ListWidget::get(const uint32_t id)
-{
-  for (auto widget : _widgets)
-    if (widget->compare_id(id))
-      return widget;
-
-  return nullptr;
 }

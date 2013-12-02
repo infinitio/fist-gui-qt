@@ -12,9 +12,3 @@ UserWidget::trigger()
   std::cout << _user.toStdString() << std::endl;
   emit clicked_signal(_uid);
 }
-
-bool
-UserWidget::compare_id(const uint32_t uid)
-{
-  return uid == _uid;
-}
