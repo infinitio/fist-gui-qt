@@ -1,17 +1,21 @@
 #include <fist-gui-qt/IconButton.hh>
 
-IconButton::IconButton(QPixmap const& pixmap, bool shadow):
+IconButton::IconButton(QPixmap const& pixmap,
+                       bool shadow,
+                       Callback const& cb):
   _color(Qt::white),
   _has_shadow(shadow),
   _cache(),
   _original(pixmap),
   _icon(),
-  _shadow()
+  _shadow(),
+  _callback(cb)
 {
   this->_draw_shape(this->_icon, this->color());
   this->_draw_shape(this->_shadow, Qt::black);
   this->_refresh();
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  connect(this, SIGNAL(released()), SLOT(_clicked()));
 }
 
 void
@@ -50,4 +54,11 @@ IconButton::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   painter.drawPixmap(QPoint(0, 0), this->_cache);
+}
+
+void
+IconButton::_clicked()
+{
+  if (this->_callback)
+    this->_callback();
 }

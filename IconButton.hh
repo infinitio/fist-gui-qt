@@ -6,14 +6,19 @@
 
 # include <fist-gui-qt/utils.hh>
 
+# include <functional>
+
 class IconButton: public QPushButton
 {
-public:
-  IconButton(QPixmap const& pixmap, bool shadow);
+  Q_OBJECT;
 
-  Q_PROPERTY(QColor color READ color WRITE setColor);
+  typedef std::function<void ()> Callback;
+public:
+  IconButton(QPixmap const& pixmap, bool shadow, Callback const& = {});
+
+  Q_PROPERTY(QColor color READ color);
   Q_PROPERTY_R(QColor, color, color);
-  Q_PROPERTY(bool shadow READ hasShadow WRITE setShadow);
+  Q_PROPERTY(bool shadow READ hasShadow);
   Q_PROPERTY_R(bool, has_shadow, hasShadow);
 
 private:
@@ -28,12 +33,16 @@ protected:
   void
   paintEvent(QPaintEvent*) override;
 
+private slots:
+  void
+  _clicked();
+
 private:
   QPixmap _cache;
   QPixmap _original;
   QPixmap _icon;
   QPixmap _shadow;
+  Callback _callback;
 };
-
 
 #endif
