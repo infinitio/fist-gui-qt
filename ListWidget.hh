@@ -61,6 +61,11 @@ public:
   int offset();
 public Q_SLOTS:
   void setOffset(int val);
+public:
+  Q_PROPERTY(int _max_rows READ maxRows WRITE setMaxRows);
+  int maxRows();
+public Q_SLOTS:
+  void setMaxRows(int val);
 
 private Q_SLOTS:
   void
@@ -69,6 +74,8 @@ private:
   int _height_hint;
   int _width_hint;
   int _offset;
+  int _max_rows;
+
   std::vector<ListItem*> _widgets;
   SmoothScrollBar* _scroll;
 

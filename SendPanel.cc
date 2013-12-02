@@ -42,8 +42,8 @@ SendPanel::SendPanel(gap_State* state):
   layout->setContentsMargins(0, 0, 0, 0);
 
   this->_users->set_mate(this->_search);
-  //this->_users->setMaxRows(5);
-  // this->_file_list->setMaxRows(4);
+  this->_users->setMaxRows(5);
+  this->_file_list->setMaxRows(4);
 
   this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
 

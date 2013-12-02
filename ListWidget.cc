@@ -21,6 +21,7 @@ ListWidget::ListWidget(QWidget* parent, QWidget* mate):
   _height_hint(0),
   _width_hint(0),
   _offset(0),
+  _max_rows(-1),
   _scroll(new SmoothScrollBar(this)),
   _wheel_event(false),
   _keyboard_index(0),
@@ -89,21 +90,26 @@ ListWidget::_layout()
   this->_width_hint = 0;
   for (auto widget: this->_widgets)
     this->_width_hint = std::max(this->_width_hint, widget->sizeHint().width());
+
+  int rows = 0;
+  int fixed_height = -1;
   for (auto widget: this->_widgets)
   {
     int widget_height = widget->sizeHint().height();
     QRect geometry(0, height - this->_offset, this->width(), widget_height);
     widget->setGeometry(geometry);
     height += widget_height + separator;
+    if (fixed_height == -1 && ++rows == this->maxRows())
+    {
+      fixed_height = height;
+    }
   }
   this->_width_hint += 5 + this->_scroll->sizeHint().width();
-  this->_height_hint = height;
+
+  int real_height = ((fixed_height != -1) ? fixed_height : height);
+  this->_height_hint = real_height;
   this->updateGeometry();
-  // QPropertyAnimation* animation = new QPropertyAnimation(this, "heightHint");
-  // animation->setDuration(200);
-  // animation->setEndValue(height);
-  // animation->start();
-  if (this->height() < height)
+  if (this->height() < real_height)
   {
     this->_scroll->show();
     this->_scroll->setMinimum(0);
@@ -125,6 +131,19 @@ void
 ListWidget::setOffset(int val)
 {
   this->_offset = val;
+  this->_layout();
+}
+
+int
+ListWidget::maxRows()
+{
+  return this->_max_rows;
+}
+
+void
+ListWidget::setMaxRows(int val)
+{
+  this->_max_rows = val;
   this->_layout();
 }
 
@@ -184,8 +203,8 @@ ListWidget::setFocus()
 
   if (_widgets.size() != 0)
   {
-    ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
 #if 0
+    ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
     item->setStyleSheet("background-color:pink;");
 #endif
   }
