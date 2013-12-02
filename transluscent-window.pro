@@ -45,7 +45,7 @@ HEADERS +=                                      \
     Footer.hh                                   \
     IconButton.hh                               \
     InfinitDock.hh                              \
-    ListItem.cc                                 \
+    ListItem.hh                                 \
     ListWidget.hh                               \
     LoginWindow.hh                              \
     RoundShadowWidget.hh                        \
