@@ -19,7 +19,6 @@
 `-------------*/
 
 static int const dock_size = 60;
-static InfinitDock* g_dock = nullptr;
 
 InfinitDock::InfinitDock(gap_State* state):
   _transaction_panel(new TransactionPanel(state)),
@@ -39,14 +38,11 @@ InfinitDock::InfinitDock(gap_State* state):
   this->_systray_menu->addAction(_quit);
   this->_systray->setContextMenu(_systray_menu);
 
-
   // Register gap callback.
-  g_dock = this;
   gap_connection_callback(_state, InfinitDock::connection_status_cb);
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
 
-  this->_panel->setCentralWidget(this->_transaction_panel);
-  this->_transaction_panel->setFocus();
+  this->_switch_view(this->_transaction_panel);
 
   this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -183,8 +179,7 @@ InfinitDock::chooseFiles()
     {
         for (auto file: selected)
             this->_send_panel->addFile(file);
-        this->_panel->centralWidget()->setParent(0);
-        this->_panel->setCentralWidget(this->_send_panel);
+        this->_switch_view(this->_send_panel);
         this->showPanel();
     }
 }
@@ -229,8 +224,7 @@ InfinitDock::dropEvent(QDropEvent *event)
         event->acceptProposedAction();
         this->_send_panel->addFile(url.toLocalFile());
       }
-  this->_panel->centralWidget()->setParent(0);
-  this->_panel->setCentralWidget(this->_send_panel);
+  this->_switch_view(this->_send_panel);
   this->showPanel();
 }
 
@@ -264,20 +258,40 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
 }
 
 void
-InfinitDock::switch_panel()
+InfinitDock::_show_send_view()
 {
-  if (this->_panel->centralWidget() == this->_send_panel)
+  this->_switch_view(this->_send_panel);
+}
+
+void
+InfinitDock::_show_user_view(uint32_t /* sender_id */)
+{
+
+}
+
+void
+InfinitDock::_show_transactions_view()
+{
+  this->_switch_view(this->_transaction_panel);
+}
+
+void
+InfinitDock::_switch_view(Panel* panel)
+{
+  if (panel == this->_panel->centralWidget())
   {
-    this->_panel->centralWidget()->setParent(0);
-    this->_panel->setCentralWidget(this->_transaction_panel);
-  }
-  else
-  {
-    this->_panel->centralWidget()->setParent(0);
-    this->_panel->setCentralWidget(this->_send_panel);
+    return;
   }
 
-  this->showPanel();
+  if (this->_panel->centralWidget() != nullptr)
+  {
+    static_cast<Panel*>(this->_panel->centralWidget())->on_hide();
+    this->_panel->centralWidget()->setParent(0);
+  }
+
+  panel->on_show();
+  this->_panel->setCentralWidget(panel);
+  // this->_panel->setFocus();
 }
 
 void

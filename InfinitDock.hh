@@ -30,7 +30,7 @@ public:
 
 public slots:
   void update();
-  void switch_panel();
+
 
 public slots:
   void _systray_activated(QSystemTrayIcon::ActivationReason reason);
@@ -47,15 +47,24 @@ public Q_SLOTS:
   void chooseFiles();
   void quit();
   void _position_panel();
+
+public slots:
+  void
+  _show_send_view();
+  void
+  _show_user_view(uint32_t sender_id);
+  void
+  _show_transactions_view();
+
 private:
+  void _switch_view(Panel* target);
+
   TransactionPanel* _transaction_panel;
   RoundShadowWidget* _panel;
 
 /*-----.
 | Send |
 `-----*/
-private Q_SLOTS:
-  void _search(QString const&);
 private:
   SendPanel* _send_panel;
 
