@@ -61,7 +61,7 @@ SmoothScrollBar::wheelEvent(QWheelEvent* event)
   this->_value_target = value;
   QPropertyAnimation* animation = new QPropertyAnimation(this, "value");
   animation->setEasingCurve(QEasingCurve::InOutQuad);
-  animation->setDuration(300);
+  animation->setDuration(250);
   animation->setEndValue(value);
   animation->start();
 }
