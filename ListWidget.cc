@@ -44,7 +44,7 @@ ListWidget::addWidget(ListItem* widget)
   this->_layout();
 }
 
-std::vector<ListItem*>
+std::vector<ListItem*> const&
 ListWidget::widgets() const
 {
   return this->_widgets;

@@ -12,12 +12,13 @@
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>
+# include <fist-gui-qt/TransactionModel.hh>
 
 class TransactionWidget:
   public ListItem
 {
 public:
-  TransactionWidget(gap_State* state, uint32_t tid);
+  TransactionWidget(TransactionModel const& model);
   Q_OBJECT;
 
 /*-----------.
@@ -38,6 +39,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   void onProgressChanged(float);
+  void onAcceptedTransaction(uint32_t);
 
 /*-------.
 | Layout |
@@ -64,12 +66,11 @@ public slots:
   void update_progress();
 
 private:
-  uint32_t _tid;
-  gap_State* _state;
+  TransactionModel const& _transaction;
   AvatarWidget* _avatar;
   QLayout* _layout;
-  QPushButton* _accept_button;
   QLabel* _status;
+  QPushButton* _accept_button;
   QTimer* _timer;
 };
 

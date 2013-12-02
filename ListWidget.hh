@@ -28,55 +28,53 @@ public:
 | Widgets |
 `--------*/
 public:
-    void
-    addWidget(ListItem* widget);
+  void
+  addWidget(ListItem* widget);
 
-    std::vector<ListItem*>
-    widgets() const;
+  std::vector<ListItem*> const&
+  widgets() const;
 
-    void
-    clearWidgets();
+  void
+  clearWidgets();
 
-    void
-    setFocus();
-
-/*-------.
-| Layout |
-`-------*/
-public:
-    virtual
-    QSize
-    sizeHint() const override;
-    virtual
-    QSize
-    minimumSizeHint() const override;
-
-public:
-    void
-    set_mate(QWidget* mate);
-
-    ListItem* get(const uint32_t id);
-
-  public:
-    Q_OBJECT;
-    Q_PROPERTY(int offset READ offset WRITE setOffset);
-    int offset();
-  public Q_SLOTS:
-    void setOffset(int val);
-
-  private Q_SLOTS:
-    void
-    _layout();
-  private:
-    int _height_hint;
-    int _width_hint;
-    int _offset;
-    std::vector<ListItem*> _widgets;
-    SmoothScrollBar* _scroll;
+  void
+  setFocus();
 
 /*-------.
-| Events |
-`-------*/
+  | Layout |
+  `-------*/
+public:
+  virtual
+  QSize
+  sizeHint() const override;
+  virtual
+  QSize
+  minimumSizeHint() const override;
+
+public:
+  void
+  set_mate(QWidget* mate);
+
+public:
+  Q_OBJECT;
+  Q_PROPERTY(int offset READ offset WRITE setOffset);
+  int offset();
+public Q_SLOTS:
+  void setOffset(int val);
+
+private Q_SLOTS:
+  void
+  _layout();
+private:
+  int _height_hint;
+  int _width_hint;
+  int _offset;
+  std::vector<ListItem*> _widgets;
+  SmoothScrollBar* _scroll;
+
+/*-------.
+  | Events |
+  `-------*/
 protected:
   virtual
   void
@@ -92,8 +90,8 @@ protected:
   QWidget* _mate;
 
 /*---------.
-| Paitning |
-`---------*/
+  | Paitning |
+  `---------*/
 protected:
   virtual
   void

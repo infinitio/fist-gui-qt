@@ -16,7 +16,10 @@ TransactionList::TransactionList():
 TransactionWidget*
 TransactionList::addTransaction(gap_State* state, uint32_t tid)
 {
-  auto widget = new TransactionWidget(state, tid);
+  if (this->_transactions.find(tid) == this->_transactions.end())
+    this->_transactions.emplace(tid, TransactionModel(state, tid));
+
+  auto widget = new TransactionWidget(this->_transactions.at(tid));
   this->_list->addWidget(widget);
   return widget;
 }

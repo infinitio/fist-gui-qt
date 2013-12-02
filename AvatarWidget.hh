@@ -22,8 +22,8 @@ class AvatarWidget:
 {
   public:
     AvatarWidget();
-    AvatarWidget(gap_State* state, uint32_t uid);
     AvatarWidget(QString const& picture);
+    AvatarWidget(QPixmap const& avatar);
 
   public:
     Q_OBJECT;
@@ -53,9 +53,6 @@ public:
              READ transactionCount
              WRITE setTransactionCount
              NOTIFY onTransactionCountChanged);
-
-public slots:
-  void slot_netwManagerFinished(QNetworkReply *reply);
 
 public Q_SLOTS:
   void setTransactionCount(int value);

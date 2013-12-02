@@ -2,13 +2,16 @@
 # define USERWIDGET_HH
 
 # include <iostream>
+
 # include <fist-gui-qt/ListItem.hh>
+# include <fist-gui-qt/UserModel.hh>
 
 class UserWidget:
   public ListItem
 {
 public:
-  UserWidget(QString const& user, uint32_t uid, QWidget* parent = nullptr);
+  UserWidget(UserModel const& model,
+             QWidget* parent = nullptr);
 
 Q_SIGNALS:
   void clicked_signal(uint32_t);
@@ -17,8 +20,7 @@ public:
   virtual void trigger();
 
 private:
-  QString const _user;
-  uint32_t _uid;
+  UserModel const& _model;
 
   Q_OBJECT;
 };

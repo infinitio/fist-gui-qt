@@ -33,36 +33,10 @@ AvatarWidget::AvatarWidget():
   this->setMaximumSize(total_size, total_size);
 }
 
-AvatarWidget::AvatarWidget(gap_State* state, uint32_t uid):
+AvatarWidget::AvatarWidget(QPixmap const& pixmap):
   AvatarWidget()
 {
-  this->_uid = uid;
-
-  // Look for the avatar in the avatars already loaded.
-  auto avatar = g_avatars.find(uid);
-
-  if (avatar == g_avatars.end())
-  {
-    // Start requesting the avatar.
-    QNetworkAccessManager* m_netwManager = new QNetworkAccessManager(this);
-    connect(m_netwManager,
-            SIGNAL(finished(QNetworkReply*)),
-            this,
-            SLOT(slot_netwManagerFinished(QNetworkReply*)));
-
-    // Setup request string.
-    const char* protocol = "http://";
-    const char* url = gap_user_avatar_url(state, uid);
-    std::string stdurl = std::string(protocol) + std::string(url);
-    gap_free_user_avatar_url(url);
-
-    // Request the image at address stdurl.
-    QUrl qurl(stdurl.c_str());
-    QNetworkRequest request(qurl);
-    m_netwManager->get(request);
-  }
-  else
-    this->setPicture(g_avatars[uid]);
+  this->setPicture(pixmap);
 }
 
 AvatarWidget::AvatarWidget(QString const& picture):
@@ -270,22 +244,5 @@ AvatarWidget::paintEvent(QPaintEvent*)
                        QString::number(this->transactionCount()));
       painter.restore();
     }
-  }
-}
-
-void
-AvatarWidget::slot_netwManagerFinished(QNetworkReply *reply)
-{
-  if (reply->error() == QNetworkReply::NoError)
-  {
-    QByteArray jpegData = reply->readAll();
-    QPixmap pixmap;
-    pixmap.loadFromData(jpegData);
-    this->setPicture(pixmap);
-    g_avatars.insert(std::pair<uint32_t, QPixmap>(_uid, pixmap));
-  }
-  else
-  {
-    this->setPicture(QPixmap(QString("resources/avatar1.png")));
   }
 }

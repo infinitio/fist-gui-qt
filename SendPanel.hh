@@ -1,6 +1,8 @@
 #ifndef SENDPANEL_HH
 # define SENDPANEL_HH
 
+# include <unordered_map>
+
 # include <QLineEdit>
 # include <QPushButton>
 # include <QWidget>
@@ -53,6 +55,7 @@ private:
   QLineEdit* _search;
   QPushButton* _send;
   ListWidget* _users;
+  std::unordered_map<uint32_t, UserModel> _user_models;
   gap_State* _state;
 
 /*-------.

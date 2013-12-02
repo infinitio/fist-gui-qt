@@ -21,35 +21,17 @@ std::map<gap_TransactionStatus, QString> g_statuses =
   { gap_transaction_rejected, "Rejected" },
 };
 
-TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
-  _tid(tid),
-  _state(state),
+TransactionWidget::TransactionWidget(TransactionModel const& model):
+  _transaction(model),
   _layout(nullptr),
   _accept_button(nullptr),
-  _status(new QLabel(g_statuses[gap_transaction_status(state, tid)])),
+  _status(new QLabel(g_statuses[this->_transaction.status()])),
   _timer(nullptr)
 {
   static int const padding = 5;
 
-  // Retrieve information from gap layer.
-  // TODO: Error checking.
-  char** file_names = gap_transaction_files(state, tid);
-  const char* first_file_name = *file_names;
 
-  uint32_t oid;
-  const char* corresp_name;
-  if (gap_self_id(state) == gap_transaction_recipient_id(state, tid))
-  {
-    corresp_name = gap_transaction_sender_fullname(state, tid);
-    oid = gap_transaction_sender_id(state, tid);
-  }
-  else
-  {
-    corresp_name = gap_transaction_recipient_fullname(state, tid);
-    oid = gap_transaction_recipient_id(state, tid);
-  }
-
-  this->_avatar = new AvatarWidget(state, oid);
+  this->_avatar = new AvatarWidget(this->_transaction.avatar());
 
   auto layout = new QHBoxLayout(this);
   this->_layout = layout;
@@ -59,8 +41,8 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   texts->setContentsMargins(5, 12, 5, 12);
   layout->addLayout(texts);
 
-  auto username = new QLabel(QString(corresp_name));
-  auto filename = new QLabel(QString(first_file_name));
+  auto username = new QLabel(this->_transaction.peer_fullname());
+  auto filename = new QLabel(this->_transaction.files().first());
 
   {
     username->setFixedWidth(120);
@@ -88,8 +70,8 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   layout->addLayout(infos);
   infos->addWidget(this->_status);
 
-  if (gap_transaction_recipient_id(_state, _tid) == gap_self_id(_state) and
-      gap_transaction_status(state, tid) == gap_transaction_waiting_for_accept)
+  if (!this->_transaction.is_sender() &&
+      this->_transaction.status() == gap_transaction_waiting_for_accept)
   {
     _accept_button = new QPushButton(QString("Accept"), this);
     connect(_accept_button, SIGNAL(clicked()), this, SLOT(accept()));
@@ -100,7 +82,7 @@ TransactionWidget::TransactionWidget(gap_State* state, uint32_t tid):
   else
     infos->addWidget(new QLabel());
 
-  if (gap_transaction_status(_state, _tid) == gap_transaction_running)
+  if (this->_transaction.status() == gap_transaction_running)
   {
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
@@ -171,17 +153,16 @@ TransactionWidget::trigger()
 void
 TransactionWidget::update()
 {
-  gap_TransactionStatus status = gap_transaction_status(_state, _tid);
-
   // Accept button update.
-  if (status != gap_transaction_waiting_for_accept &&
+  if (this->_transaction.status() != gap_transaction_waiting_for_accept &&
       this->_accept_button != nullptr)
   {
     delete this->_accept_button;
     this->_accept_button = nullptr;
   }
 
-  if (status == gap_transaction_running && this->_timer == nullptr)
+  if (this->_transaction.status() == gap_transaction_running &&
+      this->_timer == nullptr)
   {
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
@@ -192,25 +173,26 @@ TransactionWidget::update()
             this->_avatar,
             SLOT(setProgress(float)));
   }
-  else if (status != gap_transaction_running && this->_timer != nullptr)
+  else if (this->_transaction.status() != gap_transaction_running &&
+           this->_timer != nullptr)
   {
     setProgress(0);
     delete this->_timer;
     this->_timer = nullptr;
   }
 
-  this->_status->setText(g_statuses[status]);
+  this->_status->setText(g_statuses[this->_transaction.status()]);
 }
 
 void
 TransactionWidget::update_progress()
 {
-  float progress = gap_transaction_progress(_state, _tid);
+  float progress = this->_transaction.progress();
   emit onProgressChanged(progress);
 }
 
 void
 TransactionWidget::accept()
 {
-  gap_accept_transaction(this->_state, this->_tid);
+  emit onAcceptedTransaction(this->_transaction.id());
 }

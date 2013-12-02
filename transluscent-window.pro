@@ -32,9 +32,11 @@ SOURCES +=                                      \
     SmoothScrollBar.cc                          \
     TransactionFooter.cc                        \
     TransactionList.cc                          \
+    TransactionModel.cc                         \
     TransactionPanel.cc                         \
     TransactionWidget.cc                        \
     TransactionWindow.cc                        \
+    UserModel.cc                                \
     UserWidget.cc                               \
     main.cc                                     \
 
@@ -55,10 +57,12 @@ HEADERS +=                                      \
     SmoothLayout.hh                             \
     SmoothScrollBar.hh                          \
     TransactionFooter.hh                        \
+    TransactionModel.hh                         \
     TransactionList.hh                          \
     TransactionPanel.hh                         \
     TransactionWidget.hh                        \
     TransactionWindow.hh                        \
+    UserModel.hh                                \
     UserWidget.hh                               \
 
 RESOURCES += resources/resources.qrc
