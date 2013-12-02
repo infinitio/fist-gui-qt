@@ -18,6 +18,7 @@ SOURCES +=                                      \
     AvatarWidget.cc                             \
     AvatarIcon.cc                               \
     DebugWindow.cc                              \
+    FileItem.cc                                 \
     Footer.cc                                   \
     IconButton.cc                               \
     InfinitDock.cc                              \
@@ -44,6 +45,7 @@ HEADERS +=                                      \
     AvatarWidget.hh                             \
     AvatarIcon.hh                               \
     DebugWindow.hh                              \
+    FileItem.hh                                 \
     Footer.hh                                   \
     IconButton.hh                               \
     InfinitDock.hh                              \
