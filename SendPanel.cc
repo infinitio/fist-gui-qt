@@ -1,9 +1,11 @@
 #include <QEvent>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPainter>
-#include <QVBoxLayout>
+#include <QTextEdit>
+#include <QGridLayout>
 
+#include <fist-gui-qt/AvatarIcon.hh>
+#include <fist-gui-qt/FileItem.hh>
 #include <fist-gui-qt/Footer.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
@@ -11,49 +13,76 @@
 #include <fist-gui-qt/SendPanel.hh>
 #include <fist-gui-qt/utils.hh>
 
-class SendFooter:
-  public Footer
-{
-public:
-  SendFooter(QWidget* parent = nullptr):
-    Footer(parent)
-  {
-    auto layout = new QHBoxLayout(this);
-    layout->setContentsMargins(10, 10, 10, 5);
-    layout->addWidget(new IconButton(QPixmap(":/icons/gear.png"), true));
-    layout->addItem(new QSpacerItem(0, 0,
-                                    QSizePolicy::MinimumExpanding,
-                                    QSizePolicy::Minimum));
-    layout->addWidget(new IconButton(QPixmap(":/icons/arrows.png"), true));
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  }
-};
-
 /*-------------.
 | Construction |
 `-------------*/
 
-SendPanel::SendPanel(gap_State* state):
-  Super(),
-  _search(nullptr),
-  _send(new QPushButton("Send", this)),
-  _users(nullptr),
-  _state(state)
+namespace
 {
-  this->_users = new ListWidget(this);
+  struct Separator:
+    public QFrame
+  {
+    Separator()
+    {
+      this->setFrameShape(QFrame::HLine);
+      this->setFrameShadow(QFrame::Sunken);
+    }
+  };
+}
 
-  auto layout = new QHBoxLayout(this);
-  auto search = new SearchField(this, &this->_users);
-  this->_users->set_mate(search);
-  this->_search = search;
-  search->setIcon(QPixmap(":/icons/magnifier.png"));
-  new SendFooter(this);
+SendPanel::SendPanel(gap_State* state):
+  Super(new SendFooter),
+  _users(new ListWidget(this)),
+  _search(new SearchField(this, &this->_users)),
+  _send(new QPushButton("Send", this)),
+  _state(state),
+  _file_list(new ListWidget(this))
+{
+  auto layout = new QGridLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  this->_users->set_mate(this->_search);
+  //this->_users->setMaxRows(5);
+  // this->_file_list->setMaxRows(4);
+
+  this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
+
+  layout->addWidget(this->_search, 0, 0);
+  layout->addWidget(this->_send, 0, 1);
+  layout->addWidget(this->_users, 1, 0, 1, -1);
+  layout->addWidget(new Separator, 2, 0, 1, -1);
+  // layout->addWidget(new Note, 2, 0, 2, 3)
+  // layout->addWidget(new Separator, 3, 0, 3, 3);
+  layout->addWidget(this->_file_list, 3, 0, 1, -1);
+  layout->addWidget(this->_footer, 4, 0, 1, -1);
 
   connect(this->_send, SIGNAL(clicked()), this, SLOT(send()));
 
   this->connect(this->_search, SIGNAL(textChanged(QString const&)),
-                SIGNAL(onSearchChanged(QString const&)));
+                SLOT(_search_changed(QString const&)));
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+}
+
+void
+SendPanel::_search_changed(QString const& search)
+{
+
+  QStringList res;
+
+  if (search.size() != 0)
+  {
+    std::string text(search.toStdString());
+    uint32_t* uids = gap_search_users(_state, text.c_str());
+
+    for (uint32_t i = 0; uids[i] != 0; i += 1)
+      res.append(QString(gap_user_fullname(_state, uids[i])));
+
+    this->setUsers(res, uids);
+    gap_search_users_free(uids);
+  }
+  else
+    this->clearUsers();
+
 }
 
 /*------.
@@ -63,7 +92,9 @@ SendPanel::SendPanel(gap_State* state):
 void
 SendPanel::addFile(QString const& path)
 {
-  _file_path = std::string(path.toStdString());
+  auto res = this->_files.insert(path);
+  if (res.second)
+    this->_file_list->addWidget(new FileItem(path));
 }
 
 /*------.
@@ -117,20 +148,59 @@ SendPanel::send(uint32_t uid)
     gap_search_users_free(uids);
   }
 
+  if (this->_files.empty())
+  {
+    std::cerr << "NO FILES" << std::endl;
+    emit switch_signal();
+    return;
+  }
+
   const char* filenames[2] = { 0 };
-  filenames[0] = _file_path.c_str();
+  filenames[0] = this->_files.begin()->toStdString().c_str();
 
   gap_send_files(_state, uid, filenames, "Basic comment");
 
   emit switch_signal();
 }
 
+void
+SendPanel::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Escape)
+    emit switch_signal();
+}
+
 /*-------.
 | Layout |
 `-------*/
-
 QSize
 SendPanel::sizeHint() const
 {
   return QSize(320, std::min(400, Super::sizeHint().height()));
+}
+
+/*------------.
+| Show & Hide |
+`------------*/
+void
+SendPanel::on_show()
+{
+  this->_search->setFocus();
+}
+
+void
+SendPanel::on_hide()
+{
+  this->_search->clear();
+  this->_file_list->clearWidgets();
+  this->_files.clear();
+}
+
+/*-------.
+| Footer |
+`-------*/
+SendFooter*
+SendPanel::footer()
+{
+  return static_cast<SendFooter*>(this->_footer);
 }

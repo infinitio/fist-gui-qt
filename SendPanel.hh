@@ -1,28 +1,32 @@
 #ifndef SENDPANEL_HH
 # define SENDPANEL_HH
 
-# include <unordered_map>
-
 # include <QLineEdit>
 # include <QPushButton>
 # include <QWidget>
+# include <QListWidget>
+
+# include <unordered_map>
+# include <set>
 
 # include <surface/gap/gap.h>
 
+# include <fist-gui-qt/Panel.hh>
+# include <fist-gui-qt/SendFooter.hh>
 # include <fist-gui-qt/SmoothLayout.hh>
+# include <fist-gui-qt/ListWidget.hh>
 # include <fist-gui-qt/UserWidget.hh>
-# include <fist-gui-qt/AvatarIcon.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class SendPanel:
-  public SmoothLayout
+  public Panel
 {
 /*------.
 | Types |
 `------*/
 public:
   typedef SendPanel Self;
-  typedef SmoothLayout Super;
+  typedef Panel Super;
 
 /*-------------.
 | Construction |
@@ -39,7 +43,7 @@ public:
 
 public slots:
   void send(uint32_t uid = 0);
-
+  void _search_changed(QString const& search);
 /*------.
 | Users |
 `------*/
@@ -48,15 +52,18 @@ public:
   setUsers(QStringList const& users, uint32_t* uids = nullptr);
   void
   clearUsers();
+
 Q_SIGNALS:
-  void onSearchChanged(QString const& search);
   void switch_signal();
 private:
-  QLineEdit* _search;
-  QPushButton* _send;
   ListWidget* _users;
-  std::unordered_map<uint32_t, UserModel> _user_models;
+  SearchField* _search;
+  QPushButton* _send;
   gap_State* _state;
+
+protected:
+  void
+  keyPressEvent(QKeyEvent* event) override;
 
 /*-------.
 | Layout |
@@ -66,10 +73,25 @@ public:
   QSize
   sizeHint() const override;
 private:
-  std::string _file_path;
+  std::unordered_map<uint32_t, UserModel> _user_models;
+  ListWidget* _file_list;
+  std::set<QString> _files;
+
+  void
+  on_show() override;
+
+  void
+  on_hide() override;
 
 private:
   Q_OBJECT;
+
+  /*-------.
+  | Footer |
+  `-------*/
+public:
+  SendFooter*
+  footer() override;
 };
 
 #endif

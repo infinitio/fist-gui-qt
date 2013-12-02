@@ -25,6 +25,7 @@ SOURCES +=                                      \
     ListItem.cc                                 \
     ListWidget.cc                               \
     LoginWindow.cc                              \
+    Panel.cc                                    \
     RoundShadowWidget.cc                        \
     SearchField.cc                              \
     SendFooter.cc                               \
@@ -52,6 +53,7 @@ HEADERS +=                                      \
     ListItem.hh                                 \
     ListWidget.hh                               \
     LoginWindow.hh                              \
+    Panel.hh                                    \
     RoundShadowWidget.hh                        \
     SearchField.hh                              \
     SendFooter.hh                               \

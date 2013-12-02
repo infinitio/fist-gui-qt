@@ -3,6 +3,7 @@
 
 # include <QScrollArea>
 # include <QFrame>
+
 # include <surface/gap/gap.h>
 
 # include <set>
@@ -10,9 +11,11 @@
 # include <algorithm>
 
 # include <fist-gui-qt/TransactionList.hh>
+# include <fist-gui-qt/TransactionFooter.hh>
+# include <fist-gui-qt/Panel.hh>
 
 class TransactionPanel:
-  public QWidget
+  public Panel
 {
 public:
   TransactionPanel(gap_State* state, QWidget* parent = nullptr);
@@ -28,6 +31,11 @@ private:
   TransactionList* _list;
   gap_State* _state;
   Q_OBJECT;
+
+public:
+  TransactionFooter*
+  footer();
+
 };
 
 #endif

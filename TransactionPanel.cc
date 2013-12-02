@@ -5,29 +5,15 @@
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
 
+#include <iostream>
+
 #define MAX_TRANSAS 15
 
 static TransactionPanel* g_panel = nullptr;
 static gap_State* g_state = nullptr;
 
-class TransactionFooter:
-  public Footer
-{
-public:
-  TransactionFooter()
-  {
-    auto layout = new QHBoxLayout(this);
-    layout->setContentsMargins(10, 10, 10, 5);
-    layout->addWidget(new IconButton(QPixmap(":/icons/gear.png"), true));
-    layout->addItem(new QSpacerItem(0, 0,
-                                    QSizePolicy::MinimumExpanding,
-                                    QSizePolicy::Minimum));
-    layout->addWidget(new IconButton(QPixmap(":/icons/arrows.png"), true));
-  }
-};
-
 TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
-  QWidget(parent),
+  Panel(new TransactionFooter, parent),
   _list(nullptr),
   _state(state)
 {
@@ -35,7 +21,7 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
   layout->setContentsMargins(0, 0, 0, 0);
   this->_list = new TransactionList;
   layout->addWidget(this->_list);
-  layout->addWidget(new TransactionFooter);
+  layout->addWidget(this->_footer);
 
   // Register gap callback.
   g_panel = this;
@@ -93,4 +79,13 @@ TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
     g_panel->addTransaction(g_panel->_state, id);
   else
     g_panel->_list->updateTransaction(g_panel->_state, id);
+}
+
+/*-------.
+| Footer |
+`-------*/
+TransactionFooter*
+TransactionPanel::footer()
+{
+  return static_cast<TransactionFooter*>(this->_footer);
 }
