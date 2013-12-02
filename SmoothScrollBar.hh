@@ -3,8 +3,6 @@
 
 # include <QPropertyAnimation>
 # include <QWidget>
-#include <iostream>
-
 
 class SmoothScrollBar:
   public QWidget

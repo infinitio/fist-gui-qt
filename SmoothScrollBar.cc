@@ -31,6 +31,11 @@ SmoothScrollBar::paintEvent(QPaintEvent*)
   painter.setBrush(Qt::black);
   painter.setOpacity(0.5);
 
+  if (this->displayMaximum() == 0)
+  {
+    return;
+  }
+
   int start = this->height() * this->value() / this->displayMaximum();
   painter.drawRoundedRect(
     QRect(QPoint(0, start),
