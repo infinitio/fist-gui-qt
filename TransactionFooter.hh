@@ -17,12 +17,11 @@ public:
   virtual
   ~TransactionFooter() = default;
 
-Q_SIGNALS:
-  void toggle_send_view();
+  IconButton* const
+  send() const;
 
 private:
   IconButton* _send;
-  Q_OBJECT
 };
 
 #endif

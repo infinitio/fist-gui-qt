@@ -4,19 +4,9 @@
 SendFooter::SendFooter():
   Footer(nullptr),
   _back(new IconButton(QPixmap(":/icons/trash.png"),
-                       true,
-                       [this]
-                       {
-                         std::cerr << "back" << std::endl;
-                         emit toggle_transaction_view();
-                       })),
+                       true)),
   _attach(new IconButton(QPixmap(":/icons/clip.png"),
-                         true,
-                         [this]
-                         {
-                           std::cerr << "attach" << std::endl;
-                           emit toggle_file_picker();
-                         }))
+                         true))
 
 {
   this->_layout->addWidget(this->_back);
@@ -24,4 +14,16 @@ SendFooter::SendFooter():
                                   QSizePolicy::MinimumExpanding,
                                   QSizePolicy::Minimum));
   this->_layout->addWidget(this->_attach);
+}
+
+IconButton const*
+SendFooter::back() const
+{
+  return this->_back;
+}
+
+IconButton const*
+SendFooter::attach() const
+{
+  return this->_attach;
 }

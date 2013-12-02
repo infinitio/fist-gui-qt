@@ -16,14 +16,16 @@ public:
   virtual
   ~SendFooter() = default;
 
-Q_SIGNALS:
-  void toggle_transaction_view();
-  void toggle_file_picker();
+public:
+  IconButton const*
+  back() const;
+
+  IconButton const*
+  attach() const;
 
 private:
   IconButton* _back;
   IconButton* _attach;
-  Q_OBJECT
 };
 
 
