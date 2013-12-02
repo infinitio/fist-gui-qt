@@ -143,33 +143,6 @@ InfinitDock::_position_panel()
   this->_panel->move(x, y);
 }
 
-/*-----.
-| Send |
-`-----*/
-
-void
-InfinitDock::_search(QString const& search)
-{
-
-  QStringList res;
-
-  if (search.size() != 0)
-  {
-    std::string text(search.toStdString());
-    uint32_t* uids = gap_search_users(_state, text.c_str());
-
-    for (uint32_t i = 0; uids[i] != 0; i += 1)
-      res.append(QString(gap_user_fullname(_state, uids[i])));
-
-    this->_send_panel->setUsers(res, uids);
-    gap_search_users_free(uids);
-  }
-  else
-    this->_send_panel->clearUsers();
-
-}
-
-
 void
 InfinitDock::chooseFiles()
 {
@@ -302,10 +275,10 @@ InfinitDock::connection_status_cb(gap_UserStatus const status)
 }
 
 void
-InfinitDock::user_status_cb(uint32_t id, gap_UserStatus const status)
+InfinitDock::user_status_cb(uint32_t /* id */,
+                            gap_UserStatus const /* status */)
 {
   std::cerr << "User status changed" << std::endl;
-  //g_dock->_send_panel->update_list(id, status);
 }
 
 void
