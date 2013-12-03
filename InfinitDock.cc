@@ -78,6 +78,11 @@ InfinitDock::InfinitDock(gap_State* state):
           this,
           SLOT(chooseFiles()));
 
+  connect(this->_send_panel,
+          SIGNAL(switch_signal()),
+          this,
+          SLOT(_show_transactions_view()));
+
   QIcon icon(this->_logo);
   _systray->setIcon(icon);
   _systray->setVisible(true);
