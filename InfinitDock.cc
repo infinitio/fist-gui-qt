@@ -27,7 +27,21 @@ static int const dock_size = 60;
 // is to add a global pointer to the dock and makes it emit the signal.
 InfinitDock* g_dock = nullptr;
 
+class InfinitDock::Prologue
+{
+  friend InfinitDock;
+
+  Prologue(gap_State* state)
+  {
+    // Register gap callback.
+    gap_connection_callback(state, InfinitDock::connection_status_cb);
+    gap_user_status_callback(state, InfinitDock::user_status_cb);
+    gap_avatar_available_callback(state, InfinitDock::avatar_available_cb);
+  }
+};
+
 InfinitDock::InfinitDock(gap_State* state):
+  _prologue(new Prologue(state)),
   _transaction_panel(new TransactionPanel(state)),
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel(state)),
@@ -48,6 +62,7 @@ InfinitDock::InfinitDock(gap_State* state):
   // Register gap callback.
   gap_connection_callback(_state, InfinitDock::connection_status_cb);
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
+  gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
 
   this->_switch_view(this->_transaction_panel);
 
@@ -82,6 +97,21 @@ InfinitDock::InfinitDock(gap_State* state):
           SIGNAL(switch_signal()),
           this,
           SLOT(_show_transactions_view()));
+
+  connect(this,
+          SIGNAL(avatar_available(uint32_t)),
+          this->_send_panel,
+          SLOT(on_avatar_available(uint32_t)));
+
+  connect(this,
+          SIGNAL(avatar_available(uint32_t)),
+          this->_transaction_panel,
+          SLOT(on_avatar_available(uint32_t)));
+
+
+  QTimer *timer = new QTimer;
+  connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+  timer->start(500);
 
   QIcon icon(this->_logo);
   _systray->setIcon(icon);
@@ -295,6 +325,13 @@ InfinitDock::user_status_cb(uint32_t /* id */,
                             gap_UserStatus const /* status */)
 {
   std::cerr << "User status changed" << std::endl;
+}
+
+void
+InfinitDock::avatar_available_cb(uint32_t id)
+{
+  std::cerr << "Avatar available" << std::endl;
+  g_dock->avatar_available(id);
 }
 
 void

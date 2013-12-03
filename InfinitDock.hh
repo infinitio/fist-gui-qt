@@ -16,6 +16,15 @@
 class InfinitDock:
   public QMainWindow
 {
+  // This class is used to create tasks that need done first.
+  // The need comes from initialization wich create some objects that have a
+  // behavior in their contructor, which may require attributes from the dock.
+  // Using the same pattern than pimpl makes it easy to update without polluting
+  // the api.
+private:
+  class Prologue;
+  std::unique_ptr<Prologue> _prologue;
+
 /*------.
 | Types |
 `------*/
@@ -29,14 +38,18 @@ public:
   InfinitDock(gap_State* state);
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
+  static void avatar_available_cb(uint32_t id);
 
 public slots:
   void update();
 
-
 public slots:
   void _systray_activated(QSystemTrayIcon::ActivationReason reason);
 
+Q_SIGNALS:
+  void avatar_available(uint32_t id);
+  void user_status_changed(uint32_t, gap_UserStatus);
+  void connection_status_changed(gap_UserStatus);
 
 /*------.
 | Panel |
