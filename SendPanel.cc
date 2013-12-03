@@ -66,7 +66,6 @@ SendPanel::SendPanel(gap_State* state):
 void
 SendPanel::_search_changed(QString const& search)
 {
-
   QStringList res;
 
   if (search.size() != 0)
@@ -79,7 +78,6 @@ SendPanel::_search_changed(QString const& search)
   }
   else
     this->clearUsers();
-
 }
 
 /*------.
@@ -87,11 +85,26 @@ SendPanel::_search_changed(QString const& search)
 `------*/
 
 void
-SendPanel::addFile(QString const& path)
+SendPanel::add_file(QString const& path)
 {
-  auto res = this->_files.insert(path);
-  if (res.second)
-    this->_file_list->addWidget(new FileItem(path));
+  if (this->_files.insert(path, new FileItem(path)) != this->_files.end())
+  {
+    connect(this->_files[path], SIGNAL(remove(QString const&)),
+            this, SLOT(remove_file(QString const&)));
+    this->_file_list->addWidget(this->_files[path]);
+  }
+}
+
+void
+SendPanel::remove_file(QString const& path)
+{
+  auto it = this->_files.find(path);
+
+  if (it != this->_files.end())
+  {
+    this->_file_list->removeWidget(it.value());
+    this->_files.remove(path);
+  }
 }
 
 /*------.
@@ -147,10 +160,32 @@ SendPanel::send(uint32_t uid)
     return;
   }
 
-  const char* filenames[2] = { 0 };
-  filenames[0] = this->_files.begin()->toStdString().c_str();
+  char** filenames;
+  if ((filenames = (char**)malloc((this->_files.size() + 1) * sizeof(char*))) == nullptr)
+  {
+    std::cerr << "error: unable to allocate" << std::endl;
+  }
+
+  for (int i = 0; i < this->_files.size(); i++)
+  {
+    if ((filenames[i] = (char*)malloc((this->_files.keys().at(i).size() + 1))) == nullptr)
+    {
+      std::cerr << "error: unable to allocate" << std::endl;
+    }
+
+    strcpy(filenames[i], this->_files.keys().at(i).toStdString().c_str());
+  }
+  filenames[this->_files.size()] = nullptr;
 
   gap_send_files(_state, uid, filenames, "Basic comment");
+
+  auto** cpy = filenames;
+  while (*cpy != nullptr)
+  {
+    ::free((void*) *cpy);
+    ++cpy;
+  }
+  ::free((void*) filenames);
 
   emit switch_signal();
 }

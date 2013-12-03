@@ -166,7 +166,7 @@ InfinitDock::chooseFiles()
   if (selected.size())
   {
     for (auto file: selected)
-      this->_send_panel->addFile(file);
+      this->_send_panel->add_file(file);
     this->_switch_view(this->_send_panel);
     this->showPanel();
   }
@@ -211,7 +211,7 @@ InfinitDock::dropEvent(QDropEvent *event)
       if (url.isLocalFile())
       {
         event->acceptProposedAction();
-        this->_send_panel->addFile(url.toLocalFile());
+        this->_send_panel->add_file(url.toLocalFile());
       }
   this->_switch_view(this->_send_panel);
   this->showPanel();

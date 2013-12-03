@@ -2,6 +2,7 @@
 # define FWD_HH
 
 class AvatarWidget;
+class FileItem;
 class ListWidget;
 class SendPanel;
 class TransactionList;

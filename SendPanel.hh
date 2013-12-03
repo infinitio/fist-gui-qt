@@ -5,9 +5,9 @@
 # include <QPushButton>
 # include <QWidget>
 # include <QListWidget>
+# include <QSet>
 
 # include <unordered_map>
-# include <set>
 
 # include <surface/gap/gap.h>
 
@@ -39,7 +39,11 @@ public:
 `------*/
 public:
   void
-  addFile(const QString& path);
+  add_file(QString const& path);
+
+private Q_SLOTS:
+  void
+  remove_file(QString const& path);
 
 public slots:
   void send(uint32_t uid = 0);
@@ -75,7 +79,7 @@ public:
 private:
   std::unordered_map<uint32_t, UserModel> _user_models;
   ListWidget* _file_list;
-  std::set<QString> _files;
+  QHash<QString, FileItem*> _files;
 
   void
   on_show() override;
