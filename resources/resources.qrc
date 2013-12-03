@@ -3,10 +3,11 @@
   <qresource>
     <file>fonts/LucidaGrande.ttc</file>
     <file>icons/arrows.png</file>
-    <file>icons/gear.png</file>
-    <file>icons/trash.png</file>
     <file>icons/clip.png</file>
+    <file>icons/delete.png</file>
+    <file>icons/gear.png</file>
     <file>icons/magnifier.png</file>
+    <file>icons/trash.png</file>
     <file>images/logo.png</file>
   </qresource>
 </RCC>
