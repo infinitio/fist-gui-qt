@@ -18,7 +18,7 @@ namespace
 QSize
 FileItem::sizeHint() const
 {
-  return QSize(300, 24);
+  return QSize(320, 24);
 }
 
 static
@@ -73,6 +73,8 @@ FileItem::FileItem(QString const& path):
   layout->addItem(new QSpacerItem(0, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Minimum));
   layout->addWidget(this->_remove);
+
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void
