@@ -74,10 +74,7 @@ SendPanel::_search_changed(QString const& search)
     std::string text(search.toStdString());
     uint32_t* uids = gap_search_users(_state, text.c_str());
 
-    for (uint32_t i = 0; uids[i] != 0; i += 1)
-      res.append(QString(gap_user_fullname(_state, uids[i])));
-
-    this->setUsers(res, uids);
+    this->setUsers(uids);
     gap_search_users_free(uids);
   }
   else
@@ -102,17 +99,17 @@ SendPanel::addFile(QString const& path)
 `------*/
 
 void
-SendPanel::setUsers(QStringList const& users, uint32_t* uids)
+SendPanel::setUsers(uint32_t* uids)
 {
   this->_users->clearWidgets();
 
   if (uids == nullptr)
     return;
 
-  uint32_t i = 0;
-  for (auto const& user: users)
+  auto* uidscopy = uids;
+  while (*uidscopy != gap_null())
   {
-    uint32_t uid = uids[i];
+    auto uid = *uidscopy;
     if (this->_user_models.find(uid) == this->_user_models.end())
       this->_user_models.emplace(uid, UserModel(this->_state, uid));
     auto widget = new UserWidget(this->_user_models.at(uid), this);
@@ -121,14 +118,15 @@ SendPanel::setUsers(QStringList const& users, uint32_t* uids)
             this,
             SLOT(send(uint32_t)));
     this->_users->addWidget(widget);
-    ++i;
+
+    ++uidscopy;
   }
 }
 
 void
 SendPanel::clearUsers()
 {
-  this->setUsers(QStringList());
+  this->setUsers(nullptr);
 }
 
 void

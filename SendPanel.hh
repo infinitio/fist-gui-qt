@@ -49,7 +49,7 @@ public slots:
 `------*/
 public:
   void
-  setUsers(QStringList const& users, uint32_t* uids = nullptr);
+  setUsers(uint32_t* uids = nullptr);
   void
   clearUsers();
 
