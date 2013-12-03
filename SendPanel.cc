@@ -115,18 +115,12 @@ SendPanel::setUsers(QStringList const& users, uint32_t* uids)
     uint32_t uid = uids[i];
     if (this->_user_models.find(uid) == this->_user_models.end())
       this->_user_models.emplace(uid, UserModel(this->_state, uid));
-
     auto widget = new UserWidget(this->_user_models.at(uid), this);
     connect(widget,
             SIGNAL(clicked_signal(uint32_t)),
             this,
             SLOT(send(uint32_t)));
-
-    auto layout = new QHBoxLayout(widget);
-    layout->addWidget(new AvatarIcon(_state, uid));
-    layout->addWidget(new QLabel(user));
     this->_users->addWidget(widget);
-
     ++i;
   }
 }

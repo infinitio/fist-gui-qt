@@ -12,13 +12,9 @@ class AvatarIcon:
 {
 public:
   AvatarIcon(QPixmap const& pixmap);
-  AvatarIcon(gap_State* state, uint32_t uid);
 
 protected:
   virtual void paintEvent(QPaintEvent*) override;
-
-public slots:
-  void slot_netwManagerFinished(QNetworkReply *reply);
 
 private:
   uint32_t _uid;

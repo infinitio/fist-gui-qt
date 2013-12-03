@@ -3,6 +3,7 @@
 
 # include <iostream>
 
+# include <fist-gui-qt/AvatarIcon.hh>
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/UserModel.hh>
 
@@ -21,6 +22,7 @@ public:
 
 private:
   UserModel const& _model;
+  AvatarIcon* _avatar;
 
   Q_OBJECT;
 };
