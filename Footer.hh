@@ -20,6 +20,10 @@ public:
   QSize
   sizeHint() const override;
 
+  virtual
+  QSize
+  minimumSizeHint() const override;
+
 protected:
   QHBoxLayout* _layout;
 };

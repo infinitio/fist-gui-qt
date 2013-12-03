@@ -33,3 +33,9 @@ Footer::sizeHint() const
 {
   return QSize(0, 40);
 }
+
+QSize
+Footer::minimumSizeHint() const
+{
+  return this->sizeHint();
+}
