@@ -9,10 +9,7 @@ class Panel:
 {
 public:
   Panel(Footer* footer,
-        QWidget* owner = nullptr):
-    SmoothLayout(owner),
-    _footer(footer)
-  {}
+        QWidget* owner = nullptr);
 
 protected:
   Footer* _footer;
@@ -20,20 +17,19 @@ protected:
 public:
   virtual
   void
-  on_show() {}
+  on_show();
 
   virtual
   void
-  on_hide() {}
+  on_hide();
+
+  QSize
+  minimumSizeHint() const;
 
 public:
   virtual
   Footer*
-  footer()
-  {
-    // XXX: assert.
-    return this->_footer;
-  }
+  footer();
 };
 
 #endif
