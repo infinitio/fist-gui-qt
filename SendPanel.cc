@@ -6,6 +6,7 @@
 
 #include <fist-gui-qt/AvatarIcon.hh>
 #include <fist-gui-qt/FileItem.hh>
+#include <fist-gui-qt/AddFileWidget.hh>
 #include <fist-gui-qt/Footer.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
@@ -34,6 +35,7 @@ SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
   _users(new ListWidget(this)),
   _search(new SearchField(this, &this->_users)),
+  _file_adder(new AddFileWidget),
   _send(new QPushButton("Send", this)),
   _state(state),
   _file_list(new ListWidget(this))
@@ -51,10 +53,16 @@ SendPanel::SendPanel(gap_State* state):
   layout->addWidget(this->_send, 0, 1);
   layout->addWidget(this->_users, 1, 0, 1, -1);
   layout->addWidget(new Separator, 2, 0, 1, -1);
+  layout->addWidget(this->_file_adder, 3, 0, 1, -1);
   // layout->addWidget(new Note, 2, 0, 2, 3)
   // layout->addWidget(new Separator, 3, 0, 3, 3);
-  layout->addWidget(this->_file_list, 3, 0, 1, -1);
-  layout->addWidget(this->_footer, 4, 0, 1, -1);
+  layout->addWidget(this->_file_list, 4, 0, 1, -1);
+  layout->addWidget(this->_footer, 5, 0, 1, -1);
+
+  connect(this->_file_adder->attach(),
+          SIGNAL(released()),
+          this,
+          SIGNAL(choose_files()));
 
   connect(this->_send, SIGNAL(clicked()), this, SLOT(send()));
 

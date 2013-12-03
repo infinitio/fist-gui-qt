@@ -73,8 +73,8 @@ InfinitDock::InfinitDock(gap_State* state):
           this,
           SLOT(_show_transactions_view()));
 
-  connect(this->_send_panel->footer()->attach(),
-          SIGNAL(released()),
+  connect(this->_send_panel,
+          SIGNAL(choose_files()),
           this,
           SLOT(chooseFiles()));
 

@@ -59,9 +59,12 @@ public:
 
 Q_SIGNALS:
   void switch_signal();
+  void choose_files();
+
 private:
   ListWidget* _users;
   SearchField* _search;
+  AddFileWidget* _file_adder;
   QPushButton* _send;
   gap_State* _state;
 

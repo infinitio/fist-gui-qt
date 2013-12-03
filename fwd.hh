@@ -1,6 +1,7 @@
 #ifndef FWD_HH
 # define FWD_HH
 
+class AddFileWidget;
 class AvatarWidget;
 class FileItem;
 class ListWidget;

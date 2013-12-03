@@ -15,6 +15,7 @@ LIBS += -lgap
 
 # Input
 SOURCES +=                                      \
+    AddFileWidget.cc                            \
     AvatarWidget.cc                             \
     AvatarIcon.cc                               \
     DebugWindow.cc                              \
@@ -43,6 +44,7 @@ SOURCES +=                                      \
     main.cc                                     \
 
 HEADERS +=                                      \
+    AddFileWidget.hh                            \
     AvatarWidget.hh                             \
     AvatarIcon.hh                               \
     DebugWindow.hh                              \
