@@ -20,6 +20,13 @@
 
 static int const dock_size = 60;
 
+// XXX: This is dirty but there is not good way to emit a signal from a static
+// method. Unfortunately, gap api, which is in C, forces to attach C callbacks.
+// Attaching a static method works but make signal emission impossible.
+// The only 'good' way I found, while there is only one instance of InfinitDock
+// is to add a global pointer to the dock and makes it emit the signal.
+InfinitDock* g_dock = nullptr;
+
 InfinitDock::InfinitDock(gap_State* state):
   _transaction_panel(new TransactionPanel(state)),
   _panel(new RoundShadowWidget),
@@ -28,11 +35,11 @@ InfinitDock::InfinitDock(gap_State* state):
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),
-  _choose_files(new QFileDialog(this)),
+  _choose_files(nullptr),
   _quit(new QAction(tr("&Quit"), this)),
   _state(state)
 {
-  this->_choose_files->setFileMode(QFileDialog::ExistingFiles);
+  g_dock = this;
 
   this->_systray_menu->addAction(_send_files);
   this->_systray_menu->addAction(_quit);
@@ -146,15 +153,19 @@ InfinitDock::_position_panel()
 void
 InfinitDock::chooseFiles()
 {
-    this->_choose_files->exec();
-    QStringList selected = this->_choose_files->selectedFiles();
-    if (selected.size())
-    {
-        for (auto file: selected)
-            this->_send_panel->addFile(file);
-        this->_switch_view(this->_send_panel);
-        this->showPanel();
-    }
+  this->_choose_files.reset(new QFileDialog(this));
+  this->_choose_files->setFileMode(QFileDialog::ExistingFiles);
+
+  this->_choose_files->exec();
+  QStringList selected = this->_choose_files->selectedFiles();
+  if (selected.size())
+  {
+    for (auto file: selected)
+      this->_send_panel->addFile(file);
+    this->_switch_view(this->_send_panel);
+    this->showPanel();
+  }
+  this->_choose_files.reset();
 }
 
 void

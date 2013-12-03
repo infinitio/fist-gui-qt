@@ -1,6 +1,8 @@
 #ifndef INFINITDOCK_HH
 # define INFINITDOCK_HH
 
+# include <memory>
+
 # include <QMainWindow>
 # include <QTimer>
 # include <QWidget>
@@ -96,7 +98,7 @@ private:
   QSystemTrayIcon* _systray;
   QMenu* _systray_menu;
   QAction* _send_files;
-  QFileDialog* _choose_files;
+  std::unique_ptr<QFileDialog> _choose_files;
   QAction* _quit;
   gap_State* _state;
   Q_OBJECT
