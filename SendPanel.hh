@@ -83,15 +83,15 @@ private:
   void
   on_hide() override;
 
-private:
-  Q_OBJECT;
-
-  /*-------.
-  | Footer |
-  `-------*/
+/*-------.
+| Footer |
+`-------*/
 public:
   SendFooter*
   footer() override;
+
+private:
+  Q_OBJECT;
 };
 
 #endif
