@@ -1,17 +1,16 @@
 #ifndef USERMODEL_HH
 # define USERMODEL_HH
 
-# ifndef FAKEGAP
 # include <surface/gap/gap.h>
-# else
-# include <fist-gui-qt/FakeGap.hh>
-# endif
 
 # include <QString>
+# include <QPixmap>
+# include <QVariant>
 
 # include <memory>
 
-class UserModel
+class UserModel:
+  public QVariant
 {
 public:
   UserModel(gap_State* state,
@@ -25,12 +24,16 @@ public:
   uint32_t
   id() const;
 
+  QPixmap const&
+  avatar() const;
+
   gap_State* _state;
   uint32_t _id;
 
   // Every attributes are marked as mutable in order to allow lazy evaluation.
   mutable QString _fullname;
-
+  mutable QPixmap _avatar;
+  mutable bool _default_avatar;
 };
 
 #endif
