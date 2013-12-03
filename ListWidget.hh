@@ -31,7 +31,10 @@ public:
   void
   addWidget(ListItem* widget);
 
-  std::vector<ListItem*> const&
+  void
+  removeWidget(ListItem* widget);
+
+  QVector<ListItem*> const&
   widgets() const;
 
   void
@@ -76,7 +79,7 @@ private:
   int _offset;
   int _max_rows;
 
-  std::vector<ListItem*> _widgets;
+  QVector<ListItem*> _widgets;
   SmoothScrollBar* _scroll;
 
 /*-------.

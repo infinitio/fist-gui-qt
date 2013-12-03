@@ -45,7 +45,16 @@ ListWidget::addWidget(ListItem* widget)
   this->_layout();
 }
 
-std::vector<ListItem*> const&
+void
+ListWidget::removeWidget(ListItem* widget)
+{
+  this->_widgets.remove(this->_widgets.indexOf(widget));
+  widget->setParent(nullptr);
+  delete widget;
+  this->_layout();
+}
+
+QVector<ListItem*> const&
 ListWidget::widgets() const
 {
   return this->_widgets;
