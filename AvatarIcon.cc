@@ -6,11 +6,11 @@
 
 AvatarIcon::AvatarIcon(QPixmap const& pixmap):
   _uid(0),
-  _pixmap(QSize(30, 30)),
-  _mask(QSize(30, 30)),
-  _geometry(QPoint(0, 0), QSize(30, 30))
+  _pixmap(QSize(35, 35)),
+  _mask(QSize(35, 35)),
+  _geometry(QPoint(0, 0), QSize(35, 35))
 {
-  QSize size(30, 30);
+  QSize size(35, 35);
   this->setMinimumSize(size);
   this->setMaximumSize(size);
   this->_pixmap.fill(Qt::transparent);
