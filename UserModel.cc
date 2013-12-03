@@ -19,7 +19,7 @@ UserModel::fullname() const
 {
   if (this->_fullname.isNull())
   {
-    this->_fullname = gap_user_fullname(this->_state, this->_id);
+    this->_fullname = QString::fromUtf8(gap_user_fullname(this->_state, this->_id));
   }
 
   // assert this->_fullname is not null.

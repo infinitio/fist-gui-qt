@@ -50,9 +50,11 @@ TransactionModel::peer_fullname() const
 {
   if (this->_peer_fullname.isNull())
   {
-    this->_peer_fullname = this->is_sender()
-      ? gap_transaction_recipient_fullname(this->_state, this->_id)
-      : gap_transaction_sender_fullname(this->_state, this->_id);
+    this->_peer_fullname =
+      QString::fromUtf8(
+        this->is_sender()
+        ? gap_transaction_recipient_fullname(this->_state, this->_id)
+        : gap_transaction_sender_fullname(this->_state, this->_id));
   }
 
   return this->_peer_fullname;
@@ -74,7 +76,7 @@ TransactionModel::files() const
 
     do
     {
-      this->_files.push_back(*files);
+      this->_files.push_back(QString::fromUtf8(*files));
 
       // XXX: do it in gap.
       // ::free((void*) *files);
