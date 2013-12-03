@@ -2,12 +2,8 @@
 # define AVATARWIDGET_HH
 
 # include <QWidget>
-# include <QtNetwork/QNetworkAccessManager>
-# include <QtNetwork/QNetworkRequest>
-# include <QtNetwork/QNetworkReply>
 # include <QByteArray>
 # include <QPixmap>
-# include <QUrl>
 
 # include <iostream>
 # include <map>
