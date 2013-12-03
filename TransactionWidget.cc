@@ -30,10 +30,10 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
 {
   static int const padding = 5;
 
-
   this->_avatar = new AvatarWidget(this->_transaction.avatar());
 
   auto layout = new QHBoxLayout(this);
+  layout->setContentsMargins(5, 12, 5, 12);
   this->_layout = layout;
   layout->addWidget(this->_avatar);
 
@@ -129,7 +129,7 @@ QSize
 TransactionWidget::sizeHint() const
 {
   auto size = this->_layout->minimumSize();
-  return QSize(300, size.height());
+  return QSize(320, size.height());
 }
 
 QSize
