@@ -37,7 +37,7 @@ public:
   gap_TransactionStatus
   status() const;
 
-  QPixmap// const&
+  QPixmap const&
   avatar() const;
 
 private:
@@ -48,6 +48,10 @@ private:
   mutable QString _peer_fullname;
   mutable uint32_t _peer_id;
   mutable QVector<QString> _files;
+
+  // XXX/ Should be there.
+  mutable QPixmap _avatar;
+  mutable bool _default_avatar;
 };
 
 
