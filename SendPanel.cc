@@ -211,7 +211,8 @@ SendPanel::keyPressEvent(QKeyEvent* event)
 QSize
 SendPanel::sizeHint() const
 {
-  return QSize(320, std::min(400, Super::sizeHint().height()));
+  return QSize(Super::sizeHint().width(),
+               std::min(400, Super::sizeHint().height()));
 }
 
 /*------------.
