@@ -12,13 +12,15 @@ UserWidget::UserWidget(UserModel const& model,
 {
   this->_layout->addWidget(this->_avatar);
   this->_layout->addWidget(new QLabel(this->_model.fullname()));
+
+  this->setFixedHeight(this->_avatar->height() + 10);
 }
 
 QSize
 UserWidget::sizeHint() const
 {
   auto size = this->_layout->minimumSize();
-  return QSize(320, size.height());
+  return QSize(this->width(), size.height());
 }
 
 void

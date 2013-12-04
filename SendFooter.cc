@@ -2,7 +2,7 @@
 
 #include <iostream>
 SendFooter::SendFooter():
-  Footer(nullptr),
+  Footer(),
   _back(new IconButton(QPixmap(":/icons/trash.png"),
                        true)),
   _send(new IconButton(QPixmap(":/icons/send.png"),

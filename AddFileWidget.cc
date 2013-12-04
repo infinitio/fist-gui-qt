@@ -27,5 +27,5 @@ AddFileWidget::attach()
 QSize
 AddFileWidget::sizeHint() const
 {
-  return QSize(320, 24);
+  return QSize(this->width(), 24);
 }

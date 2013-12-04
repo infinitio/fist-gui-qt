@@ -7,9 +7,9 @@ Footer::Footer(QWidget* parent):
   _layout(new QHBoxLayout(this))
 {
   this->_layout->setContentsMargins(10, 10, 10, 5);
-  this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-  this->setFixedHeight(40);
-  this->setFixedWidth(320);
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  this->setFixedSize(320, 40);
 }
 
 void
@@ -32,7 +32,7 @@ Footer::paintEvent(QPaintEvent*)
 QSize
 Footer::sizeHint() const
 {
-  return QSize(0, 40);
+  return QSize(this->width(), this->height());
 }
 
 QSize

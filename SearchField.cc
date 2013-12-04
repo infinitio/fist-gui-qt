@@ -15,6 +15,8 @@ SearchField::SearchField(QWidget* owner, ListWidget** list):
   this->setFont(font);
   this->setContentsMargins(margin, 0, margin, 0);
   this->setPlaceholderText("Search for a friend ...");
+  this->setFixedWidth(320);
+  this->setFixedHeight(this->height());
 }
 
 void
@@ -24,7 +26,7 @@ SearchField::setIcon(QPixmap const& pixmap)
   int padding = margin;
   if (!this->_icon.isNull())
     padding += margin + this->_icon.width();
-  this->setContentsMargins(padding, 0, 0, 0);
+  this->setContentsMargins(padding, 0, margin, 0);
   repaint();
 }
 
@@ -40,14 +42,13 @@ SearchField::keyPressEvent(QKeyEvent* event)
 QSize
 SearchField::sizeHint() const
 {
-  return QSize(60, 40);
+  // XXX: 60 -> width - 'more' button.
+  return QSize(320, this->height());
 }
 
 void
 SearchField::paintEvent(QPaintEvent* event)
 {
-  QLineEdit::paintEvent(event);
-
   QPainter painter(this);
   // Draw icon
   if (!this->_icon.isNull())

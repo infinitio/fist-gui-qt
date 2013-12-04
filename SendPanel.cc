@@ -27,6 +27,9 @@ namespace
     {
       this->setFrameShape(QFrame::HLine);
       this->setFrameShadow(QFrame::Sunken);
+
+      this->setFixedHeight(5);
+      this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
   };
 }
@@ -47,14 +50,16 @@ SendPanel::SendPanel(gap_State* state):
   this->footer()->send()->disable();
   this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
 
-  layout->addWidget(this->_search);
-  layout->addWidget(this->_users);
-  layout->addWidget(new Separator);
-  layout->addWidget(this->_file_adder);
-  // layout->addWidget(new Note, 2, 0, 2, 3)
-  // layout->addWidget(new Separator, 3, 0, 3, 3);
-  layout->addWidget(this->_file_list);
-  layout->addWidget(this->_footer);
+  {
+    auto layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(this->_search);
+    layout->addWidget(this->_users);
+    layout->addWidget(new Separator);
+    layout->addWidget(this->_file_adder);
+    layout->addWidget(this->_file_list);
+    layout->addWidget(this->_footer);
+  }
 
   connect(this->_file_adder->attach(),
           SIGNAL(released()),

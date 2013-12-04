@@ -18,7 +18,7 @@ namespace
 QSize
 FileItem::sizeHint() const
 {
-  return QSize(320, 24);
+  return QSize(this->width(), 24);
 }
 
 static

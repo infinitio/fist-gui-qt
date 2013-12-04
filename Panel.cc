@@ -7,6 +7,7 @@ Panel::Panel(Footer* footer,
   SmoothLayout(owner),
   _footer(footer)
 {
+  this->setHeightHint(this->_footer->size().height());
   this->setMaximumHeight(400);
   this->setFixedWidth(320);
 
@@ -16,7 +17,7 @@ Panel::Panel(Footer* footer,
 QSize
 Panel::minimumSizeHint() const
 {
-  return QSize(320, 0);
+  return QSize(320, this->_footer->sizeHint().height());
 }
 
 void
