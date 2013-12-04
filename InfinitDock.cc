@@ -74,10 +74,6 @@ InfinitDock::InfinitDock(gap_State* state):
   connect(this->_send_panel, SIGNAL(onSearchChanged(QString const&)),
           SLOT(_search(QString const&)));
 
-  QTimer *timer = new QTimer;
-  connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-  timer->start(2000);
-
   connect(this->_transaction_panel->footer()->send(),
           SIGNAL(released()),
           this,
