@@ -19,6 +19,26 @@ IconButton::IconButton(QPixmap const& pixmap,
 }
 
 void
+IconButton::enable()
+{
+  if (!this->isEnabled())
+  {
+    QPushButton::setDisabled(false);
+    this->_refresh();
+  }
+}
+
+void
+IconButton::disable()
+{
+  if (this->isEnabled())
+  {
+    QPushButton::setDisabled(true);
+    this->_refresh();
+  }
+}
+
+void
 IconButton::_draw_shape(QPixmap& pixmap, QColor const& color)
 {
   pixmap = QPixmap(this->_original.size());

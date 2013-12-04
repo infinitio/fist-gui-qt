@@ -174,6 +174,8 @@ SendPanel::send(uint32_t uid)
     return;
   }
 
+  this->footer()->send()->disable();
+
   char** filenames;
   if ((filenames = (char**)malloc((this->_files.size() + 1) * sizeof(char*))) == nullptr)
   {

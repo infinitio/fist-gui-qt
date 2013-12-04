@@ -20,6 +20,10 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
   auto layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   this->_list = new TransactionList;
+
+  connect(this->_list, SIGNAL(on_transaction_accepted(uint32_t)),
+          this, SLOT(on_transaction_accepted(uint32_t)));
+
   layout->addWidget(this->_list);
   layout->addWidget(this->_footer);
 
@@ -64,6 +68,13 @@ void
 TransactionPanel::setFocus()
 {
   this->_list->setFocus();
+}
+
+void
+TransactionPanel::on_transaction_accepted(uint32_t tid)
+{
+  std::cerr << "accepted " << tid << std::endl;
+  gap_accept_transaction(this->_state, tid);
 }
 
 TransactionWidget*

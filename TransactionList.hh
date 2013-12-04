@@ -28,6 +28,10 @@ public Q_SLOTS:
   void setFocus();
   void keyPressEvent(QKeyEvent* event);
 
+Q_SIGNALS:
+  void
+  on_transaction_accepted(uint32_t);
+
 public:
   TransactionList();
 

@@ -25,6 +25,13 @@ private:
   void _draw_shape(QPixmap& pixmap, QColor const& color);
   void _refresh();
 
+public:
+  void
+  enable();
+
+  void
+  disable();
+
 protected:
   virtual
   QSize

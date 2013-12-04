@@ -194,5 +194,5 @@ TransactionWidget::update_progress()
 void
 TransactionWidget::accept()
 {
-  emit onAcceptedTransaction(this->_transaction.id());
+  emit on_transaction_accepted(this->_transaction.id());
 }

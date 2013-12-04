@@ -104,7 +104,6 @@ InfinitDock::InfinitDock(gap_State* state):
           this->_transaction_panel,
           SLOT(on_avatar_available(uint32_t)));
 
-
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
   timer->start(500);

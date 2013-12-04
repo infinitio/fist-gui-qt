@@ -39,7 +39,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
   void onProgressChanged(float);
-  void onAcceptedTransaction(uint32_t);
+  void
+  on_transaction_accepted(uint32_t);
 
 /*-------.
 | Layout |

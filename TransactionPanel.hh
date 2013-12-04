@@ -25,16 +25,21 @@ public Q_SLOTS:
   TransactionWidget*
   addTransaction(gap_State* state, uint32_t tid);
 
+  void
+  on_transaction_accepted(uint32_t);
+
   void setFocus();
 
 private:
   TransactionList* _list;
   gap_State* _state;
-  Q_OBJECT;
 
 public:
   TransactionFooter*
   footer();
+
+private:
+  Q_OBJECT;
 
 };
 
