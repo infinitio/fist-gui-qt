@@ -33,42 +33,38 @@ namespace
 
 SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
-  _users(new ListWidget(this)),
+  _users(new ListWidget
+),
   _search(new SearchField(this, &this->_users)),
   _file_adder(new AddFileWidget),
-  _send(new QPushButton("Send", this)),
   _state(state),
-  _file_list(new ListWidget(this))
+  _file_list(new ListWidget)
 {
-  auto layout = new QGridLayout(this);
-  layout->setContentsMargins(0, 0, 0, 0);
-
   this->_users->set_mate(this->_search);
   this->_users->setMaxRows(5);
   this->_file_list->setMaxRows(4);
 
+  this->footer()->send()->disable();
   this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
 
-  layout->addWidget(this->_search, 0, 0);
-  layout->addWidget(this->_send, 0, 1);
-  layout->addWidget(this->_users, 1, 0, 1, -1);
-  layout->addWidget(new Separator, 2, 0, 1, -1);
-  layout->addWidget(this->_file_adder, 3, 0, 1, -1);
+  layout->addWidget(this->_search);
+  layout->addWidget(this->_users);
+  layout->addWidget(new Separator);
+  layout->addWidget(this->_file_adder);
   // layout->addWidget(new Note, 2, 0, 2, 3)
   // layout->addWidget(new Separator, 3, 0, 3, 3);
-  layout->addWidget(this->_file_list, 4, 0, 1, -1);
-  layout->addWidget(this->_footer, 5, 0, 1, -1);
+  layout->addWidget(this->_file_list);
+  layout->addWidget(this->_footer);
 
   connect(this->_file_adder->attach(),
           SIGNAL(released()),
           this,
           SIGNAL(choose_files()));
 
-  connect(this->_send, SIGNAL(clicked()), this, SLOT(send()));
+  connect(this->footer()->send(), SIGNAL(clicked()), this, SLOT(send()));
 
   this->connect(this->_search, SIGNAL(textChanged(QString const&)),
                 SLOT(_search_changed(QString const&)));
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void
@@ -101,6 +97,9 @@ SendPanel::add_file(QString const& path)
             this, SLOT(remove_file(QString const&)));
     this->_file_list->addWidget(this->_files[path]);
   }
+
+  if (this->_files.size() > 0)
+    this->footer()->send()->enable();
 }
 
 void
@@ -113,6 +112,9 @@ SendPanel::remove_file(QString const& path)
     this->_file_list->removeWidget(it.value());
     this->_files.remove(path);
   }
+
+  if (this->_files.size() == 0)
+    this->footer()->send()->disable();
 }
 
 /*------.
@@ -164,7 +166,6 @@ SendPanel::send(uint32_t uid)
   if (this->_files.empty())
   {
     std::cerr << "NO FILES" << std::endl;
-    emit switch_signal();
     return;
   }
 

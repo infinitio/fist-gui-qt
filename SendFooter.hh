@@ -20,12 +20,12 @@ public:
   IconButton const*
   back() const;
 
-  IconButton const*
-  attach() const;
+  IconButton*
+  send() const;
 
 private:
   IconButton* _back;
-  IconButton* _attach;
+  IconButton* _send;
 };
 
 
