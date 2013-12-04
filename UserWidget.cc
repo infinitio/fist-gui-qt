@@ -7,11 +7,18 @@ UserWidget::UserWidget(UserModel const& model,
                        QWidget* parent):
   ListItem(parent),
   _model(model),
+  _layout(new QHBoxLayout(this)),
   _avatar(new AvatarIcon(this->_model.avatar()))
 {
-  auto layout = new QHBoxLayout(this);
-  layout->addWidget(this->_avatar);
-  layout->addWidget(new QLabel(this->_model.fullname()));
+  this->_layout->addWidget(this->_avatar);
+  this->_layout->addWidget(new QLabel(this->_model.fullname()));
+}
+
+QSize
+UserWidget::sizeHint() const
+{
+  auto size = this->_layout->minimumSize();
+  return QSize(320, size.height());
 }
 
 void
