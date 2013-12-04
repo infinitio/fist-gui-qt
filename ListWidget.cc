@@ -107,6 +107,7 @@ ListWidget::_layout()
     int widget_height = widget->sizeHint().height();
     QRect geometry(0, height - this->_offset, this->width(), widget_height);
     widget->setGeometry(geometry);
+    widget_height = widget->size().height();
     height += widget_height + separator;
     if (fixed_height == -1 && ++rows == this->maxRows())
     {
@@ -243,7 +244,7 @@ ListWidget::paintEvent(QPaintEvent*)
   int height = -this->_offset;
   for (auto widget: this->_widgets)
   {
-    height += widget->sizeHint().height();
+    height += widget->size().height();
     painter.drawRect(0, height, this->width(), separator - 1);
     height += separator;
   }

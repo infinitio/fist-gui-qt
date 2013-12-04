@@ -9,6 +9,7 @@ Footer::Footer(QWidget* parent):
   this->_layout->setContentsMargins(10, 10, 10, 5);
   this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
   this->setFixedHeight(40);
+  this->setFixedWidth(320);
 }
 
 void

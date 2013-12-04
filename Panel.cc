@@ -7,9 +7,10 @@ Panel::Panel(Footer* footer,
   SmoothLayout(owner),
   _footer(footer)
 {
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
-  this->setWidthHint(320);
-  this->setHeightHint(0);
+  this->setMaximumHeight(400);
+  this->setFixedWidth(320);
+
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
 }
 
 QSize
