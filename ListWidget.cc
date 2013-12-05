@@ -119,7 +119,7 @@ ListWidget::_layout()
   int real_height = ((fixed_height != -1) ? fixed_height : height);
   this->_height_hint = real_height;
   this->updateGeometry();
-  if (this->height() < real_height)
+  if (this->height() < height)
   {
     this->_scroll->show();
     this->_scroll->setMinimum(0);
