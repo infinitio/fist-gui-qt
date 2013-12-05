@@ -10,7 +10,7 @@ class AddFileWidget:
   public QWidget
 {
 public:
-  AddFileWidget();
+  AddFileWidget(QWidget* parent = nullptr);
 
   virtual
   QSize

@@ -3,8 +3,8 @@
 #include <QPixmap>
 #include <QHBoxLayout>
 
-AddFileWidget::AddFileWidget():
-  QWidget(nullptr),
+AddFileWidget::AddFileWidget(QWidget* parent):
+  QWidget(parent),
   _text(new QLabel(QString("attach files"))),
   _attach(new IconButton(QPixmap(":/icons/clip.png"), // Remove.
                          true))
