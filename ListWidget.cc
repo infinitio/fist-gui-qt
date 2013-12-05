@@ -39,7 +39,7 @@ ListWidget::ListWidget(QWidget* parent, QWidget* mate):
 void
 ListWidget::addWidget(ListItem* widget)
 {
-  this->_widgets.insert(this->_widgets.begin(), widget);
+  this->_widgets.insert(widget);
   widget->setParent(this);
   widget->show();
   this->_layout();
@@ -48,13 +48,13 @@ ListWidget::addWidget(ListItem* widget)
 void
 ListWidget::removeWidget(ListItem* widget)
 {
-  this->_widgets.remove(this->_widgets.indexOf(widget));
+  auto res = this->_widgets.remove(widget);
   widget->setParent(nullptr);
   delete widget;
   this->_layout();
 }
 
-QVector<ListItem*> const&
+QSet<ListItem*> const&
 ListWidget::widgets() const
 {
   return this->_widgets;

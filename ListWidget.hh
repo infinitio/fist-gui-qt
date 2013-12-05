@@ -1,6 +1,7 @@
 #ifndef LISTWIDGET_HH
 # define LISTWIDGET_HH
 
+# include <QSet>
 # include <QWidget>
 # include <QLineEdit>
 
@@ -34,7 +35,7 @@ public:
   void
   removeWidget(ListItem* widget);
 
-  QVector<ListItem*> const&
+  QSet<ListItem*> const&
   widgets() const;
 
   void
@@ -70,6 +71,10 @@ public:
 public Q_SLOTS:
   void setMaxRows(int val);
 
+Q_SIGNALS:
+  void
+  resized();
+
 private Q_SLOTS:
   void
   _layout();
@@ -79,7 +84,7 @@ private:
   int _offset;
   int _max_rows;
 
-  QVector<ListItem*> _widgets;
+  QSet<ListItem*> _widgets;
   SmoothScrollBar* _scroll;
 
 /*-------.
@@ -100,8 +105,8 @@ protected:
   QWidget* _mate;
 
 /*---------.
-  | Paitning |
-  `---------*/
+| Paitning |
+`---------*/
 protected:
   virtual
   void
