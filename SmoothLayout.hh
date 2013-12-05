@@ -54,12 +54,27 @@ public:
              WRITE setWidthHint
              NOTIFY onWidthHintChanged);
   Q_PROPERTY_R(int, width_hint, widthHint);
+  Q_PROPERTY(int maximumHeight
+             READ maximumHeight
+             WRITE setMaximumHeight
+             NOTIFY onMaximumHeightChanged);
+  Q_PROPERTY_R(int, maximum_height, maximumHeight);
+  Q_PROPERTY(int maximumWidth
+             READ maximumWidth
+             WRITE setMaximumWidth
+             NOTIFY onMaximumWidthChanged);
+  Q_PROPERTY_R(int, maximum_width, maximumWidth);
 public:
   void setHeightHint(int value);
   void setWidthHint(int value);
+  void setMaximumHeight(int value);
+  void setMaximumWidth(int value);
+
 Q_SIGNALS:
   void onHeightHintChanged();
   void onWidthHintChanged();
+  void onMaximumHeightChanged();
+  void onMaximumWidthChanged();
 
 private:
   Q_OBJECT;
