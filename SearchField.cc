@@ -57,4 +57,6 @@ SearchField::paintEvent(QPaintEvent* event)
                               (this->height() - this->_icon.height()) / 2),
                        this->_icon);
   }
+
+  QLineEdit::paintEvent(event);
 }
