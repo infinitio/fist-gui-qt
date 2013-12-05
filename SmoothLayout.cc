@@ -113,7 +113,8 @@ SmoothLayout::_layout()
   for (QWidget* widget: widgets)
   {
     QSize hint(widget->sizeHint());
-    height += hint.height();
+    if (hint.height() > 0)
+      height += hint.height();
     width = std::max(width, hint.width());
   }
 
