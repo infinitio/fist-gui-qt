@@ -62,11 +62,11 @@ Q_SIGNALS:
   void choose_files();
 
 private:
-  ListWidget* _users;
-  SearchField* _search;
-  AddFileWidget* _file_adder;
-  QPushButton* _send;
   gap_State* _state;
+  SearchField* _search;
+  ListWidget* _users;
+  AddFileWidget* _file_adder;
+  ListWidget* _file_list;
 
 protected:
   void
@@ -81,7 +81,7 @@ public:
   sizeHint() const override;
 private:
   std::unordered_map<uint32_t, UserModel> _user_models;
-  ListWidget* _file_list;
+
   QHash<QString, FileItem*> _files;
 
   void

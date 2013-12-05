@@ -36,16 +36,22 @@ namespace
 
 SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
-  _users(new ListWidget
-),
-  _search(new SearchField(this, &this->_users)),
-  _file_adder(new AddFileWidget),
   _state(state),
-  _file_list(new ListWidget)
+  _search(new SearchField(this, &this->_users)),
+  _users(new ListWidget(this)),
+  _file_adder(new AddFileWidget(this)),
+  _file_list(new ListWidget(this))
 {
+  this->footer()->setParent(this);
+
   this->_users->set_mate(this->_search);
   this->_users->setMaxRows(5);
   this->_file_list->setMaxRows(4);
+
+  connect(this->_file_list, SIGNAL(resized()),
+          this, SLOT(repaint()));
+  connect(this->_users, SIGNAL(resized()),
+          this, SLOT(repaint()));
 
   this->footer()->send()->disable();
   this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
