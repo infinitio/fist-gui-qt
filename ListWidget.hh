@@ -35,7 +35,7 @@ public:
   void
   removeWidget(ListItem* widget);
 
-  QSet<ListItem*> const&
+  QList<ListItem*> const&
   widgets() const;
 
   void
@@ -84,7 +84,7 @@ private:
   int _offset;
   int _max_rows;
 
-  QSet<ListItem*> _widgets;
+  QList<ListItem*> _widgets;
   SmoothScrollBar* _scroll;
 
 /*-------.
