@@ -45,9 +45,11 @@ private Q_SLOTS:
   void
   remove_file(QString const& path);
 
-public slots:
-  void send(uint32_t uid = 0);
+private slots:
+  void _send();
   void _search_changed(QString const& search);
+  void _set_peer(uint32_t uid);
+  void _pick_user();
 /*------.
 | Users |
 `------*/
@@ -67,6 +69,8 @@ private:
   ListWidget* _users;
   AddFileWidget* _file_adder;
   ListWidget* _file_list;
+  uint32_t _peer_id;
+  bool _ignore_search_result;
 
 protected:
   void
@@ -75,10 +79,6 @@ protected:
 /*-------.
 | Layout |
 `-------*/
-public:
-  virtual
-  QSize
-  sizeHint() const override;
 private:
   std::unordered_map<uint32_t, UserModel> _user_models;
 

@@ -40,7 +40,9 @@ SendPanel::SendPanel(gap_State* state):
   _search(new SearchField(this, &this->_users)),
   _users(new ListWidget(this)),
   _file_adder(new AddFileWidget(this)),
-  _file_list(new ListWidget(this))
+  _file_list(new ListWidget(this)),
+  _peer_id(gap_null()),
+  _ignore_search_result(false)
 {
   this->footer()->setParent(this);
 
@@ -53,35 +55,36 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_users, SIGNAL(resized()),
           this, SLOT(repaint()));
 
+  connect(this->_search, SIGNAL(returnPressed()),
+          this, SLOT(_pick_user()));
+
   this->footer()->send()->disable();
   this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
-
-  {
-    auto layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(this->_search);
-    layout->addWidget(this->_users);
-    layout->addWidget(new Separator);
-    layout->addWidget(this->_file_adder);
-    layout->addWidget(this->_file_list);
-    layout->addWidget(this->_footer);
-  }
 
   connect(this->_file_adder->attach(),
           SIGNAL(released()),
           this,
           SIGNAL(choose_files()));
 
-  connect(this->footer()->send(), SIGNAL(clicked()), this, SLOT(send()));
+  connect(this->footer()->send(), SIGNAL(clicked()), this, SLOT(_send()));
 
-  this->connect(this->_search, SIGNAL(textChanged(QString const&)),
-                SLOT(_search_changed(QString const&)));
+  connect(this->_search, SIGNAL(textChanged(QString const&)),
+          SLOT(_search_changed(QString const&)));
 }
 
 void
 SendPanel::_search_changed(QString const& search)
 {
+  if (this->_ignore_search_result)
+    return;
+
   QStringList res;
+
+  if (this->_peer_id != gap_null())
+  {
+    this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
+    this->_peer_id = gap_null();
+  }
 
   if (search.size() != 0)
   {
@@ -150,7 +153,7 @@ SendPanel::setUsers(uint32_t* uids)
     connect(widget,
             SIGNAL(clicked_signal(uint32_t)),
             this,
-            SLOT(send(uint32_t)));
+            SLOT(_set_peer(uint32_t)));
     this->_users->addWidget(widget);
 
     ++uidscopy;
@@ -164,16 +167,38 @@ SendPanel::clearUsers()
 }
 
 void
-SendPanel::send(uint32_t uid)
+SendPanel::_set_peer(uint32_t uid)
 {
-  if (uid == 0)
+  this->_users->clearWidgets();
+  this->_ignore_search_result = true;
+  this->_search->setText(this->_user_models.at(uid).fullname());
+  this->_ignore_search_result = false;
+  this->_search->setIcon(this->_user_models.at(uid).avatar());
+  this->_peer_id = uid;
+}
+
+void
+SendPanel::_pick_user()
+{
+  if (this->_peer_id == gap_null())
   {
     std::string text(this->_search->text().toStdString());
     uint32_t* uids = gap_search_users(_state, text.c_str());
-    uid = uids[0];
+    if (uids == nullptr)
+      return;
+    auto uid = uids[0];
     gap_search_users_free(uids);
+    this->_set_peer(uid);
   }
+  else
+  {
+    this->_send();
+  }
+}
 
+void
+SendPanel::_send()
+{
   if (this->_files.empty())
   {
     std::cerr << "NO FILES" << std::endl;
@@ -199,7 +224,7 @@ SendPanel::send(uint32_t uid)
   }
   filenames[this->_files.size()] = nullptr;
 
-  gap_send_files(_state, uid, filenames, "Basic comment");
+  gap_send_files(_state, this->_peer_id, filenames, "Basic comment");
 
   auto** cpy = filenames;
   while (*cpy != nullptr)
@@ -217,16 +242,6 @@ SendPanel::keyPressEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Escape)
     emit switch_signal();
-}
-
-/*-------.
-| Layout |
-`-------*/
-QSize
-SendPanel::sizeHint() const
-{
-  return QSize(Super::sizeHint().width(),
-               std::min(400, Super::sizeHint().height()));
 }
 
 /*------------.
