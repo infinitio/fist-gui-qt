@@ -25,6 +25,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _transaction(model),
   _layout(nullptr),
   _accept_button(nullptr),
+  _reject_button(nullptr),
+  _cancel_button(nullptr),
   _status(new QLabel(g_statuses[this->_transaction.status()])),
   _timer(nullptr)
 {
@@ -73,11 +75,17 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   if (!this->_transaction.is_sender() &&
       this->_transaction.status() == gap_transaction_waiting_for_accept)
   {
-    _accept_button = new QPushButton(QString("Accept"), this);
-    connect(_accept_button, SIGNAL(clicked()), this, SLOT(accept()));
-    _accept_button->move(this->_avatar->width() + padding, padding);
+    auto buttons = new QHBoxLayout;
+    infos->addLayout(buttons);
 
-    infos->addWidget(_accept_button);
+    this->_accept_button = new QPushButton(QString("Accept"), this);
+    connect(this->_accept_button, SIGNAL(released()), this, SLOT(accept()));
+
+    this->_reject_button = new QPushButton(QString("Reject"), this);
+    connect(this->_reject_button, SIGNAL(released()), this, SLOT(reject()));
+
+    buttons->addWidget(this->_accept_button);
+    buttons->addWidget(this->_reject_button);
   }
   else
     infos->addWidget(new QLabel());
@@ -159,6 +167,8 @@ TransactionWidget::update()
   {
     delete this->_accept_button;
     this->_accept_button = nullptr;
+    delete this->_reject_button;
+    this->_reject_button = nullptr;
   }
 
   if (this->_transaction.status() == gap_transaction_running &&
@@ -195,4 +205,10 @@ void
 TransactionWidget::accept()
 {
   emit on_transaction_accepted(this->_transaction.id());
+}
+
+void
+TransactionWidget::reject()
+{
+  emit on_transaction_rejected(this->_transaction.id());
 }

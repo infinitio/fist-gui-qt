@@ -41,6 +41,8 @@ Q_SIGNALS:
   void onProgressChanged(float);
   void
   on_transaction_accepted(uint32_t);
+  void
+  on_transaction_rejected(uint32_t);
 
 /*-------.
 | Layout |
@@ -64,6 +66,7 @@ public:
 
 public slots:
   void accept();
+  void reject();
   void update_progress();
 
 private:
@@ -71,6 +74,8 @@ private:
   AvatarWidget* _avatar;
   QLayout* _layout;
   QPushButton* _accept_button;
+  QPushButton* _reject_button;
+  QPushButton* _cancel_button;
   QLabel* _status;
   QTimer* _timer;
 };
