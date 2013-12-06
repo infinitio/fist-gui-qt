@@ -23,8 +23,9 @@ public:
   void
   on_hide();
 
+public:
   QSize
-  minimumSizeHint() const;
+  minimumSizeHint() const override;
 
 public:
   virtual

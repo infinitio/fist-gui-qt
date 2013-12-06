@@ -8,16 +8,21 @@ Panel::Panel(Footer* footer,
   _footer(footer)
 {
   this->setHeightHint(this->_footer->size().height());
+
   this->setMaximumHeight(400);
   this->setFixedWidth(320);
 
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 }
+
+// /*-------.
+// | Layout |
+// `-------*/
 
 QSize
 Panel::minimumSizeHint() const
 {
-  return QSize(320, this->_footer->sizeHint().height());
+  return QSize(Super::sizeHint().width(), this->_footer->sizeHint().height());
 }
 
 void
