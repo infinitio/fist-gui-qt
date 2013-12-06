@@ -21,6 +21,7 @@ SOURCES +=                                      \
     DebugWindow.cc                              \
     FileItem.cc                                 \
     Footer.cc                                   \
+    HorizontalSeparator.cc                      \
     IconButton.cc                               \
     InfinitDock.cc                              \
     ListItem.cc                                 \
@@ -49,6 +50,7 @@ HEADERS +=                                      \
     DebugWindow.hh                              \
     FileItem.hh                                 \
     Footer.hh                                   \
+    HorizontalSeparator.hh                      \
     IconButton.hh                               \
     InfinitDock.hh                              \
     ListItem.hh                                 \
