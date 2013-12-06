@@ -45,7 +45,8 @@ SmoothLayout::resizeEvent(QResizeEvent* event)
   for (QWidget* widget: widgets)
   {
     total_height += widget->sizeHint().height();
-    if (widget->sizePolicy().verticalPolicy() & QSizePolicy::GrowFlag)
+    if ((widget->sizePolicy().verticalPolicy() & QSizePolicy::GrowFlag) &&
+        (widget->sizeHint().height() != widget->size().height()))
       ++growing;
   }
 
@@ -57,8 +58,10 @@ SmoothLayout::resizeEvent(QResizeEvent* event)
     int width = sizeHint.width();
     int height = sizeHint.height();
     if (growing &&
-        (widget->sizePolicy().verticalPolicy() & QSizePolicy::GrowFlag))
+        (widget->sizePolicy().verticalPolicy() & QSizePolicy::GrowFlag) &&
+        (widget->sizeHint().height() != widget->size().height()))
       height += (size.height() - total_height) / growing; // FIXME: rounding
+    height = std::max(0, height);
     if (width <= size.width())
     {
       if (policy & QSizePolicy::ExpandFlag)
