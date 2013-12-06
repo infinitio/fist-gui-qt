@@ -41,7 +41,7 @@ private:
   void
   _layout();
   QWidgetList
-  _child_widgets() const;
+  _child_widgets(bool visible_only = false) const;
 
 public:
   Q_PROPERTY(int heightHint

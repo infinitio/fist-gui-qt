@@ -99,12 +99,15 @@ SmoothLayout::sizeHint() const
 }
 
 QWidgetList
-SmoothLayout::_child_widgets() const
+SmoothLayout::_child_widgets(bool visible_only) const
 {
   QWidgetList widgets;
   for (QObject* child: this->children())
     if (QWidget* widget = dynamic_cast<QWidget*>(child))
-      widgets.append(widget);
+    {
+      if (visible_only ? widget->isVisible() : true)
+        widgets.append(widget);
+    }
   return widgets;
 }
 
