@@ -22,7 +22,9 @@ SearchField::SearchField(QWidget* owner, ListWidget** list):
 void
 SearchField::setIcon(QPixmap const& pixmap)
 {
-  this->_icon = pixmap;
+  this->_icon = pixmap.scaled(QSize(20, 20),
+                              Qt::KeepAspectRatioByExpanding,
+                              Qt::SmoothTransformation);
   int padding = margin;
   if (!this->_icon.isNull())
     padding += margin + this->_icon.width();
