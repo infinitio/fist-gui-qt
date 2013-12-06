@@ -18,22 +18,34 @@ public:
   typedef ListWidget Self;
   typedef QWidget Super;
 
+/*------.
+| Enums |
+`------*/
+public:
+  enum Position
+  {
+    Top = 0x01,
+    Bottom = 0x02,
+  };
+
 /*-------------.
 | Construction |
 `-------------*/
 public:
   ListWidget(QWidget* parent = nullptr);
-  ListWidget(QWidget* parent, QWidget* mate);
 
 /*--------.
 | Widgets |
 `--------*/
 public:
   void
-  addWidget(ListItem* widget);
+  add_widget(ListItem* widget, Position position = Bottom);
 
   void
-  removeWidget(ListItem* widget);
+  remove_widget(ListItem* widget, bool all = true);
+
+  void
+  move_widget(ListItem* widget, Position position = Bottom);
 
   QList<ListItem*> const&
   widgets() const;
@@ -54,10 +66,6 @@ public:
   virtual
   QSize
   minimumSizeHint() const override;
-
-public:
-  void
-  set_mate(QWidget* mate);
 
 public:
   Q_OBJECT;

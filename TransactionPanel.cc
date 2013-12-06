@@ -17,9 +17,6 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 {
   this->footer()->setParent(this);
 
-  connect(this->_list, SIGNAL(resized),
-          this, SLOT(on_list_resized));
-
   // Register gap callback.
   g_panel = this;
   gap_transaction_callback(state, TransactionPanel::transaction_cb);
@@ -50,24 +47,40 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
     transactions_list.insert(trs[v]);
   gap_transactions_free(trs);
 
+  if (transactions_list.empty())
+  {
+    // XXX: Add place holder.
+    return;
+  }
+
   auto iter = transactions_list.begin();
-  uint32_t i = 0;
-  // for ( ; i < 15 && iter != transactions_list.end(); i += 1, iter++);
-  // for ( ; iter != transactions_list.begin(); iter--)
   for (uint32_t i = 0;
        iter != transactions_list.end() && i < MAX_TRANSAS;
        ++i, ++iter)
-    addTransaction(state, *iter);
+  {
+    this->add_transaction(state, *iter, true);
+  }
 }
 
 TransactionWidget*
-TransactionPanel::addTransaction(gap_State* state, uint32_t tid)
+TransactionPanel::add_transaction(gap_State* state,
+                                  uint32_t tid,
+                                  bool init)
 {
   if (this->_transactions.find(tid) == this->_transactions.end())
     this->_transactions.emplace(tid, TransactionModel(state, tid));
 
   auto widget = new TransactionWidget(this->_transactions.at(tid));
-  this->_list->addWidget(widget);
+
+  connect(widget, SIGNAL(on_transaction_accepted(uint32_t)),
+          this, SLOT(_on_transaction_accepted(uint32_t)));
+  connect(widget, SIGNAL(on_transaction_rejected(uint32_t)),
+          this, SLOT(_on_transaction_rejected(uint32_t)));
+
+  this->_list->add_widget(widget,
+                          init ?
+                            ListWidget::Position::Bottom :
+                            ListWidget::Position::Top);
   return widget;
 }
 
@@ -78,10 +91,17 @@ TransactionPanel::setFocus()
 }
 
 void
-TransactionPanel::on_transaction_accepted(uint32_t tid)
+TransactionPanel::_on_transaction_accepted(uint32_t tid)
 {
   std::cerr << "accepted " << tid << std::endl;
   gap_accept_transaction(this->_state, tid);
+}
+
+void
+TransactionPanel::_on_transaction_rejected(uint32_t tid)
+{
+  std::cerr << "reject " << tid << std::endl;
+  gap_reject_transaction(this->_state, tid);
 }
 
 void
@@ -90,7 +110,7 @@ TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
   if (status == gap_transaction_waiting_for_accept)
   {
     std::cerr << id << std::endl;
-    g_panel->addTransaction(g_panel->_state, id);
+    g_panel->add_transaction(g_panel->_state, id);
   }
   else
     // std::cerr << this->_list->widgets().size() << "update transaction(s)" << std::endl;

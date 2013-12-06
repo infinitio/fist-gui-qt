@@ -33,14 +33,9 @@ SendPanel::SendPanel(gap_State* state):
 {
   this->footer()->setParent(this);
 
-  this->_users->set_mate(this->_search);
   this->_users->setMaxRows(5);
   this->_file_list->setMaxRows(4);
 
-  connect(this->_file_list, SIGNAL(resized()),
-          this, SLOT(repaint()));
-  connect(this->_users, SIGNAL(resized()),
-          this, SLOT(repaint()));
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
 
@@ -91,7 +86,7 @@ SendPanel::add_file(QString const& path)
   {
     connect(this->_files[path], SIGNAL(remove(QString const&)),
             this, SLOT(remove_file(QString const&)));
-    this->_file_list->addWidget(this->_files[path]);
+    this->_file_list->add_widget(this->_files[path]);
   }
 }
 
@@ -102,7 +97,7 @@ SendPanel::remove_file(QString const& path)
 
   if (it != this->_files.end())
   {
-    this->_file_list->removeWidget(it.value());
+    this->_file_list->remove_widget(it.value());
     this->_files.remove(path);
   }
 }
@@ -133,7 +128,7 @@ SendPanel::setUsers(uint32_t* uids)
             SIGNAL(clicked_signal(uint32_t)),
             this,
             SLOT(_set_peer(uint32_t)));
-    this->_users->addWidget(widget);
+    this->_users->add_widget(widget, ListWidget::Position::Top);
 
     ++uidscopy;
   }

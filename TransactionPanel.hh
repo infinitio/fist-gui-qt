@@ -24,16 +24,17 @@ public:
 
 public Q_SLOTS:
   TransactionWidget*
-  addTransaction(gap_State* state, uint32_t tid);
+  add_transaction(gap_State* state, uint32_t tid, bool init = false);
 
   void
-  on_transaction_accepted(uint32_t);
+  _on_transaction_accepted(uint32_t);
+
+  void
+  _on_transaction_rejected(uint32_t);
 
   void setFocus();
 
-  void
-  on_list_resized();
-
+public:
   void
   updateTransaction(gap_State* state,
                     uint32_t tid);

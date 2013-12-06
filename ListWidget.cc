@@ -13,10 +13,6 @@ static int const separator = 1;
 `-------------*/
 
 ListWidget::ListWidget(QWidget* parent):
-  ListWidget(parent, parent)
-{}
-
-ListWidget::ListWidget(QWidget* parent, QWidget* mate):
   Super(parent),
   _height_hint(0),
   _width_hint(0),
@@ -24,8 +20,7 @@ ListWidget::ListWidget(QWidget* parent, QWidget* mate):
   _max_rows(-1),
   _scroll(new SmoothScrollBar(this)),
   _wheel_event(false),
-  _keyboard_index(0),
-  _mate(mate)
+  _keyboard_index(0)
 {
   this->_scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
@@ -37,21 +32,43 @@ ListWidget::ListWidget(QWidget* parent, QWidget* mate):
 `--------*/
 
 void
-ListWidget::addWidget(ListItem* widget)
+ListWidget::add_widget(ListItem* widget, Position position)
 {
-  this->_widgets.push_front(widget);
+  if (position == Position::Bottom)
+    this->_widgets.push_back(widget);
+  else if (position == Position::Top)
+    this->_widgets.push_front(widget);
+
   widget->setParent(this);
   widget->show();
   this->_layout();
 }
 
 void
-ListWidget::removeWidget(ListItem* widget)
+ListWidget::remove_widget(ListItem* widget, bool all)
 {
-  auto res = this->_widgets.removeAll(widget);
+  if (all)
+    this->_widgets.removeAll(widget);
+  else
+  {
+    auto index = this->_widgets.indexOf(widget);
+    if (index != -1)
+      this->_widgets.removeAt(index);
+  }
   widget->setParent(nullptr);
   delete widget;
   this->_layout();
+}
+
+void
+ListWidget::move_widget(ListItem* widget, Position position)
+{
+  auto index = this->_widgets.indexOf(widget);
+  if (index != -1)
+  {
+    this->_widgets.removeAt(index);
+    this->add_widget(widget, position);
+  }
 }
 
 QList<ListItem*> const&
@@ -84,12 +101,6 @@ ListWidget::minimumSizeHint() const
 {
   // FIXME: minimum height when items are present.
   return QSize(this->_width_hint, 0);
-}
-
-void
-ListWidget::set_mate(QWidget* mate)
-{
-  this->_mate = mate;
 }
 
 void
@@ -191,7 +202,10 @@ ListWidget::keyPressEvent(QKeyEvent*)
   std::cout << _widgets.size() << " " << _keyboard_index << std::endl;
 
   if (_keyboard_index == 0)
-    _mate->setFocus();
+  {
+
+    //_mate->setFocus();
+  }
   else
   {
     if (old_index > 0)
