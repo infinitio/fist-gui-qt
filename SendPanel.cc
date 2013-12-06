@@ -37,7 +37,7 @@ namespace
 SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
   _state(state),
-  _search(new SearchField(this, &this->_users)),
+  _search(new SearchField(this)),
   _users(new ListWidget(this)),
   _file_adder(new AddFileWidget(this)),
   _file_list(new ListWidget(this)),

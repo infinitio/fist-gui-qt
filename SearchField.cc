@@ -4,9 +4,8 @@
 
 static int const margin = 10;
 
-SearchField::SearchField(QWidget* owner, ListWidget** list):
-  QLineEdit(owner),
-  _list(list)
+SearchField::SearchField(QWidget* owner):
+  QLineEdit(owner)
 {
   this->setFrame(false);
   QFont font("Lucida Grande");
@@ -17,6 +16,8 @@ SearchField::SearchField(QWidget* owner, ListWidget** list):
   this->setPlaceholderText("Search for a friend ...");
   this->setFixedWidth(320);
   this->setFixedHeight(this->height());
+
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 void
@@ -36,7 +37,9 @@ void
 SearchField::keyPressEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_Up)
-    (*_list)->setFocus();
+    emit up_pressed();
+  else if (event->key() == Qt::Key_Down)
+    emit down_pressed();
   else
     QLineEdit::keyPressEvent(event);
 }

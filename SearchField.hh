@@ -14,7 +14,7 @@ class SearchField:
 | Construction |
 `-------------*/
 public:
-  SearchField(QWidget* owner, ListWidget** list);
+  SearchField(QWidget* owner);
 
 /*--------.
 | Display |
@@ -28,6 +28,13 @@ public:
 
 protected:
   void keyPressEvent(QKeyEvent* event);
+
+Q_SIGNALS:
+  void
+  up_pressed();
+
+  void
+  down_pressed();
 
 /*-------.
 | Layout |
@@ -45,7 +52,7 @@ public:
   paintEvent(QPaintEvent* event);
 
 private:
-  ListWidget** _list;
+  Q_OBJECT;
 };
 
 
