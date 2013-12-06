@@ -14,6 +14,7 @@ AddFileWidget::AddFileWidget(QWidget* parent):
   layout->addItem(new QSpacerItem(0, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Maximum));
   layout->addWidget(this->_text);
+  this->setFixedWidth(320);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 };
