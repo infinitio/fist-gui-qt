@@ -17,7 +17,7 @@
 # include <fist-gui-qt/ListWidget.hh>
 # include <fist-gui-qt/UserWidget.hh>
 # include <fist-gui-qt/fwd.hh>
-
+# include <fist-gui-qt/HorizontalSeparator.hh>
 class SendPanel:
   public Panel
 {
@@ -67,9 +67,17 @@ private:
   gap_State* _state;
   SearchField* _search;
   ListWidget* _users;
+  HorizontalSeparator* _file_part_seperator;
   AddFileWidget* _file_adder;
   ListWidget* _file_list;
+
+/*-------------.
+| SearchResult |
+`-------------*/
   uint32_t _peer_id;
+
+  // FreeSearch is an functor to replace standard unique_ptr default delete.
+  QVector<uint32_t> _results;
   bool _ignore_search_result;
 
 protected:

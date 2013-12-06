@@ -12,36 +12,23 @@
 #include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/SendPanel.hh>
+#include <fist-gui-qt/HorizontalSeparator.hh>
 #include <fist-gui-qt/utils.hh>
 
 /*-------------.
 | Construction |
 `-------------*/
 
-namespace
-{
-  struct Separator:
-    public QFrame
-  {
-    Separator()
-    {
-      this->setFrameShape(QFrame::HLine);
-      this->setFrameShadow(QFrame::Sunken);
-
-      this->setFixedHeight(5);
-      this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    }
-  };
-}
-
 SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
   _state(state),
   _search(new SearchField(this)),
   _users(new ListWidget(this)),
+  _file_part_seperator(new HorizontalSeparator(this)),
   _file_adder(new AddFileWidget(this)),
   _file_list(new ListWidget(this)),
   _peer_id(gap_null()),
+  _results(),
   _ignore_search_result(false)
 {
   this->footer()->setParent(this);
@@ -54,11 +41,9 @@ SendPanel::SendPanel(gap_State* state):
           this, SLOT(repaint()));
   connect(this->_users, SIGNAL(resized()),
           this, SLOT(repaint()));
-
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
 
-  this->footer()->send()->disable();
   this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
 
   connect(this->_file_adder->attach(),
@@ -89,10 +74,7 @@ SendPanel::_search_changed(QString const& search)
   if (search.size() != 0)
   {
     std::string text(search.toStdString());
-    uint32_t* uids = gap_search_users(_state, text.c_str());
-
-    this->setUsers(uids);
-    gap_search_users_free(uids);
+    this->setUsers(gap_search_users(_state, text.c_str()));
   }
   else
     this->clearUsers();
@@ -111,9 +93,6 @@ SendPanel::add_file(QString const& path)
             this, SLOT(remove_file(QString const&)));
     this->_file_list->addWidget(this->_files[path]);
   }
-
-  if (this->_files.size() > 0)
-    this->footer()->send()->enable();
 }
 
 void
@@ -126,9 +105,6 @@ SendPanel::remove_file(QString const& path)
     this->_file_list->removeWidget(it.value());
     this->_files.remove(path);
   }
-
-  if (this->_files.size() == 0)
-    this->footer()->send()->disable();
 }
 
 /*------.
@@ -140,13 +116,16 @@ SendPanel::setUsers(uint32_t* uids)
 {
   this->_users->clearWidgets();
 
+  this->_results.clear();
+
   if (uids == nullptr)
     return;
 
-  auto* uidscopy = uids;
+  uint32_t* uidscopy = uids;
   while (*uidscopy != gap_null())
   {
     auto uid = *uidscopy;
+    this->_results.push_back(uid);
     if (this->_user_models.find(uid) == this->_user_models.end())
       this->_user_models.emplace(uid, UserModel(this->_state, uid));
     auto widget = new UserWidget(this->_user_models.at(uid), this);
@@ -182,12 +161,9 @@ SendPanel::_pick_user()
 {
   if (this->_peer_id == gap_null())
   {
-    std::string text(this->_search->text().toStdString());
-    uint32_t* uids = gap_search_users(_state, text.c_str());
-    if (uids == nullptr)
+    if (this->_results.empty())
       return;
-    auto uid = uids[0];
-    gap_search_users_free(uids);
+    auto uid = this->_results.last();
     this->_set_peer(uid);
   }
   else
@@ -199,23 +175,29 @@ SendPanel::_pick_user()
 void
 SendPanel::_send()
 {
-  if (this->_files.empty())
+  if (this->_peer_id == gap_null())
   {
-    std::cerr << "NO FILES" << std::endl;
+    this->_search->setFocus();
     return;
   }
 
-  this->footer()->send()->disable();
+  if (this->_files.empty())
+  {
+    this->_file_adder->pulse();
+    return;
+  }
 
   char** filenames;
-  if ((filenames = (char**)malloc((this->_files.size() + 1) * sizeof(char*))) == nullptr)
+  if ((filenames = (char**)malloc((this->_files.size() + 1) * sizeof(char*)))
+      == nullptr)
   {
     std::cerr << "error: unable to allocate" << std::endl;
   }
 
   for (int i = 0; i < this->_files.size(); i++)
   {
-    if ((filenames[i] = (char*)malloc((this->_files.keys().at(i).size() + 1))) == nullptr)
+    if ((filenames[i] = (char*)malloc((this->_files.keys().at(i).size() + 1)))
+        == nullptr)
     {
       std::cerr << "error: unable to allocate" << std::endl;
     }
@@ -259,6 +241,8 @@ SendPanel::on_hide()
   this->_search->clear();
   this->_file_list->clearWidgets();
   this->_files.clear();
+  this->_results.clear();
+  this->_peer_id = gap_null();
 }
 
 /*-------.
