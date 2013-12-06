@@ -1,5 +1,3 @@
-#include <QHBoxLayout>
-
 #include <fist-gui-qt/Footer.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
@@ -14,18 +12,13 @@ static gap_State* g_state = nullptr;
 
 TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
   Panel(new TransactionFooter, parent),
-  _list(nullptr),
+  _list(new ListWidget(this)),
   _state(state)
 {
-  auto layout = new QVBoxLayout(this);
-  layout->setContentsMargins(0, 0, 0, 0);
-  this->_list = new TransactionList;
+  this->footer()->setParent(this);
 
-  connect(this->_list, SIGNAL(on_transaction_accepted(uint32_t)),
-          this, SLOT(on_transaction_accepted(uint32_t)));
-
-  layout->addWidget(this->_list);
-  layout->addWidget(this->_footer);
+  connect(this->_list, SIGNAL(resized),
+          this, SLOT(on_list_resized));
 
   // Register gap callback.
   g_panel = this;
@@ -59,9 +52,23 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 
   auto iter = transactions_list.begin();
   uint32_t i = 0;
-  for ( ; i < 15 && iter != transactions_list.end(); i += 1, iter++);
-  for ( ; iter != transactions_list.begin(); iter--)
+  // for ( ; i < 15 && iter != transactions_list.end(); i += 1, iter++);
+  // for ( ; iter != transactions_list.begin(); iter--)
+  for (uint32_t i = 0;
+       iter != transactions_list.end() && i < MAX_TRANSAS;
+       ++i, ++iter)
     addTransaction(state, *iter);
+}
+
+TransactionWidget*
+TransactionPanel::addTransaction(gap_State* state, uint32_t tid)
+{
+  if (this->_transactions.find(tid) == this->_transactions.end())
+    this->_transactions.emplace(tid, TransactionModel(state, tid));
+
+  auto widget = new TransactionWidget(this->_transactions.at(tid));
+  this->_list->addWidget(widget);
+  return widget;
 }
 
 void
@@ -77,20 +84,28 @@ TransactionPanel::on_transaction_accepted(uint32_t tid)
   gap_accept_transaction(this->_state, tid);
 }
 
-TransactionWidget*
-TransactionPanel::addTransaction(gap_State* state, uint32_t tid)
-{
-  return this->_list->addTransaction(state, tid);
-}
-
 void
 TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
   if (status == gap_transaction_waiting_for_accept)
+  {
+    std::cerr << id << std::endl;
     g_panel->addTransaction(g_panel->_state, id);
+  }
   else
-    g_panel->_list->updateTransaction(g_panel->_state, id);
+    // std::cerr << this->_list->widgets().size() << "update transaction(s)" << std::endl;
+    g_panel->updateTransaction(g_panel->_state, id);
 }
+
+void
+TransactionPanel::updateTransaction(gap_State* state, uint32_t tid)
+{
+  // XXX:
+  std::cerr << this->_list->widgets().size() << "update transaction(s)" << std::endl;
+  for (auto widget: this->_list->widgets())
+    widget->update();
+}
+
 
 /*-------.
 | Footer |
@@ -99,4 +114,10 @@ TransactionFooter*
 TransactionPanel::footer()
 {
   return static_cast<TransactionFooter*>(this->_footer);
+}
+
+void
+TransactionPanel::on_list_resized()
+{
+
 }

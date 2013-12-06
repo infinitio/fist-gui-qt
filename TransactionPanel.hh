@@ -10,8 +10,9 @@
 # include <unordered_map>
 # include <algorithm>
 
-# include <fist-gui-qt/TransactionList.hh>
+# include <fist-gui-qt/ListWidget.hh>
 # include <fist-gui-qt/TransactionFooter.hh>
+# include <fist-gui-qt/TransactionWidget.hh>
 # include <fist-gui-qt/Panel.hh>
 
 class TransactionPanel:
@@ -30,13 +31,22 @@ public Q_SLOTS:
 
   void setFocus();
 
+  void
+  on_list_resized();
+
+  void
+  updateTransaction(gap_State* state,
+                    uint32_t tid);
+
 private:
-  TransactionList* _list;
+  ListWidget* _list;
   gap_State* _state;
 
 public:
   TransactionFooter*
   footer();
+
+  std::unordered_map<uint32_t, TransactionModel> _transactions;
 
 private:
   Q_OBJECT;

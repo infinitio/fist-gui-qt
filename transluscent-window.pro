@@ -34,7 +34,6 @@ SOURCES +=                                      \
     SmoothLayout.cc                             \
     SmoothScrollBar.cc                          \
     TransactionFooter.cc                        \
-    TransactionList.cc                          \
     TransactionModel.cc                         \
     TransactionPanel.cc                         \
     TransactionWidget.cc                        \
@@ -64,7 +63,6 @@ HEADERS +=                                      \
     SmoothScrollBar.hh                          \
     TransactionFooter.hh                        \
     TransactionModel.hh                         \
-    TransactionList.hh                          \
     TransactionPanel.hh                         \
     TransactionWidget.hh                        \
     TransactionWindow.hh                        \
