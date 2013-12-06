@@ -4,13 +4,13 @@
 # include <QByteArray>
 # include <QPixmap>
 
-AvatarIcon::AvatarIcon(QPixmap const& pixmap):
+AvatarIcon::AvatarIcon(QPixmap const& pixmap,
+                       QSize const& size):
   _uid(0),
-  _pixmap(QSize(35, 35)),
-  _mask(QSize(35, 35)),
-  _geometry(QPoint(0, 0), QSize(35, 35))
+  _pixmap(size),
+  _mask(size),
+  _geometry(QPoint(0, 0), size)
 {
-  QSize size(35, 35);
   this->setMinimumSize(size);
   this->setMaximumSize(size);
   this->_pixmap.fill(Qt::transparent);
