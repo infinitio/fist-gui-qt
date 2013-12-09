@@ -51,6 +51,10 @@ main(int argc, char** argv)
 
   // Open qt application.
   QApplication app(argc, argv);
+
+  QFont arial("Arial", 11);
+  QApplication::setFont(arial);
+
   if (QFontDatabase::addApplicationFont(":/fonts/LucidaGrande.ttc") < 0)
     exit(1);
 
