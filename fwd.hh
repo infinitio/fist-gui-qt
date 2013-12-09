@@ -4,13 +4,14 @@
 class AddFileWidget;
 class AvatarWidget;
 class FileItem;
+class IconButton;
 class ListWidget;
+class Panel;
+class RoundShadowWidget;
+class SearchField;
 class SendPanel;
 class TransactionList;
 class TransactionPanel;
 class TransactionWidget;
-class RoundShadowWidget;
-class SearchField;
-class Panel;
 
 #endif
