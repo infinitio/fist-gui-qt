@@ -10,12 +10,12 @@
 
 # include <surface/gap/gap.h>
 
-# include <fist-gui-qt/ui_LoginWindow.h>
+# include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/InfinitDock.hh>
+# include <fist-gui-qt/RoundShadowWidget.hh>
 
 class LoginWindow:
-  public QMainWindow,
-  public Ui::LoginWindow
+  public RoundShadowWidget
 {
 private:
   gap_State* _state;
@@ -23,8 +23,24 @@ public:
   LoginWindow(gap_State* state);
   void keyPressEvent(QKeyEvent* event);
 
-public slots:
-  void login();
+private slots:
+  void
+  _quit();
+
+  void
+  _reduce();
+
+  void
+  _login();
+
+private:
+  QLineEdit* _email_field;
+  QLineEdit* _password_field;
+  QLabel* _message_field;
+
+  IconButton* _quit_button;
+  QLabel* _reset_password_link;
+  QLabel* _create_account_link;
 
 private:
   Q_OBJECT

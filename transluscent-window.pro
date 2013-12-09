@@ -26,6 +26,7 @@ SOURCES +=                                      \
     InfinitDock.cc                              \
     ListItem.cc                                 \
     ListWidget.cc                               \
+    LoginFooter.cc                              \
     LoginWindow.cc                              \
     Panel.cc                                    \
     RoundShadowWidget.cc                        \
@@ -55,6 +56,7 @@ HEADERS +=                                      \
     InfinitDock.hh                              \
     ListItem.hh                                 \
     ListWidget.hh                               \
+    LoginFooter.hh                              \
     LoginWindow.hh                              \
     Panel.hh                                    \
     RoundShadowWidget.hh                        \
@@ -75,6 +77,3 @@ HEADERS +=                                      \
 RESOURCES += resources/resources.qrc
 
 QMAKE_CXXFLAGS += -std=c++11
-
-FORMS += \
-    LoginWindow.ui
