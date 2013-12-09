@@ -45,7 +45,7 @@ InfinitDock::InfinitDock(gap_State* state):
   _transaction_panel(new TransactionPanel(state)),
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel(state)),
-  _logo(":/images/logo.png"),
+  _logo(":/icons/logo.png"),
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),
@@ -64,10 +64,10 @@ InfinitDock::InfinitDock(gap_State* state):
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
   gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
 
-  this->_switch_view(this->_transaction_panel);
-
   this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
+
+  this->_switch_view(this->_transaction_panel);
 
   connect(this->_panel, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
