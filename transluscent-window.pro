@@ -70,6 +70,7 @@ HEADERS +=                                      \
     TransactionWindow.hh                        \
     UserModel.hh                                \
     UserWidget.hh                               \
+    globals.hh                               \
 
 RESOURCES += resources/resources.qrc
 
