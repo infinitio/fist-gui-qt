@@ -27,12 +27,18 @@ public Q_SLOTS:
   add_transaction(gap_State* state, uint32_t tid, bool init = false);
 
   void
+  setFocus();
+
+  void
+  avatar_available(uint32_t uid);
+
+private Q_SLOTS:
+  void
   _on_transaction_accepted(uint32_t);
 
   void
   _on_transaction_rejected(uint32_t);
 
-  void setFocus();
 
 public:
   void

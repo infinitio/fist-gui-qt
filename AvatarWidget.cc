@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <QPainter>
 
 #include <fist-gui-qt/AvatarWidget.hh>

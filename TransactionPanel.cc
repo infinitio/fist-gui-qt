@@ -91,6 +91,27 @@ TransactionPanel::setFocus()
 }
 
 void
+TransactionPanel::avatar_available(uint32_t uid)
+{
+  std::cerr << "TransactionPanel: " << uid << " avatar available" << std::endl;
+  // XXX: Ugly, but no better way for the moment.
+  bool update_list = false;
+  for (auto& tr: this->_transactions)
+  {
+    if (tr.second.peer_id() == uid)
+    {
+      update_list = true;
+      std::cerr << tr.second.peer_fullname().toStdString() << ": new avatar" << std::endl;
+      tr.second.avatar_available();
+      this->_list->update();
+    }
+  }
+
+  if (update_list)
+    this->_list->update();
+}
+
+void
 TransactionPanel::_on_transaction_accepted(uint32_t tid)
 {
   std::cerr << "accepted " << tid << std::endl;
@@ -107,6 +128,7 @@ TransactionPanel::_on_transaction_rejected(uint32_t tid)
 void
 TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
+  std::cerr << "transaction callback: " << id << " status: " << status << std::endl;
   if (status == gap_transaction_waiting_for_accept)
   {
     std::cerr << id << std::endl;

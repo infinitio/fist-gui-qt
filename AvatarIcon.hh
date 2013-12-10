@@ -15,6 +15,9 @@ public:
   AvatarIcon(QPixmap const& pixmap,
              QSize const& size = QSize(35, 35));
 
+  void
+  set_avatar(QPixmap const& pixmap);
+
 protected:
   virtual void paintEvent(QPaintEvent*) override;
 

@@ -37,8 +37,15 @@ public:
   gap_TransactionStatus
   status() const;
 
+  // XXX: Avatar fetching duplicated from UserModel.
   QPixmap const&
   avatar() const;
+
+  bool
+  new_avatar() const;
+
+  bool
+  avatar_available();
 
 private:
   gap_State* _state;
@@ -52,6 +59,7 @@ private:
   // XXX/ Should be there.
   mutable QPixmap _avatar;
   mutable bool _default_avatar;
+  mutable bool _new_avatar;
 };
 
 

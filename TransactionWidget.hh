@@ -1,7 +1,6 @@
 #ifndef TRANSACTIONWIDGET_HH
 # define TRANSACTIONWIDGET_HH
 
-# include <iostream>
 # include <QWidget>
 # include <QPushButton>
 # include <QTimer>

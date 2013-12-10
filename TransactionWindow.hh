@@ -4,8 +4,6 @@
 # include <QKeyEvent>
 # include <QWidget>
 
-# include <iostream>
-
 class TransactionWindow:
   public QWidget
 {

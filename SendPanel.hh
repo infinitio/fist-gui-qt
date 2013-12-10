@@ -50,6 +50,10 @@ private slots:
   void _search_changed(QString const& search);
   void _set_peer(uint32_t uid);
   void _pick_user();
+public slots:
+  void
+  avatar_available(uint32_t uid);
+
 /*------.
 | Users |
 `------*/
@@ -89,7 +93,6 @@ protected:
 `-------*/
 private:
   std::unordered_map<uint32_t, UserModel> _user_models;
-
   QHash<QString, FileItem*> _files;
 
   void

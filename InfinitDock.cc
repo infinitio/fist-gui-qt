@@ -1,12 +1,14 @@
+#include <iostream>
+
+#include <QAction>
 #include <QApplication>
-#include <QFileDialog>
 #include <QDesktopWidget>
+#include <QFileDialog>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QSystemTrayIcon>
 #include <QUrl>
-#include <QMenu>
-#include <QAction>
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
@@ -95,12 +97,12 @@ InfinitDock::InfinitDock(gap_State* state):
   connect(this,
           SIGNAL(avatar_available(uint32_t)),
           this->_send_panel,
-          SLOT(on_avatar_available(uint32_t)));
+          SLOT(avatar_available(uint32_t)));
 
   connect(this,
           SIGNAL(avatar_available(uint32_t)),
           this->_transaction_panel,
-          SLOT(on_avatar_available(uint32_t)));
+          SLOT(avatar_available(uint32_t)));
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -323,7 +325,7 @@ InfinitDock::user_status_cb(uint32_t /* id */,
 void
 InfinitDock::avatar_available_cb(uint32_t id)
 {
-  std::cerr << "Avatar available" << std::endl;
+  std::cerr << "Avatar available (" << id << ")" << std::endl;
   g_dock->avatar_available(id);
 }
 

@@ -5,7 +5,6 @@
 # include <QByteArray>
 # include <QPixmap>
 
-# include <iostream>
 # include <map>
 # include <surface/gap/gap.h>
 

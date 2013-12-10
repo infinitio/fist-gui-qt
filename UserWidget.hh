@@ -22,7 +22,11 @@ Q_SIGNALS:
   void clicked_signal(uint32_t);
 
 public:
-  virtual void trigger();
+  void
+  trigger() override;
+
+  void
+  update() override;
 
 /*-----------.
 | Attributes |

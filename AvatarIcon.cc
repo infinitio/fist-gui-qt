@@ -13,24 +13,30 @@ AvatarIcon::AvatarIcon(QPixmap const& pixmap,
 {
   this->setMinimumSize(size);
   this->setMaximumSize(size);
+  this->set_avatar(pixmap);
+}
+
+void
+AvatarIcon::set_avatar(QPixmap const& pixmap)
+{
   this->_pixmap.fill(Qt::transparent);
 
   {
     _mask.fill(Qt::transparent);
-    QPainter painter(&_mask);
+    QPainter painter(&this->_mask);
     painter.setRenderHints(QPainter::Antialiasing |
                            QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
-    painter.drawEllipse(_geometry);
+    painter.drawEllipse(this->_geometry);
   }
 
   QPainter painter(&this->_pixmap);
   painter.setRenderHints(QPainter::Antialiasing |
                          QPainter::SmoothPixmapTransform);
-  painter.drawPixmap(_geometry, pixmap);
+  painter.drawPixmap(this->_geometry, pixmap);
   painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-  painter.drawPixmap(_geometry, _mask);
+  painter.drawPixmap(this->_geometry, this->_mask);
 }
 
 void

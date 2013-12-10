@@ -24,9 +24,19 @@ public:
   uint32_t
   id() const;
 
+  bool
+  user_status();
+
   QPixmap const&
   avatar() const;
 
+  bool
+  new_avatar() const;
+
+  bool
+  avatar_available();
+
+private:
   gap_State* _state;
   uint32_t _id;
 
@@ -34,6 +44,7 @@ public:
   mutable QString _fullname;
   mutable QPixmap _avatar;
   mutable bool _default_avatar;
+  mutable bool _new_avatar;
 };
 
 #endif

@@ -10,7 +10,8 @@ UserModel::UserModel(gap_State* state,
   _id(id),
   _fullname((const char *) nullptr),
   _avatar(),
-  _default_avatar(true)
+  _default_avatar(true),
+  _new_avatar(true)
 {
 }
 
@@ -31,6 +32,18 @@ uint32_t
 UserModel::id() const
 {
   return this->_id;
+}
+
+bool
+UserModel::new_avatar() const
+{
+  return this->_new_avatar;
+}
+
+bool
+UserModel::avatar_available()
+{
+  this->_new_avatar = true;
 }
 
 QPixmap const&
@@ -60,5 +73,6 @@ UserModel::avatar() const
     }
   }
 
+  this->_new_avatar = false;
   return this->_avatar;
 }

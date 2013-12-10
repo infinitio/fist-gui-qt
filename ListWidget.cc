@@ -3,6 +3,8 @@
 #include <QPainter>
 #include <QWheelEvent>
 
+#include <iostream>
+
 #include <fist-gui-qt/ListWidget.hh>
 
 static int const items = 5;
@@ -57,6 +59,7 @@ ListWidget::remove_widget(ListItem* widget, bool all)
   }
   widget->setParent(nullptr);
   delete widget;
+  widget = nullptr;
   this->_layout();
 }
 
@@ -80,8 +83,11 @@ ListWidget::widgets() const
 void
 ListWidget::clearWidgets()
 {
-  for (auto const& widget: this->_widgets)
+  for (auto& widget: this->_widgets)
+  {
     delete widget;
+    widget = nullptr;
+  }
   this->_widgets.clear();
   this->_layout();
 }
@@ -243,6 +249,16 @@ ListWidget::resizeEvent(QResizeEvent*)
                          size.width(), this->height());
   }
   this->_layout();
+}
+
+void
+ListWidget::update()
+{
+  for (auto const& widget: this->_widgets)
+  {
+    std::cerr << "update widget: " << widget << std::endl;
+    widget->update();
+  }
 }
 
 /*---------.

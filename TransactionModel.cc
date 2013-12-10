@@ -1,8 +1,5 @@
 #include "TransactionModel.hh"
 
-#include <iostream>
-
-
 #include <QBuffer>
 #include <QImageReader>
 
@@ -10,11 +7,12 @@ TransactionModel::TransactionModel(gap_State* state,
                                    uint32_t id):
   _state(state),
   _id(id),
-  _peer_fullname((char const*) nullptr),
+  _peer_fullname(),
   _peer_id(0),
   _files(),
   _avatar(),
-  _default_avatar(true)
+  _default_avatar(true),
+  _new_avatar(true)
 {
 }
 
@@ -90,6 +88,18 @@ TransactionModel::status() const
   return gap_transaction_status(this->_state, this->_id);
 }
 
+bool
+TransactionModel::new_avatar() const
+{
+  return this->_new_avatar;
+}
+
+bool
+TransactionModel::avatar_available()
+{
+  this->_new_avatar = true;
+}
+
 QPixmap const&
 TransactionModel::avatar() const
 {
@@ -99,9 +109,7 @@ TransactionModel::avatar() const
     void* data = nullptr;
     size_t len = 0;
 
-    auto res = gap_avatar(this->_state, this->_id, &data, &len);
-
-    if (res == gap_ok)
+    if (gap_ok == gap_avatar(this->_state, this->peer_id(), &data, &len))
     {
       QByteArray raw((char *) data, len);
       QBuffer buff(&raw);
@@ -110,6 +118,7 @@ TransactionModel::avatar() const
       reader.setDevice(&buff);
       this->_avatar =  QPixmap::fromImageReader(&reader);
       this->_default_avatar = false;
+
     }
     else if(this->_avatar.isNull())
     {
@@ -117,5 +126,6 @@ TransactionModel::avatar() const
     }
   }
 
+  this->_new_avatar = false;
   return this->_avatar;
 }

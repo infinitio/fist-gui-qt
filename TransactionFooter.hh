@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include <QSpacerItem>
-#include <iostream>
 
 class TransactionFooter:
   public Footer

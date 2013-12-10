@@ -56,7 +56,7 @@ public:
   void
   setFocus();
 
-/*-------.
+  /*-------.
   | Layout |
   `-------*/
 public:
@@ -78,10 +78,12 @@ public:
   int maxRows();
 public Q_SLOTS:
   void setMaxRows(int val);
-
 Q_SIGNALS:
   void
   resized();
+public Q_SLOTS:
+  void
+  update();
 
 private Q_SLOTS:
   void

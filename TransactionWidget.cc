@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -161,6 +163,12 @@ TransactionWidget::trigger()
 void
 TransactionWidget::update()
 {
+  if (this->_transaction.new_avatar())
+  {
+    std::cerr << "tr widget: " << this->_transaction.peer_fullname().toStdString() << ": update avatar" << std::endl;
+    this->_avatar->setPicture(this->_transaction.avatar());
+  }
+
   // Accept button update.
   if (this->_transaction.status() != gap_transaction_waiting_for_accept &&
       this->_accept_button != nullptr)

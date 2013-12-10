@@ -1,18 +1,20 @@
+#include <iostream>
+
 #include <QEvent>
+#include <QGridLayout>
 #include <QLineEdit>
 #include <QPainter>
 #include <QTextEdit>
-#include <QGridLayout>
 
+#include <fist-gui-qt/AddFileWidget.hh>
 #include <fist-gui-qt/AvatarIcon.hh>
 #include <fist-gui-qt/FileItem.hh>
-#include <fist-gui-qt/AddFileWidget.hh>
 #include <fist-gui-qt/Footer.hh>
+#include <fist-gui-qt/HorizontalSeparator.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/SendPanel.hh>
-#include <fist-gui-qt/HorizontalSeparator.hh>
 #include <fist-gui-qt/utils.hh>
 
 /*-------------.
@@ -110,7 +112,6 @@ void
 SendPanel::setUsers(uint32_t* uids)
 {
   this->_users->clearWidgets();
-
   this->_results.clear();
 
   if (uids == nullptr)
@@ -140,6 +141,9 @@ SendPanel::clearUsers()
   this->setUsers(nullptr);
 }
 
+/*------.
+| Slots |
+`------*/
 void
 SendPanel::_set_peer(uint32_t uid)
 {
@@ -212,6 +216,19 @@ SendPanel::_send()
   ::free((void*) filenames);
 
   emit switch_signal();
+}
+
+void
+SendPanel::avatar_available(uint32_t uid)
+{
+  std::cerr << "SendPanel: avatar Available" << std::endl;
+  auto it = this->_user_models.find(uid);
+  if (it != this->_user_models.end())
+  {
+    std::cerr << it->second.fullname().toStdString() << ": new avatar" << std::endl;
+    it->second.avatar_available();
+    this->_users->update();
+  }
 }
 
 void

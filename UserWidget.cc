@@ -1,6 +1,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+#include <iostream>
+
 #include <fist-gui-qt/UserWidget.hh>
 
 UserWidget::UserWidget(UserModel const& model,
@@ -28,4 +30,15 @@ UserWidget::trigger()
 {
   std::cout << "clicked: " << this->_model.fullname().toStdString() << std::endl;
   emit clicked_signal(this->_model.id());
+}
+
+void
+UserWidget::update()
+{
+  std::cerr << "UserWidget: " << this << " update" << std::endl;
+  if (this->_model.new_avatar())
+  {
+    std::cerr << "new avatar available" << std::endl;
+    this->_avatar->set_avatar(this->_model.avatar());
+  }
 }
