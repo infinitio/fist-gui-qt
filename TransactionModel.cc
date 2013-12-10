@@ -72,19 +72,13 @@ TransactionModel::files() const
   if (this->_files.empty())
   {
     char** files = gap_transaction_files(this->_state, this->_id);
-    char** to_delete = files;
-
-    do
+    char** copyied = files;
+    while (*copyied != nullptr)
     {
-      this->_files.push_back(QString::fromUtf8(*files));
-
-      // XXX: do it in gap.
-      // ::free((void*) *files);
+      this->_files.push_back(QString::fromUtf8(*copyied));
+      ++copyied;
     }
-    while((*++files) != nullptr);
-
-    // XXX: do it in gap.
-    // ::free((void*) to_delete);
+    ::free((void*) files);
   }
 
   return this->_files;

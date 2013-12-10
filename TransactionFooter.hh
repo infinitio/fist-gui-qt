@@ -17,7 +17,7 @@ public:
   virtual
   ~TransactionFooter() = default;
 
-  IconButton* const
+  IconButton const&
   send() const;
 
 private:

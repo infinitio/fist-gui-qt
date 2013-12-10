@@ -71,10 +71,8 @@ InfinitDock::InfinitDock(gap_State* state):
 
   connect(this->_panel, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
-  connect(this->_send_panel, SIGNAL(onSearchChanged(QString const&)),
-          SLOT(_search(QString const&)));
 
-  connect(this->_transaction_panel->footer()->send(),
+  connect(&this->_transaction_panel->footer()->send(),
           SIGNAL(released()),
           this,
           SLOT(_show_send_view()));

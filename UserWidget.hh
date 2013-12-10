@@ -24,18 +24,18 @@ Q_SIGNALS:
 public:
   virtual void trigger();
 
-/*-------.
-| Layout |
-`-------*/
-private:
-  QHBoxLayout* _layout;
-
 /*-----------.
 | Attributes |
 `-----------*/
 private:
   UserModel const& _model;
   AvatarIcon* _avatar;
+
+/*-------.
+| Layout |
+`-------*/
+private:
+  QHBoxLayout* _layout;
 
   Q_OBJECT;
 };

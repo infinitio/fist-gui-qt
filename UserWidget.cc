@@ -7,8 +7,8 @@ UserWidget::UserWidget(UserModel const& model,
                        QWidget* parent):
   ListItem(parent),
   _model(model),
-  _layout(new QHBoxLayout(this)),
-  _avatar(new AvatarIcon(this->_model.avatar()))
+  _avatar(new AvatarIcon(this->_model.avatar())),
+  _layout(new QHBoxLayout(this))
 {
   this->_layout->addWidget(this->_avatar);
   this->_layout->addWidget(new QLabel(this->_model.fullname()));

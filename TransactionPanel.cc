@@ -118,7 +118,7 @@ TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 }
 
 void
-TransactionPanel::updateTransaction(gap_State* state, uint32_t tid)
+TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t /* tid */)
 {
   // XXX:
   std::cerr << this->_list->widgets().size() << "update transaction(s)" << std::endl;
@@ -134,10 +134,4 @@ TransactionFooter*
 TransactionPanel::footer()
 {
   return static_cast<TransactionFooter*>(this->_footer);
-}
-
-void
-TransactionPanel::on_list_resized()
-{
-
 }

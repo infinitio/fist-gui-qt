@@ -12,8 +12,8 @@ TransactionFooter::TransactionFooter():
   this->_layout->addWidget(this->_send);
 }
 
-IconButton* const
+IconButton const&
 TransactionFooter::send() const
 {
-  return this->_send;
+  return *this->_send;
 }

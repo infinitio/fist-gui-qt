@@ -23,13 +23,13 @@ LoginFooter::mouseReleaseEvent(QMouseEvent*)
 }
 
 void
-LoginFooter::enterEvent(QEvent* event)
+LoginFooter::enterEvent(QEvent*)
 {
   this->setCursor(QCursor(Qt::PointingHandCursor));
 }
 
 void
-LoginFooter::leaveEvent(QEvent* event)
+LoginFooter::leaveEvent(QEvent*)
 {
   this->setCursor(QCursor(Qt::ArrowCursor));
 }
