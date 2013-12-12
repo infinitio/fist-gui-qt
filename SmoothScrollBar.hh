@@ -29,66 +29,86 @@ class SmoothScrollBar:
   private:                                              \
     Type _##Name;                                       \
 
-    Q_PROPERTY(int minimum READ minimum WRITE setMinimum);
-    PROPERTY_RW(int, minimum, minimum, setMinimum,
-                QPropertyAnimation* animation =
-                new QPropertyAnimation(this, "displayMinimum");
-                animation->setDuration(200);
-                animation->setEndValue(value);
-                animation->start();
-      );
-    Q_PROPERTY(int maximum READ maximum WRITE setMaximum);
-    PROPERTY_RW(int, maximum, maximum, setMaximum,
-                QPropertyAnimation* animation =
-                new QPropertyAnimation(this, "displayMaximum");
-                animation->setDuration(200);
-                animation->setEndValue(value);
-                animation->start();
-      );
-    Q_PROPERTY(int pageSize READ pageSize WRITE setPageSize);
-    PROPERTY_RW(int, pageSize, pageSize, setPageSize,
-                QPropertyAnimation* animation =
-                new QPropertyAnimation(this, "displayPageSize");
-                animation->setDuration(200);
-                animation->setEndValue(value);
-                animation->start();
-      );
+  Q_PROPERTY(int minimum READ minimum WRITE setMinimum);
+  PROPERTY_RW(int, minimum, minimum, setMinimum,
+              QPropertyAnimation* animation =
+              new QPropertyAnimation(this, "displayMinimum");
+              animation->setDuration(200);
+              animation->setEndValue(value);
+              animation->start();
+    );
+  Q_PROPERTY(int maximum READ maximum WRITE setMaximum);
+  PROPERTY_RW(int, maximum, maximum, setMaximum,
+              QPropertyAnimation* animation =
+              new QPropertyAnimation(this, "displayMaximum");
+              animation->setDuration(200);
+              animation->setEndValue(value);
+              animation->start();
+    );
+  Q_PROPERTY(int pageSize READ pageSize WRITE setPageSize);
+  PROPERTY_RW(int, pageSize, pageSize, setPageSize,
+              QPropertyAnimation* animation =
+              new QPropertyAnimation(this, "displayPageSize");
+              animation->setDuration(200);
+              animation->setEndValue(value);
+              animation->start();
+    );
 
-    Q_PROPERTY(int displayMinimum READ displayMinimum WRITE setDisplayMinimum);
-    PROPERTY_RW(int, displayMinimum, displayMinimum, setDisplayMinimum,
-                this->repaint());
-    Q_PROPERTY(int displayMaximum READ displayMaximum WRITE setDisplayMaximum);
-    PROPERTY_RW(int, displayMaximum, displayMaximum, setDisplayMaximum,
-                this->repaint());
-    Q_PROPERTY(int displayPageSize READ displayPageSize WRITE setDisplayPageSize);
-    PROPERTY_RW(int, displayPageSize, displayPageSize, setDisplayPageSize,
-                this->repaint());
-    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged);
-    PROPERTY_RW(int, value, value, setValue,
-                this->repaint();
-                Q_EMIT valueChanged(value);
-      );
-  private:
-    int _value_target;
-    Q_PROPERTY(int step READ step WRITE setStep);
-    PROPERTY_RW(int, step, step, setStep, );
-  Q_SIGNALS:
-    void valueChanged(int);
+  Q_PROPERTY(int displayMinimum READ displayMinimum WRITE setDisplayMinimum);
+  PROPERTY_RW(int, displayMinimum, displayMinimum, setDisplayMinimum,
+              this->repaint());
+  Q_PROPERTY(int displayMaximum READ displayMaximum WRITE setDisplayMaximum);
+  PROPERTY_RW(int, displayMaximum, displayMaximum, setDisplayMaximum,
+              this->repaint());
+  Q_PROPERTY(int displayPageSize READ displayPageSize WRITE setDisplayPageSize);
+  PROPERTY_RW(int, displayPageSize, displayPageSize, setDisplayPageSize,
+              this->repaint());
+  Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged);
+  PROPERTY_RW(int, value, value, setValue,
+              this->repaint();
+              Q_EMIT valueChanged(value);
+    );
+private:
+  int _value_target;
+  QPropertyAnimation* _value_animation;
+private:
+  Q_PROPERTY(float opacity READ opacity WRITE setOpacity);
+  PROPERTY_RW(float, opacity, opacity, setOpacity,
+              this->repaint();
+    );
+  QPropertyAnimation* _opacity_animation;
 
-  public:
-    SmoothScrollBar(QWidget* parent);
+  Q_PROPERTY(int step READ step WRITE setStep);
+  PROPERTY_RW(int, step, step, setStep, );
 
-    virtual
-    QSize
-    sizeHint() const override;
+private Q_SLOTS:
+  void
+  fade();
+Q_SIGNALS:
+  void valueChanged(int);
 
-  protected:
-    virtual
-    void
-    paintEvent(QPaintEvent*) override;
-    virtual
-    void
-    wheelEvent(QWheelEvent*) override;
+public:
+  SmoothScrollBar(QWidget* parent);
+
+  virtual
+  QSize
+  sizeHint() const override;
+
+protected:
+  virtual
+  void
+  paintEvent(QPaintEvent*) override;
+  virtual
+  void
+  wheelEvent(QWheelEvent*) override;
+
+public:
+  void
+  bite(QPainter& painter);
+protected:
+  bool
+  eventFilter(QObject* target,
+              QEvent* event) override;
 };
 
 #endif

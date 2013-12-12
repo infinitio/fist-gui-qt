@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include <QWheelEvent>
 #include <QPainter>
 
@@ -12,24 +14,36 @@ SmoothScrollBar::SmoothScrollBar(QWidget* parent):
   _displayMaximum(_maximum),
   _displayPageSize(_pageSize),
   _value(0),
-  _value_target(_value),
+  _value_animation(new QPropertyAnimation(this, "value")),
+  _opacity(0.5),
+  _opacity_animation(new QPropertyAnimation(this, "opacity")),
   _step(1)
-{}
+{
+  this->_value_animation->setEasingCurve(QEasingCurve::InOutQuad);
+
+  this->_opacity_animation->setEasingCurve(QEasingCurve::InOutQuad);
+  this->_opacity_animation->setDuration(1250);
+  this->_opacity_animation->setEndValue(0);
+
+  connect(this->_value_animation, SIGNAL(finished()),
+          this, SLOT(fade()));
+
+  this->fade();
+}
 
 QSize
 SmoothScrollBar::sizeHint() const
 {
-  return QSize(10, 40);
+  return QSize(7, 40);
 }
 
 void
-SmoothScrollBar::paintEvent(QPaintEvent*)
+SmoothScrollBar::bite(QPainter& painter)
 {
-  QPainter painter(this);
   painter.setRenderHints(QPainter::Antialiasing);
   painter.setPen(Qt::NoPen);
   painter.setBrush(Qt::black);
-  painter.setOpacity(0.5);
+  painter.setOpacity(this->_opacity);
 
   if (this->displayMaximum() == 0)
   {
@@ -42,6 +56,13 @@ SmoothScrollBar::paintEvent(QPaintEvent*)
           QSize(this->width(),
                 this->height() * this->displayPageSize() / this->displayMaximum())),
     4, 4);
+}
+
+void
+SmoothScrollBar::paintEvent(QPaintEvent*)
+{
+  QPainter painter(this);
+  this->bite(painter);
 }
 
 void
@@ -58,10 +79,24 @@ SmoothScrollBar::wheelEvent(QWheelEvent* event)
     value -= this->step();
     value = std::max(value, 0);
   }
+
   this->_value_target = value;
-  QPropertyAnimation* animation = new QPropertyAnimation(this, "value");
-  animation->setEasingCurve(QEasingCurve::InOutQuad);
-  animation->setDuration(250);
-  animation->setEndValue(value);
-  animation->start();
+  this->_value_animation->setDuration(600); // std::abs(250 * (this->_value_target - this->value())));
+  this->_value_animation->setEndValue(value);
+  this->_value_animation->start();
+
+  this->setOpacity(0.5);
+  this->_opacity_animation->stop();
+}
+
+void
+SmoothScrollBar::fade()
+{
+  this->_opacity_animation->start();
+}
+
+bool
+SmoothScrollBar::eventFilter(QObject* target, QEvent* event)
+{
+  return true;
 }
