@@ -2,6 +2,7 @@
 # define SMOOTHLAYOUT_HH
 
 # include <QWidget>
+# include <QPropertyAnimation>
 
 # include <fist-gui-qt/utils.hh>
 
@@ -75,6 +76,10 @@ Q_SIGNALS:
   void onWidthHintChanged();
   void onMaximumHeightChanged();
   void onMaximumWidthChanged();
+
+private:
+  QPropertyAnimation* _height_animation;
+  QPropertyAnimation* _width_animation;
 
 private:
   Q_OBJECT;

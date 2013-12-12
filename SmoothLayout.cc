@@ -17,8 +17,15 @@ SmoothLayout::SmoothLayout(QWidget* owner):
   _height_hint(0),
   _width_hint(0),
   _maximum_height(0),
-  _maximum_width(0)
-{}
+  _maximum_width(0),
+  _height_animation(new QPropertyAnimation(this, "heightHint")),
+  _width_animation(new QPropertyAnimation(this, "widthHint"))
+{
+  this->_height_animation->setDuration(1);
+  // this->_height_animation->setEasingCurve(QEasingCurve::InOutQuad);
+
+  this->_width_animation->setDuration(120);
+}
 
 /*-------.
 | Layout |
@@ -130,27 +137,18 @@ SmoothLayout::_layout()
   {
     if (height != this->_height_hint)
     {
-      QPropertyAnimation* animation =
-        new QPropertyAnimation(this, "heightHint");
-      animation->setDuration(80);
-      animation->setEasingCurve(QEasingCurve::InOutQuad);
-      animation->setEndValue(height);
-      animation->start();
+      this->_height_animation->setEndValue(height);
+      this->_height_animation->start();
     }
     if (width != this->_width_hint)
     {
-      QPropertyAnimation* animation =
-        new QPropertyAnimation(this, "widthHint");
-      animation->setDuration(120);
-      animation->setEndValue(width);
-      animation->start();
+      this->_width_animation->setEndValue(width);
+      this->_width_animation->start();
     }
   }
-  else
-  {
-    this->setHeightHint(height);
-    this->setWidthHint(width);
-  }
+
+  this->setHeightHint(height);
+  this->setWidthHint(width);
 }
 
 void
