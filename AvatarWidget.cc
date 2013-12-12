@@ -9,7 +9,7 @@
 `-------------*/
 
 // Diameter of the avatar
-static int const picture_size = 47;
+static int const picture_size = 45;
 static int const shadow_width = 3;
 static int const border_width = 3;
 static int const progress_size = 4;
@@ -33,6 +33,7 @@ AvatarWidget::AvatarWidget():
 {
   this->setMinimumSize(total_size, total_size);
   this->setMaximumSize(total_size, total_size);
+  this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
 AvatarWidget::AvatarWidget(QPixmap const& pixmap):
@@ -125,6 +126,7 @@ AvatarWidget::setPicture(QPixmap const& avatar)
     }
   }
   Q_EMIT this->onPictureChanged();
+  adjustSize();
 }
 
 /*-------------.
