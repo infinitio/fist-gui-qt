@@ -131,11 +131,12 @@ ListWidget::_layout()
       fixed_height = height;
     }
   }
-  this->_width_hint += 5 + this->_scroll->sizeHint().width();
+  this->_width_hint += this->_scroll->sizeHint().width();
 
   int real_height = ((fixed_height != -1) ? fixed_height : height);
   this->_height_hint = real_height;
   this->updateGeometry();
+
   if (this->height() < height)
   {
     this->_scroll->show();

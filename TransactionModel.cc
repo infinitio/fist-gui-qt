@@ -58,6 +58,12 @@ TransactionModel::peer_fullname() const
   return this->_peer_fullname;
 }
 
+gap_UserStatus
+TransactionModel::peer_connection_status() const
+{
+  return gap_user_status(this->_state, this->peer_id());
+}
+
 float
 TransactionModel::progress() const
 {

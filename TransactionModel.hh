@@ -28,6 +28,9 @@ public:
   QString const&
   peer_fullname() const;
 
+  gap_UserStatus
+  peer_connection_status() const;
+
   float
   progress() const;
 
