@@ -3,9 +3,9 @@
 #include <iostream>
 SendFooter::SendFooter():
   Footer(),
-  _back(new IconButton(QPixmap(":/icons/trash.png"),
+  _back(new IconButton(QPixmap(":/icons/add-cancel.png"),
                        true)),
-  _send(new IconButton(QPixmap(":/icons/send.png"),
+  _send(new IconButton(QPixmap(":/icons/transfer.png"),
                          true))
 {
   this->_layout->addWidget(this->_back);

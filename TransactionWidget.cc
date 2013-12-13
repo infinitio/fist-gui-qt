@@ -220,3 +220,74 @@ TransactionWidget::reject()
 {
   emit on_transaction_rejected(this->_transaction.id());
 }
+
+void
+TransactionWidget::cancel()
+{
+  emit on_transaction_canceled(this->_transaction.id());
+}
+
+/*-------.
+| Status |
+`-------*/
+void
+TransactionWidget::update_status()
+{
+  switch (this->_transaction.status())
+  {
+    case gap_transaction_none:
+      this->_status->setPixmap(QPixmap());
+      this->_status->setToolTip(QString("None"));
+      break;
+    case gap_transaction_pending:
+      this->_status->setPixmap(QPixmap());
+      this->_status->setToolTip(QString("Pending"));
+      break;
+    case gap_transaction_copying:
+      this->_status->setPixmap(QPixmap());
+      this->_status->setToolTip(QString("Copying"));
+      break;
+    case gap_transaction_waiting_for_accept:
+      this->_status->setMovie(new QMovie(QString(":/icons/loading.gif")));;
+      this->_status->movie()->start();
+      this->_status->setToolTip(QString("Waiting for peer to be online"));
+      break;
+    case gap_transaction_accepted:
+      this->_status->setPixmap(QPixmap(QString(":/icons/accept.png")));
+      this->_status->setToolTip(QString("Accepted"));
+      break;
+    case gap_transaction_preparing:
+      this->_status->setPixmap(QPixmap(QString(":/icons/accept.png")));
+      this->_status->setToolTip(QString("Preparing"));
+      break;
+    case gap_transaction_running:
+      if (this->_transaction.is_sender())
+        this->_status->setPixmap(QPixmap(QString(":/icons/main-upload.png")));
+      else
+        this->_status->setPixmap(QPixmap(QString(":/icons/main-download.png")));
+      this->_status->setToolTip(QString("Running"));
+      break;
+    case gap_transaction_cleaning:
+      this->_status->setPixmap(QPixmap());
+      this->_status->setToolTip(QString("Cleaning"));
+      break;
+    case gap_transaction_finished:
+      this->_status->setPixmap(QPixmap(QString(":/icons/accept.png")));
+      this->_status->setToolTip(QString("Finished"));
+      break;
+    case gap_transaction_failed:
+      this->_status->setPixmap(QPixmap(QString(":/icons/error.png")));
+      this->_status->setToolTip(QString("Failed"));
+      break;
+    case gap_transaction_canceled:
+      this->_status->setPixmap(QPixmap(QString(":/icons/reject.png")));
+      this->_status->setToolTip(QString("Canceled"));
+      break;
+    case gap_transaction_rejected:
+      this->_status->setPixmap(QPixmap(QString(":/icons/reject.png")));
+      this->_status->setToolTip(QString("Rejected"));
+      break;
+    default:
+      std::cerr << "lul" << std::endl;
+  }
+}

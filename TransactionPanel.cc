@@ -76,6 +76,8 @@ TransactionPanel::add_transaction(gap_State* state,
           this, SLOT(_on_transaction_accepted(uint32_t)));
   connect(widget, SIGNAL(on_transaction_rejected(uint32_t)),
           this, SLOT(_on_transaction_rejected(uint32_t)));
+  connect(widget, SIGNAL(on_transaction_canceled(uint32_t)),
+          this, SLOT(_on_transaction_canceled(uint32_t)));
 
   this->_list->add_widget(widget,
                           init ?
@@ -123,6 +125,13 @@ TransactionPanel::_on_transaction_rejected(uint32_t tid)
 {
   std::cerr << "reject " << tid << std::endl;
   gap_reject_transaction(this->_state, tid);
+}
+
+void
+TransactionPanel::_on_transaction_canceled(uint32_t tid)
+{
+  std::cerr << "cancel " << tid << std::endl;
+  gap_cancel_transaction(this->_state, tid);
 }
 
 void

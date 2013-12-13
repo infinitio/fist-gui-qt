@@ -101,14 +101,6 @@ protected:
   virtual
   void
   wheelEvent(QWheelEvent*) override;
-
-public:
-  void
-  bite(QPainter& painter);
-protected:
-  bool
-  eventFilter(QObject* target,
-              QEvent* event) override;
 };
 
 #endif

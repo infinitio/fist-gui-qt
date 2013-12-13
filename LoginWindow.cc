@@ -18,7 +18,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
   _message_field(new QLabel),
-  _quit_button(new IconButton(QPixmap(QString(":/icons/delete.png")), true)),
+  _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")), false)),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text))
 {
@@ -49,7 +49,7 @@ LoginWindow::LoginWindow(gap_State* state):
   auto logo = new QLabel;
   {
     logo->setScaledContents(true);
-    logo->setPixmap(QPixmap(QString(":/images/logo.png")));
+    logo->setPixmap(QPixmap(QString(":/images/logo-complete.png")));
   }
 
   // Message field

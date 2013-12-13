@@ -40,7 +40,7 @@ UserModel::new_avatar() const
   return this->_new_avatar;
 }
 
-bool
+void
 UserModel::avatar_available()
 {
   this->_new_avatar = true;
@@ -69,7 +69,7 @@ UserModel::avatar() const
     }
     else if(this->_avatar.isNull())
     {
-      this->_avatar = QPixmap(QString("resources/avatar1.png"));
+      this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
     }
   }
 

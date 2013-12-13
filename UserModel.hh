@@ -33,7 +33,7 @@ public:
   bool
   new_avatar() const;
 
-  bool
+  void
   avatar_available();
 
 private:

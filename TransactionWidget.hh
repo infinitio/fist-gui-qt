@@ -42,6 +42,8 @@ Q_SIGNALS:
   on_transaction_accepted(uint32_t);
   void
   on_transaction_rejected(uint32_t);
+  void
+  on_transaction_canceled(uint32_t);
 
 /*-------.
 | Layout |

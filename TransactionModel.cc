@@ -52,7 +52,7 @@ TransactionModel::peer_fullname() const
       QString::fromUtf8(
         this->is_sender()
         ? gap_transaction_recipient_fullname(this->_state, this->_id)
-        : gap_transaction_sender_fullname(this->_state, this->_id));
+        : gap_transaction_sender_fullname(this->_state, this->_id)).trimmed();
   }
 
   return this->_peer_fullname;
@@ -100,7 +100,7 @@ TransactionModel::new_avatar() const
   return this->_new_avatar;
 }
 
-bool
+void
 TransactionModel::avatar_available()
 {
   this->_new_avatar = true;
@@ -128,7 +128,7 @@ TransactionModel::avatar() const
     }
     else if(this->_avatar.isNull())
     {
-      this->_avatar = QPixmap(QString("resources/avatar1.png"));
+      this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
     }
   }
 

@@ -39,6 +39,8 @@ private Q_SLOTS:
   void
   _on_transaction_rejected(uint32_t);
 
+  void
+  _on_transaction_canceled(uint32_t);
 
 public:
   void

@@ -11,7 +11,7 @@
 LoginFooter::LoginFooter():
   Footer()
 {
-  auto text = new QLabel(QString("Login"));
+  auto text = new QLabel(view::login::footer::text);
   view::login::footer::style(*this);
   this->_layout->addWidget(text, 0, Qt::AlignCenter);
 }

@@ -38,8 +38,9 @@ SmoothScrollBar::sizeHint() const
 }
 
 void
-SmoothScrollBar::bite(QPainter& painter)
+SmoothScrollBar::paintEvent(QPaintEvent*)
 {
+  QPainter painter(this);
   painter.setRenderHints(QPainter::Antialiasing);
   painter.setPen(Qt::NoPen);
   painter.setBrush(Qt::black);
@@ -56,13 +57,7 @@ SmoothScrollBar::bite(QPainter& painter)
           QSize(this->width(),
                 this->height() * this->displayPageSize() / this->displayMaximum())),
     4, 4);
-}
 
-void
-SmoothScrollBar::paintEvent(QPaintEvent*)
-{
-  QPainter painter(this);
-  this->bite(painter);
 }
 
 void
@@ -93,10 +88,4 @@ void
 SmoothScrollBar::fade()
 {
   this->_opacity_animation->start();
-}
-
-bool
-SmoothScrollBar::eventFilter(QObject* target, QEvent* event)
-{
-  return true;
 }

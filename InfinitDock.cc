@@ -47,7 +47,7 @@ InfinitDock::InfinitDock(gap_State* state):
   _transaction_panel(new TransactionPanel(state)),
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel(state)),
-  _logo(":/icons/logo.png"),
+  _logo(":/icons/menu-bar-fire@2x.png"),
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),

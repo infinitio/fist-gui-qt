@@ -2,7 +2,7 @@
 
 TransactionFooter::TransactionFooter():
   Footer(nullptr),
-  _send(new IconButton(QPixmap(":/icons/arrows.png"),
+  _send(new IconButton(QPixmap(":/icons/transfer.png"),
                        true))
 {
   this->_layout->addWidget(new IconButton(QPixmap(":/icons/gear.png"), true));

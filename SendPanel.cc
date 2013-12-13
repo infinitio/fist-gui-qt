@@ -41,14 +41,13 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
 
-  this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
+  this->_search->setIcon(QPixmap(":/icons/search@2x.png"));
 
-  connect(this->_file_adder->attach(),
-          SIGNAL(released()),
-          this,
-          SIGNAL(choose_files()));
+  connect(this->_file_adder->attach(), SIGNAL(released()),
+          this, SIGNAL(choose_files()));
 
-  connect(this->footer()->send(), SIGNAL(clicked()), this, SLOT(_send()));
+  connect(this->footer()->send(), SIGNAL(clicked()),
+          this, SLOT(_send()));
 
   connect(this->_search, SIGNAL(textChanged(QString const&)),
           SLOT(_search_changed(QString const&)));
@@ -64,7 +63,7 @@ SendPanel::_search_changed(QString const& search)
 
   if (this->_peer_id != gap_null())
   {
-    this->_search->setIcon(QPixmap(":/icons/magnifier.png"));
+    this->_search->setIcon(QPixmap(":/icons/search@2x.png"));
     this->_peer_id = gap_null();
   }
 
