@@ -32,6 +32,9 @@ public Q_SLOTS:
   void
   avatar_available(uint32_t uid);
 
+  void
+  user_status_changed(uint32_t uid, gap_UserStatus status);
+
 private Q_SLOTS:
   void
   _on_transaction_accepted(uint32_t);

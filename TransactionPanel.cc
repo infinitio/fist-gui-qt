@@ -114,6 +114,15 @@ TransactionPanel::avatar_available(uint32_t uid)
 }
 
 void
+TransactionPanel::user_status_changed(uint32_t /* uid */,
+                                      gap_UserStatus /* status */)
+{
+  std::cerr << "updated!" << std::endl;
+  // XXX: Do per user update.
+  this->_list->update();
+}
+
+void
 TransactionPanel::_on_transaction_accepted(uint32_t tid)
 {
   std::cerr << "accepted " << tid << std::endl;

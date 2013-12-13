@@ -98,11 +98,15 @@ InfinitDock::InfinitDock(gap_State* state):
           SIGNAL(avatar_available(uint32_t)),
           this->_send_panel,
           SLOT(avatar_available(uint32_t)));
-
   connect(this,
           SIGNAL(avatar_available(uint32_t)),
           this->_transaction_panel,
           SLOT(avatar_available(uint32_t)));
+  connect(this,
+          SIGNAL(user_status_changed(uint32_t, gap_UserStatus)),
+          this->_transaction_panel,
+          SLOT(user_status_changed(uint32_t, gap_UserStatus)));
+
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -316,10 +320,11 @@ InfinitDock::connection_status_cb(gap_UserStatus const status)
 }
 
 void
-InfinitDock::user_status_cb(uint32_t /* id */,
-                            gap_UserStatus const /* status */)
+InfinitDock::user_status_cb(uint32_t id,
+                            gap_UserStatus const status)
 {
   std::cerr << "User status changed" << std::endl;
+  g_dock->user_status_changed(id, status);
 }
 
 void
