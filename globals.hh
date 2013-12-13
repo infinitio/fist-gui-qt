@@ -140,7 +140,30 @@ namespace view
 
       static
       QString const
-      text("Login");
+      text("LOGIN");
+    }
+  }
+
+  namespace transaction
+  {
+    static
+    QMargins const
+    margins(13, 13, 13, 13);
+
+    namespace peer
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 12), QColor(0x25, 0x25, 0x25));
+    }
+
+    namespace files
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 11.5), QColor(0xA8, 0xA8, 0xA8));
+
+
     }
   }
 }

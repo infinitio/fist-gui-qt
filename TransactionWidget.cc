@@ -1,115 +1,109 @@
 #include <iostream>
 
+#include <QSpacerItem>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMovie>
 
 #include <fist-gui-qt/AvatarWidget.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/TransactionWindow.hh>
+#include <fist-gui-qt/globals.hh>
 
-std::map<gap_TransactionStatus, QString> g_statuses =
+QVector<gap_TransactionStatus> g_finals =
 {
-  { gap_transaction_none, "None" },
-  { gap_transaction_pending, "Pending" },
-  { gap_transaction_copying, "Copying" },
-  { gap_transaction_waiting_for_accept, "Waiting for accept" },
-  { gap_transaction_accepted, "Accepted" },
-  { gap_transaction_preparing, "Preparing" },
-  { gap_transaction_running, "In progress" },
-  { gap_transaction_cleaning, "Cleaning" },
-  { gap_transaction_finished, "Done" },
-  { gap_transaction_failed, "Failed" },
-  { gap_transaction_canceled, "Canceled" },
-  { gap_transaction_rejected, "Rejected" },
+  gap_transaction_cleaning,
+  gap_transaction_finished,
+  gap_transaction_failed,
+  gap_transaction_canceled,
+  gap_transaction_rejected,
 };
 
 TransactionWidget::TransactionWidget(TransactionModel const& model):
   _transaction(model),
+  _peer_avatar(new AvatarWidget(this->_transaction.avatar())),
+  _peer_status(new QLabel),
   _layout(nullptr),
-  _accept_button(nullptr),
-  _reject_button(nullptr),
-  _cancel_button(nullptr),
-  _status(new QLabel(g_statuses[this->_transaction.status()])),
+  _accept_button(new RoundButton(QColor(0xCA, 0xE1, 0x41),
+                                 QPixmap(QString(":/icons/check.png")),
+                                 QSize(30, 30))),
+  _reject_button(new RoundButton(QColor(0xE8, 0x60, 0x56),
+                                 QPixmap(QString(":/icons/reject.png")),
+                                 QSize(30, 30))),
+  _cancel_button(new RoundButton(QColor(0xC7, 0xC7, 0xC7),
+                                 QPixmap(QString(":/icons/reject.png")),
+                                 QSize(30, 30))),
+  _mtime(new QLabel),
+  _status(new QLabel),
   _timer(nullptr)
 {
-  static int const padding = 5;
+  connect(this->_accept_button, SIGNAL(released()),
+          this, SLOT(accept()));
+  connect(this->_reject_button, SIGNAL(released()),
+          this, SLOT(reject()));
+  connect(this->_cancel_button, SIGNAL(released()),
+          this, SLOT(cancel()));
 
-  this->_avatar = new AvatarWidget(this->_transaction.avatar());
+  this->_peer_avatar = new AvatarWidget(this->_transaction.avatar());
 
   auto layout = new QHBoxLayout(this);
-  layout->setContentsMargins(5, 12, 5, 12);
+  layout->setContentsMargins(8, 8, 8, 8);
   this->_layout = layout;
-  layout->addWidget(this->_avatar);
+  layout->addWidget(this->_peer_avatar, 0, Qt::AlignLeft);
 
   auto texts = new QVBoxLayout;
-  texts->setContentsMargins(5, 12, 5, 12);
+  texts->setContentsMargins(5, 0, 5, 0);
+
   layout->addLayout(texts);
 
+  texts->addStretch();
+  auto user_and_status = new QHBoxLayout;
+  texts->addLayout(user_and_status);
   auto username = new QLabel(this->_transaction.peer_fullname());
-  auto filename = new QLabel(this->_transaction.files().first());
-
   {
-    username->setFixedWidth(120);
-    QFont font;
-    font.setBold(true);
-    username->setFont(font);
-    username->move(this->_avatar->width() + padding, padding);
-    texts->addWidget(username);
+    view::transaction::peer::style(*username);
+    username->setMaximumWidth(150);
+    // username->setMinimumWidth(0);
+    username->setStyleSheet("background-color: pink;");
+    username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    user_and_status->addWidget(username);
   }
-
+  user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
+  user_and_status->addStretch(0);
+  texts->addSpacing(4);
+  auto filename = new QLabel(this->_transaction.files().first());
   {
-    filename->setFixedWidth(120);
-    QFont font;
-    filename->setFont(font);
-    QPalette palette;
-    palette.setColor(QPalette::WindowText, QColor(150, 150, 150));
-    filename->setPalette(palette);
-    filename->move(this->_avatar->width() + padding,
-                    this->_avatar->height() - filename->height() - padding);
+    view::transaction::files::style(*filename);
+    filename->setFixedWidth(170);
+    filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
     texts->addWidget(filename);
   }
 
+  texts->addStretch();
+  layout->addStretch();
   auto infos = new QVBoxLayout;
-  infos->setContentsMargins(5, 12, 5, 12);
+  infos->setContentsMargins(0, 0, 0, 0);
   layout->addLayout(infos);
-  infos->addWidget(this->_status);
 
-  if (!this->_transaction.is_sender() &&
-      this->_transaction.status() == gap_transaction_waiting_for_accept)
-  {
-    auto buttons = new QHBoxLayout;
-    infos->addLayout(buttons);
+  infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+  infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+  infos->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignLeft);
 
-    this->_accept_button = new QPushButton(QString("Accept"), this);
-    connect(this->_accept_button, SIGNAL(released()), this, SLOT(accept()));
+  layout->addStretch();
+  layout->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
+  this->update();
 
-    this->_reject_button = new QPushButton(QString("Reject"), this);
-    connect(this->_reject_button, SIGNAL(released()), this, SLOT(reject()));
+  // connect(this,
+  //         SIGNAL(onProgressChanged(float)),
+  //         this->_peer_avatar,
+  //         SLOT(setProgress(float)));
 
-    buttons->addWidget(this->_accept_button);
-    buttons->addWidget(this->_reject_button);
-  }
-  else
-    infos->addWidget(new QLabel());
-
-  if (this->_transaction.status() == gap_transaction_running)
-  {
-    _timer = new QTimer;
-    connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
-    _timer->start(1000);
-
-    connect(this,
-            SIGNAL(onProgressChanged(float)),
-            this->_avatar,
-            SLOT(setProgress(float)));
-  }
-
-  setSizePolicy(QSizePolicy::MinimumExpanding,
-                QSizePolicy::Fixed);
+  setSizePolicy(QSizePolicy::Minimum,
+                QSizePolicy::Minimum);
   adjustSize();
 
 #if 0
-  connect(this->_avatar,
+  connect(this->_peer_avatar,
           SIGNAL(onProgressChanged(float)),
           SIGNAL(onProgressChanged(float)));
 #endif
@@ -122,13 +116,13 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
 float
 TransactionWidget::progress() const
 {
-  return this->_avatar->progress();
+  return this->_peer_avatar->progress();
 }
 
 void
 TransactionWidget::setProgress(float value)
 {
-  this->_avatar->setProgress(value);
+  this->_peer_avatar->setProgress(value);
 }
 
 /*-------.
@@ -139,7 +133,7 @@ QSize
 TransactionWidget::sizeHint() const
 {
   auto size = this->_layout->minimumSize();
-  return QSize(305, size.height());
+  return QSize(313, size.height());
 }
 
 QSize
@@ -165,30 +159,51 @@ TransactionWidget::update()
 {
   if (this->_transaction.new_avatar())
   {
-    std::cerr << "tr widget: " << this->_transaction.peer_fullname().toStdString() << ": update avatar" << std::endl;
-    this->_avatar->setPicture(this->_transaction.avatar());
+    this->_peer_avatar->setPicture(this->_transaction.avatar());
   }
 
-  // Accept button update.
-  if (this->_transaction.status() != gap_transaction_waiting_for_accept &&
-      this->_accept_button != nullptr)
+  if (this->_transaction.status() == gap_transaction_waiting_for_accept &&
+      !this->_transaction.is_sender())
   {
-    delete this->_accept_button;
-    this->_accept_button = nullptr;
-    delete this->_reject_button;
-    this->_reject_button = nullptr;
+    this->_accept_button->show();
+    this->_reject_button->show();
+  }
+  else
+  {
+    this->_accept_button->hide();
+    this->_reject_button->hide();
+  }
+
+  if (this->_accept_button->isHidden())
+  {
+    if (!g_finals.contains(this->_transaction.status()))
+    {
+      this->_cancel_button->show();
+    }
+    else
+    {
+      this->_cancel_button->hide();
+    }
+    this->_status->show();
+  }
+  else
+  {
+    this->_cancel_button->hide();
+    this->_status->hide();
   }
 
   if (this->_transaction.status() == gap_transaction_running &&
       this->_timer == nullptr)
   {
+    this->_peer_avatar->setTransactionCount(this->_transaction.files().size());
+
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
     _timer->start(1000);
 
     connect(this,
             SIGNAL(onProgressChanged(float)),
-            this->_avatar,
+            this->_peer_avatar,
             SLOT(setProgress(float)));
   }
   else if (this->_transaction.status() != gap_transaction_running &&
@@ -199,7 +214,12 @@ TransactionWidget::update()
     this->_timer = nullptr;
   }
 
-  this->_status->setText(g_statuses[this->_transaction.status()]);
+  if (g_finals.contains(this->_transaction.status()))
+  {
+    this->_peer_avatar->setTransactionCount(0);
+  }
+
+  this->update_status();
 }
 
 void

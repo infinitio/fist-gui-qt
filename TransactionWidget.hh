@@ -1,6 +1,8 @@
 #ifndef TRANSACTIONWIDGET_HH
 # define TRANSACTIONWIDGET_HH
 
+# include <memory>
+
 # include <QWidget>
 # include <QPushButton>
 # include <QTimer>
@@ -12,6 +14,7 @@
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>
 # include <fist-gui-qt/TransactionModel.hh>
+# include <fist-gui-qt/RoundButton.hh>
 
 class TransactionWidget:
   public ListItem
@@ -68,15 +71,19 @@ public:
 public slots:
   void accept();
   void reject();
+  void cancel();
   void update_progress();
+  void update_status();
 
 private:
   TransactionModel const& _transaction;
-  AvatarWidget* _avatar;
+  AvatarWidget* _peer_avatar;
+  QLabel* _peer_status;
   QLayout* _layout;
-  QPushButton* _accept_button;
-  QPushButton* _reject_button;
-  QPushButton* _cancel_button;
+  RoundButton* _accept_button;
+  RoundButton* _reject_button;
+  RoundButton* _cancel_button;
+  QLabel* _mtime;
   QLabel* _status;
   QTimer* _timer;
 };

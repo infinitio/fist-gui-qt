@@ -29,6 +29,7 @@ SOURCES +=                                      \
     LoginFooter.cc                              \
     LoginWindow.cc                              \
     Panel.cc                                    \
+    RoundButton.cc                              \
     RoundShadowWidget.cc                        \
     SearchField.cc                              \
     SendFooter.cc                               \
@@ -59,6 +60,7 @@ HEADERS +=                                      \
     LoginFooter.hh                              \
     LoginWindow.hh                              \
     Panel.hh                                    \
+    RoundButton.hh                              \
     RoundShadowWidget.hh                        \
     SearchField.hh                              \
     SendFooter.hh                               \
