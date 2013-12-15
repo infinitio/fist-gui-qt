@@ -1,8 +1,9 @@
-#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/ShapeButton.hh>
 
-IconButton::IconButton(QPixmap const& pixmap,
-                       bool shadow,
-                       Callback const& cb):
+ShapeButton::ShapeButton(QPixmap const& pixmap,
+                         bool shadow,
+                         Callback const& cb):
+  _color(Qt::white),
   _has_shadow(shadow),
   _cache(),
   _original(pixmap),
@@ -10,6 +11,7 @@ IconButton::IconButton(QPixmap const& pixmap,
   _shadow(),
   _callback(cb)
 {
+  this->_draw_shape(this->_icon, this->color());
   this->_draw_shape(this->_shadow, Qt::black);
   this->_refresh();
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -17,7 +19,7 @@ IconButton::IconButton(QPixmap const& pixmap,
 }
 
 void
-IconButton::enable()
+ShapeButton::enable()
 {
   if (!this->isEnabled())
   {
@@ -26,7 +28,7 @@ IconButton::enable()
 }
 
 void
-IconButton::disable()
+ShapeButton::disable()
 {
   if (this->isEnabled())
   {
@@ -35,7 +37,7 @@ IconButton::disable()
 }
 
 void
-IconButton::_draw_shape(QPixmap& pixmap, QColor const& color)
+ShapeButton::_draw_shape(QPixmap& pixmap, QColor const& color)
 {
   pixmap = QPixmap(this->_original.size());
   pixmap.fill(Qt::transparent); // Triggers the pixmap alpha channel.
@@ -46,7 +48,7 @@ IconButton::_draw_shape(QPixmap& pixmap, QColor const& color)
 }
 
 void
-IconButton::_refresh()
+ShapeButton::_refresh()
 {
   QSize size(this->_original.size());
   if (this->hasShadow())
@@ -60,20 +62,20 @@ IconButton::_refresh()
 }
 
 QSize
-IconButton::sizeHint() const
+ShapeButton::sizeHint() const
 {
-  return this->_original.size();
+  return this->_cache.size();
 }
 
 void
-IconButton::paintEvent(QPaintEvent*)
+ShapeButton::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.drawPixmap(QPoint(0, 0), this->_original);
+  painter.drawPixmap(QPoint(0, 0), this->_cache);
 }
 
 void
-IconButton::_clicked()
+ShapeButton::_clicked()
 {
   if (this->_callback)
     this->_callback();

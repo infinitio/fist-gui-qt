@@ -34,6 +34,7 @@ SOURCES +=                                      \
     SearchField.cc                              \
     SendFooter.cc                               \
     SendPanel.cc                                \
+    ShapeButton.cc                              \
     SmoothLayout.cc                             \
     SmoothScrollBar.cc                          \
     TransactionFooter.cc                        \
@@ -65,6 +66,7 @@ HEADERS +=                                      \
     SearchField.hh                              \
     SendFooter.hh                               \
     SendPanel.hh                                \
+    ShapeButton.hh                              \
     SmoothLayout.hh                             \
     SmoothScrollBar.hh                          \
     TransactionFooter.hh                        \

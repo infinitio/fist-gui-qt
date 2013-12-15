@@ -1,5 +1,5 @@
-#ifndef ICONBUTTON_HH
-# define ICONBUTTON_HH
+#ifndef SHAPEBUTTON_HH
+# define SHAPEBUTTON_HH
 
 # include <QPainter>
 # include <QPushButton>
@@ -8,16 +8,16 @@
 
 # include <functional>
 
-class IconButton: public QPushButton
+class ShapeButton: public QPushButton
 {
   Q_OBJECT;
 
   typedef std::function<void ()> Callback;
 public:
-  IconButton(QPixmap const& pixmap,
-             bool shadow = false,
-             Callback const& = {});
+  ShapeButton(QPixmap const& pixmap, bool shadow = false, Callback const& = {});
 
+  Q_PROPERTY(QColor color READ color);
+  Q_PROPERTY_R(QColor, color, color);
   Q_PROPERTY(bool shadow READ hasShadow);
   Q_PROPERTY_R(bool, has_shadow, hasShadow);
 

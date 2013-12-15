@@ -14,7 +14,7 @@
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>
 # include <fist-gui-qt/TransactionModel.hh>
-# include <fist-gui-qt/RoundButton.hh>
+# include <fist-gui-qt/IconButton.hh>
 
 class TransactionWidget:
   public ListItem
@@ -80,9 +80,9 @@ private:
   AvatarWidget* _peer_avatar;
   QLabel* _peer_status;
   QLayout* _layout;
-  RoundButton* _accept_button;
-  RoundButton* _reject_button;
-  RoundButton* _cancel_button;
+  IconButton* _accept_button;
+  IconButton* _reject_button;
+  IconButton* _cancel_button;
   QLabel* _mtime;
   QLabel* _status;
   QTimer* _timer;

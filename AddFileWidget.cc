@@ -8,8 +8,7 @@
 AddFileWidget::AddFileWidget(QWidget* parent):
   QWidget(parent),
   _text(new QLabel(QString("attach files"))),
-  _attach(new IconButton(QPixmap(":/icons/files.png"),
-                         true))
+  _attach(new IconButton(QPixmap(":/icons/files.png")))
 {
   auto* layout = new QHBoxLayout(this);
   layout->addWidget(this->_attach);

@@ -44,7 +44,7 @@ FileItem::FileItem(QString const& path):
   _icon(new QLabel),
   _size(new QLabel(readable_size(_file.size()))),
   _remove(new IconButton(QPixmap(":/icons/delete.png"), // Remove.
-                         true,
+                         false,
                          [this]
                          {
                            emit remove(this->_file.fileName());
