@@ -37,6 +37,9 @@ public:
   QVector<QString> const&
   files() const;
 
+  QString
+  tooltip() const;
+
   gap_TransactionStatus
   status() const;
 

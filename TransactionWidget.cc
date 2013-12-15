@@ -65,8 +65,12 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
   user_and_status->addStretch(0);
   texts->addSpacing(4);
-  auto filename = new QLabel(this->_transaction.files().first());
+
+  auto filename = this->_transaction.files().size() == 1 ?
+    new QLabel(this->_transaction.files().first()) :
+    new QLabel(QString("%1 files").arg(this->_transaction.files().size()));
   {
+    filename->setToolTip(this->_transaction.tooltip());
     view::transaction::files::style(*filename);
     filename->setFixedWidth(170);
     filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);

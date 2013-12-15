@@ -88,6 +88,17 @@ TransactionModel::files() const
   return this->_files;
 }
 
+QString
+TransactionModel::tooltip() const
+{
+  QString tooltip;
+  for (auto const& file: this->files())
+    tooltip.append(file).append("\n");
+  tooltip.remove(tooltip.size() - 1, 1);
+
+  return tooltip;
+}
+
 gap_TransactionStatus
 TransactionModel::status() const
 {
