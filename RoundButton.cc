@@ -12,8 +12,8 @@ RoundButton::RoundButton(QColor const& color,
                          QWidget* parent):
   QPushButton(parent),
   _color(color),
-  _image(icon),
   _size(size),
+  _image(icon.scaled(this->_size.width() * 0.5, this->_size.height() * 0.5)),
   _hover(false)
 {
   this->setMaximumSize(this->_size);

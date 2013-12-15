@@ -15,8 +15,8 @@ public:
 
 private:
   QColor _color;
-  QPixmap _image;
   QSize _size;
+  QPixmap _image;
   bool _hover;
 
 private:
