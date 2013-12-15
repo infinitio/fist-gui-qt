@@ -16,7 +16,6 @@ RoundButton::RoundButton(QColor const& color,
   _size(size),
   _hover(false)
 {
-  std::cerr << this->_size.width() << ":" << this->_size.height() << std::endl;
   this->setMaximumSize(this->_size);
 }
 

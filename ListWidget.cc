@@ -257,7 +257,6 @@ ListWidget::update()
 {
   for (auto const& widget: this->_widgets)
   {
-    std::cerr << "update widget: " << widget << std::endl;
     widget->update();
   }
 }

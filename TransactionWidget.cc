@@ -301,7 +301,5 @@ TransactionWidget::update_status()
       this->_status->setPixmap(QPixmap(QString(":/icons/reject.png")));
       this->_status->setToolTip(QString("Rejected"));
       break;
-    default:
-      std::cerr << "lul" << std::endl;
   }
 }
