@@ -204,7 +204,7 @@ SendPanel::_send()
   }
   filenames[this->_files.size()] = nullptr;
 
-  gap_send_files(_state, this->_peer_id, filenames, "Basic comment");
+  gap_send_files(_state, this->_peer_id, filenames, "");
 
   auto** cpy = filenames;
   while (*cpy != nullptr)
