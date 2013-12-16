@@ -259,6 +259,7 @@ ListWidget::update()
   {
     widget->update();
   }
+  this->repaint();
 }
 
 /*---------.
