@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 
 #include <QSpacerItem>
 #include <QHBoxLayout>
@@ -57,8 +58,6 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   {
     view::transaction::peer::style(*username);
     username->setMaximumWidth(150);
-    // username->setMinimumWidth(0);
-    username->setStyleSheet("background-color: pink;");
     username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     user_and_status->addWidget(username);
   }
@@ -251,59 +250,72 @@ TransactionWidget::cancel()
 void
 TransactionWidget::update_status()
 {
-  switch (this->_transaction.status())
+  struct StatusUpdater
   {
-    case gap_transaction_none:
-      this->_status->setPixmap(QPixmap());
-      this->_status->setToolTip(QString("None"));
-      break;
-    case gap_transaction_pending:
-      this->_status->setPixmap(QPixmap());
-      this->_status->setToolTip(QString("Pending"));
-      break;
-    case gap_transaction_copying:
-      this->_status->setPixmap(QPixmap());
-      this->_status->setToolTip(QString("Copying"));
-      break;
-    case gap_transaction_waiting_for_accept:
-      this->_status->setMovie(new QMovie(QString(":/icons/loading.gif")));;
-      this->_status->movie()->start();
-      this->_status->setToolTip(QString("Waiting for peer to be online"));
-      break;
-    case gap_transaction_accepted:
-      this->_status->setPixmap(QPixmap(QString(":/icons/accept.png")));
-      this->_status->setToolTip(QString("Accepted"));
-      break;
-    case gap_transaction_preparing:
-      this->_status->setPixmap(QPixmap(QString(":/icons/accept.png")));
-      this->_status->setToolTip(QString("Preparing"));
-      break;
-    case gap_transaction_running:
-      if (this->_transaction.is_sender())
-        this->_status->setPixmap(QPixmap(QString(":/icons/main-upload.png")));
+    StatusUpdater(QString const& image_path,
+                  bool animated,
+                  QString const& tooltip):
+      _image_path(image_path),
+      _animated(animated),
+      _tooltip(tooltip)
+    {}
+
+    void
+    operator () (QLabel& label) const
+    {
+      label.setToolTip(this->_tooltip);
+      if (this->_animated)
+      {
+        label.setMovie(new QMovie(this->_image_path));
+        label.movie()->start();
+      }
       else
-        this->_status->setPixmap(QPixmap(QString(":/icons/main-download.png")));
-      this->_status->setToolTip(QString("Running"));
-      break;
-    case gap_transaction_cleaning:
-      this->_status->setPixmap(QPixmap());
-      this->_status->setToolTip(QString("Cleaning"));
-      break;
-    case gap_transaction_finished:
-      this->_status->setPixmap(QPixmap(QString(":/icons/accept.png")));
-      this->_status->setToolTip(QString("Finished"));
-      break;
-    case gap_transaction_failed:
-      this->_status->setPixmap(QPixmap(QString(":/icons/error.png")));
-      this->_status->setToolTip(QString("Failed"));
-      break;
-    case gap_transaction_canceled:
-      this->_status->setPixmap(QPixmap(QString(":/icons/reject.png")));
-      this->_status->setToolTip(QString("Canceled"));
-      break;
-    case gap_transaction_rejected:
-      this->_status->setPixmap(QPixmap(QString(":/icons/reject.png")));
-      this->_status->setToolTip(QString("Rejected"));
-      break;
+      {
+        label.setPixmap(QPixmap(this->_image_path));
+      }
+    }
+
+  private:
+    QString _image_path;
+    bool _animated;
+    QString _tooltip;
+  };
+
+  static std::map<gap_TransactionStatus, StatusUpdater> tooltips{
+    { gap_transaction_none, StatusUpdater(QString(), false, "None") },
+    { gap_transaction_pending, StatusUpdater(QString(), false, "Pending") },
+    { gap_transaction_copying, StatusUpdater(QString(), false, "Copying") },
+    { gap_transaction_waiting_for_accept,
+        StatusUpdater(QString(":/icons/loading.gif"),
+                      true,
+                      "Wait for user to accept") },
+    { gap_transaction_accepted,
+        StatusUpdater(QString(":/icons/loading.gif"),
+                      true,
+                      "Waiting for peer to be online") },
+    { gap_transaction_preparing,
+        StatusUpdater(QString(":/icons/loading.gif"),
+                      true,
+                      "Waiting for peer to be online") },
+    { gap_transaction_running, StatusUpdater(QString(), false, "Running") },
+    { gap_transaction_cleaning,
+        StatusUpdater(QString(), false, "Cleaning") },
+    { gap_transaction_finished,
+        StatusUpdater(QString(":/icons/check.png"), false, "Finished") },
+    { gap_transaction_failed,
+        StatusUpdater(QString(":/icons/error.png"), false, "Failed") },
+    { gap_transaction_canceled,
+        StatusUpdater(QString(":/icons/remove-people.png"), false, "Canceled") },
+    { gap_transaction_rejected,
+        StatusUpdater(QString(":/icons/remove-people.png"), false, "Rejected") },
+  };
+
+  tooltips.at(this->_transaction.status())(*this->_status);
+  if (this->_transaction.status() == gap_transaction_running)
+  {
+    if (this->_transaction.is_sender())
+      this->_status->setPixmap(QPixmap(QString(":/icons/main-upload.png")));
+    else
+      this->_status->setPixmap(QPixmap(QString(":/icons/main-download.png")));
   }
 }
