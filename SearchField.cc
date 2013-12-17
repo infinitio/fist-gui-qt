@@ -1,22 +1,19 @@
 #include <QPainter>
 
 #include <fist-gui-qt/SearchField.hh>
+#include <fist-gui-qt/globals.hh>
 
-static int const margin = 10;
+static int const margin = 7;
 
 SearchField::SearchField(QWidget* owner):
   QLineEdit(owner)
 {
   this->setFrame(false);
-  QFont font("Lucida Grande");
-  font.setBold(true);
-  font.setPixelSize(12);
-  this->setFont(font);
+  view::send::search_field::style(*this);
   this->setContentsMargins(margin, 0, margin, 0);
-  this->setPlaceholderText("Search for a friend ...");
+  this->setPlaceholderText(view::send::search_field::text);
   this->setFixedWidth(320);
   this->setFixedHeight(this->height());
-
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
@@ -48,7 +45,7 @@ QSize
 SearchField::sizeHint() const
 {
   // XXX: 60 -> width - 'more' button.
-  return QSize(320, this->height());
+  return QSize(320, 40);
 }
 
 void

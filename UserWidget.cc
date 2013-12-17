@@ -1,28 +1,46 @@
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 #include <iostream>
 
 #include <fist-gui-qt/UserWidget.hh>
+#include <fist-gui-qt/globals.hh>
 
 UserWidget::UserWidget(UserModel const& model,
                        QWidget* parent):
   ListItem(parent),
   _model(model),
-  _avatar(new AvatarIcon(this->_model.avatar())),
+  _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
   _layout(new QHBoxLayout(this))
 {
-  this->_layout->addWidget(this->_avatar);
-  this->_layout->addWidget(new QLabel(this->_model.fullname()));
 
-  this->setFixedHeight(this->_avatar->height() + 10);
+  this->_layout->setContentsMargins(10, 10, 10, 10);
+  this->_layout->addWidget(this->_avatar);
+  this->_layout->addSpacing(10);
+
+  {
+    auto texts = new QVBoxLayout();
+    {
+      auto fullname = new QLabel(this->_model.fullname());
+      view::send::user::fullname::style(*fullname);
+      texts->addWidget(fullname);
+    }
+    {
+      auto handle = new QLabel(this->_model.fullname());
+      view::send::user::handle::style(*handle);
+      texts->addWidget(handle);
+    }
+    this->_layout->addLayout(texts);
+  }
+  // this->_layout->addWidget(new QLabel(this->_model.fullname()));
+  // this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 }
 
 QSize
 UserWidget::sizeHint() const
 {
-  auto size = this->_layout->minimumSize();
-  return QSize(this->width(), size.height());
+  return QSize(this->width(), this->_avatar->height() + 2 * 10);
 }
 
 void

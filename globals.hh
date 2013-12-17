@@ -33,7 +33,7 @@ namespace
   struct TextStyle
   {
     TextStyle(QFont const& font,
-              QColor const& color = QColor(0x00, 0x00, 0x00)):
+              QColor const& color = QColor(0x25, 0x25, 0x25)):
       _font(font),
       _color(color)
     {}
@@ -162,9 +162,75 @@ namespace view
       static
       TextStyle const
       style(QFont("Arial", 11.5), QColor(0xA8, 0xA8, 0xA8));
-
-
     }
+  }
+
+  namespace send
+  {
+    namespace file
+    {
+      namespace name
+      {
+        static
+        TextStyle const
+        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
+      }
+
+      namespace size
+      {
+        static
+        TextStyle const
+        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
+      }
+
+      static
+      QColor const
+      background(0xF8, 0xF8, 0xF8);
+    }
+
+    namespace file_adder
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
+
+      static
+      QColor const
+      background(0xF8, 0xF8, 0xF8);
+
+      static
+      QString const
+      text("Add files...");
+    }
+
+    namespace search_field
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9, QFont::Bold));
+
+      static
+      QString const
+      text("Search for a friend...");
+    }
+
+    namespace user
+    {
+      namespace fullname
+      {
+        static
+        TextStyle const
+        style(QFont("Arial", 9), QColor(0x00, 0x00, 0x00));
+      }
+
+      namespace handle
+      {
+        static
+        TextStyle const
+        style(QFont("Arial", 7.5), QColor(0xC4, 0xC4, 0xC4));
+      }
+    }
+
   }
 }
 

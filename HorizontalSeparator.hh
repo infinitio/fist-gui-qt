@@ -9,6 +9,14 @@ class HorizontalSeparator:
 {
 public:
   HorizontalSeparator(QWidget* parent = nullptr);
+
+public:
+  QSize
+  sizeHint() const override;
+
+protected:
+  void
+  paintEvent(QPaintEvent*) override;
 };
 
 #endif

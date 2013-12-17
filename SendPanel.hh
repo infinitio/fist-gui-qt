@@ -72,8 +72,8 @@ private:
   SearchField* _search;
   ListWidget* _users;
   HorizontalSeparator* _file_part_seperator;
-  AddFileWidget* _file_adder;
   ListWidget* _file_list;
+  AddFileWidget* _file_adder;
 
 /*-------------.
 | SearchResult |

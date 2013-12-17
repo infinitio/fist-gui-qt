@@ -15,6 +15,7 @@
 #include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/SendPanel.hh>
+#include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/utils.hh>
 
 /*-------------.
@@ -27,8 +28,8 @@ SendPanel::SendPanel(gap_State* state):
   _search(new SearchField(this)),
   _users(new ListWidget(this)),
   _file_part_seperator(new HorizontalSeparator(this)),
-  _file_adder(new AddFileWidget(this)),
   _file_list(new ListWidget(this)),
+  _file_adder(new AddFileWidget(this)),
   _peer_id(gap_null()),
   _results(),
   _ignore_search_result(false)
@@ -36,7 +37,15 @@ SendPanel::SendPanel(gap_State* state):
   this->footer()->setParent(this);
 
   this->_users->setMaxRows(5);
-  this->_file_list->setMaxRows(4);
+
+  {
+    this->_file_list->setMaxRows(3);
+    auto palette = this->_file_list->palette();
+    palette.setColor(QPalette::Window, view::send::file_adder::background);
+    this->_file_list->setPalette(palette);
+    this->_file_list->setAutoFillBackground(true);
+  }
+
 
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
@@ -83,12 +92,13 @@ SendPanel::_search_changed(QString const& search)
 void
 SendPanel::add_file(QString const& path)
 {
-  if (this->_files.insert(path, new FileItem(path)) != this->_files.end())
-  {
-    connect(this->_files[path], SIGNAL(remove(QString const&)),
-            this, SLOT(remove_file(QString const&)));
-    this->_file_list->add_widget(this->_files[path]);
-  }
+  if (this->_files.contains(path))
+    return;
+
+  this->_files.insert(path, new FileItem(path));
+  connect(this->_files[path], SIGNAL(remove(QString const&)),
+          this, SLOT(remove_file(QString const&)));
+  this->_file_list->add_widget(this->_files[path]);
 }
 
 void

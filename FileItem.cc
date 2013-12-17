@@ -1,4 +1,5 @@
 #include <fist-gui-qt/FileItem.hh>
+#include <fist-gui-qt/globals.hh>
 
 #include <QHBoxLayout>
 
@@ -18,7 +19,7 @@ namespace
 QSize
 FileItem::sizeHint() const
 {
-  return QSize(this->width(), 24);
+  return QSize(this->width(), 42);
 }
 
 static
@@ -50,31 +51,44 @@ FileItem::FileItem(QString const& path):
                            emit remove(this->_file.fileName());
                          }))
 {
-  // Toggle word wrap to filename.
-  this->_name->setWordWrap(true);
+  this->setContentsMargins(6, 0, 6, 0);
 
-  // Make size grey.
+  // Background.
   {
-    QPalette palette;
-    palette.setColor(QPalette::WindowText, QColor(150, 150, 150));
-    this->_size->setPalette(palette);
+    QPalette palette = this->palette();
+    {
+      palette.setColor(QPalette::Window, view::send::file::background);
+    }
+    this->setPalette(palette);
+    this->setAutoFillBackground(true);
+  }
+
+  // Name.
+  {
+    view::send::file::name::style(*this->_name);
+  }
+
+  // Size.
+  {
+    view::send::file::size::style(*this->_size);
   }
 
   auto* layout = new QHBoxLayout(this);
   QFileIconProvider icon_provider;
   this->_icon->setPixmap(icon_provider.icon(_file).pixmap(18));
   layout->addWidget(this->_icon);
-  layout->addItem(new QSpacerItem(0, 0,
+  layout->addItem(new QSpacerItem(4, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Minimum));
   layout->addWidget(this->_name);
   layout->addItem(new QSpacerItem(0, 0,
                                   QSizePolicy::Expanding, QSizePolicy::Minimum));
   layout->addWidget(this->_size);
-  layout->addItem(new QSpacerItem(0, 0,
+  layout->addItem(new QSpacerItem(4, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Minimum));
   layout->addWidget(this->_remove);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->adjustSize();
 }
 
 void
