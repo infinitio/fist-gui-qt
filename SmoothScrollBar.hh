@@ -22,8 +22,11 @@ class SmoothScrollBar:
     void                                                \
     Write(Type value)                                   \
     {                                                   \
-      this->_##Name = value;                            \
-      Notify;                                           \
+      if (this->_##Name != value)                       \
+      {                                                 \
+        this->_##Name = value;                          \
+        Notify;                                         \
+      }                                                 \
     }                                                   \
                                                         \
   private:                                              \
@@ -101,6 +104,9 @@ protected:
   virtual
   void
   wheelEvent(QWheelEvent*) override;
+private:
+  void
+  _scroll(bool up);
 };
 
 #endif

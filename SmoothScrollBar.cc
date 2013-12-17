@@ -61,10 +61,10 @@ SmoothScrollBar::paintEvent(QPaintEvent*)
 }
 
 void
-SmoothScrollBar::wheelEvent(QWheelEvent* event)
+SmoothScrollBar::_scroll(bool up)
 {
   int value = this->_value_target;
-  if (event->delta() < 0)
+  if (up)
   {
     value += this->step();
     value = std::min(value, this->maximum() - this->pageSize());
@@ -76,12 +76,18 @@ SmoothScrollBar::wheelEvent(QWheelEvent* event)
   }
 
   this->_value_target = value;
-  this->_value_animation->setDuration(600); // std::abs(250 * (this->_value_target - this->value())));
+  this->_value_animation->setDuration(600);
   this->_value_animation->setEndValue(value);
   this->_value_animation->start();
 
   this->setOpacity(0.5);
   this->_opacity_animation->stop();
+}
+
+void
+SmoothScrollBar::wheelEvent(QWheelEvent* event)
+{
+  this->_scroll(event->delta() < 0);
 }
 
 void
