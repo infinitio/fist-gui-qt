@@ -137,14 +137,13 @@ ListWidget::_layout()
   this->_height_hint = real_height;
   this->updateGeometry();
 
+  this->_scroll->setMinimum(0);
+  this->_scroll->setMaximum(height);
+  this->_scroll->setPageSize(this->height());
+  this->_scroll->setStep(height / 5);
+
   if (this->height() < height)
-  {
     this->_scroll->show();
-    this->_scroll->setMinimum(0);
-    this->_scroll->setMaximum(height);
-    this->_scroll->setPageSize(this->height());
-    this->_scroll->setStep(height / 5);
-  }
   else
     this->_scroll->hide();
 }
@@ -182,7 +181,7 @@ ListWidget::setMaxRows(int val)
 void
 ListWidget::wheelEvent(QWheelEvent* event)
 {
-  if (!this->_wheel_event)
+  if (!this->_wheel_event && !this->_scroll->isHidden())
   {
     this->_wheel_event = true;
     QCoreApplication::sendEvent(this->_scroll, event);
