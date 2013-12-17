@@ -133,7 +133,7 @@ RoundShadowWidget::paintEvent(QPaintEvent*)
                           radius,
                           radius);
   // FIXME
-  painter.setBrush(QColor(0xD2, 0x39, 0x2A));
+  painter.setBrush(QColor(0xE3, 0x59, 0x55));
   painter.drawRoundedRect(shadow,
                           this->height() - shadow - radius * 2,
                           this->width() - shadow * 2,

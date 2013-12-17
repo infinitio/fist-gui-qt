@@ -9,7 +9,7 @@ Footer::Footer(QWidget* parent):
   this->_layout->setContentsMargins(10, 10, 10, 5);
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  this->setFixedSize(320, 40);
+  this->setFixedSize(320, 32);
 }
 
 void
@@ -17,8 +17,8 @@ Footer::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   QLinearGradient gradient;
-  gradient.setColorAt(0, QColor(0xEC, 0x3D, 0x2B));
-  gradient.setColorAt(1, QColor(0xD2, 0x39, 0x2A));
+  gradient.setColorAt(0, QColor(0xF3, 0x63, 0x5F));
+  gradient.setColorAt(1, QColor(0xE3, 0x59, 0x55));
   gradient.setStart(QPoint(0, 0));
   gradient.setFinalStop(QPoint(0, this->height()));
   QBrush brush(gradient);
@@ -32,7 +32,7 @@ Footer::paintEvent(QPaintEvent*)
 QSize
 Footer::sizeHint() const
 {
-  return QSize(this->width(), this->height());
+  return QSize(this->width(), 32);
 }
 
 QSize
