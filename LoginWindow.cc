@@ -18,7 +18,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
   _message_field(new QLabel),
-  _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")), false)),
+  _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text))
 {
@@ -52,7 +52,7 @@ LoginWindow::LoginWindow(gap_State* state):
     logo->setPixmap(QPixmap(QString(":/images/logo-complete.png")));
   }
 
-  // Message field
+  // Message field.
   {
     view::login::message::style(*this->_message_field);
   }
@@ -62,6 +62,8 @@ LoginWindow::LoginWindow(gap_State* state):
     view::login::links::style(*this->_create_account_link);
     this->_create_account_link->setTextInteractionFlags(
       view::login::links::interration_flags);
+    this->_create_account_link->setSizePolicy(
+      QSizePolicy::Minimum, QSizePolicy::Maximum);
   }
 
   // Forgotten password.
@@ -69,6 +71,8 @@ LoginWindow::LoginWindow(gap_State* state):
     view::login::links::style(*this->_reset_password_link);
     this->_reset_password_link->setTextInteractionFlags(
       view::login::links::interration_flags);
+    this->_reset_password_link->setSizePolicy(
+      QSizePolicy::Minimum, QSizePolicy::Maximum);
   }
 
   // Footer.
@@ -86,7 +90,6 @@ LoginWindow::LoginWindow(gap_State* state):
   this->_password_field->setEchoMode(QLineEdit::Password);
   auto layout = new QVBoxLayout(central_widget);
   layout->setContentsMargins(0, 10, 0, 0);
-
   {
     auto hlayout = new QHBoxLayout();
     hlayout->addWidget(this->_quit_button, 0, Qt::AlignRight);
@@ -96,22 +99,21 @@ LoginWindow::LoginWindow(gap_State* state):
 
   layout->addSpacing(15);
   layout->addWidget(logo, 0, Qt::AlignCenter);
-  layout->addWidget(this->_message_field, 240, Qt::AlignCenter);
+  layout->addWidget(this->_message_field, 260, Qt::AlignCenter);
   layout->addSpacing(5);
-  layout->addWidget(this->_email_field, 240, Qt::AlignCenter);
+  layout->addWidget(this->_email_field, 260, Qt::AlignCenter);
   layout->addSpacing(5);
-  layout->addWidget(this->_password_field, 240,  Qt::AlignCenter);
+  layout->addWidget(this->_password_field, 260,  Qt::AlignCenter);
   layout->addSpacing(5);
   {
     auto hlayout = new QHBoxLayout();
     hlayout->addWidget(this->_create_account_link, 0, Qt::AlignRight);
-    hlayout->addSpacing(50);
-    hlayout->addWidget(this->_reset_password_link);
-    layout->addLayout(hlayout);
+    hlayout->addSpacing(60);
+    hlayout->addWidget(this->_reset_password_link, 0, Qt::AlignLeft);
+    layout->addLayout(hlayout, Qt::AlignCenter);
   }
   layout->addSpacing(20);
   layout->addWidget(footer);
-  // this->setupUi(this);
 
   this->setCentralWidget(central_widget);
 }
