@@ -46,7 +46,6 @@ SendPanel::SendPanel(gap_State* state):
     this->_file_list->setAutoFillBackground(true);
   }
 
-
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
 
@@ -58,15 +57,18 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->footer()->send(), SIGNAL(clicked()),
           this, SLOT(_send()));
 
-  connect(this->_search, SIGNAL(textChanged(QString const&)),
-          SLOT(_search_changed(QString const&)));
+  connect(this->_search, SIGNAL(search_ready(QString const&)),
+          this, SLOT(_search_changed(QString const&)));
 }
 
 void
 SendPanel::_search_changed(QString const& search)
 {
   if (this->_ignore_search_result)
+  {
+    this->_ignore_search_result = false;
     return;
+  }
 
   QStringList res;
 
@@ -159,7 +161,6 @@ SendPanel::_set_peer(uint32_t uid)
   this->_users->clearWidgets();
   this->_ignore_search_result = true;
   this->_search->setText(this->_user_models.at(uid).fullname());
-  this->_ignore_search_result = false;
   this->_search->setIcon(this->_user_models.at(uid).avatar());
   this->_peer_id = uid;
 }

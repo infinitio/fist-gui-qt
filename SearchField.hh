@@ -3,6 +3,7 @@
 
 # include <QLineEdit>
 # include <QKeyEvent>
+# include <QTimer>
 
 # include <fist-gui-qt/utils.hh>
 # include <fist-gui-qt/ListWidget.hh>
@@ -35,6 +36,19 @@ Q_SIGNALS:
 
   void
   down_pressed();
+
+  void
+  search_ready(QString const& text);
+
+private slots:
+  void
+  delay_expired();
+
+  void
+  text_changed(QString const& text);
+
+private:
+  QTimer _search_delay;
 
 /*-------.
 | Layout |

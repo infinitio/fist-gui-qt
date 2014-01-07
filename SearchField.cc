@@ -15,6 +15,12 @@ SearchField::SearchField(QWidget* owner):
   this->setFixedWidth(320);
   this->setFixedHeight(this->height());
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  connect(this, SIGNAL(textChanged(QString const&)),
+          SLOT(text_changed(QString const&)));
+  this->_search_delay.setSingleShot(true);
+  connect(&this->_search_delay, SIGNAL(timeout()),
+          this, SLOT(delay_expired()));
 }
 
 void
@@ -39,6 +45,23 @@ SearchField::keyPressEvent(QKeyEvent* event)
     emit down_pressed();
   else
     QLineEdit::keyPressEvent(event);
+}
+
+void
+SearchField::text_changed(QString const& text)
+{
+  if (text.isEmpty())
+    emit search_ready(this->text());
+  else
+  {
+    this->_search_delay.start(300);
+  }
+}
+
+void
+SearchField::delay_expired()
+{
+  emit search_ready(this->text());
 }
 
 QSize
