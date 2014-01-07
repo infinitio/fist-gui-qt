@@ -31,6 +31,31 @@ SmoothScrollBar::SmoothScrollBar(QWidget* parent):
   this->fade();
 }
 
+void
+SmoothScrollBar::setMaximum(int const& height)
+{
+  // If the size is different, we need to scroll (up or down) to fit the new
+  // size.
+  if (this->_maximum != height)
+  {
+    if (height < this->_maximum)
+    {
+      this->_maximum = height;
+      this->_scroll_to(0, 165);
+    }
+    else
+    {
+      this->_maximum = height;
+    }
+  }
+
+  QPropertyAnimation* animation =
+    new QPropertyAnimation(this, "displayMaximum");
+  animation->setDuration(200);
+  animation->setEndValue(height);
+  animation->start();
+}
+
 QSize
 SmoothScrollBar::sizeHint() const
 {
@@ -61,6 +86,21 @@ SmoothScrollBar::paintEvent(QPaintEvent*)
 }
 
 void
+SmoothScrollBar::_scroll_to(int value, int speed)
+{
+  if (value != this->_value_target)
+  {
+    this->_value_target = value;
+    this->_value_animation->setDuration(speed);
+    this->_value_animation->setEndValue(value);
+    this->_value_animation->start();
+  }
+
+  this->_opacity_animation->stop();
+  this->setOpacity(0.5);
+}
+
+void
 SmoothScrollBar::_scroll(bool up)
 {
   int value = this->_value_target;
@@ -75,19 +115,29 @@ SmoothScrollBar::_scroll(bool up)
     value = std::max(value, 0);
   }
 
-  this->_value_target = value;
-  this->_value_animation->setDuration(600);
-  this->_value_animation->setEndValue(value);
-  this->_value_animation->start();
-
-  this->setOpacity(0.5);
-  this->_opacity_animation->stop();
+  this->_scroll_to(value);
 }
 
 void
 SmoothScrollBar::wheelEvent(QWheelEvent* event)
 {
   this->_scroll(event->delta() < 0);
+}
+
+void
+SmoothScrollBar::showEvent(QShowEvent*)
+{
+  this->setOpacity(0.5);
+  this->fade();
+}
+
+void
+SmoothScrollBar::reload()
+{
+  this->_value_target = 0;
+  this->_value_animation->setDuration(600);
+  this->_value_animation->setEndValue(0);
+  this->_value_animation->start();
 }
 
 void
