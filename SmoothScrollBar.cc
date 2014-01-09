@@ -44,9 +44,7 @@ SmoothScrollBar::setMaximum(int const& height)
       this->_scroll_to(0, 165);
     }
     else
-    {
       this->_maximum = height;
-    }
   }
 
   QPropertyAnimation* animation =
@@ -88,6 +86,11 @@ SmoothScrollBar::paintEvent(QPaintEvent*)
 void
 SmoothScrollBar::_scroll_to(int value, int speed)
 {
+  if (value > this->maximum())
+    value = this->maximum();
+  else if (value < 0)
+    value = 0;
+
   if (value != this->_value_target)
   {
     this->_value_target = value;
