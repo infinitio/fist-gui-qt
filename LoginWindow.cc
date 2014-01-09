@@ -22,6 +22,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text))
 {
+  this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
   this->setWindowFlags(view::login::flags);
 
