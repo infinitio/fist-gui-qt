@@ -22,7 +22,7 @@
 
 static int const dock_size = 60;
 
-// XXX: This is dirty but there is not good way to emit a signal from a static
+// XXX: This is dirty but there is no good way to emit a signal from a static
 // method. Unfortunately, gap api, which is in C, forces to attach C callbacks.
 // Attaching a static method works but make signal emission impossible.
 // The only 'good' way I found, while there is only one instance of InfinitDock
@@ -42,9 +42,11 @@ class InfinitDock::Prologue
   }
 };
 
+// Creating the transaction panel is a long operation. So we just wait until all
+// the graphical part is fully load, and then, initialize it.
 InfinitDock::InfinitDock(gap_State* state):
   _prologue(new Prologue(state)),
-  _transaction_panel(new TransactionPanel(state)),
+  _transaction_panel(nullptr),
   _panel(new RoundShadowWidget),
   _send_panel(new SendPanel(state)),
   _logo(":/icons/menu-bar-fire@2x.png"),
@@ -57,19 +59,22 @@ InfinitDock::InfinitDock(gap_State* state):
 {
   g_dock = this;
 
+  QIcon icon(this->_logo);
+  _systray->setIcon(icon);
+  _systray->setVisible(true);
+  connect(_systray,
+          SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+          this,
+          SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
+
   this->_systray_menu->addAction(_send_files);
   this->_systray_menu->addAction(_quit);
   this->_systray->setContextMenu(_systray_menu);
 
-  // Register gap callback.
-  gap_connection_callback(_state, InfinitDock::connection_status_cb);
-  gap_user_status_callback(_state, InfinitDock::user_status_cb);
-  gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
-
   this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
 
-  this->_switch_view(this->_transaction_panel);
+  this->_transaction_panel = new TransactionPanel(state);
 
   connect(this->_panel, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
@@ -107,18 +112,17 @@ InfinitDock::InfinitDock(gap_State* state):
           this->_transaction_panel,
           SLOT(user_status_changed(uint32_t, gap_UserStatus)));
 
+  // Register gap callback.
+  gap_connection_callback(_state, InfinitDock::connection_status_cb);
+  gap_user_status_callback(_state, InfinitDock::user_status_cb);
+  gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
+
+  this->_switch_view(this->_transaction_panel);
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
   timer->start(500);
 
-  QIcon icon(this->_logo);
-  _systray->setIcon(icon);
-  _systray->setVisible(true);
-  connect(_systray,
-          SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-          this,
-          SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(chooseFiles()));
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
   this->show();
