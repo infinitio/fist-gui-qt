@@ -65,7 +65,7 @@ namespace view
 
     static
     Qt::WindowFlags const
-    flags = Qt::FramelessWindowHint | Qt::Tool;
+    flags = Qt::FramelessWindowHint;
 
     namespace email
     {
