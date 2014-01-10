@@ -10,11 +10,11 @@
 # include <QFileDialog>
 
 # include <surface/gap/gap.h>
-
+# include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class InfinitDock:
-  public QMainWindow
+  public RoundShadowWidget
 {
   // This class is used to create tasks that need done first.
   // The need comes from initialization wich create some objects that have a
@@ -70,18 +70,26 @@ public slots:
   _show_user_view(uint32_t sender_id);
   void
   _show_transactions_view();
+  void
+  _show_menu();
 
 private:
   void _switch_view(Panel* target);
 
   TransactionPanel* _transaction_panel;
-  RoundShadowWidget* _panel;
+//  RoundShadowWidget* _panel;
 
 /*-----.
 | Send |
 `-----*/
 private:
   SendPanel* _send_panel;
+
+/*-----.
+| Menu |
+`-----*/
+private:
+  QMenu* _menu;
 
 /*--------------.
 | Drag and drop |

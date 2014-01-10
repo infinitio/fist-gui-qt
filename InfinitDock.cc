@@ -47,8 +47,9 @@ class InfinitDock::Prologue
 InfinitDock::InfinitDock(gap_State* state):
   _prologue(new Prologue(state)),
   _transaction_panel(nullptr),
-  _panel(new RoundShadowWidget),
+//  _panel(new RoundShadowWidget),
   _send_panel(new SendPanel(state)),
+  _menu(new QMenu(this)),
   _logo(":/icons/menu-bar-fire@2x.png"),
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
@@ -71,18 +72,22 @@ InfinitDock::InfinitDock(gap_State* state):
   this->_systray_menu->addAction(_quit);
   this->_systray->setContextMenu(_systray_menu);
 
-  this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+  this->setWindowFlags(Qt::FramelessWindowHint);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
 
   this->_transaction_panel = new TransactionPanel(state);
 
-  connect(this->_panel, SIGNAL(onSizeChanged()),
+  connect(this, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
 
   connect(&this->_transaction_panel->footer()->send(),
           SIGNAL(released()),
           this,
           SLOT(_show_send_view()));
+  connect(&this->_transaction_panel->footer()->menu(),
+          SIGNAL(released()),
+          this,
+          SLOT(_show_menu()));
 
   connect(this->_send_panel->footer()->back(),
           SIGNAL(released()),
@@ -111,6 +116,8 @@ InfinitDock::InfinitDock(gap_State* state):
           SIGNAL(user_status_changed(uint32_t, gap_UserStatus)),
           this->_transaction_panel,
           SLOT(user_status_changed(uint32_t, gap_UserStatus)));
+
+  this->_menu->addAction(_quit);
 
   // Register gap callback.
   gap_connection_callback(_state, InfinitDock::connection_status_cb);
@@ -159,21 +166,21 @@ InfinitDock::transactionPanel()
 void
 InfinitDock::showPanel()
 {
-  this->_panel->show();
-  this->_panel->setFocus();
+  this->show();
+  this->setFocus();
   this->_position_panel();
 }
 
 void
 InfinitDock::hidePanel()
 {
-  this->_panel->hide();
+  this->hide();
 }
 
 void
 InfinitDock::togglePanel()
 {
-  if (this->_panel->isVisible())
+  if (this->isVisible())
     this->hidePanel();
   else
     this->showPanel();
@@ -183,9 +190,9 @@ void
 InfinitDock::_position_panel()
 {
   QPoint pos(this->_systray->geometry().topLeft());
-  auto x = pos.x() - this->_panel->width();
-  auto y = pos.y() - this->_panel->height() - 32;
-  this->_panel->move(x, y);
+  auto x = pos.x() - this->width();
+  auto y = pos.y() - this->height() - 32;
+  this->move(x, y);
 }
 
 void
@@ -209,7 +216,7 @@ InfinitDock::chooseFiles()
 void
 InfinitDock::quit()
 {
-    this->_panel->hide();
+    this->hide();
     this->_send_panel->hide();
     this->_transaction_panel->hide();
     this->_systray->hide();
@@ -253,7 +260,7 @@ InfinitDock::dropEvent(QDropEvent *event)
 void
 InfinitDock::closeEvent(QCloseEvent* event)
 {
-  this->_panel->close();
+  this->close();
   Super::closeEvent(event);
   qApp->quit();
 }
@@ -292,6 +299,16 @@ InfinitDock::_show_user_view(uint32_t /* sender_id */)
 }
 
 void
+InfinitDock::_show_menu()
+{
+  std::cerr << "lol" << std::endl;
+  this->_menu->show();
+
+  QPoint pos(this->geometry().bottomLeft());
+  this->_menu->move(pos);
+}
+
+void
 InfinitDock::_show_transactions_view()
 {
   this->_switch_view(this->_transaction_panel);
@@ -300,19 +317,19 @@ InfinitDock::_show_transactions_view()
 void
 InfinitDock::_switch_view(Panel* panel)
 {
-  if (panel == this->_panel->centralWidget())
+  if (panel == this->centralWidget())
   {
     return;
   }
 
-  if (this->_panel->centralWidget() != nullptr)
+  if (this->centralWidget() != nullptr)
   {
-    static_cast<Panel*>(this->_panel->centralWidget())->on_hide();
-    this->_panel->centralWidget()->setParent(0);
+    static_cast<Panel*>(this->centralWidget())->on_hide();
+    this->centralWidget()->setParent(0);
   }
 
   panel->on_show();
-  this->_panel->setCentralWidget(panel);
+  this->setCentralWidget(panel);
   // this->_panel->setFocus();
 }
 
