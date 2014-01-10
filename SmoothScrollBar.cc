@@ -91,6 +91,9 @@ SmoothScrollBar::_scroll_to(int value, int speed)
   else if (value < 0)
     value = 0;
 
+  this->_opacity_animation->stop();
+  this->setOpacity(0.5);
+
   if (value != this->_value_target)
   {
     this->_value_target = value;
@@ -98,9 +101,11 @@ SmoothScrollBar::_scroll_to(int value, int speed)
     this->_value_animation->setEndValue(value);
     this->_value_animation->start();
   }
+  else
+  {
+    this->fade();
+  }
 
-  this->_opacity_animation->stop();
-  this->setOpacity(0.5);
 }
 
 void
