@@ -17,9 +17,13 @@ public:
   ~TransactionFooter() = default;
 
   IconButton const&
+  menu() const;
+
+  IconButton const&
   send() const;
 
 private:
+  IconButton* _menu;
   IconButton* _send;
 };
 
