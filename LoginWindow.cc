@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QApplication>
+#include <QRegExp>
 
 #include <iostream>
 
@@ -126,7 +127,11 @@ LoginWindow::_login()
   QString email = this->_email_field->text();
   QString pw = this->_password_field->text();
 
-  if (email.isEmpty() || !email.contains("@"))
+  static QRegExp email_checker(regexp::email,
+                               Qt::CaseInsensitive);
+
+
+  if (email.isEmpty() || !email_checker.exactMatch(email))
   {
     this->_message_field->setText("invalid email format");
     this->_email_field->setFocus();
