@@ -184,7 +184,11 @@ SendPanel::_pick_user()
 void
 SendPanel::_send()
 {
-  if (this->_peer_id == gap_null())
+  static QRegExp email_checker(regexp::email,
+                               Qt::CaseInsensitive);
+
+  if (this->_peer_id == gap_null() &&
+      !email_checker.exactMatch(this->_search->text()))
   {
     this->_search->setFocus();
     return;
@@ -215,7 +219,13 @@ SendPanel::_send()
   }
   filenames[this->_files.size()] = nullptr;
 
-  gap_send_files(_state, this->_peer_id, filenames, "");
+  if (this->_peer_id != gap_null())
+    gap_send_files(_state, this->_peer_id, filenames, "");
+  else
+    gap_send_files_by_email(_state,
+                            this->_search->text().toStdString().c_str(),
+                            filenames,
+                            "");
 
   auto** cpy = filenames;
   while (*cpy != nullptr)
@@ -231,11 +241,9 @@ SendPanel::_send()
 void
 SendPanel::avatar_available(uint32_t uid)
 {
-  std::cerr << "SendPanel: avatar Available" << std::endl;
   auto it = this->_user_models.find(uid);
   if (it != this->_user_models.end())
   {
-    std::cerr << it->second.fullname().toStdString() << ": new avatar" << std::endl;
     it->second.avatar_available();
     this->_users->update();
   }
