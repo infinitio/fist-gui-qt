@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QSystemTrayIcon>
 #include <QUrl>
+#include <QWidgetAction>
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
@@ -117,6 +118,12 @@ InfinitDock::InfinitDock(gap_State* state):
           this->_transaction_panel,
           SLOT(user_status_changed(uint32_t, gap_UserStatus)));
 
+  // XXX: Specialize a QWidgetAction to add a better visual and for example,
+  // to copy the version in the user clipboard on click.
+  QWidgetAction* version = new QWidgetAction(this->_menu);
+  version->setDefaultWidget(new QLabel(QString(INFINIT_VERSION)));
+  this->_menu->addAction(version);
+  this->_menu->addSeparator();
   this->_menu->addAction(_quit);
 
   // Register gap callback.
@@ -178,9 +185,9 @@ InfinitDock::hidePanel()
 }
 
 void
-InfinitDock::togglePanel()
+InfinitDock::togglePanel(bool toggle_only)
 {
-  if (this->isVisible())
+  if (this->isVisible() and !toggle_only)
     this->hidePanel();
   else
     this->showPanel();
@@ -271,7 +278,7 @@ InfinitDock::mouseReleaseEvent(QMouseEvent* event)
   if (event->button() == Qt::LeftButton)
   {
     event->accept();
-    this->togglePanel();
+    this->togglePanel(true);
   }
   else
     Super::mouseReleaseEvent(event);
@@ -280,10 +287,16 @@ InfinitDock::mouseReleaseEvent(QMouseEvent* event)
 void
 InfinitDock::keyPressEvent(QKeyEvent* event)
 {
-  if (event->key() == Qt::Key_Return)
-    this->togglePanel();
-  else if (event->key() == Qt::Key_Escape)
-    this->deleteLater();
+  if (this->centralWidget() == this->_transaction_panel)
+  {
+    if (event->key() == Qt::Key_Escape)
+      this->togglePanel();
+  }
+  else if (this->centralWidget() == this->_send_panel)
+  {
+    if (event->key() == Qt::Key_Escape)
+      this->togglePanel();
+  }
 }
 
 void

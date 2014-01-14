@@ -58,7 +58,7 @@ public Q_SLOTS:
   TransactionPanel& transactionPanel();
   void hidePanel();
   void showPanel();
-  void togglePanel();
+  void togglePanel(bool toogle_only = false);
   void chooseFiles();
   void quit();
   void _position_panel();
