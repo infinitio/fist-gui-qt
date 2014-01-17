@@ -32,6 +32,14 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _status(new QLabel),
   _timer(nullptr)
 {
+
+  QPalette palette = this->palette();
+  {
+    palette.setColor(QPalette::Window, view::background);
+  }
+  this->setAutoFillBackground(true);
+  this->setPalette(palette);
+
   connect(this->_accept_button, SIGNAL(released()),
           this, SLOT(accept()));
   connect(this->_reject_button, SIGNAL(released()),
