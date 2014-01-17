@@ -2,6 +2,7 @@
 #include <QPainter>
 
 #include <fist-gui-qt/RoundShadowWidget.hh>
+#include <fist-gui-qt/globals.hh>
 
 /*-------------.
 | Construction |
@@ -125,7 +126,7 @@ RoundShadowWidget::paintEvent(QPaintEvent*)
                        this->height() - (shadow + radius) * 2,
                        180);
   }
-  painter.setBrush(Qt::white);
+  painter.setBrush(view::background);
   painter.drawRoundedRect(shadow,
                           shadow,
                           this->width() - shadow * 2,
