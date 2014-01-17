@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QDesktopWidget>
 #include <QSystemTrayIcon>
 #include <QUrl>
 #include <QWidgetAction>
@@ -196,10 +197,15 @@ InfinitDock::togglePanel(bool toggle_only)
 void
 InfinitDock::_position_panel()
 {
-  QPoint pos(this->_systray->geometry().topLeft());
-  auto x = pos.x() - this->width();
-  auto y = pos.y() - this->height() - 32;
-  this->move(x, y);
+  QPoint systray_position(this->_systray->geometry().topLeft());
+
+  auto screen = QDesktopWidget().availableGeometry();
+
+  auto x = systray_position.x() - this->width();
+  auto y = systray_position.y() - this->height() - 32;
+
+  this->move(qBound(screen.left(), x, screen.right()),
+             qBound(screen.top(), y, screen.bottom()));
 }
 
 void
