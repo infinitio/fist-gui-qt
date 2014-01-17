@@ -147,8 +147,8 @@ InfinitDock::InfinitDock(gap_State* state):
 void
 InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
 {
-    switch (reason)
-    {
+  switch (reason)
+  {
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Unknown:
@@ -158,7 +158,9 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::Context:
       this->hidePanel();
       break;
-    }
+    default:
+      break;
+  }
 }
 
 /*------.
@@ -320,7 +322,6 @@ InfinitDock::_show_user_view(uint32_t /* sender_id */)
 void
 InfinitDock::_show_menu()
 {
-  std::cerr << "lol" << std::endl;
   this->_menu->show();
 
   QPoint pos(this->geometry().bottomLeft());
