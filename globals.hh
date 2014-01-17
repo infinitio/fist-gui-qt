@@ -62,6 +62,10 @@ namespace regexp
 
 namespace view
 {
+  static
+  QColor const
+  background(0xF8, 0xF8, 0xF8);
+
   namespace login
   {
     static
