@@ -18,6 +18,7 @@ RoundShadowWidget::RoundShadowWidget():
   this->setWindowFlags(Qt::FramelessWindowHint);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
   this->setMinimumSize(QSize(0, 0));
+  this->setFocusPolicy(Qt::StrongFocus);
 }
 
 /*-------------------.
