@@ -23,6 +23,15 @@ LoginWindow::LoginWindow(gap_State* state):
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text))
 {
+  {
+    QPalette palette = this->palette();
+    {
+      palette.setColor(QPalette::Window, view::background);
+    }
+    this->setAutoFillBackground(true);
+    this->setPalette(palette);
+  }
+
   this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
   this->setWindowFlags(view::login::flags);
@@ -94,6 +103,7 @@ LoginWindow::LoginWindow(gap_State* state):
   layout->setContentsMargins(0, 10, 0, 0);
   {
     auto hlayout = new QHBoxLayout();
+    hlayout->addStretch();
     hlayout->addWidget(this->_quit_button, 0, Qt::AlignRight);
     hlayout->addSpacing(10);
     layout->addLayout(hlayout);
@@ -178,6 +188,12 @@ LoginWindow::keyPressEvent(QKeyEvent* event)
 }
 
 void
+LoginWindow::focusInEvent(QFocusEvent*)
+{
+  this->_email_field->setFocus();
+}
+
+void
 LoginWindow::_quit()
 {
   this->deleteLater();
@@ -190,6 +206,5 @@ LoginWindow::_quit()
 void
 LoginWindow::_reduce()
 {
-  std::cerr << "reduce" << std::endl;
   this->setWindowState(Qt::WindowMinimized);
 }

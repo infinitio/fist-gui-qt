@@ -34,6 +34,10 @@ private slots:
   _login();
 
 private:
+  void
+  focusInEvent(QFocusEvent* event) override;
+
+private:
   QLineEdit* _email_field;
   QLineEdit* _password_field;
   QLabel* _message_field;
