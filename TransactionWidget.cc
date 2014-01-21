@@ -98,11 +98,6 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   layout->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
   this->update();
 
-  // connect(this,
-  //         SIGNAL(onProgressChanged(float)),
-  //         this->_peer_avatar,
-  //         SLOT(setProgress(float)));
-
   setSizePolicy(QSizePolicy::Minimum,
                 QSizePolicy::Minimum);
   adjustSize();
