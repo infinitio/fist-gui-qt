@@ -12,6 +12,8 @@
 #include <QUrl>
 #include <QWidgetAction>
 
+#include <version.hh>
+
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
 #include <fist-gui-qt/SendPanel.hh>
