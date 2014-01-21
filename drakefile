@@ -1,0 +1,117 @@
+import drake
+import drake.cxx
+import drake.cxx.qt
+
+def configure(cxx_toolkit = None,
+              cxx_config = drake.cxx.Config(),
+              prefix = '/usr',
+              qt = None,
+              libraries = []):
+
+  cxx_config = drake.cxx.Config(cxx_config)
+  cxx_toolkit = cxx_toolkit or drake.cxx.Toolkit()
+
+  if qt is None:
+    qt = drake.cxx.qt.Qt(prefix = prefix, gui = True)
+
+  qt.plug(cxx_toolkit)
+
+  # Qt use file generation tools, which create function with
+  # missing declaration.
+  cxx_config.warnings.missing_declarations = None
+
+  # Add file config first.
+  cxx_config += qt.config
+  cxx_config += qt.config_gui
+
+  # Add the OS specific libraries. Windows ones has to be put
+  # after Qt ones.
+  if cxx_toolkit.os == drake.os.windows:
+    cxx_config.lib('shlwapi')
+    cxx_config.lib('ws2_32')
+    cxx_config.lib('gdi32')
+    cxx_config.lib('mswsock')
+    cxx_config.lib('uuid')
+    cxx_config.lib('ole32')
+    cxx_config.lib('winmm')
+    cxx_config.lib('oleaut32')
+    cxx_config.lib('qtmain')
+    cxx_config.lib('z')
+    cxx_config.lib('comdlg32')
+    cxx_config.lib('imm32')
+    cxx_config.lib('winspool')
+
+  cxx_config.add_local_include_path('.')
+
+  sources = drake.nodes(
+    "AddFileWidget.cc",
+    "AvatarWidget.cc",
+    "AvatarIcon.cc",
+    "DebugWindow.cc",
+    "FileItem.cc",
+    "Footer.cc",
+    "HorizontalSeparator.cc",
+    "IconButton.cc",
+    "InfinitDock.cc",
+    "ListItem.cc",
+    "ListWidget.cc",
+    "LoginFooter.cc",
+    "LoginWindow.cc",
+    "Panel.cc",
+    "RoundButton.cc",
+    "RoundShadowWidget.cc",
+    "SearchField.cc",
+    "SendFooter.cc",
+    "SendPanel.cc",
+    "ShapeButton.cc",
+    "SmoothLayout.cc",
+    "SmoothScrollBar.cc",
+    "TransactionFooter.cc",
+    "TransactionModel.cc",
+    "TransactionPanel.cc",
+    "TransactionWidget.cc",
+    "TransactionWindow.cc",
+    "UserModel.cc",
+    "UserWidget.cc",
+    "main.cc",
+    "AddFileWidget.hh",
+    "AvatarWidget.hh",
+    "AvatarIcon.hh",
+    "DebugWindow.hh",
+    "FileItem.hh",
+    "Footer.hh",
+    "HorizontalSeparator.hh",
+    "IconButton.hh",
+    "InfinitDock.hh",
+    "ListItem.hh",
+    "ListWidget.hh",
+    "LoginFooter.hh",
+    "LoginWindow.hh",
+    "Panel.hh",
+    "RoundButton.hh",
+    "RoundShadowWidget.hh",
+    "SearchField.hh",
+    "SendFooter.hh",
+    "SendPanel.hh",
+    "ShapeButton.hh",
+    "SmoothLayout.hh",
+    "SmoothScrollBar.hh",
+    "TransactionFooter.hh",
+    "TransactionModel.hh",
+    "TransactionPanel.hh",
+    "TransactionWidget.hh",
+    "TransactionWindow.hh",
+    "UserModel.hh",
+    "UserWidget.hh",
+    "globals.hh",
+    "resources/resources.qrc",
+  )
+
+  qt_application = drake.cxx.Executable(
+    'bin/infinit-gui',
+    sources + libraries,
+    cxx_toolkit,
+    cxx_config)
+
+  app = drake.Rule('build')
+  app << qt_application
