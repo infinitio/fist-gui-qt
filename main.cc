@@ -13,6 +13,8 @@
 #include <QDesktopWidget>
 #include <QVBoxLayout>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/AvatarWidget.hh>
 #include <fist-gui-qt/DebugWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
@@ -24,6 +26,8 @@
 #include <fist-gui-qt/utils.hh>
 
 #include <surface/gap/gap.h>
+
+ELLE_LOG_COMPONENT("infinit.FIST");
 
 static
 void
@@ -46,6 +50,7 @@ center_window(QWidget* widget)
 int
 main(int argc, char** argv)
 {
+  ELLE_LOG("start FIST gui");
   // Connect to gap.
   gap_State* state = gap_new();
 
@@ -54,9 +59,6 @@ main(int argc, char** argv)
 
   QFont arial("Arial", 11);
   QApplication::setFont(arial);
-
-  if (QFontDatabase::addApplicationFont(":/fonts/LucidaGrande.ttc") < 0)
-    exit(1);
 
   app.setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   app.setQuitOnLastWindowClosed(false);
