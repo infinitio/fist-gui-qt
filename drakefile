@@ -13,6 +13,7 @@ def configure(cxx_toolkit = None,
 
   if qt is None:
     qt = drake.cxx.qt.Qt(prefix = prefix, gui = True)
+  libraries = list(map(lambda lib: drake.copy(lib, 'lib', strip_prefix = True), libraries))
 
   qt.plug(cxx_toolkit)
 
@@ -23,6 +24,8 @@ def configure(cxx_toolkit = None,
   # Add file config first.
   cxx_config += qt.config
   cxx_config += qt.config_gui
+
+  cxx_config.lib_path_runtime('../lib')
 
   # Add the OS specific libraries. Windows ones has to be put
   # after Qt ones.
@@ -91,6 +94,9 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/RoundButton.hh",
     "src/fist-gui-qt/RoundShadowWidget.hh",
     "src/fist-gui-qt/SearchField.hh",
+    "src/fist-gui-qt/SearchField.cc",
+    "src/fist-gui-qt/SearchResultWidget.hh",
+    "src/fist-gui-qt/SearchResultWidget.cc",
     "src/fist-gui-qt/SendFooter.hh",
     "src/fist-gui-qt/SendPanel.hh",
     "src/fist-gui-qt/ShapeButton.hh",
@@ -103,6 +109,7 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/TransactionWindow.hh",
     "src/fist-gui-qt/UserModel.hh",
     "src/fist-gui-qt/UserWidget.hh",
+
     "src/fist-gui-qt/globals.hh",
     "resources/fist-gui-qt/resources.qrc",
   )
