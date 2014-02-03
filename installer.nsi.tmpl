@@ -1,0 +1,147 @@
+; Registry
+!define regkey "Software\${company}\${product_name}"
+!define uninstkey "Software\Microsoft\Windows\CurrentVersion\Uninstall\${product_name}"
+!define startmenu "$SMPROGRAMS\${company}\${product_name}"
+
+!define uninstaller "uninstall.exe"
+
+;------------------------------------------------------------------------------
+; General configuration
+;------------------------------------------------------------------------------
+
+XPStyle on
+ShowInstDetails show
+ShowUninstDetails hide
+AutoCloseWindow false
+
+Name "${product_name}"
+Caption "${product_name}"
+
+Icon "${resources_folder}/${icon}"
+
+SetDateSave on
+SetDatablockOptimize on
+CRCCheck on
+SilentInstall normal
+
+InstallDir "$PROGRAMFILES\${company}\${product_name}"
+InstallDirRegKey HKLM "${'${regkey}'}" ""
+
+LicenseText "License"
+LicenseData "${resources_folder}/${license}"
+
+; Set the text which prompts the user to enter the installation directory
+DirText "Choose the install directory"
+
+UninstallText "This will uninstall ${product_name}."
+UninstallIcon "${resources_folder}/${icon}"
+
+;------------------------------------------------------------------------------
+; Pages
+;------------------------------------------------------------------------------
+
+Page license
+
+; Page components
+Page directory
+Page instfiles
+
+UninstPage uninstConfirm
+UninstPage instfiles
+
+;------------------------------------------------------------------------------
+; Installer background
+;------------------------------------------------------------------------------
+
+!ifdef background
+
+	Function .onGUIInit
+		; extract background BMP into temp plugin directory
+		InitPluginsDir
+		File /oname=$PLUGINSDIR\1.bmp "${resources_folder}/${background}"
+
+		BgImage::SetBg /NOUNLOAD /FILLSCREEN $PLUGINSDIR\1.bmp
+		BgImage::Redraw /NOUNLOAD
+	FunctionEnd
+
+	Function .onGUIEnd
+		; Destroy must not have /NOUNLOAD so NSIS will be able to unload and
+		; delete BgImage before it exits
+		BgImage::Destroy
+	FunctionEnd
+
+!endif
+
+;------------------------------------------------------------------------------
+; Install section
+;------------------------------------------------------------------------------
+
+Section "Install Infinit"
+
+	WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
+	WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
+	WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
+	WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
+
+	; Main binaries
+	SetOutPath $INSTDIR
+	File "${resources_folder}\${executable}"
+        % for lib in libraries:
+          File "${resources_folder}/${lib}"
+        % endfor
+
+	File "${resources_folder}\${license}"
+	File "${resources_folder}\${release_notes}"
+	File "${resources_folder}\${documentation}"
+	File "${resources_folder}\${icon}"
+
+	WriteUninstaller "${'${uninstaller}'}"
+
+SectionEnd
+
+
+;------------------------------------------------------------------------------
+; Create shortcuts section
+;------------------------------------------------------------------------------
+
+Section
+	CreateDirectory "${'${startmenu}'}"
+	SetOutPath $INSTDIR ; for working directory
+
+	CreateShortCut "${'${startmenu}'}\${product_name}.lnk" "$INSTDIR\${executable}" "" "$INSTDIR\${icon}"
+	CreateShortCut "${'${startmenu}'}\Release Notes.lnk" "$INSTDIR\${release_notes}"
+	CreateShortCut "${'${startmenu}'}\Documentation.lnk" "$INSTDIR\${documentation}"
+
+	WriteINIStr "${'${startmenu}'}\web site.url" "InternetShortcut" "URL" ${website}
+	; CreateShortCut "${'${startmenu}'}\Web Site.lnk "${website}" "URL"
+	ExecShell "open" "$INSTDIR\${release_notes}"
+
+SectionEnd
+
+;------------------------------------------------------------------------------
+; Uninstall section
+;------------------------------------------------------------------------------
+
+Section "Uninstall"
+	DeleteRegKey HKLM "${'${uninstkey}'}"
+	DeleteRegKey HKLM "${'${regkey}'}"
+
+	Delete "${'${startmenu}'}\*.*"
+	Delete "${'${startmenu}'}"
+
+	Delete "$INSTDIR\${license}"
+        Delete "$INSTDIR\${release_notes}"
+	Delete "$INSTDIR\${icon}"
+	Delete "$INSTDIR\${documentation}"
+
+	Delete "$INSTDIR\${executable}"
+
+        % for lib in libraries:
+          DELETE "$INSTDIR\${lib}"
+        % endfor
+
+	RMDir "$INSTDIR"
+SectionEnd
+
+
+
