@@ -157,12 +157,13 @@ def configure(cxx_toolkit = None,
       'release_notes': 'Release notes.txt',
       'documentation': 'Documentation.txt',
       })
+  nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
+                                   resources = installer_resources)
 
-  nsi_context = drake.nsis.Context(resources = installer_resources)
 
-  with templating_context:
-    with nsi_context:
-      installer = drake.Node('installer.nsi.tmpl')
+  with nsi_context:
+    with templating_context:
+      installer = drake.nodes('installer.nsi.tmpl')
 
   installer_rule = drake.Rule('installer')
-  installer_rule << installer
+  installer_rule << drake.Node('bin/installer.exe')
