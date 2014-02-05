@@ -314,9 +314,9 @@ TransactionWidget::update_status()
     { gap_transaction_failed,
         StatusUpdater(QString(":/icons/error.png"), false, "Failed") },
     { gap_transaction_canceled,
-        StatusUpdater(QString(":/icons/remove-people.png"), false, "Canceled") },
+        StatusUpdater(QString(":/icons/error.png"), false, "Canceled") },
     { gap_transaction_rejected,
-        StatusUpdater(QString(":/icons/remove-people.png"), false, "Rejected") },
+        StatusUpdater(QString(":/icons/error.png"), false, "Rejected") },
   };
 
   tooltips.at(this->_transaction.status())(*this->_status);
