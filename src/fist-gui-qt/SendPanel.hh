@@ -1,11 +1,7 @@
 #ifndef SENDPANEL_HH
 # define SENDPANEL_HH
 
-# include <QLineEdit>
-# include <QPushButton>
 # include <QWidget>
-# include <QListWidget>
-# include <QSet>
 
 # include <unordered_map>
 
@@ -13,11 +9,9 @@
 
 # include <fist-gui-qt/Panel.hh>
 # include <fist-gui-qt/SendFooter.hh>
-# include <fist-gui-qt/SmoothLayout.hh>
-# include <fist-gui-qt/ListWidget.hh>
-# include <fist-gui-qt/UserWidget.hh>
+# include <fist-gui-qt/UserModel.hh>
 # include <fist-gui-qt/fwd.hh>
-# include <fist-gui-qt/HorizontalSeparator.hh>
+
 class SendPanel:
   public Panel
 {

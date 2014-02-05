@@ -13,5 +13,8 @@ class SendPanel;
 class TransactionList;
 class TransactionPanel;
 class TransactionWidget;
+class SearchResultWidget;
+class HorizontalSeparator;
+class SendFooter;
 
 #endif

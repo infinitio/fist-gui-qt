@@ -1,11 +1,5 @@
 #include <iostream>
 
-#include <QEvent>
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QPainter>
-#include <QTextEdit>
-
 #include <fist-gui-qt/AddFileWidget.hh>
 #include <fist-gui-qt/AvatarIcon.hh>
 #include <fist-gui-qt/FileItem.hh>
@@ -13,7 +7,9 @@
 #include <fist-gui-qt/HorizontalSeparator.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
+#include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/SearchField.hh>
+#include <fist-gui-qt/SearchResultWidget.hh>
 #include <fist-gui-qt/SendPanel.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/utils.hh>
@@ -135,7 +131,7 @@ SendPanel::setUsers(uint32_t* uids)
     this->_results.push_back(uid);
     if (this->_user_models.find(uid) == this->_user_models.end())
       this->_user_models.emplace(uid, UserModel(this->_state, uid));
-    auto widget = new UserWidget(this->_user_models.at(uid), this);
+    auto widget = new SearchResultWidget(this->_user_models.at(uid), this);
     connect(widget,
             SIGNAL(clicked_signal(uint32_t)),
             this,
