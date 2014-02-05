@@ -117,7 +117,7 @@ def configure(cxx_toolkit = None,
   )
 
   application = drake.cxx.Executable(
-    'bin/fist',
+    'bin/infinit',
     sources + libraries,
     cxx_toolkit,
     cxx_config)
@@ -146,7 +146,7 @@ def configure(cxx_toolkit = None,
       content = {
         'company': 'Infinit.io',
         'website': 'www.infinit.io',
-        'product_name': 'fist',
+        'product_name': 'infinit',
 
         # Resources.
         'resources_folder':
