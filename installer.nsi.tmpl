@@ -113,8 +113,8 @@ Section
 	CreateShortCut "${'${startmenu}'}\Documentation.lnk" "$INSTDIR\${documentation}"
 
 	WriteINIStr "${'${startmenu}'}\web site.url" "InternetShortcut" "URL" ${website}
-	; CreateShortCut "${'${startmenu}'}\Web Site.lnk "${website}" "URL"
-	ExecShell "open" "$INSTDIR\${release_notes}"
+	CreateShortCut "${'${startmenu}'}\Web Site.lnk "${website}" "URL"
+	; ExecShell "open" "$INSTDIR\${release_notes}"
 
 SectionEnd
 
@@ -140,6 +140,7 @@ Section "Uninstall"
           DELETE "$INSTDIR\${lib}"
         % endfor
 
+        DELETE "$INSTDIR\${'${uninstaller}'}"
 	RMDir "$INSTDIR"
 SectionEnd
 
