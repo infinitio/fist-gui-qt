@@ -32,6 +32,7 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _status(new QLabel),
   _timer(nullptr)
 {
+  this->_peer_status->setPixmap(QPixmap(":/icons/status.png"));
 
   QPalette palette = this->palette();
   {
@@ -161,6 +162,11 @@ TransactionWidget::update()
   {
     this->_peer_avatar->setPicture(this->_transaction.avatar());
   }
+
+  if (this->_transaction.peer_connection_status())
+    this->_peer_status->show();
+  else
+    this->_peer_status->hide();
 
   if (this->_transaction.status() == gap_transaction_waiting_for_accept &&
       !this->_transaction.is_sender())
