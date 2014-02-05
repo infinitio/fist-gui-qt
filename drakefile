@@ -46,6 +46,8 @@ def configure(cxx_toolkit = None,
     cxx_config.lib('comdlg32')
     cxx_config.lib('imm32')
     cxx_config.lib('winspool')
+    # Remove the command line windows on qt.
+    cxx_config.flag("-Wl,-subsystem,windows")
 
   cxx_config.add_local_include_path('src')
 
@@ -123,47 +125,48 @@ def configure(cxx_toolkit = None,
   build_rule = drake.Rule('build')
   build_rule << application
 
-  # Installer.
-  installer_resources = drake.nodes(
-    'resources/icons/icon.ico',
-    'resources/images/installer_background.png',
-    'resources/fist-gui-qt/Release notes.txt',
-    'resources/fist-gui-qt/License.txt',
-    'resources/fist-gui-qt/Documentation.txt',
-    )
+  if cxx_toolkit.os == drake.os.windows:
+    # Installer.
+    installer_resources = drake.nodes(
+      'resources/icons/icon.ico',
+      'resources/images/installer_background.png',
+      'resources/fist-gui-qt/Release notes.txt',
+      'resources/fist-gui-qt/License.txt',
+      'resources/fist-gui-qt/Documentation.txt',
+      )
 
-  installer_resources_folder = drake.Node('installer_resources')
-  installer_resources = list(map(
-      lambda x: drake.copy(x,
-                           installer_resources_folder.name().basename(),
-                           strip_prefix = True),
-      installer_resources + [application] + libraries))
+    installer_resources_folder = drake.Node('installer_resources')
+    installer_resources = list(map(
+        lambda x: drake.copy(x,
+                             installer_resources_folder.name().basename(),
+                             strip_prefix = True),
+        installer_resources + [application] + libraries))
 
-  templating_context = drake.templating.Context(
-    content = {
-      'company': 'Infinit.io',
-      'website': 'www.infinit.io',
-      'product_name': 'fist',
+    templating_context = drake.templating.Context(
+      content = {
+        'company': 'Infinit.io',
+        'website': 'www.infinit.io',
+        'product_name': 'fist',
 
-      # Resources.
-      'resources_folder':
-        str(drake.path_build(installer_resources_folder.name())),
-      'executable': str(application.name().basename()),
-      'libraries':
-        list(map(lambda lib: str(lib.name().basename()), libraries)),
-      'icon': 'icon.ico',
-      'background': 'installer_background.png',
-      'license': 'License.txt',
-      'release_notes': 'Release notes.txt',
-      'documentation': 'Documentation.txt',
-      })
-  nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
-                                   resources = installer_resources)
+        # Resources.
+        'resources_folder':
+          str(drake.path_build(installer_resources_folder.name())),
+        'executable': str(application.name().basename()),
+        'libraries':
+          list(map(lambda lib: str(lib.name().basename()), libraries)),
+        'icon': 'icon.ico',
+        'background': 'installer_background.png',
+        'license': 'License.txt',
+        'release_notes': 'Release notes.txt',
+        'documentation': 'Documentation.txt',
+        })
+    nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
+                                     resources = installer_resources)
 
 
-  with nsi_context:
-    with templating_context:
-      installer = drake.nodes('installer.nsi.tmpl')
+    with nsi_context:
+      with templating_context:
+        installer = drake.nodes('installer.nsi.tmpl')
 
-  installer_rule = drake.Rule('installer')
-  installer_rule << drake.Node('bin/installer.exe')
+    installer_rule = drake.Rule('installer')
+    installer_rule << drake.Node('bin/installer.exe')
