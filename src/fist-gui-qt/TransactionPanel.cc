@@ -3,7 +3,9 @@
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
 
-#include <iostream>
+#include <elle/log.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.TransactionPanel");
 
 #define MAX_TRANSAS 15
 
@@ -95,7 +97,7 @@ TransactionPanel::setFocus()
 void
 TransactionPanel::avatar_available(uint32_t uid)
 {
-  std::cerr << "TransactionPanel: " << uid << " avatar available" << std::endl;
+  ELLE_TRACE_SCOPE("%s: avatar available for user %s", *this, uid);
   // XXX: Ugly, but no better way for the moment.
   bool update_list = false;
   for (auto& tr: this->_transactions)
@@ -103,21 +105,25 @@ TransactionPanel::avatar_available(uint32_t uid)
     if (tr.second.peer_id() == uid)
     {
       update_list = true;
-      std::cerr << tr.second.peer_fullname().toStdString() << ": new avatar" << std::endl;
+      ELLE_DEBUG("update %s's avatar", tr.second.peer_fullname().toStdString());
       tr.second.avatar_available();
-      this->_list->update();
+      // this->_list->update();
     }
   }
 
   if (update_list)
+  {
+    ELLE_TRACE("%s: update transaction list", *this);
     this->_list->update();
+  }
 }
 
 void
-TransactionPanel::user_status_changed(uint32_t /* uid */,
-                                      gap_UserStatus /* status */)
+TransactionPanel::user_status_changed(uint32_t uid,
+                                      gap_UserStatus status)
 {
-  std::cerr << "updated!" << std::endl;
+  ELLE_TRACE_SCOPE("%s: user %s status changed to %s", uid, status);
+
   // XXX: Do per user update.
   this->_list->update();
 }
@@ -125,47 +131,47 @@ TransactionPanel::user_status_changed(uint32_t /* uid */,
 void
 TransactionPanel::_on_transaction_accepted(uint32_t tid)
 {
-  std::cerr << "accepted " << tid << std::endl;
+  ELLE_TRACE_SCOPE("%s: accept transaction %s", *this, tid);
   gap_accept_transaction(this->_state, tid);
 }
 
 void
 TransactionPanel::_on_transaction_rejected(uint32_t tid)
 {
-  std::cerr << "reject " << tid << std::endl;
+  ELLE_TRACE_SCOPE("%s: reject transaction %s", *this, tid);
   gap_reject_transaction(this->_state, tid);
 }
 
 void
 TransactionPanel::_on_transaction_canceled(uint32_t tid)
 {
-  std::cerr << "cancel " << tid << std::endl;
+  ELLE_TRACE_SCOPE("%s: cancel transaction %s", *this, tid);
   gap_cancel_transaction(this->_state, tid);
 }
 
 void
 TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
-  std::cerr << "transaction callback: " << id << " status: " << status << std::endl;
+  ELLE_TRACE_SCOPE("transaction %s updated with status %s", id, status);
   if (status == gap_transaction_waiting_for_accept)
   {
-    std::cerr << id << std::endl;
+    ELLE_DEBUG("new transaction");
     g_panel->add_transaction(g_panel->_state, id);
   }
   else
-    // std::cerr << this->_list->widgets().size() << "update transaction(s)" << std::endl;
+  {
+    ELLE_DEBUG("update transaction");
     g_panel->updateTransaction(g_panel->_state, id);
+  }
 }
 
 void
-TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t /* tid */)
+TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 {
-  // XXX:
-  std::cerr << this->_list->widgets().size() << "update transaction(s)" << std::endl;
+  ELLE_TRACE_SCOPE("%s: update transaction %s", *this, id);
   for (auto widget: this->_list->widgets())
     widget->update();
 }
-
 
 /*-------.
 | Footer |
