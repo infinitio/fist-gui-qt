@@ -325,12 +325,12 @@ TransactionWidget::update_status()
     if (this->_transaction.is_sender())
     {
       this->_status->setPixmap(QPixmap(QString(":/icons/main-upload.png")));
-      this->_status->setText(QString("Uploading"));
+      this->_status->setToolTip(QString("Uploading"));
     }
     else
     {
       this->_status->setPixmap(QPixmap(QString(":/icons/main-download.png")));
-      this->_status->setText(QString("Downloading"));
+      this->_status->setToolTip(QString("Downloading"));
     }
   }
 }
