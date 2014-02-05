@@ -75,6 +75,7 @@ LoginWindow::LoginWindow(gap_State* state):
       view::login::links::interration_flags);
     this->_create_account_link->setSizePolicy(
       QSizePolicy::Minimum, QSizePolicy::Maximum);
+    this->_create_account_link->setOpenExternalLinks(true);
   }
 
   // Forgotten password.
@@ -84,6 +85,7 @@ LoginWindow::LoginWindow(gap_State* state):
       view::login::links::interration_flags);
     this->_reset_password_link->setSizePolicy(
       QSizePolicy::Minimum, QSizePolicy::Maximum);
+    this->_reset_password_link->setOpenExternalLinks(true);
   }
 
   // Footer.
