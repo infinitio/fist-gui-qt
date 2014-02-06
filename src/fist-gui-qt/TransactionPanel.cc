@@ -72,6 +72,21 @@ TransactionPanel::add_transaction(gap_State* state,
   if (this->_transactions.find(tid) == this->_transactions.end())
     this->_transactions.emplace(tid, TransactionModel(state, tid));
 
+  auto const& transaction = this->_transactions.at(tid);
+
+  if (!transaction.is_sender())
+  {
+    emit systray_message(
+      "Incoming!",
+      elle::sprintf(
+        "%s wants to send %s to you.",
+        transaction.peer_fullname().toStdString(),
+        (transaction.files().size() == 1)
+          ? transaction.files()[0].toStdString()
+          : elle::sprintf("%s files", transaction.files().size())
+      ).c_str());
+  }
+
   auto widget = new TransactionWidget(this->_transactions.at(tid));
 
   connect(widget, SIGNAL(on_transaction_accepted(uint32_t)),
@@ -107,7 +122,6 @@ TransactionPanel::avatar_available(uint32_t uid)
       update_list = true;
       ELLE_DEBUG("update %s's avatar", tr.second.peer_fullname().toStdString());
       tr.second.avatar_available();
-      // this->_list->update();
     }
   }
 
@@ -153,22 +167,109 @@ void
 TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
   ELLE_TRACE_SCOPE("transaction %s updated with status %s", id, status);
-  if (status == gap_transaction_waiting_for_accept)
+  g_panel->_transaction_cb(id, status);
+}
+
+void
+TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
+{
+  if (this->_transactions.find(id) == this->_transactions.end())
   {
+    this->_transactions.emplace(id, TransactionModel(this->_state, id));
     ELLE_DEBUG("new transaction");
-    g_panel->add_transaction(g_panel->_state, id);
+    this->add_transaction(this->_state, id);
   }
   else
   {
     ELLE_DEBUG("update transaction");
-    g_panel->updateTransaction(g_panel->_state, id);
+    this->updateTransaction(this->_state, id);
   }
 }
 
 void
 TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 {
-  ELLE_TRACE_SCOPE("%s: update transaction %s", *this, id);
+  ELLE_ERR("%s: update transaction %s", *this, id);
+
+  auto const& transaction = this->_transactions.at(id);
+
+  switch (transaction.status())
+  {
+    case gap_transaction_accepted:
+      if (transaction.is_sender())
+        emit systray_message(
+          "Accepted!",
+          elle::sprintf(
+            "%s accepted %s.",
+            transaction.peer_fullname().toStdString(),
+            (transaction.files().size() == 1)
+            ? transaction.files()[0].toStdString()
+            : elle::sprintf("your %s files", transaction.files().size())
+          ).c_str());
+      break;
+    case gap_transaction_rejected:
+      if (transaction.is_sender())
+        emit systray_message(
+          "Shenanigans!",
+          elle::sprintf("%s declined your transfer.",
+                        transaction.peer_fullname().toStdString()).c_str(),
+          QSystemTrayIcon::Warning);
+      break;
+    case gap_transaction_canceled:
+      if (transaction.is_sender())
+        emit systray_message(
+          "Nuts!",
+          elle::sprintf("Your transfer with %s was cancelled.",
+                        transaction.peer_fullname().toStdString()).c_str());
+      break;
+    case gap_transaction_failed:
+      if (transaction.is_sender())
+        emit systray_message(
+          "Oh no!",
+          elle::sprintf(
+            "%s couldn't be sent to %s.",
+            (transaction.files().size() == 1)
+              ? transaction.files()[0].toStdString()
+              : elle::sprintf("your %s files", transaction.files().size()),
+            transaction.peer_fullname().toStdString()).c_str(),
+          QSystemTrayIcon::Warning);
+      else
+        emit systray_message(
+          "Oh no!",
+          elle::sprintf(
+            "%s couldn't be received from %s.",
+            (transaction.files().size() == 1)
+              ? transaction.files()[0].toStdString()
+              : elle::sprintf("%s files", transaction.files().size()),
+            transaction.peer_fullname().toStdString()).c_str(),
+          QSystemTrayIcon::Warning);
+
+      break;
+    case gap_transaction_finished:
+      if (transaction.is_sender())
+        emit systray_message(
+          "Success!",
+          elle::sprintf(
+            "%s received %s.",
+            transaction.peer_fullname().toStdString(),
+            (transaction.files().size() == 1)
+              ? transaction.files()[0].toStdString()
+              : elle::sprintf("your %s files", transaction.files().size())
+          ).c_str());
+      else
+        emit systray_message(
+          "Success!",
+          elle::sprintf(
+            "%s received from %s.",
+            (transaction.files().size() == 1)
+              ? transaction.files()[0].toStdString()
+              : elle::sprintf("%s files", transaction.files().size()),
+            transaction.peer_fullname().toStdString()).c_str());
+      break;
+    default:
+      break;
+  }
+
   for (auto widget: this->_list->widgets())
     widget->update();
 }

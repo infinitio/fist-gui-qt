@@ -58,7 +58,13 @@ public:
   TransactionFooter*
   footer();
 
+  void
+  _transaction_cb(uint32_t id,
+                  gap_TransactionStatus status);
+
+private:
   std::unordered_map<uint32_t, TransactionModel> _transactions;
+
 
 private:
   Q_OBJECT;

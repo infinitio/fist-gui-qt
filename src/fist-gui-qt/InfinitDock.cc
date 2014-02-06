@@ -80,6 +80,14 @@ InfinitDock::InfinitDock(gap_State* state):
   this->setAttribute(Qt::WA_TranslucentBackground, true);
 
   this->_transaction_panel = new TransactionPanel(state);
+  connect(this->_transaction_panel,
+          SIGNAL(systray_message(QString const&,
+                                 QString const&,
+                                 QSystemTrayIcon::MessageIcon)),
+          this,
+          SLOT(_systray_message(QString const&,
+                                QString const&,
+                                QSystemTrayIcon::MessageIcon)));
 
   connect(this, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
@@ -163,6 +171,14 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     default:
       break;
   }
+}
+
+void
+InfinitDock::_systray_message(QString const& title,
+                              QString const& message,
+                              QSystemTrayIcon::MessageIcon icon)
+{
+  this->_systray->showMessage(title, "       " + message, icon, 3000);
 }
 
 /*------.

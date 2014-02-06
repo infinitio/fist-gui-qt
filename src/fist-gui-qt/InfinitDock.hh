@@ -79,9 +79,12 @@ private:
   TransactionPanel* _transaction_panel;
 //  RoundShadowWidget* _panel;
 
-/*-----.
-| Send |
-`-----*/
+private Q_SLOTS:
+  void
+  _systray_message(QString const& title,
+                   QString const& message,
+                   QSystemTrayIcon::MessageIcon icon);
+
 private:
   SendPanel* _send_panel;
 
