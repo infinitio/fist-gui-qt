@@ -8,17 +8,18 @@
 #include <fist-gui-qt/ListWidget.hh>
 
 static int const items = 5;
-static int const separator = 1;
 
 /*-------------.
 | Construction |
 `-------------*/
 
-ListWidget::ListWidget(QWidget* parent):
+ListWidget::ListWidget(QWidget* parent,
+                       Separator const& separator):
   Super(parent),
+  _offset(0),
+  _separator(separator),
   _height_hint(0),
   _width_hint(0),
-  _offset(0),
   _max_rows(-1),
   _scroll(new SmoothScrollBar(this)),
   _wheel_event(false),
@@ -125,15 +126,21 @@ ListWidget::_layout()
     QRect geometry(0, height - this->_offset, this->width(), widget_height);
     widget->setGeometry(geometry);
     widget_height = widget->size().height();
-    height += widget_height + separator;
+    height += widget_height + this->_separator._colors.size();
     if (fixed_height == -1 && ++rows == this->maxRows())
     {
       fixed_height = height;
     }
   }
+
   this->_width_hint += this->_scroll->sizeHint().width();
 
   int real_height = ((fixed_height != -1) ? fixed_height : height);
+
+  // Remove the bottom separator.
+  if (!this->_widgets.empty())
+    real_height -= this->_separator._colors.size();
+
   this->_height_hint = real_height;
   this->updateGeometry();
 
@@ -268,16 +275,20 @@ ListWidget::_update()
 `---------*/
 
 void
-ListWidget::paintEvent(QPaintEvent*)
+ListWidget::paintEvent(QPaintEvent* e)
 {
   QPainter painter(this);
-  painter.setPen(QColor(220, 220, 220));
-  painter.setBrush(QColor(220, 220, 220));
   int height = -this->_offset;
+
   for (auto widget: this->_widgets)
   {
     height += widget->size().height();
-    painter.drawRect(0, height, this->width(), separator - 1);
-    height += separator;
+    for (auto const& color: this->_separator._colors)
+    {
+      painter.setPen(color);
+      painter.setBrush(color);
+      painter.drawRect(0, height, this->width(), 0);
+      height += 1;
+    }
   }
 }

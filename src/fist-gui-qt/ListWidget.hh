@@ -4,6 +4,8 @@
 # include <QSet>
 # include <QWidget>
 # include <QLineEdit>
+# include <QVector>
+# include <QColor>
 
 # include <fist-gui-qt/SmoothScrollBar.hh>
 # include <fist-gui-qt/ListItem.hh>
@@ -11,6 +13,18 @@
 class ListWidget:
   public QWidget
 {
+public:
+  class Separator
+  {
+  public:
+    Separator(QVector<QColor> const& colors):
+      _colors(colors)
+    {}
+  private:
+    QVector<QColor> _colors;
+  friend ListWidget;
+  };
+
 /*------.
 | Types |
 `------*/
@@ -32,7 +46,9 @@ public:
 | Construction |
 `-------------*/
 public:
-  ListWidget(QWidget* parent = nullptr);
+ ListWidget(QWidget* parent = nullptr,
+            Separator const& separator = Separator({QColor(0xE3, 0xE3, 0xE3),
+                                                   Qt::white}));
 
 /*--------.
 | Widgets |
@@ -89,9 +105,10 @@ private Q_SLOTS:
   void
   _layout();
 private:
+  int _offset;
+  Separator _separator;
   int _height_hint;
   int _width_hint;
-  int _offset;
   int _max_rows;
 
   QList<ListItem*> _widgets;
