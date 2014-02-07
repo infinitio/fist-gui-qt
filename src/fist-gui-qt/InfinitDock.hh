@@ -8,6 +8,7 @@
 # include <QWidget>
 # include <QSystemTrayIcon>
 # include <QFileDialog>
+# include <QStringList>
 
 # include <surface/gap/gap.h>
 # include <fist-gui-qt/RoundShadowWidget.hh>
@@ -59,7 +60,8 @@ public Q_SLOTS:
   void hidePanel();
   void showPanel();
   void togglePanel(bool toogle_only = false);
-  void chooseFiles();
+  void pick_files();
+
   void quit();
   void _position_panel();
 
@@ -122,7 +124,7 @@ private:
   QSystemTrayIcon* _systray;
   QMenu* _systray_menu;
   QAction* _send_files;
-  std::unique_ptr<QFileDialog> _choose_files;
+  std::unique_ptr<QFileDialog> _file_picker;
   QAction* _quit;
   gap_State* _state;
   Q_OBJECT

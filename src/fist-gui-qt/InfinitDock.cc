@@ -58,7 +58,7 @@ InfinitDock::InfinitDock(gap_State* state):
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),
-  _choose_files(nullptr),
+  _file_picker(nullptr),
   _quit(new QAction(tr("&Quit"), this)),
   _state(state)
 {
@@ -109,7 +109,7 @@ InfinitDock::InfinitDock(gap_State* state):
   connect(this->_send_panel,
           SIGNAL(choose_files()),
           this,
-          SLOT(chooseFiles()));
+          SLOT(pick_files()));
 
   connect(this->_send_panel,
           SIGNAL(switch_signal()),
@@ -148,7 +148,7 @@ InfinitDock::InfinitDock(gap_State* state):
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
   timer->start(500);
 
-  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(chooseFiles()));
+  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
   this->show();
   this->showPanel();
@@ -228,22 +228,31 @@ InfinitDock::_position_panel()
              qBound(screen.top(), y, screen.bottom()));
 }
 
-void
-InfinitDock::chooseFiles()
+static
+QFileDialog*
+spaw_dialog(InfinitDock* dock)
 {
-  this->_choose_files.reset(new QFileDialog(this));
-  this->_choose_files->setFileMode(QFileDialog::ExistingFiles);
+  std::unique_ptr<QFileDialog> file_picker(new QFileDialog(dock));
+  file_picker->setFileMode(QFileDialog::ExistingFiles);
+  return file_picker.release();
 
-  this->_choose_files->exec();
-  QStringList selected = this->_choose_files->selectedFiles();
+}
+
+void
+InfinitDock::pick_files()
+{
+  this->_file_picker.reset(spaw_dialog(this));
+  this->_file_picker->exec();
+  QStringList selected = this->_file_picker->selectedFiles();
+
   if (selected.size())
   {
-    for (auto file: selected)
+    for (auto const& file: selected)
       this->_send_panel->add_file(file);
     this->_switch_view(this->_send_panel);
     this->showPanel();
   }
-  this->_choose_files.reset();
+  this->_file_picker.reset();
 }
 
 void
