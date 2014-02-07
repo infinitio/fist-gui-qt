@@ -88,7 +88,7 @@ namespace view
 
       static
       QSize const
-      size(240, 40);
+      size(240, 37);
     }
 
     namespace password
@@ -103,7 +103,7 @@ namespace view
 
       static
       QSize const
-      size(240, 40);
+      size(240, 37);
     }
 
     namespace message
@@ -145,7 +145,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 12, QFont::Bold), QColor(0xFF, 0xFF, 0xFF));
+      style(QFont("Arial", 11, QFont::Bold), Qt::white);
 
       static
       QString const
