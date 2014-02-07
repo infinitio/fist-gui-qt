@@ -63,7 +63,7 @@ public:
 `---------*/
 public:
   void
-  paintEvent(QPaintEvent* event);
+  paintEvent(QPaintEvent* event) override;
 
 private:
   Q_OBJECT;

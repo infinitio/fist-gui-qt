@@ -146,6 +146,8 @@ ListWidget::_layout()
     this->_scroll->show();
   else
     this->_scroll->hide();
+
+  this->_update();
 }
 
 int
@@ -252,13 +254,13 @@ ListWidget::resizeEvent(QResizeEvent*)
 }
 
 void
-ListWidget::update()
+ListWidget::_update()
 {
   for (auto const& widget: this->_widgets)
   {
     widget->update();
   }
-  this->repaint();
+  this->update();
 }
 
 /*---------.

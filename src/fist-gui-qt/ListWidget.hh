@@ -83,7 +83,7 @@ Q_SIGNALS:
   resized();
 public Q_SLOTS:
   void
-  update();
+  _update();
 
 private Q_SLOTS:
   void

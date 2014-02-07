@@ -137,7 +137,7 @@ void
 AvatarWidget::setTransactionCount(int transactionCount)
 {
   this->_transaction_count = transactionCount;
-  repaint();
+  update();
   Q_EMIT onTransactionCountChanged(transactionCount);
 }
 
@@ -145,7 +145,7 @@ void
 AvatarWidget::setProgress(float progress)
 {
   this->_progress = progress;
-  repaint();
+  update();
   Q_EMIT onProgressChanged(progress);
 }
 

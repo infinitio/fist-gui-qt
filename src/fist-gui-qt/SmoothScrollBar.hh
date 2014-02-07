@@ -75,16 +75,16 @@ class SmoothScrollBar:
 
   Q_PROPERTY(int displayMinimum READ displayMinimum WRITE setDisplayMinimum);
   PROPERTY_RWN(int, displayMinimum, displayMinimum, setDisplayMinimum,
-              this->repaint());
+              this->update());
   Q_PROPERTY(int displayMaximum READ displayMaximum WRITE setDisplayMaximum);
   PROPERTY_RWN(int, displayMaximum, displayMaximum, setDisplayMaximum,
-              this->repaint());
+              this->update());
   Q_PROPERTY(int displayPageSize READ displayPageSize WRITE setDisplayPageSize);
   PROPERTY_RWN(int, displayPageSize, displayPageSize, setDisplayPageSize,
-              this->repaint());
+              this->update());
   Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged);
   PROPERTY_RWN(int, value, value, setValue,
-              this->repaint();
+              this->update();
               Q_EMIT valueChanged(value);
     );
 private:
@@ -93,7 +93,7 @@ private:
 private:
   Q_PROPERTY(float opacity READ opacity WRITE setOpacity);
   PROPERTY_RWN(float, opacity, opacity, setOpacity,
-              this->repaint();
+              this->update();
     );
   QPropertyAnimation* _opacity_animation;
 

@@ -33,7 +33,7 @@ SearchField::setIcon(QPixmap const& pixmap)
   if (!this->_icon.isNull())
     padding += margin + this->_icon.width();
   this->setContentsMargins(padding, 0, margin, 0);
-  repaint();
+  this->update();
 }
 
 void
