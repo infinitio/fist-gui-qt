@@ -24,6 +24,12 @@ public:
 
   virtual void update();
 
+  int
+  widthHint() const;
+
+  QSize
+  sizeHint() const override;
+
 private:
   virtual
   void

@@ -128,7 +128,7 @@ QSize
 TransactionWidget::sizeHint() const
 {
   auto size = this->_layout->minimumSize();
-  return QSize(313, size.height());
+  return QSize(this->widthHint(), size.height());
 }
 
 QSize

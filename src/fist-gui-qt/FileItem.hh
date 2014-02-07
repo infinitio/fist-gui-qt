@@ -1,10 +1,11 @@
 #ifndef FILEITEM_HH
 # define FILEITEM_HH
 
-# include <QGraphicsPixmapItem>
-# include <QListWidgetItem>
 # include <QFileIconProvider>
+# include <QGraphicsPixmapItem>
+# include <QHBoxLayout>
 # include <QLabel>
+# include <QListWidgetItem>
 # include <QString>
 
 # include <fist-gui-qt/IconButton.hh>
@@ -18,10 +19,6 @@ public:
   virtual ~FileItem() = default;
 
   virtual
-  QSize
-  sizeHint() const override;
-
-  virtual
   void
   trigger() override;
 
@@ -30,6 +27,7 @@ Q_SIGNALS:
   remove(QString const&);
 
 private:
+  QHBoxLayout* _layout;
   QFile _file;
   QLabel* _name;
   QLabel* _icon;

@@ -8,7 +8,6 @@
 # include <QWidget>
 # include <QSystemTrayIcon>
 # include <QFileDialog>
-# include <QStringList>
 
 # include <surface/gap/gap.h>
 # include <fist-gui-qt/RoundShadowWidget.hh>

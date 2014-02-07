@@ -40,7 +40,8 @@ SearchResultWidget::SearchResultWidget(UserModel const& model,
 QSize
 SearchResultWidget::sizeHint() const
 {
-  return QSize(this->width(), this->_avatar->height() + 2 * 10);
+  auto size = this->_layout->minimumSize();
+  return QSize(this->widthHint(), size.height());
 }
 
 void

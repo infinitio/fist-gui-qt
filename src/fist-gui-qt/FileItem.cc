@@ -16,12 +16,6 @@ namespace
   };
 }
 
-QSize
-FileItem::sizeHint() const
-{
-  return QSize(this->width(), 42);
-}
-
 static
 QString
 readable_size(qint64 size)
@@ -40,6 +34,7 @@ readable_size(qint64 size)
 
 FileItem::FileItem(QString const& path):
   ListItem(nullptr, view::send::file::background, false),
+  _layout(new QHBoxLayout(this)),
   _file(path),
   _name(new QLabel(_file.fileName())),
   _icon(new QLabel),
@@ -63,21 +58,21 @@ FileItem::FileItem(QString const& path):
     view::send::file::size::style(*this->_size);
   }
 
-  auto* layout = new QHBoxLayout(this);
   QFileIconProvider icon_provider;
   this->_icon->setPixmap(icon_provider.icon(_file).pixmap(18));
-  layout->addWidget(this->_icon);
-  layout->addItem(new QSpacerItem(4, 0,
+  this->_layout->addWidget(this->_icon);
+  this->_layout->addItem(new QSpacerItem(4, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Minimum));
-  layout->addWidget(this->_name);
-  layout->addItem(new QSpacerItem(0, 0,
+  this->_layout->addWidget(this->_name);
+  this->_layout->addItem(new QSpacerItem(0, 0,
                                   QSizePolicy::Expanding, QSizePolicy::Minimum));
-  layout->addWidget(this->_size);
-  layout->addItem(new QSpacerItem(4, 0,
+  this->_layout->addWidget(this->_size);
+  this->_layout->addItem(new QSpacerItem(4, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Minimum));
-  layout->addWidget(this->_remove);
+  this->_layout->addWidget(this->_remove);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->setFixedHeight(42);
   this->adjustSize();
 }
 
