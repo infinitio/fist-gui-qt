@@ -15,7 +15,7 @@ SearchField::SearchField(QWidget* owner):
   this->setFixedWidth(320);
   this->setFixedHeight(this->height());
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
+  this->setTextMargins(15, 0, 0, 0);
   connect(this, SIGNAL(textChanged(QString const&)),
           SLOT(text_changed(QString const&)));
   this->_search_delay.setSingleShot(true);

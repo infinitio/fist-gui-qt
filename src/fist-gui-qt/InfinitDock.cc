@@ -375,9 +375,8 @@ InfinitDock::_switch_view(Panel* panel)
     this->centralWidget()->setParent(0);
   }
 
-  panel->on_show();
   this->setCentralWidget(panel);
-  // this->_panel->setFocus();
+  panel->on_show();
 }
 
 void
