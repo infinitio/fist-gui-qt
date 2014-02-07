@@ -9,7 +9,7 @@
 
 SearchResultWidget::SearchResultWidget(UserModel const& model,
                        QWidget* parent):
-  ListItem(parent),
+  ListItem(parent, Qt::white),
   _model(model),
   _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
   _layout(new QHBoxLayout(this))

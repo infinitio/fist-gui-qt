@@ -39,7 +39,7 @@ readable_size(qint64 size)
 };
 
 FileItem::FileItem(QString const& path):
-  ListItem(nullptr),
+  ListItem(nullptr, view::send::file::background, false),
   _file(path),
   _name(new QLabel(_file.fileName())),
   _icon(new QLabel),
@@ -52,16 +52,6 @@ FileItem::FileItem(QString const& path):
                          }))
 {
   this->setContentsMargins(6, 0, 6, 0);
-
-  // Background.
-  {
-    QPalette palette = this->palette();
-    {
-      palette.setColor(QPalette::Window, view::send::file::background);
-    }
-    this->setPalette(palette);
-    this->setAutoFillBackground(true);
-  }
 
   // Name.
   {

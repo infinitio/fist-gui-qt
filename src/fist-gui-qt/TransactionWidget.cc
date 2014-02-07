@@ -21,6 +21,7 @@ QVector<gap_TransactionStatus> g_finals =
 };
 
 TransactionWidget::TransactionWidget(TransactionModel const& model):
+  ListItem(nullptr, view::background, false),
   _transaction(model),
   _peer_avatar(new AvatarWidget(this->_transaction.avatar())),
   _peer_status(new QLabel),
@@ -33,13 +34,6 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _timer(nullptr)
 {
   this->_peer_status->setPixmap(QPixmap(":/icons/status.png"));
-
-  QPalette palette = this->palette();
-  {
-    palette.setColor(QPalette::Window, view::background);
-  }
-  this->setAutoFillBackground(true);
-  this->setPalette(palette);
 
   connect(this->_accept_button, SIGNAL(released()),
           this, SLOT(accept()));
