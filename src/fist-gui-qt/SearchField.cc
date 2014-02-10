@@ -26,7 +26,7 @@ SearchField::SearchField(QWidget* owner):
 void
 SearchField::setIcon(QPixmap const& pixmap)
 {
-  this->_icon = pixmap.scaled(QSize(20, 20),
+  this->_icon = pixmap.scaled(QSize(16, 16),
                               Qt::KeepAspectRatioByExpanding,
                               Qt::SmoothTransformation);
   int padding = margin;
