@@ -10,7 +10,8 @@
 
 RoundShadowWidget::RoundShadowWidget():
   _radius(5),
-  _shadow(10)
+  _shadow(10),
+  _background(view::background)
 {
   int shadow = this->_shadow;
   int margin = this->_radius + shadow;
@@ -51,6 +52,20 @@ RoundShadowWidget::setShadow(int value)
   Q_EMIT this->onShadowChanged();
 }
 
+QColor const&
+RoundShadowWidget::background()
+{
+  return this->_background;
+}
+
+void
+RoundShadowWidget::setBackground(QColor const& value)
+{
+  this->_background = value;
+  Q_EMIT this->onBackgroundChanged();
+  this->update();
+}
+
 /*---------.
 | Geometry |
 `---------*/
@@ -80,6 +95,7 @@ RoundShadowWidget::resizeEvent(QResizeEvent* event)
 {
   this->update();
 }
+
 
 /*--------.
 | Drawing |
@@ -115,6 +131,7 @@ RoundShadowWidget::paintEvent(QPaintEvent*)
                      this->width() - (shadow + radius) * 2,
                      -shadow);
   }
+
   {
     this->_draw_corner(painter,
                        0,
@@ -133,14 +150,15 @@ RoundShadowWidget::paintEvent(QPaintEvent*)
                        this->height() - (shadow + radius) * 2,
                        180);
   }
-  painter.setBrush(view::background);
+  painter.setBrush(this->_background);
   painter.drawRoundedRect(shadow,
                           shadow,
                           this->width() - shadow * 2,
                           this->height() - shadow * 2,
                           radius,
                           radius);
-  // FIXME
+
+  // FIXME.
   painter.setBrush(QColor(0xE3, 0x59, 0x55));
   painter.drawRoundedRect(shadow,
                           this->height() - shadow - radius * 2,

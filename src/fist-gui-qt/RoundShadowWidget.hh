@@ -26,17 +26,40 @@ public:
   Q_OBJECT;
   Q_PROPERTY(int radius READ radius WRITE setRadius NOTIFY onRadiusChanged);
   Q_PROPERTY(int shadow READ shadow WRITE setShadow NOTIFY onShadowChanged);
+  Q_PROPERTY(QColor background
+             READ background
+             WRITE setBackground
+             NOTIFY onBackgroundChanged);
 public:
-  int radius();
-  void setRadius(int value);
-  int shadow();
-  void setShadow(int value);
+  int
+  radius();
+  void
+  setRadius(int value);
+  int
+  shadow();
+  void
+  setShadow(int value);
+  QColor const&
+  background();
+
+public Q_SLOTS:
+  void
+  setBackground(QColor const& value);
+
 Q_SIGNALS:
-  void onRadiusChanged();
-  void onShadowChanged();
+  void
+  onRadiusChanged();
+  void
+  onShadowChanged();
+  void
+  onBackgroundChanged();
 private:
-  int _radius;
-  int _shadow;
+  int
+  _radius;
+  int
+  _shadow;
+  QColor
+  _background;
 
 /*---------.
 | Geometry |
