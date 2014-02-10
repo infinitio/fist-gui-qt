@@ -32,6 +32,9 @@ Q_SIGNALS:
                   QSystemTrayIcon::MessageIcon icon =
                     QSystemTrayIcon::Information);
 
+  void
+  set_background_color(QColor const& color);
+
 public:
   QSize
   minimumSizeHint() const override;

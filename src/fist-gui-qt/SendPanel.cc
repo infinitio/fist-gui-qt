@@ -258,12 +258,14 @@ SendPanel::keyPressEvent(QKeyEvent* event)
 void
 SendPanel::on_show()
 {
+  emit set_background_color(Qt::white);
   this->_search->setFocus();
 }
 
 void
 SendPanel::on_hide()
 {
+  emit set_background_color(view::background);
   this->_search->clear();
   this->_file_list->clearWidgets();
   this->_files.clear();

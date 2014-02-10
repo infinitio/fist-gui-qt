@@ -80,50 +80,51 @@ InfinitDock::InfinitDock(gap_State* state):
   this->setAttribute(Qt::WA_TranslucentBackground, true);
 
   this->_transaction_panel = new TransactionPanel(state);
-  connect(this->_transaction_panel,
-          SIGNAL(systray_message(QString const&,
-                                 QString const&,
-                                 QSystemTrayIcon::MessageIcon)),
-          this,
-          SLOT(_systray_message(QString const&,
-                                QString const&,
-                                QSystemTrayIcon::MessageIcon)));
+
+  this->_register_panel(this->_transaction_panel);
+  this->_register_panel(this->_send_panel);
 
   connect(this, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
 
-  connect(&this->_transaction_panel->footer()->send(),
-          SIGNAL(released()),
-          this,
-          SLOT(_show_send_view()));
-  connect(&this->_transaction_panel->footer()->menu(),
-          SIGNAL(released()),
-          this,
-          SLOT(_show_menu()));
+  {
+    connect(&this->_transaction_panel->footer()->send(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_send_view()));
+    connect(&this->_transaction_panel->footer()->menu(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_menu()));
+  }
 
-  connect(this->_send_panel->footer()->back(),
-          SIGNAL(released()),
-          this,
-          SLOT(_show_transactions_view()));
+  {
+    connect(this->_send_panel->footer()->back(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_transactions_view()));
 
-  connect(this->_send_panel,
-          SIGNAL(choose_files()),
-          this,
-          SLOT(pick_files()));
+    connect(this->_send_panel,
+            SIGNAL(choose_files()),
+            this,
+            SLOT(pick_files()));
 
-  connect(this->_send_panel,
-          SIGNAL(switch_signal()),
-          this,
-          SLOT(_show_transactions_view()));
+    connect(this->_send_panel,
+            SIGNAL(switch_signal()),
+            this,
+            SLOT(_show_transactions_view()));
+  }
 
   connect(this,
           SIGNAL(avatar_available(uint32_t)),
           this->_send_panel,
           SLOT(avatar_available(uint32_t)));
+
   connect(this,
           SIGNAL(avatar_available(uint32_t)),
           this->_transaction_panel,
           SLOT(avatar_available(uint32_t)));
+
   connect(this,
           SIGNAL(user_status_changed(uint32_t, gap_UserStatus)),
           this->_transaction_panel,
@@ -184,6 +185,20 @@ InfinitDock::_systray_message(QString const& title,
 /*------.
 | Panel |
 `------*/
+
+void
+InfinitDock::_register_panel(Panel* panel)
+{
+  connect(panel, SIGNAL(systray_message(QString const&,
+                                        QString const&,
+                                        QSystemTrayIcon::MessageIcon)),
+          this, SLOT(_systray_message(QString const&,
+                                      QString const&,
+                                      QSystemTrayIcon::MessageIcon)));
+
+  connect(panel, SIGNAL(set_background_color(QColor const&)),
+          this, SLOT(setBackground(QColor const&)));
+}
 
 TransactionPanel&
 InfinitDock::transactionPanel()

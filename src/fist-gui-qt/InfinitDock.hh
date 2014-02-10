@@ -55,7 +55,12 @@ Q_SIGNALS:
 | Panel |
 `------*/
 public Q_SLOTS:
-  TransactionPanel& transactionPanel();
+  TransactionPanel&
+  transactionPanel();
+
+  void
+  _register_panel(Panel* panel);
+
   void hidePanel();
   void showPanel();
   void togglePanel(bool toogle_only = false);
