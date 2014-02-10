@@ -32,7 +32,7 @@ SendPanel::SendPanel(gap_State* state):
 {
   this->footer()->setParent(this);
 
-  this->_users->setMaxRows(5);
+  this->_users->setMaxRows(4);
 
   {
     this->_file_list->setMaxRows(3);
