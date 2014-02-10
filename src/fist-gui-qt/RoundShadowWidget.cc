@@ -75,6 +75,12 @@ RoundShadowWidget::event(QEvent* event)
     return Super::event(event);
 }
 
+void
+RoundShadowWidget::resizeEvent(QResizeEvent* event)
+{
+  this->update();
+}
+
 /*--------.
 | Drawing |
 `--------*/

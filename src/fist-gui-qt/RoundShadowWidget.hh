@@ -48,6 +48,9 @@ protected:
   bool
   event(QEvent* event) override;
 
+public:
+  void
+  resizeEvent(QResizeEvent* event) override;
 /*--------.
 | Drawing |
 `--------*/
