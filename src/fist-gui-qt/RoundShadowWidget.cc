@@ -10,7 +10,7 @@
 
 RoundShadowWidget::RoundShadowWidget():
   _radius(5),
-  _shadow(10),
+  _shadow(3),
   _background(view::background)
 {
   int shadow = this->_shadow;
