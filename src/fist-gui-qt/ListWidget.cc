@@ -44,6 +44,7 @@ ListWidget::add_widget(ListItem* widget, Position position)
 
   widget->setParent(this);
   widget->show();
+  this->_scroll->raise();
   this->_layout();
 }
 
