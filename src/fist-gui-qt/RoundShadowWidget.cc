@@ -8,14 +8,15 @@
 | Construction |
 `-------------*/
 
-RoundShadowWidget::RoundShadowWidget():
-  _radius(5),
-  _shadow(3),
+RoundShadowWidget::RoundShadowWidget(int radius,
+                                     int shadow):
+  _radius(radius),
+  _shadow(shadow),
   _background(view::background)
 {
-  int shadow = this->_shadow;
-  int margin = this->_radius + shadow;
-  this->setContentsMargins(shadow, margin, shadow, margin);
+  auto margin = this->_radius + this->_shadow;
+  this->setContentsMargins(this->_shadow, margin,
+                           this->_shadow, margin);
   this->setWindowFlags(Qt::FramelessWindowHint);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
   this->setMinimumSize(QSize(0, 0));

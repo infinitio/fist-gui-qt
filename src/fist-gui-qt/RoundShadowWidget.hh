@@ -17,7 +17,8 @@ public:
 | Construction |
 `-------------*/
 public:
-  RoundShadowWidget();
+  RoundShadowWidget(int radius = 5,
+                    int shadow = 3);
 
 /*-------------------.
 | Display properties |
