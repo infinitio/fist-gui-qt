@@ -14,7 +14,7 @@
 #include <iostream>
 
 LoginWindow::LoginWindow(gap_State* state):
-  RoundShadowWidget(),
+  RoundShadowWidget(5, 0),
   _state(state),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
