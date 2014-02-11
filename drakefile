@@ -46,6 +46,7 @@ def configure(cxx_toolkit = None,
     cxx_config.lib('comdlg32')
     cxx_config.lib('imm32')
     cxx_config.lib('winspool')
+    cxx_config.lib('QtCore')
     # Remove the command line windows on qt.
     cxx_config.flag("-Wl,-subsystem,windows")
 
