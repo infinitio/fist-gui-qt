@@ -179,7 +179,7 @@ InfinitDock::_systray_message(QString const& title,
                               QString const& message,
                               QSystemTrayIcon::MessageIcon icon)
 {
-  this->_systray->showMessage(title, "       " + message, icon, 3000);
+  this->_systray->showMessage(title, message, icon, 3000);
 }
 
 /*------.
