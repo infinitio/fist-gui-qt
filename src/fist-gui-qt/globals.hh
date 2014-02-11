@@ -170,14 +170,14 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 12), QColor(0x25, 0x25, 0x25));
+      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
     }
 
     namespace files
     {
       static
       TextStyle const
-      style(QFont("Arial", 11.5), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
     }
   }
 
