@@ -47,6 +47,7 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_email_field->setPlaceholderText(view::login::email::placeholder);
     this->_email_field->setFixedSize(view::login::email::size);
     view::login::email::style(*this->_email_field);
+    this->_email_field->setTextMargins(15, 0, 15, 0);
   }
 
   // Password field.
@@ -54,6 +55,7 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_password_field->setPlaceholderText(view::login::password::placeholder);
     this->_password_field->setFixedSize(view::login::password::size);
     view::login::password::style(*this->_password_field);
+    this->_password_field->setTextMargins(15, 0, 15, 0);
   }
 
   // Logo.
