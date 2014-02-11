@@ -26,6 +26,7 @@ private:
 
   QPixmap _pixmap;
   QPixmap _mask;
+  int _border;
   QRect _geometry;
 
   Q_OBJECT;

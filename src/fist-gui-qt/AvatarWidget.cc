@@ -93,8 +93,8 @@ AvatarWidget::setPicture(QPixmap const& avatar)
       {
         mask.fill(Qt::transparent);
         QPainter painter(&mask);
-        painter.setRenderHints(QPainter::Antialiasing |
-                               QPainter::SmoothPixmapTransform);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
         QPointF center(picture_size / 2., picture_size / 2.);
         QRadialGradient gradient(center, picture_size / 2.,
                                  center, picture_size / 2. - 1);
@@ -108,8 +108,8 @@ AvatarWidget::setPicture(QPixmap const& avatar)
       {
         picture.fill(Qt::transparent);
         QPainter painter(&picture);
-        painter.setRenderHints(QPainter::Antialiasing |
-                              QPainter::SmoothPixmapTransform);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
         painter.setBrush(Qt::NoBrush);
         painter.setPen(Qt::NoPen);
         painter.drawPixmap(QRect(QPoint(0, 0), picture.size()),

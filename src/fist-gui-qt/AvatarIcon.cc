@@ -9,7 +9,8 @@ AvatarIcon::AvatarIcon(QPixmap const& pixmap,
   _uid(0),
   _pixmap(size),
   _mask(size),
-  _geometry(QPoint(0, 0), size)
+  _border(1),
+  _geometry(QPoint(0, 0), size - QSize(this->_border * 2, this->_border * 2))
 {
   this->setMinimumSize(size);
   this->setMaximumSize(size);
@@ -24,7 +25,7 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
   {
     _mask.fill(Qt::transparent);
     QPainter painter(&this->_mask);
-    painter.setRenderHints(QPainter::Antialiasing |
+    painter.setRenderHints(QPainter::HighQualityAntialiasing |
                            QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
@@ -32,8 +33,7 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
   }
 
   QPainter painter(&this->_pixmap);
-  painter.setRenderHints(QPainter::Antialiasing |
-                         QPainter::SmoothPixmapTransform);
+  painter.translate(this->_border, this->_border);
   painter.drawPixmap(this->_geometry, pixmap);
   painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
   painter.drawPixmap(this->_geometry, this->_mask);
@@ -43,7 +43,7 @@ void
 AvatarIcon::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.setRenderHints(QPainter::Antialiasing |
-                          QPainter::SmoothPixmapTransform);
+  painter.setRenderHints(QPainter::HighQualityAntialiasing |
+                         QPainter::SmoothPixmapTransform);
   painter.drawPixmap(_geometry, this->_pixmap);
 }
