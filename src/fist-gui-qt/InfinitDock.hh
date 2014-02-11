@@ -41,7 +41,7 @@ public:
   static void avatar_available_cb(uint32_t id);
 
 public slots:
-  void update();
+  void _update();
 
 public slots:
   void _systray_activated(QSystemTrayIcon::ActivationReason reason);

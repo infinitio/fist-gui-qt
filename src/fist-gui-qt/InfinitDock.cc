@@ -146,7 +146,7 @@ InfinitDock::InfinitDock(gap_State* state):
   this->_switch_view(this->_transaction_panel);
 
   QTimer *timer = new QTimer;
-  connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+  connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
   timer->start(500);
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
@@ -392,6 +392,7 @@ InfinitDock::_switch_view(Panel* panel)
 
   this->setCentralWidget(panel);
   panel->on_show();
+  this->update();
 }
 
 void
@@ -417,7 +418,7 @@ InfinitDock::avatar_available_cb(uint32_t id)
 }
 
 void
-InfinitDock::update()
+InfinitDock::_update()
 {
   if (not gap_poll(_state))
     std::cout << "Error while polling" << std::endl;
