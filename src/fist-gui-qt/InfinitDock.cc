@@ -155,7 +155,8 @@ InfinitDock::InfinitDock(gap_State* state):
   this->showPanel();
 
   this->_systray_message(QString("Infinit is started!"),
-                         QString("Click the icon to start sharing files."),
+                         QString("Make sure the Infinit icon is always visible "
+                                 "by clicking customize!"),
                          QSystemTrayIcon::Information);
 }
 
