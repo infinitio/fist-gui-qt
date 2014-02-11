@@ -119,7 +119,7 @@ def configure(cxx_toolkit = None,
   )
 
   application = drake.cxx.Executable(
-    'bin/infinit',
+    'bin/Infinit',
     sources + libraries,
     cxx_toolkit,
     cxx_config)
@@ -148,7 +148,7 @@ def configure(cxx_toolkit = None,
       content = {
         'company': 'Infinit.io',
         'website': 'www.infinit.io',
-        'product_name': 'infinit',
+        'product_name': 'Infinit',
 
         # Resources.
         'resources_folder':
