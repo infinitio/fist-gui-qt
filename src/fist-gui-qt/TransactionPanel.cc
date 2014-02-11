@@ -2,6 +2,7 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
+#include <fist-gui-qt/NoNotificationWidget.hh>
 
 #include <elle/log.hh>
 
