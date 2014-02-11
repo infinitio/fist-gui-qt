@@ -27,7 +27,7 @@ SearchResultWidget::SearchResultWidget(UserModel const& model,
       texts->addWidget(fullname);
     }
     {
-      auto handle = new QLabel(this->_model.fullname());
+      auto handle = new QLabel(this->_model.handle());
       view::send::user::handle::style(*handle);
       texts->addWidget(handle);
     }
