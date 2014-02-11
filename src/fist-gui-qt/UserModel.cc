@@ -28,6 +28,17 @@ UserModel::fullname() const
   return this->_fullname;
 }
 
+QString const&
+UserModel::handle() const
+{
+  if (this->_handle.isNull())
+  {
+    this->_handle = QString::fromUtf8(gap_user_handle(this->_state, this->_id));
+  }
+
+  return this->_handle;
+}
+
 uint32_t
 UserModel::id() const
 {

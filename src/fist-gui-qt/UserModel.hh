@@ -21,6 +21,9 @@ public:
   QString const&
   fullname() const;
 
+  QString const&
+  handle() const;
+
   uint32_t
   id() const;
 
@@ -42,6 +45,7 @@ private:
 
   // Every attributes are marked as mutable in order to allow lazy evaluation.
   mutable QString _fullname;
+  mutable QString _handle;
   mutable QPixmap _avatar;
   mutable bool _default_avatar;
   mutable bool _new_avatar;
