@@ -7,7 +7,7 @@ TransactionModel::TransactionModel(gap_State* state,
                                    uint32_t id):
   _state(state),
   _id(id),
-  _peer_fullname(),
+  _peer_fullname((char const*) nullptr),
   _peer_id(0),
   _files(),
   _avatar(),
