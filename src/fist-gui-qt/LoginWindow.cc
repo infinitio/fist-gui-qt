@@ -113,23 +113,30 @@ LoginWindow::LoginWindow(gap_State* state):
 
   layout->addSpacing(15);
   layout->addWidget(logo, 0, Qt::AlignCenter);
+  layout->addStretch();
   layout->addWidget(this->_message_field, 260, Qt::AlignCenter);
   layout->addSpacing(5);
   layout->addWidget(this->_email_field, 260, Qt::AlignCenter);
   layout->addSpacing(5);
+  layout->addSpacing(0);
   layout->addWidget(this->_password_field, 260,  Qt::AlignCenter);
   layout->addSpacing(5);
   {
     auto hlayout = new QHBoxLayout();
+
+    hlayout->addStretch();
     hlayout->addWidget(this->_create_account_link, 0, Qt::AlignRight);
-    hlayout->addSpacing(60);
+    hlayout->addSpacing(40);
     hlayout->addWidget(this->_reset_password_link, 0, Qt::AlignLeft);
+    hlayout->addStretch();
     layout->addLayout(hlayout, Qt::AlignCenter);
   }
+
   layout->addSpacing(20);
   layout->addWidget(footer);
 
   this->setCentralWidget(central_widget);
+  this->update();
 }
 
 void

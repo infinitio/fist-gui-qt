@@ -117,7 +117,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0x30, 0x30, 0x00));
+      style(QFont("Arial", 9), QColor(0x3D, 0x91, 0xD4));
 
       static
       Qt::TextInteractionFlags const
@@ -130,14 +130,14 @@ namespace view
       {
         static
         QString const
-        text("<a href=\"https://infinit.io/forgot_password\">forgot pasword?</a>");
+        text("<a style=\"text-decoration: none;\" href=\"https://infinit.io/forgot_password\">forgot pasword?</a>");
       }
 
       namespace need_an_account
       {
         static
         QString const
-        text("<a href=\"https://infinit.io/register\">need an account?</a>");
+        text("<a style=\"text-decoration: none;\" href=\"https://infinit.io/register\">need an account?</a>");
       }
     }
 
