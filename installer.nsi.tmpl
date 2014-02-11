@@ -112,8 +112,8 @@ Section
 	CreateShortCut "${'${startmenu}'}\Release Notes.lnk" "$INSTDIR\${release_notes}"
 	CreateShortCut "${'${startmenu}'}\Documentation.lnk" "$INSTDIR\${documentation}"
 
-	WriteINIStr "${'${startmenu}'}\web site.url" "InternetShortcut" "URL" ${website}
-	CreateShortCut "${'${startmenu}'}\Web Site.lnk "${website}" "URL"
+	WriteINIStr "${'${startmenu}'}\WebSite.url" "InternetShortcut" "URL" ${website}
+	CreateShortCut "${'${startmenu}'}\WebSite.lnk "${website}" "URL"
 	; ExecShell "open" "$INSTDIR\${release_notes}"
 
 SectionEnd
