@@ -271,7 +271,7 @@ TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
   }
 
   for (auto widget: this->_list->widgets())
-    widget->update();
+    widget->_update();
 }
 
 /*-------.

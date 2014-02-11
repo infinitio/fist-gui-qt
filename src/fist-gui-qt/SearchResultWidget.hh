@@ -25,8 +25,9 @@ public:
   void
   trigger() override;
 
+protected:
   void
-  update() override;
+  _update() override;
 
 /*-----------.
 | Attributes |

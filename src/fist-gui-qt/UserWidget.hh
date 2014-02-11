@@ -26,7 +26,7 @@ public:
   trigger() override;
 
   void
-  update() override;
+  _update() override;
 
 /*-----------.
 | Attributes |

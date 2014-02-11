@@ -155,7 +155,7 @@ ListWidget::_layout()
   else
     this->_scroll->hide();
 
-  this->_update();
+  this->update();
 }
 
 int
@@ -266,7 +266,7 @@ ListWidget::_update()
 {
   for (auto const& widget: this->_widgets)
   {
-    widget->update();
+    widget->_update();
   }
   this->update();
 }

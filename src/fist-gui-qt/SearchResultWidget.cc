@@ -52,7 +52,7 @@ SearchResultWidget::trigger()
 }
 
 void
-SearchResultWidget::update()
+SearchResultWidget::_update()
 {
   std::cerr << "SearchResultWidget: " << this << " update" << std::endl;
   if (this->_model.new_avatar())

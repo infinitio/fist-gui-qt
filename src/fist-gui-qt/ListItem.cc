@@ -64,6 +64,6 @@ ListItem::leaveEvent(QEvent*)
 }
 
 void
-ListItem::update()
+ListItem::_update()
 {
 }

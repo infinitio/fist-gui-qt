@@ -51,7 +51,7 @@ UserWidget::trigger()
 }
 
 void
-UserWidget::update()
+UserWidget::_update()
 {
   std::cerr << "UserWidget: " << this << " update" << std::endl;
   if (this->_model.new_avatar())

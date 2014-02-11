@@ -3,12 +3,16 @@
 
 # include <elle/attribute.hh>
 
+# include <fist-gui-qt/fwd.hh>
+
 # include <QColor>
 # include <QWidget>
 
 class ListItem:
   public QWidget
 {
+  friend ListWidget;
+
 public:
   ListItem(QWidget* parent = nullptr,
            QColor const& background_color = Qt::transparent,
@@ -22,8 +26,12 @@ public:
   void
   leaveEvent(QEvent* e) override;
 
-  virtual void update();
+public:
+  virtual
+  void
+  _update();
 
+public:
   int
   widthHint() const;
 

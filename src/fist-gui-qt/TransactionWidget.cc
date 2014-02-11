@@ -91,7 +91,7 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
 
   layout->addStretch();
   layout->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
-  this->update();
+  this->_update();
 
   setSizePolicy(QSizePolicy::Minimum,
                 QSizePolicy::Minimum);
@@ -102,6 +102,7 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
           SIGNAL(onProgressChanged(float)),
           SIGNAL(onProgressChanged(float)));
 #endif
+  this->update();
 }
 
 /*-----------.
@@ -150,7 +151,7 @@ TransactionWidget::trigger()
 }
 
 void
-TransactionWidget::update()
+TransactionWidget::_update()
 {
   if (this->_transaction.new_avatar())
   {

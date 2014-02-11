@@ -65,8 +65,9 @@ public:
   void
   trigger();
 
+public:
   void
-  update() override;
+  _update() override;
 
 public slots:
   void accept();
