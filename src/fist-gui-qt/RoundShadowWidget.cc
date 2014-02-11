@@ -177,8 +177,8 @@ RoundShadowWidget::_draw_side(QPainter& painter,
                               int height)
 {
   QLinearGradient gradient;
-  gradient.setColorAt(0, QColor(0, 0, 0, 0));
-  gradient.setColorAt(1, QColor(0, 0, 0, 127));
+  gradient.setColorAt(0, QColor(0x33, 0x33, 0x33, 0));
+  gradient.setColorAt(1, QColor(0x33, 0x33, 0x33, 127));
   gradient.setStart(QPoint(left, top));
   gradient.setFinalStop(QPoint(left + (width < height ? width : 0),
                                top + (height < width ? height : 0)));
