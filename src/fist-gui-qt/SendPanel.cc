@@ -241,8 +241,9 @@ SendPanel::avatar_available(uint32_t uid)
   if (it != this->_user_models.end())
   {
     it->second.avatar_available();
-    this->_users->_update();
   }
+
+  this->_users->reload();
 }
 
 void

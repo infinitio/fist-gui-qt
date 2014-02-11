@@ -135,7 +135,7 @@ TransactionPanel::avatar_available(uint32_t uid)
   if (update_list)
   {
     ELLE_TRACE("%s: update transaction list", *this);
-    this->_list->update();
+    this->_list->reload();
   }
 }
 

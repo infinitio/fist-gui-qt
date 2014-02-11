@@ -265,12 +265,13 @@ ListWidget::resizeEvent(QResizeEvent*)
 }
 
 void
-ListWidget::_update()
+ListWidget::reload()
 {
   for (auto const& widget: this->_widgets)
   {
-    widget->_update();
+    widget->reload();
   }
+
   this->update();
 }
 

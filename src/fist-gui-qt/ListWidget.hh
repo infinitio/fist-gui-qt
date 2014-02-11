@@ -99,7 +99,7 @@ Q_SIGNALS:
   resized();
 public Q_SLOTS:
   void
-  _update();
+  reload();
 
 private Q_SLOTS:
   void
