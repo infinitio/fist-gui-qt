@@ -153,6 +153,10 @@ InfinitDock::InfinitDock(gap_State* state):
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
   this->show();
   this->showPanel();
+
+  this->_systray_message(QString("Infinit is started!"),
+                         QString("Click the icon to start sharing files."),
+                         QSystemTrayIcon::Information);
 }
 
 void
