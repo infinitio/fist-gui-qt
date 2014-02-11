@@ -241,8 +241,8 @@ InfinitDock::_position_panel()
 
   auto screen = QDesktopWidget().availableGeometry();
 
-  auto x = systray_position.x() - this->width();
-  auto y = systray_position.y() - this->height() - 32;
+  auto x = systray_position.x() - this->width() + 24;
+  auto y = systray_position.y() - this->height() - 16;
 
   this->move(qBound(screen.left(), x, screen.right()),
              qBound(screen.top(), y, screen.bottom()));
