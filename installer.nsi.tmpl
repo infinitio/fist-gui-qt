@@ -76,7 +76,7 @@ UninstPage instfiles
 ; Install section
 ;------------------------------------------------------------------------------
 
-Section "Install Infinit"
+Section "Install ${product_name}"
 
 	WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
 	WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
