@@ -51,7 +51,7 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 
   if (transactions_list.empty())
   {
-    // XXX: Add place holder.
+    this->_list->add_widget(new NoNotificationWidget);
     return;
   }
 
@@ -69,6 +69,12 @@ TransactionPanel::add_transaction(gap_State* state,
                                   uint32_t tid,
                                   bool init)
 {
+  if (this->_list->widgets().size() == 1 &&
+      this->_transactions.size() == 0)
+  {
+    this->_list->clearWidgets();
+  }
+
   if (this->_transactions.find(tid) == this->_transactions.end())
     this->_transactions.emplace(tid, TransactionModel(state, tid));
 

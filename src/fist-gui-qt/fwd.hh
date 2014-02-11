@@ -6,6 +6,7 @@ class AvatarWidget;
 class FileItem;
 class IconButton;
 class ListWidget;
+class NoNotificationWidget;
 class Panel;
 class RoundShadowWidget;
 class SearchField;

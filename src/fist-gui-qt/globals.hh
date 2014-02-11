@@ -155,6 +155,13 @@ namespace view
 
   namespace transaction
   {
+    namespace no_notification
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
+    }
+
     static
     QMargins const
     margins(13, 13, 13, 13);

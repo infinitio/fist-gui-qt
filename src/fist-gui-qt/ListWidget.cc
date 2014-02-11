@@ -140,7 +140,10 @@ ListWidget::_layout()
 
   // Remove the bottom separator.
   if (!this->_widgets.empty())
+  {
     real_height -= this->_separator._colors.size();
+    height -= this->_separator._colors.size();
+  }
 
   this->_height_hint = real_height;
   this->updateGeometry();
