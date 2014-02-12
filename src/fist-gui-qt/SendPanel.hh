@@ -5,6 +5,8 @@
 
 # include <unordered_map>
 
+# include <elle/Printable.hh>
+
 # include <surface/gap/gap.h>
 
 # include <fist-gui-qt/Panel.hh>
@@ -13,7 +15,8 @@
 # include <fist-gui-qt/fwd.hh>
 
 class SendPanel:
-  public Panel
+  public Panel,
+  public elle::Printable
 {
 /*------.
 | Types |
@@ -104,6 +107,13 @@ public:
 
 private:
   Q_OBJECT;
+
+public:
+  /*----------.
+  | Printable |
+  `----------*/
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif

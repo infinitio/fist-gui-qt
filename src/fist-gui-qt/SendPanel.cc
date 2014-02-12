@@ -285,3 +285,9 @@ SendPanel::footer()
 {
   return static_cast<SendFooter*>(this->_footer);
 }
+
+void
+SendPanel::print(std::ostream& stream) const
+{
+  stream << "SendPanel";
+}
