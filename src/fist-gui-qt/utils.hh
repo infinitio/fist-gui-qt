@@ -47,4 +47,13 @@ operator << (std::ostream& out, QSize const& p)
   return out;
 }
 
+inline
+std::ostream&
+operator << (std::ostream& out, QString const& s)
+{
+  if (s.isNull())
+    return out;
+  return out << s.toStdString();
+}
+
 #endif
