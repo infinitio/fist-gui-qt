@@ -87,6 +87,12 @@ private:
   QLabel* _mtime;
   QLabel* _status;
   QTimer* _timer;
+
+/*----------.
+| Printable |
+`----------*/
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif

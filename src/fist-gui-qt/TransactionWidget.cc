@@ -1,4 +1,3 @@
-#include <iostream>
 #include <map>
 
 #include <QSpacerItem>
@@ -6,10 +5,14 @@
 #include <QLabel>
 #include <QMovie>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/AvatarWidget.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/TransactionWindow.hh>
 #include <fist-gui-qt/globals.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 
 QVector<gap_TransactionStatus> g_finals =
 {
@@ -33,6 +36,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _status(new QLabel),
   _timer(nullptr)
 {
+  ELLE_TRACE_SCOPE("%s: contruction", *this);
+
   this->_peer_status->setPixmap(QPixmap(":/icons/status.png"));
 
   connect(this->_accept_button, SIGNAL(released()),
@@ -45,7 +50,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   this->_peer_avatar = new AvatarWidget(this->_transaction.avatar());
 
   auto layout = new QHBoxLayout(this);
-  layout->setContentsMargins(8, 8, 8, 8);
+  // XXX: should but 13, 13, 13, 13 but avatar widget size is strange.
+  layout->setContentsMargins(8, 8, 13, 8);
   this->_layout = layout;
   layout->addWidget(this->_peer_avatar, 0, Qt::AlignLeft);
 
@@ -118,6 +124,7 @@ TransactionWidget::progress() const
 void
 TransactionWidget::setProgress(float value)
 {
+  ELLE_DEBUG("%s: update progress to %s", *this, value);
   this->_peer_avatar->setProgress(value);
 }
 
@@ -141,6 +148,7 @@ TransactionWidget::minimumSizeHint() const
 void
 TransactionWidget::trigger()
 {
+  ELLE_TRACE_SCOPE("%s: clicked", *this);
 #if 0
   auto pop = new TransactionWindow(parentWidget());
   parentWidget()->hide();
@@ -153,35 +161,45 @@ TransactionWidget::trigger()
 void
 TransactionWidget::_update()
 {
+  ELLE_TRACE_SCOPE("%s: update", *this);
+
   if (this->_transaction.new_avatar())
   {
+    ELLE_DEBUG("new avatar");
     this->_peer_avatar->setPicture(this->_transaction.avatar());
   }
 
+  ELLE_DEBUG("peer is %sconnected",
+             this->_transaction.peer_connection_status() ? "" : "dis");
   if (this->_transaction.peer_connection_status())
+  {
     this->_peer_status->show();
+  }
   else
     this->_peer_status->hide();
 
   if (this->_transaction.status() == gap_transaction_waiting_for_accept &&
       !this->_transaction.is_sender())
   {
+    ELLE_DEBUG("show accept / reject buttons");
     this->_accept_button->show();
     this->_reject_button->show();
   }
-  else
+  else if (!this->_accept_button->isHidden())
   {
+    ELLE_DEBUG("hide accept / reject buttons");
     this->_accept_button->hide();
     this->_reject_button->hide();
   }
 
   if (this->_accept_button->isHidden())
   {
-    if (!g_finals.contains(this->_transaction.status()))
+    if (this->_cancel_button->isHidden() &&
+        !g_finals.contains(this->_transaction.status()))
     {
       this->_cancel_button->show();
     }
-    else
+    else if (!this->_cancel_button->isHidden())
     {
       this->_cancel_button->hide();
     }
@@ -196,11 +214,12 @@ TransactionWidget::_update()
   if (this->_transaction.status() == gap_transaction_running &&
       this->_timer == nullptr)
   {
+    ELLE_TRACE("run progress timer");
     this->_peer_avatar->setTransactionCount(this->_transaction.files().size());
 
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
-    _timer->start(1000);
+    _timer->start(300);
 
     connect(this,
             SIGNAL(onProgressChanged(float)),
@@ -226,6 +245,7 @@ TransactionWidget::_update()
 void
 TransactionWidget::update_progress()
 {
+  ELLE_DUMP("%s: update progress", *this);
   float progress = this->_transaction.progress();
   emit onProgressChanged(progress);
 }
@@ -233,18 +253,22 @@ TransactionWidget::update_progress()
 void
 TransactionWidget::accept()
 {
+  ELLE_TRACE_SCOPE("%s: accept transaction", *this);
   emit on_transaction_accepted(this->_transaction.id());
 }
 
 void
 TransactionWidget::reject()
 {
+  ELLE_TRACE_SCOPE("%s: reject transaction", *this);
   emit on_transaction_rejected(this->_transaction.id());
 }
 
 void
 TransactionWidget::cancel()
 {
+  ELLE_TRACE_SCOPE("%s: cancel transaction", *this);
+
   emit on_transaction_canceled(this->_transaction.id());
 }
 
@@ -254,7 +278,8 @@ TransactionWidget::cancel()
 void
 TransactionWidget::update_status()
 {
-  struct StatusUpdater
+  struct StatusUpdater:
+    public elle::Printable
   {
     StatusUpdater(QString const& image_path,
                   bool animated,
@@ -267,6 +292,8 @@ TransactionWidget::update_status()
     void
     operator () (QLabel& label) const
     {
+      ELLE_TRACE_SCOPE("%s: update label", *this);
+
       label.setToolTip(this->_tooltip);
       if (this->_animated)
       {
@@ -283,6 +310,13 @@ TransactionWidget::update_status()
     QString _image_path;
     bool _animated;
     QString _tooltip;
+
+    void
+    print(std::ostream& stream) const override
+    {
+      stream << "StatusUpdater";
+    }
+
   };
 
   static std::map<gap_TransactionStatus, StatusUpdater> tooltips{
@@ -328,4 +362,10 @@ TransactionWidget::update_status()
       this->_status->setToolTip(QString("Downloading"));
     }
   }
+}
+
+void
+TransactionWidget::print(std::ostream& stream) const
+{
+  stream << "TransactionWidget(" << this->_transaction << ")";
 }
