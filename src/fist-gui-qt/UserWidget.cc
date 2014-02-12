@@ -2,10 +2,12 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include <iostream>
+#include <elle/log.hh>
 
 #include <fist-gui-qt/UserWidget.hh>
 #include <fist-gui-qt/globals.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.UserWidget");
 
 UserWidget::UserWidget(UserModel const& model,
                        QWidget* parent):
@@ -14,6 +16,7 @@ UserWidget::UserWidget(UserModel const& model,
   _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
   _layout(new QHBoxLayout(this))
 {
+  ELLE_TRACE_SCOPE("%s: contruction", *this);
 
   this->_layout->setContentsMargins(10, 10, 10, 10);
   this->_layout->addWidget(this->_avatar);
@@ -46,17 +49,23 @@ UserWidget::sizeHint() const
 void
 UserWidget::trigger()
 {
-  std::cout << "clicked: " << this->_model.fullname().toStdString() << std::endl;
+  ELLE_TRACE_SCOPE("%s: clicked", *this);
   emit clicked_signal(this->_model.id());
 }
 
 void
 UserWidget::_update()
 {
-  std::cerr << "UserWidget: " << this << " update" << std::endl;
+  ELLE_TRACE_SCOPE("%s: _update", *this);
   if (this->_model.new_avatar())
   {
-    std::cerr << "new avatar available" << std::endl;
+    ELLE_DEBUG("avatar available");
     this->_avatar->set_avatar(this->_model.avatar());
   }
+}
+
+void
+UserWidget::print(std::ostream& stream) const
+{
+  stream << "UserWidget(" << this->_model << ")";
 }
