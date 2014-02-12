@@ -196,7 +196,7 @@ TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
 void
 TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 {
-  ELLE_ERR("%s: update transaction %s", *this, id);
+  ELLE_TRACE_SCOPE("%s: update transaction %s", *this, id);
 
   auto const& transaction = this->_transactions.at(id);
 
@@ -288,4 +288,10 @@ TransactionFooter*
 TransactionPanel::footer()
 {
   return static_cast<TransactionFooter*>(this->_footer);
+}
+
+void
+TransactionPanel::print(std::ostream& stream) const
+{
+  stream << "TransactionPanel";
 }
