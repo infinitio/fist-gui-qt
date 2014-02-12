@@ -130,7 +130,7 @@ namespace view
       {
         static
         QString const
-        text("<a style=\"text-decoration: none;\" href=\"https://infinit.io/forgot_password\">forgot pasword?</a>");
+        text("<a style=\"text-decoration: none;\" href=\"https://infinit.io/forgot_password\">forgot password?</a>");
       }
 
       namespace need_an_account
