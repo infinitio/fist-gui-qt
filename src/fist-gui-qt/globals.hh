@@ -227,7 +227,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9, QFont::Bold));
+      style(QFont("Arial", 9));
 
       static
       QString const
