@@ -2,6 +2,7 @@
 # define LISTITEM_HH
 
 # include <elle/attribute.hh>
+# include <elle/Printable.hh>
 
 # include <fist-gui-qt/fwd.hh>
 
@@ -9,7 +10,8 @@
 # include <QWidget>
 
 class ListItem:
-  public QWidget
+  public QWidget,
+  public elle::Printable
 {
   friend ListWidget;
 
@@ -48,6 +50,12 @@ private:
 
   ELLE_ATTRIBUTE(QColor, background);
   ELLE_ATTRIBUTE(bool, clickable);
+
+  /*----------.
+  | Printable |
+  `----------*/
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif // !LISTITEM_HH

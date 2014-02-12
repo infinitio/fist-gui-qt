@@ -74,3 +74,9 @@ void
 ListItem::_update()
 {
 }
+
+void
+ListItem::print(std::ostream& stream) const
+{
+  stream << "ListItem";
+}
