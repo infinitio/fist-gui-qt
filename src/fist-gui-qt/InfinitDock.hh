@@ -9,12 +9,16 @@
 # include <QSystemTrayIcon>
 # include <QFileDialog>
 
+# include <elle/Printable.hh>
+
 # include <surface/gap/gap.h>
+
 # include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class InfinitDock:
-  public RoundShadowWidget
+  public RoundShadowWidget,
+  public elle::Printable
 {
   // This class is used to create tasks that need done first.
   // The need comes from initialization wich create some objects that have a
@@ -131,7 +135,34 @@ private:
   std::unique_ptr<QFileDialog> _file_picker;
   QAction* _quit;
   gap_State* _state;
+
   Q_OBJECT
+
+  /*----------.
+  | Printable |
+  `----------*/
+  void
+  print(std::ostream& stream) const override;
 };
+
+inline
+std::ostream&
+operator << (std::ostream& out, QSystemTrayIcon::ActivationReason const& reason)
+{
+  switch (reason)
+  {
+    case QSystemTrayIcon::Unknown:
+      out << "Unknown reason"; break;
+    case QSystemTrayIcon::Context:
+      out << "Context menu requested"; break;
+    case QSystemTrayIcon::DoubleClick:
+      out << "Double clicked"; break;
+    case QSystemTrayIcon::Trigger:
+      out << "Triggered"; break;
+    case QSystemTrayIcon::MiddleClick:
+      out << "MiddleClicked"; break;
+  }
+  return out;
+}
 
 #endif

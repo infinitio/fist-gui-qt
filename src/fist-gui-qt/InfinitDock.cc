@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <QAction>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -14,11 +12,15 @@
 
 #include <version.hh>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
 #include <fist-gui-qt/SendPanel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.Dock");
 
 /*-------------.
 | Construction |
@@ -39,6 +41,8 @@ class InfinitDock::Prologue
 
   Prologue(gap_State* state)
   {
+    ELLE_TRACE_SCOPE("ininitialize Prologue");
+
     // Register gap callback.
     gap_connection_callback(state, InfinitDock::connection_status_cb);
     gap_user_status_callback(state, InfinitDock::user_status_cb);
@@ -147,7 +151,7 @@ InfinitDock::InfinitDock(gap_State* state):
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
-  timer->start(500);
+  timer->start(1000);
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
@@ -163,6 +167,8 @@ InfinitDock::InfinitDock(gap_State* state):
 void
 InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
 {
+  ELLE_TRACE_SCOPE("%s: system activated: %s", *this, reason);
+
   switch (reason)
   {
     case QSystemTrayIcon::Trigger:
@@ -184,6 +190,8 @@ InfinitDock::_systray_message(QString const& title,
                               QString const& message,
                               QSystemTrayIcon::MessageIcon icon)
 {
+  ELLE_TRACE_SCOPE("%s: show system tray message: %s - %s",
+                   *this, title, message);
   this->_systray->showMessage(title, message, icon, 3000);
 }
 
@@ -194,6 +202,10 @@ InfinitDock::_systray_message(QString const& title,
 void
 InfinitDock::_register_panel(Panel* panel)
 {
+  ELLE_ASSERT(panel != nullptr);
+
+  ELLE_TRACE_SCOPE("%s: register panel %s", *this, *panel);
+
   connect(panel, SIGNAL(systray_message(QString const&,
                                         QString const&,
                                         QSystemTrayIcon::MessageIcon)),
@@ -214,6 +226,8 @@ InfinitDock::transactionPanel()
 void
 InfinitDock::showPanel()
 {
+  ELLE_TRACE_SCOPE("%s: show dock", *this);
+
   this->show();
   this->setFocus();
   this->_position_panel();
@@ -222,12 +236,16 @@ InfinitDock::showPanel()
 void
 InfinitDock::hidePanel()
 {
+  ELLE_TRACE_SCOPE("%s: hide dock", *this);
+
   this->hide();
 }
 
 void
 InfinitDock::togglePanel(bool toggle_only)
 {
+  ELLE_TRACE_SCOPE("%s: toggle dock", *this);
+
   if (this->isVisible() and !toggle_only)
     this->hidePanel();
   else
@@ -237,6 +255,10 @@ InfinitDock::togglePanel(bool toggle_only)
 void
 InfinitDock::_position_panel()
 {
+  ELLE_TRACE_SCOPE("%s: move panel", *this);
+
+  ELLE_DEBUG("%s: old position: (%s, %s)", *this, this->x(), this->y());
+
   QPoint systray_position(this->_systray->geometry().topLeft());
 
   auto screen = QDesktopWidget().availableGeometry();
@@ -246,24 +268,31 @@ InfinitDock::_position_panel()
 
   this->move(qBound(screen.left(), x, screen.right()),
              qBound(screen.top(), y, screen.bottom()));
+
+  ELLE_DEBUG("%s: new position: (%s, %s)", *this, this->x(), this->y());
 }
 
 static
 QFileDialog*
 spaw_dialog(InfinitDock* dock)
 {
+  ELLE_TRACE_SCOPE("Dock: spawn file picker");
+
   std::unique_ptr<QFileDialog> file_picker(new QFileDialog(dock));
   file_picker->setFileMode(QFileDialog::ExistingFiles);
   return file_picker.release();
-
 }
 
 void
 InfinitDock::pick_files()
 {
+  ELLE_TRACE_SCOPE("%s: spawn file picker", *this);
+
   this->_file_picker.reset(spaw_dialog(this));
   this->_file_picker->exec();
   QStringList selected = this->_file_picker->selectedFiles();
+
+  ELLE_DEBUG_SCOPE("%s selected file(s)", selected.size());
 
   if (selected.size())
   {
@@ -296,6 +325,8 @@ InfinitDock::quit()
 void
 InfinitDock::dragEnterEvent(QDragEnterEvent *event)
 {
+  ELLE_TRACE_SCOPE("%s: drag entered", *this);
+
   if (event->mimeData()->hasUrls())
     for (auto const& url: event->mimeData()->urls())
       if (url.isLocalFile())
@@ -308,6 +339,8 @@ InfinitDock::dragEnterEvent(QDragEnterEvent *event)
 void
 InfinitDock::dropEvent(QDropEvent *event)
 {
+  ELLE_TRACE_SCOPE("%s: drop", *this);
+
   if (event->mimeData()->hasUrls())
     for (auto const& url: event->mimeData()->urls())
       if (url.isLocalFile())
@@ -315,6 +348,7 @@ InfinitDock::dropEvent(QDropEvent *event)
         event->acceptProposedAction();
         this->_send_panel->add_file(url.toLocalFile());
       }
+
   this->_switch_view(this->_send_panel);
   this->showPanel();
 }
@@ -322,6 +356,8 @@ InfinitDock::dropEvent(QDropEvent *event)
 void
 InfinitDock::closeEvent(QCloseEvent* event)
 {
+  ELLE_TRACE_SCOPE("%s: close", *this);
+
   this->close();
   Super::closeEvent(event);
   qApp->quit();
@@ -330,8 +366,12 @@ InfinitDock::closeEvent(QCloseEvent* event)
 void
 InfinitDock::mouseReleaseEvent(QMouseEvent* event)
 {
+  ELLE_TRACE_SCOPE("%s: mouse released", *this);
+
   if (event->button() == Qt::LeftButton)
   {
+    ELLE_DEBUG("left button clicked");
+
     event->accept();
     this->togglePanel(true);
   }
@@ -342,33 +382,47 @@ InfinitDock::mouseReleaseEvent(QMouseEvent* event)
 void
 InfinitDock::keyPressEvent(QKeyEvent* event)
 {
+  ELLE_TRACE_SCOPE("%s: key pressed (%s)", *this, event->key());
+
+  if (this->centralWidget() != nullptr)
+    ELLE_DEBUG("%s currently active", *this->centralWidget());
+
   if (this->centralWidget() == this->_transaction_panel)
   {
     if (event->key() == Qt::Key_Escape)
+    {
+      ELLE_DEBUG("escape pressed");
       this->togglePanel();
+    }
   }
   else if (this->centralWidget() == this->_send_panel)
   {
     if (event->key() == Qt::Key_Escape)
+    {
+      ELLE_DEBUG("escape pressed");
       this->togglePanel();
+    }
   }
 }
 
 void
 InfinitDock::_show_send_view()
 {
+  ELLE_TRACE_SCOPE("%s: show send view", *this);
   this->_switch_view(this->_send_panel);
 }
 
 void
 InfinitDock::_show_user_view(uint32_t /* sender_id */)
 {
-
+  ELLE_TRACE_SCOPE("%s: show user view", *this);
 }
 
 void
 InfinitDock::_show_menu()
 {
+  ELLE_TRACE_SCOPE("%s: show menu", *this);
+
   this->_menu->show();
 
   QPoint pos(this->geometry().bottomLeft());
@@ -378,19 +432,27 @@ InfinitDock::_show_menu()
 void
 InfinitDock::_show_transactions_view()
 {
+  ELLE_TRACE_SCOPE("%s: show transaction view", *this);
+
   this->_switch_view(this->_transaction_panel);
 }
 
 void
 InfinitDock::_switch_view(Panel* panel)
 {
+  ELLE_ASSERT(panel != nullptr);
+
+  ELLE_TRACE_SCOPE("%s: make %s active", *this, *panel);
+
   if (panel == this->centralWidget())
   {
+    ELLE_DEBUG("%s was already active", *panel);
     return;
   }
 
   if (this->centralWidget() != nullptr)
   {
+    ELLE_DEBUG("hide %s", *this->centralWidget());
     static_cast<Panel*>(this->centralWidget())->on_hide();
     this->centralWidget()->setParent(0);
   }
@@ -403,28 +465,38 @@ InfinitDock::_switch_view(Panel* panel)
 void
 InfinitDock::connection_status_cb(gap_UserStatus const status)
 {
- // if (status == gap_user_status_offline)
-  std::cout << "Connection status callback: " << status << std::endl;
+  ELLE_TRACE_SCOPE("Dock: Connection status changed to %s", status);
 }
 
 void
 InfinitDock::user_status_cb(uint32_t id,
                             gap_UserStatus const status)
 {
-  std::cerr << "User status changed" << std::endl;
+  ELLE_TRACE_SCOPE("Dock: User (%s) status changed to %s", id, status);
+
   g_dock->user_status_changed(id, status);
 }
 
 void
 InfinitDock::avatar_available_cb(uint32_t id)
 {
-  std::cerr << "Avatar available (" << id << ")" << std::endl;
+  ELLE_TRACE_SCOPE("Dock: Avatar available for user %s", id);
+
   g_dock->avatar_available(id);
 }
 
 void
 InfinitDock::_update()
 {
-  if (not gap_poll(_state))
-    std::cout << "Error while polling" << std::endl;
+  ELLE_DUMP("%s: poll", *this);
+  auto res = gap_poll(_state);
+
+  if (!res)
+    ELLE_ERR("poll failed: %s", res);
+}
+
+void
+InfinitDock::print(std::ostream& stream) const
+{
+  stream << "Dock";
 }
