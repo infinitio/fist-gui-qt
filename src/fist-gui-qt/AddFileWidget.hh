@@ -5,11 +5,14 @@
 # include <QWidget>
 # include <QColor>
 
+# include <elle/Printable.hh>
+
 # include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/utils.hh>
 
 class AddFileWidget:
-  public QWidget
+  public QWidget,
+  public elle::Printable
 {
 public:
   AddFileWidget(QWidget* parent = nullptr);
@@ -41,7 +44,7 @@ private:
   mousePressEvent(QMouseEvent*) override;
 
   void
-  dragEnterEvent(QDragEnterEvent *event) override;
+  dragEnterEvent(QDragEnterEvent *) override;
 
   void
   dropEvent(QDropEvent*) override;
@@ -63,6 +66,12 @@ private:
 
 private:
   Q_OBJECT;
+
+/*----------.
+| Printable |
+`----------*/
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif

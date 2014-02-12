@@ -42,7 +42,6 @@ AddFileWidget::AddFileWidget(QWidget* parent):
   this->setFixedWidth(320);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
   this->setAcceptDrops(true);
 };
 
@@ -127,4 +126,10 @@ AddFileWidget::dropEvent(QDropEvent *event)
         ELLE_DEBUG("%s dropped", url.toLocalFile());
         emit file_dropped(url.toLocalFile());
       }
+}
+
+void
+AddFileWidget::print(std::ostream& stream) const
+{
+  stream << "File adder";
 }
