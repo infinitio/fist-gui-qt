@@ -3,6 +3,8 @@
 
 # include <surface/gap/gap.h>
 
+# include <elle/Printable.hh>
+
 # include <QString>
 # include <QPixmap>
 # include <QVariant>
@@ -10,7 +12,7 @@
 # include <memory>
 
 class UserModel:
-  public QVariant
+  public elle::Printable
 {
 public:
   UserModel(gap_State* state,
@@ -49,6 +51,13 @@ private:
   mutable QPixmap _avatar;
   mutable bool _default_avatar;
   mutable bool _new_avatar;
+
+  /*----------.
+  | Printable |
+  `----------*/
+  void
+  print(std::ostream& stream) const override;
+
 };
 
 #endif

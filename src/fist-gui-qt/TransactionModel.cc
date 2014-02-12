@@ -1,12 +1,18 @@
-#include "TransactionModel.hh"
+#include <fist-gui-qt/TransactionModel.hh>
+#include <fist-gui-qt/utils.hh>
+
+#include <elle/log.hh>
 
 #include <QBuffer>
 #include <QImageReader>
+
+ELLE_LOG_COMPONENT("infinit.FIST.TransactionModel");
 
 TransactionModel::TransactionModel(gap_State* state,
                                    uint32_t id):
   _state(state),
   _id(id),
+  _is_sender(boost::logic::indeterminate),
   _peer_fullname((char const*) nullptr),
   _peer_id(0),
   _files(),
@@ -14,6 +20,7 @@ TransactionModel::TransactionModel(gap_State* state,
   _default_avatar(true),
   _new_avatar(true)
 {
+  ELLE_TRACE_SCOPE("%s: create transaction model", *this);
 }
 
 uint32_t
@@ -25,9 +32,14 @@ TransactionModel::id() const
 bool
 TransactionModel::is_sender() const
 {
-  // XXX: Use tribool.
-  return gap_self_id(this->_state) ==
-    gap_transaction_sender_id(this->_state, this->_id);
+  if (boost::logic::indeterminate(this->_is_sender))
+  {
+    this->_is_sender = (gap_self_id(this->_state) ==
+                        gap_transaction_sender_id(this->_state, this->_id));
+    ELLE_DEBUG("%s: fetched 'is_sender': %s", *this, this->_is_sender);
+  }
+
+  return (this->_is_sender == true);
 }
 
 uint32_t
@@ -38,6 +50,7 @@ TransactionModel::peer_id() const
     this->_peer_id = this->is_sender()
       ? gap_transaction_recipient_id(this->_state, this->_id)
       : gap_transaction_sender_id(this->_state, this->_id);
+    ELLE_DEBUG("%s: fetched 'peer_id': %s", *this, this->_peer_id);
   }
 
   return this->_peer_id;
@@ -53,6 +66,7 @@ TransactionModel::peer_fullname() const
         this->is_sender()
         ? gap_transaction_recipient_fullname(this->_state, this->_id)
         : gap_transaction_sender_fullname(this->_state, this->_id)).trimmed();
+    ELLE_DEBUG("%s: fetched 'peer_fullname': %s", *this, this->_peer_fullname);
   }
 
   return this->_peer_fullname;
@@ -83,6 +97,8 @@ TransactionModel::files() const
       ++copyied;
     }
     ::free((void*) files);
+
+    ELLE_DEBUG("%s: fetched 'files': %s", *this, this->_files);
   }
 
   return this->_files;
@@ -91,12 +107,16 @@ TransactionModel::files() const
 QString
 TransactionModel::tooltip() const
 {
-  QString tooltip;
-  for (auto const& file: this->files())
-    tooltip.append(file).append("\n");
-  tooltip.remove(tooltip.size() - 1, 1);
+  if (this->_tooltip.isNull())
+  {
+    for (auto const& file: this->files())
+      this->_tooltip.append(file).append("\n");
+    this->_tooltip.remove(this->_tooltip.size() - 1, 1);
 
-  return tooltip;
+    ELLE_DEBUG("%s: fetched 'tooltip': %s", *this, this->_tooltip);
+  }
+
+  return this->_tooltip;
 }
 
 gap_TransactionStatus
@@ -128,6 +148,7 @@ TransactionModel::avatar() const
 
     if (gap_ok == gap_avatar(this->_state, this->peer_id(), &data, &len))
     {
+      ELLE_DEBUG("%s: get avatar data", *this);
       QByteArray raw((char *) data, len);
       QBuffer buff(&raw);
       QImageReader reader;
@@ -139,10 +160,23 @@ TransactionModel::avatar() const
     }
     else if(this->_avatar.isNull())
     {
+      ELLE_DEBUG("%s: avatar not available yet", *this);
       this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
     }
   }
 
   this->_new_avatar = false;
   return this->_avatar;
+}
+
+void
+TransactionModel::print(std::ostream& stream) const
+{
+  stream << "TransactionModel(" << this->_id << ")";
+  if (!boost::logic::indeterminate(this->_is_sender))
+  {
+    stream << " "
+           << (this->is_sender() ? "to" : "from")
+           << " " << this->peer_fullname();
+  }
 }
