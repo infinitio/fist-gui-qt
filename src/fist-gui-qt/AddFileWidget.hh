@@ -30,6 +30,29 @@ public:
   void
   setPulseColor(QColor const& color);
 
+private:
+  void
+  enterEvent(QEvent*) override;
+
+  void
+  leaveEvent(QEvent*) override;
+
+  void
+  mousePressEvent(QMouseEvent*) override;
+
+  void
+  dragEnterEvent(QDragEnterEvent *event) override;
+
+  void
+  dropEvent(QDropEvent*) override;
+
+signals:
+   void
+   clicked();
+
+   void
+   file_dropped(QString const&);
+
 public slots:
   void
   pulse();

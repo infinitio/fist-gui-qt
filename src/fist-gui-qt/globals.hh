@@ -211,6 +211,10 @@ namespace view
       style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
 
       static
+      TextStyle const
+      hover_style(QFont("Arial", 9), QColor(0x3C, 0x91, 0xD4));
+
+      static
       QColor const
       background(0xF8, 0xF8, 0xF8);
 

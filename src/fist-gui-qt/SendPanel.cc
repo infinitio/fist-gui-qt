@@ -45,10 +45,13 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
 
-  this->_search->setIcon(QPixmap(":/icons/search@2x.png"));
+  this->_search->setIcon(QPixmap(":/icons/search.png"));
 
   connect(this->_file_adder->attach(), SIGNAL(released()),
           this, SIGNAL(choose_files()));
+
+  connect(this->_file_adder, SIGNAL(file_dropped(QString const&)),
+          this, SLOT(add_file(QString const&)));
 
   connect(this->footer()->send(), SIGNAL(clicked()),
           this, SLOT(_send()));
