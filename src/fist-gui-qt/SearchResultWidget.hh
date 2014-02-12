@@ -43,6 +43,12 @@ private:
   QHBoxLayout* _layout;
 
   Q_OBJECT;
+
+/*----------.
+| Printable |
+`----------*/
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif

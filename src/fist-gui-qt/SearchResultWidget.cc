@@ -2,18 +2,21 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include <iostream>
+#include <elle/log.hh>
 
 #include <fist-gui-qt/SearchResultWidget.hh>
 #include <fist-gui-qt/globals.hh>
 
+ELLE_LOG_COMPONENT("infinit.FIST.SearchResult");
+
 SearchResultWidget::SearchResultWidget(UserModel const& model,
-                       QWidget* parent):
+                                       QWidget* parent):
   ListItem(parent, Qt::white),
   _model(model),
   _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
   _layout(new QHBoxLayout(this))
 {
+  ELLE_TRACE_SCOPE("%s: contruction", *this);
 
   this->_layout->setContentsMargins(10, 10, 10, 10);
   this->_layout->addWidget(this->_avatar);
@@ -47,17 +50,23 @@ SearchResultWidget::sizeHint() const
 void
 SearchResultWidget::trigger()
 {
-  std::cout << "clicked: " << this->_model.fullname().toStdString() << std::endl;
+  ELLE_TRACE_SCOPE("%s: clicked", *this);
   emit clicked_signal(this->_model.id());
 }
 
 void
 SearchResultWidget::_update()
 {
-  std::cerr << "SearchResultWidget: " << this << " update" << std::endl;
+  ELLE_TRACE_SCOPE("%s: update", *this);
   if (this->_model.new_avatar())
   {
-    std::cerr << "new avatar available" << std::endl;
+    ELLE_DEBUG("avatar available");
     this->_avatar->set_avatar(this->_model.avatar());
   }
+}
+
+void
+SearchResultWidget::print(std::ostream& stream) const
+{
+  stream << "SearchResult(" << this->_model << ")";
 }
