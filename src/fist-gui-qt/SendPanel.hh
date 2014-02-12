@@ -31,7 +31,7 @@ public:
 /*------.
 | Files |
 `------*/
-public:
+public Q_SLOTS:
   void
   add_file(QString const& path);
 

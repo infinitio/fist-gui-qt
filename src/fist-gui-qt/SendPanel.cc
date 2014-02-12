@@ -47,7 +47,7 @@ SendPanel::SendPanel(gap_State* state):
 
   this->_search->setIcon(QPixmap(":/icons/search.png"));
 
-  connect(this->_file_adder->attach(), SIGNAL(released()),
+  connect(this->_file_adder, SIGNAL(clicked()),
           this, SIGNAL(choose_files()));
 
   connect(this->_file_adder, SIGNAL(file_dropped(QString const&)),
