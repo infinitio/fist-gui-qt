@@ -47,7 +47,7 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_email_field->setPlaceholderText(view::login::email::placeholder);
     this->_email_field->setFixedSize(view::login::email::size);
     view::login::email::style(*this->_email_field);
-    this->_email_field->setTextMargins(15, 0, 15, 0);
+    this->_email_field->setTextMargins(12, 0, 12, 0);
   }
 
   // Password field.
@@ -55,7 +55,7 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_password_field->setPlaceholderText(view::login::password::placeholder);
     this->_password_field->setFixedSize(view::login::password::size);
     view::login::password::style(*this->_password_field);
-    this->_password_field->setTextMargins(15, 0, 15, 0);
+    this->_password_field->setTextMargins(12, 0, 12, 0);
   }
 
   // Logo.
@@ -115,13 +115,10 @@ LoginWindow::LoginWindow(gap_State* state):
 
   layout->addSpacing(15);
   layout->addWidget(logo, 0, Qt::AlignCenter);
-  layout->addStretch();
   layout->addWidget(this->_message_field, 260, Qt::AlignCenter);
+  layout->addWidget(this->_email_field, 0, Qt::AlignCenter);
   layout->addSpacing(5);
-  layout->addWidget(this->_email_field, 260, Qt::AlignCenter);
-  layout->addSpacing(5);
-  layout->addSpacing(0);
-  layout->addWidget(this->_password_field, 260,  Qt::AlignCenter);
+  layout->addWidget(this->_password_field, 0,  Qt::AlignCenter);
   layout->addSpacing(5);
   {
     auto hlayout = new QHBoxLayout();
@@ -134,7 +131,7 @@ LoginWindow::LoginWindow(gap_State* state):
     layout->addLayout(hlayout, Qt::AlignCenter);
   }
 
-  layout->addSpacing(20);
+  layout->addSpacing(40);
   layout->addWidget(footer);
 
   this->setCentralWidget(central_widget);

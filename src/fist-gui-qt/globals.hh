@@ -88,7 +88,7 @@ namespace view
 
       static
       QSize const
-      size(240, 37);
+      size(240, 38);
     }
 
     namespace password
@@ -103,7 +103,7 @@ namespace view
 
       static
       QSize const
-      size(240, 37);
+      size(240, 38);
     }
 
     namespace message
