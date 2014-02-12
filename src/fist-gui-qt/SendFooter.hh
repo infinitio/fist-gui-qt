@@ -18,14 +18,14 @@ public:
   ~SendFooter() = default;
 
 public:
-  ShapeButton const*
+  IconButton*
   back() const;
 
   IconButton*
   send() const;
 
 private:
-  ShapeButton* _back;
+  IconButton* _back;
   IconButton* _send;
 };
 

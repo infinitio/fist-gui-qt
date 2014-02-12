@@ -3,7 +3,7 @@
 #include <iostream>
 SendFooter::SendFooter():
   Footer(),
-  _back(new ShapeButton(QPixmap(":/icons/add-cancel.png"))),
+  _back(new IconButton(QPixmap(":/icons/cancel-send.png"))),
   _send(new IconButton(QPixmap(":/icons/transfer.png")))
 {
   this->_layout->addWidget(this->_back);
@@ -13,7 +13,7 @@ SendFooter::SendFooter():
   this->_layout->addWidget(this->_send);
 }
 
-ShapeButton const*
+IconButton*
 SendFooter::back() const
 {
   return this->_back;
