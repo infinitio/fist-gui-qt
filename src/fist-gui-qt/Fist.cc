@@ -1,5 +1,6 @@
 #include <memory>
 
+#include <QDesktopWidget>
 #include <QFont>
 #include <QIcon>
 #include <QPixmap>
@@ -11,6 +12,26 @@
 #include <fist-gui-qt/LoginWindow.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
+
+static
+void
+center_window(QWidget& widget)
+{
+  int width = widget.frameGeometry().width();
+  int height = widget.frameGeometry().height();
+
+  QDesktopWidget wid;
+
+  // Main screen only.
+  int screenWidth = wid.screen(0)->width();
+  int screenHeight = wid.screen(0)->height();
+
+  widget.setGeometry((screenWidth / 2) - (width / 2),
+                     (screenHeight / 2) - (height / 2),
+                     width,
+                     height);
+}
+
 
 Fist::Fist(int argc, char** argv):
   _application(new QApplication(argc, argv)),
@@ -58,6 +79,7 @@ Fist::operator ()()
   LoginWindow* login = new LoginWindow(this->_state);
 
   ELLE_WARN("Show login window");
+  center_window(*login);
   login->show();
 
   return this->_application->exec();
