@@ -162,6 +162,8 @@ InfinitDock::InfinitDock(gap_State* state):
                          QString("Make sure the Infinit icon is always visible "
                                  "by clicking customize!"),
                          QSystemTrayIcon::Information);
+
+  this->setAcceptDrops(true);
 }
 
 void
