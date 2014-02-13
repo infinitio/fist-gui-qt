@@ -120,6 +120,9 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/UserWidget.hh",
     "src/fist-gui-qt/globals.hh",
     "src/fist-gui-qt/main.cc",
+
+    "src/fist-gui-qt/DesktopIcon.hh",
+    "src/fist-gui-qt/DesktopIcon.cc",
   )
 
   application = drake.cxx.Executable(
