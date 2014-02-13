@@ -67,9 +67,11 @@ Q_SIGNALS:
 private:
   gap_State* _state;
   SearchField* _search;
+  HorizontalSeparator* _users_part_separator;
   ListWidget* _users;
   HorizontalSeparator* _file_part_seperator;
   ListWidget* _file_list;
+  HorizontalSeparator* _adder_part_seperator;
   AddFileWidget* _file_adder;
 
 /*-------------.

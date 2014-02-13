@@ -24,9 +24,11 @@ SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
   _state(state),
   _search(new SearchField(this)),
+  _users_part_separator(new HorizontalSeparator(this)),
   _users(new ListWidget(this)),
   _file_part_seperator(new HorizontalSeparator(this)),
   _file_list(new ListWidget(this)),
+  _adder_part_seperator(new HorizontalSeparator(this)),
   _file_adder(new AddFileWidget(this)),
   _peer_id(gap_null()),
   _results(),
@@ -63,6 +65,10 @@ SendPanel::SendPanel(gap_State* state):
 
   connect(this->_search, SIGNAL(search_ready(QString const&)),
           this, SLOT(_search_changed(QString const&)));
+
+  //XXX: Could be factored.
+  this->_users_part_separator->hide();
+  this->_adder_part_seperator->hide();
 }
 
 void
@@ -107,6 +113,8 @@ SendPanel::add_file(QString const& path)
   if (this->_files.contains(path))
     return;
 
+  this->_adder_part_seperator->show();
+
   this->_files.insert(path, new FileItem(path));
   connect(this->_files[path], SIGNAL(remove(QString const&)),
           this, SLOT(remove_file(QString const&)));
@@ -125,6 +133,9 @@ SendPanel::remove_file(QString const& path)
     this->_file_list->remove_widget(it.value());
     this->_files.remove(path);
   }
+
+  if (this->_files.empty())
+    this->_adder_part_seperator->hide();
 }
 
 /*------.
@@ -158,7 +169,7 @@ SendPanel::setUsers(uint32_t* uids)
             this,
             SLOT(_set_peer(uint32_t)));
     this->_users->add_widget(widget, ListWidget::Position::Top);
-
+    this->_users_part_separator->show();
     ++uidscopy;
   }
 }
@@ -168,6 +179,7 @@ SendPanel::clearUsers()
 {
   ELLE_TRACE_SCOPE("%s: clear user list", *this);
   this->setUsers(nullptr);
+  this->_users_part_separator->hide();
 }
 
 /*------.
@@ -297,6 +309,7 @@ SendPanel::on_show()
 {
   emit set_background_color(Qt::white);
   this->_search->setFocus();
+  this->update();
 }
 
 void
@@ -308,6 +321,7 @@ SendPanel::on_hide()
   this->_files.clear();
   this->_results.clear();
   this->_peer_id = gap_null();
+  this->_adder_part_seperator->hide();
 }
 
 /*-------.
