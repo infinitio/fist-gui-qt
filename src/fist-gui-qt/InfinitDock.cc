@@ -156,7 +156,7 @@ InfinitDock::InfinitDock(gap_State* state):
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
   this->show();
-  this->showPanel();
+  this->show_dock();
 
   this->_systray_message(QString("Infinit is started!"),
                          QString("Make sure the Infinit icon is always visible "
@@ -175,10 +175,10 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Unknown:
     case QSystemTrayIcon::MiddleClick:
-      this->togglePanel();
+      this->toggle_dock();
       break;
     case QSystemTrayIcon::Context:
-      this->hidePanel();
+      this->hide_dock();
       break;
     default:
       break;
@@ -224,17 +224,17 @@ InfinitDock::transactionPanel()
 }
 
 void
-InfinitDock::showPanel()
+InfinitDock::show_dock()
 {
   ELLE_TRACE_SCOPE("%s: show dock", *this);
 
   this->show();
-  this->setFocus();
-  this->_position_panel();
+  this->activateWindow();
+  this->setFocus(Qt::ActiveWindowFocusReason);
 }
 
 void
-InfinitDock::hidePanel()
+InfinitDock::hide_dock()
 {
   ELLE_TRACE_SCOPE("%s: hide dock", *this);
 
@@ -242,14 +242,14 @@ InfinitDock::hidePanel()
 }
 
 void
-InfinitDock::togglePanel(bool toggle_only)
+InfinitDock::toggle_dock(bool toggle_only)
 {
   ELLE_TRACE_SCOPE("%s: toggle dock", *this);
 
   if (this->isVisible() and !toggle_only)
-    this->hidePanel();
+    this->hide_dock();
   else
-    this->showPanel();
+    this->show_dock();
 }
 
 void
@@ -299,7 +299,7 @@ InfinitDock::pick_files()
     for (auto const& file: selected)
       this->_send_panel->add_file(file);
     this->_switch_view(this->_send_panel);
-    this->showPanel();
+    this->show_dock();
   }
   this->_file_picker.reset();
 }
@@ -350,7 +350,7 @@ InfinitDock::dropEvent(QDropEvent *event)
       }
 
   this->_switch_view(this->_send_panel);
-  this->showPanel();
+  this->show_dock();
 }
 
 void
@@ -373,10 +373,19 @@ InfinitDock::mouseReleaseEvent(QMouseEvent* event)
     ELLE_DEBUG("left button clicked");
 
     event->accept();
-    this->togglePanel(true);
+    this->toggle_dock(true);
   }
   else
     Super::mouseReleaseEvent(event);
+}
+
+void
+InfinitDock::focusInEvent(QFocusEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: get focus (%s)", *this, event->reason());
+
+  this->update();
+  this->_position_panel();
 }
 
 void
@@ -392,7 +401,7 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_Escape)
     {
       ELLE_DEBUG("escape pressed");
-      this->togglePanel();
+      this->toggle_dock();
     }
   }
   else if (this->centralWidget() == this->_send_panel)
@@ -400,7 +409,7 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_Escape)
     {
       ELLE_DEBUG("escape pressed");
-      this->togglePanel();
+      this->toggle_dock();
     }
   }
 }

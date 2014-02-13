@@ -3,11 +3,12 @@
 
 # include <memory>
 
+# include <QFileDialog>
+# include <QFocusEvent>
 # include <QMainWindow>
+# include <QSystemTrayIcon>
 # include <QTimer>
 # include <QWidget>
-# include <QSystemTrayIcon>
-# include <QFileDialog>
 
 # include <elle/Printable.hh>
 
@@ -65,9 +66,15 @@ public Q_SLOTS:
   void
   _register_panel(Panel* panel);
 
-  void hidePanel();
-  void showPanel();
-  void togglePanel(bool toogle_only = false);
+  void
+  hide_dock();
+
+  void
+  show_dock();
+
+  void
+  toggle_dock(bool toogle_only = false);
+
   void pick_files();
 
   void quit();
@@ -127,6 +134,9 @@ protected:
   void
   mouseReleaseEvent(QMouseEvent* event) override;
 
+  void
+  focusInEvent(QFocusEvent* event) override;
+
 private:
   QPixmap _logo;
   QSystemTrayIcon* _systray;
@@ -163,6 +173,42 @@ operator << (std::ostream& out, QSystemTrayIcon::ActivationReason const& reason)
       out << "MiddleClicked"; break;
   }
   return out;
+}
+
+inline
+std::ostream&
+operator << (std::ostream& out, Qt::FocusReason reason)
+{
+  switch (reason)
+  {
+    case Qt::MouseFocusReason:
+      out << "mouse";
+      break;
+    case Qt::TabFocusReason:
+      out << "tab";
+      break;
+    case Qt::BacktabFocusReason:
+      out << "backtab";
+      break;
+    case Qt::ActiveWindowFocusReason:
+      out << "active window";
+      break;
+    case Qt::PopupFocusReason:
+      out << "popup";
+      break;
+    case Qt::ShortcutFocusReason:
+      out << "shortcut";
+      break;
+    case Qt::MenuBarFocusReason:
+      out << "menu bar";
+      break;
+    case Qt::OtherFocusReason:
+      out << "other reason";
+      break;
+    default:
+      out << "no reason";
+  }
+  return out << " focus";
 }
 
 #endif

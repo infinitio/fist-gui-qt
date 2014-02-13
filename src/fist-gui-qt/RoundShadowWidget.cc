@@ -14,6 +14,8 @@ RoundShadowWidget::RoundShadowWidget(int radius,
   _shadow(shadow),
   _background(view::background)
 {
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+
   auto margin = this->_radius + this->_shadow;
   this->setContentsMargins(this->_shadow, margin,
                            this->_shadow, margin);
