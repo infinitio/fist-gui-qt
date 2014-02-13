@@ -1,4 +1,4 @@
-#include <iostream>
+#include <elle/log.hh>
 
 #include <fist-gui-qt/AddFileWidget.hh>
 #include <fist-gui-qt/AvatarIcon.hh>
@@ -66,8 +66,11 @@ SendPanel::SendPanel(gap_State* state):
 void
 SendPanel::_search_changed(QString const& search)
 {
+  ELLE_TRACE_SCOPE("%s: search changed: %s", *this, search);
+
   if (this->_ignore_search_result)
   {
+    ELLE_DEBUG("result ignored");
     this->_ignore_search_result = false;
     return;
   }
@@ -76,6 +79,7 @@ SendPanel::_search_changed(QString const& search)
 
   if (this->_peer_id != gap_null())
   {
+    ELLE_DEBUG("reset selection");
     this->_search->setIcon(QPixmap(":/icons/search@2x.png"));
     this->_peer_id = gap_null();
   }
@@ -96,6 +100,8 @@ SendPanel::_search_changed(QString const& search)
 void
 SendPanel::add_file(QString const& path)
 {
+  ELLE_TRACE_SCOPE("%s: add file: %s", *this, path);
+
   if (this->_files.contains(path))
     return;
 
@@ -108,7 +114,9 @@ SendPanel::add_file(QString const& path)
 void
 SendPanel::remove_file(QString const& path)
 {
-  auto it = this->_files.find(path);
+  ELLE_TRACE_SCOPE("%s: remove file: %s", *this, path);
+
+ auto it = this->_files.find(path);
 
   if (it != this->_files.end())
   {
@@ -124,11 +132,16 @@ SendPanel::remove_file(QString const& path)
 void
 SendPanel::setUsers(uint32_t* uids)
 {
+  ELLE_TRACE_SCOPE("%s: set users", *this);
+
   this->_users->clearWidgets();
   this->_results.clear();
 
   if (uids == nullptr)
+  {
+    ELLE_DEBUG("reset");
     return;
+  }
 
   uint32_t* uidscopy = uids;
   while (*uidscopy != gap_null())
@@ -151,6 +164,7 @@ SendPanel::setUsers(uint32_t* uids)
 void
 SendPanel::clearUsers()
 {
+  ELLE_TRACE_SCOPE("%s: clear user list", *this);
   this->setUsers(nullptr);
 }
 
@@ -160,7 +174,8 @@ SendPanel::clearUsers()
 void
 SendPanel::_set_peer(uint32_t uid)
 {
-  this->_users->clearWidgets();
+  ELLE_TRACE_SCOPE("%s: set peer: %s", *this, this->_user_models.at(uid));
+  this->clearUsers();
   this->_ignore_search_result = true;
   this->_search->setText(this->_user_models.at(uid).fullname());
   this->_search->setIcon(this->_user_models.at(uid).avatar());
@@ -170,6 +185,7 @@ SendPanel::_set_peer(uint32_t uid)
 void
 SendPanel::_pick_user()
 {
+  ELLE_TRACE_SCOPE("%s: pick user", *this);
   if (this->_peer_id == gap_null())
   {
     if (this->_results.empty())
@@ -186,18 +202,22 @@ SendPanel::_pick_user()
 void
 SendPanel::_send()
 {
+  ELLE_TRACE_SCOPE("%s: send", *this);
+
   static QRegExp email_checker(regexp::email,
                                Qt::CaseInsensitive);
 
   if (this->_peer_id == gap_null() &&
       !email_checker.exactMatch(this->_search->text()))
   {
+    ELLE_DEBUG("peer is not set");
     this->_search->setFocus();
     return;
   }
 
   if (this->_files.empty())
   {
+    ELLE_DEBUG("file list is empty");
     this->_file_adder->pulse();
     return;
   }
@@ -206,7 +226,7 @@ SendPanel::_send()
   if ((filenames = (char**)malloc((this->_files.size() + 1) * sizeof(char*)))
       == nullptr)
   {
-    std::cerr << "error: unable to allocate" << std::endl;
+    ELLE_ERR("unable to allocate file list");
   }
 
   for (int i = 0; i < this->_files.size(); i++)
@@ -214,20 +234,27 @@ SendPanel::_send()
     if ((filenames[i] = (char*)malloc((this->_files.keys().at(i).size() + 1)))
         == nullptr)
     {
-      std::cerr << "error: unable to allocate" << std::endl;
+      ELLE_ERR("unable to allocate file name");
     }
 
     strcpy(filenames[i], this->_files.keys().at(i).toStdString().c_str());
   }
+  delete filenames[this->_files.size()];
   filenames[this->_files.size()] = nullptr;
 
   if (this->_peer_id != gap_null())
+  {
+    ELLE_TRACE_SCOPE("send files to %s", this->_user_models.at(this->_peer_id));
     gap_send_files(_state, this->_peer_id, filenames, "");
+  }
   else
+  {
+    ELLE_TRACE_SCOPE("send files to %s", this->_search->text());
     gap_send_files_by_email(_state,
                             this->_search->text().toStdString().c_str(),
                             filenames,
                             "");
+  }
 
   auto** cpy = filenames;
   while (*cpy != nullptr)
@@ -243,6 +270,7 @@ SendPanel::_send()
 void
 SendPanel::avatar_available(uint32_t uid)
 {
+  ELLE_TRACE_SCOPE("%s: user (%s) avatar available", *this, uid);
   auto it = this->_user_models.find(uid);
   if (it != this->_user_models.end())
   {
