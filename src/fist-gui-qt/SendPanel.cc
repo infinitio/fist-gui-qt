@@ -18,6 +18,8 @@
 | Construction |
 `-------------*/
 
+ELLE_LOG_COMPONENT("infinit.FIST.SendPanel");
+
 SendPanel::SendPanel(gap_State* state):
   Super(new SendFooter),
   _state(state),
