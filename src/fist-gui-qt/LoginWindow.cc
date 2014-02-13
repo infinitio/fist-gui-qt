@@ -26,6 +26,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _create_account_link(new QLabel(view::login::links::need_an_account::text))
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
+
   {
     QPalette palette = this->palette();
     {
@@ -118,7 +119,9 @@ LoginWindow::LoginWindow(gap_State* state):
 
   layout->addSpacing(15);
   layout->addWidget(logo, 0, Qt::AlignCenter);
-  layout->addWidget(this->_message_field, 260, Qt::AlignCenter);
+  layout->addStretch();
+  layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
+  layout->addStretch();
   layout->addWidget(this->_email_field, 0, Qt::AlignCenter);
   layout->addSpacing(5);
   layout->addWidget(this->_password_field, 0,  Qt::AlignCenter);
@@ -134,7 +137,7 @@ LoginWindow::LoginWindow(gap_State* state):
     layout->addLayout(hlayout, Qt::AlignCenter);
   }
 
-  layout->addSpacing(40);
+  layout->addStretch();
   layout->addWidget(footer);
 
   this->setCentralWidget(central_widget);
@@ -177,8 +180,8 @@ LoginWindow::_login()
   {
     auto dock = new InfinitDock(_state);
     dock->show();
-    this->deleteLater();
     this->_message_field->clear();
+    this->close();
     return;
   }
 
