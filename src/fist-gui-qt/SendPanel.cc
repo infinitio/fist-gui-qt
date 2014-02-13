@@ -50,6 +50,9 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_file_adder, SIGNAL(clicked()),
           this, SIGNAL(choose_files()));
 
+  connect(this->_file_adder->attach(), SIGNAL(released()),
+          this, SIGNAL(choose_files()));
+
   connect(this->_file_adder, SIGNAL(file_dropped(QString const&)),
           this, SLOT(add_file(QString const&)));
 
