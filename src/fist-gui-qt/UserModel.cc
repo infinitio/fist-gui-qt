@@ -26,7 +26,8 @@ UserModel::fullname() const
 {
   if (this->_fullname.isNull())
   {
-    this->_fullname = QString::fromUtf8(gap_user_fullname(this->_state, this->_id));
+    this->_fullname =
+      QString::fromUtf8(gap_user_fullname(this->_state, this->_id));
 
     ELLE_DEBUG("%s: fetched 'fullname': %s", *this, this->_fullname);
   }
@@ -41,7 +42,8 @@ UserModel::handle() const
 {
   if (this->_handle.isNull())
   {
-    this->_handle = QString::fromUtf8(gap_user_handle(this->_state, this->_id));
+    this->_handle =
+      QString::fromUtf8(gap_user_handle(this->_state, this->_id));
 
     ELLE_DEBUG("%s: fetched 'handle': %s", *this, this->_handle);
   }
