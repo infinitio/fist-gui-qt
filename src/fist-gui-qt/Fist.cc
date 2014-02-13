@@ -3,6 +3,7 @@
 #include <QFont>
 #include <QIcon>
 #include <QPixmap>
+#include <QTextCodec>
 
 #include <elle/log.hh>
 
@@ -35,6 +36,9 @@ Fist::_initialize_application()
   this->_application->setFont(arial);
   this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   this->_application->setQuitOnLastWindowClosed(false);
+
+  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 }
 
 void
@@ -50,7 +54,9 @@ Fist::about_to_quit()
 int
 Fist::operator ()()
 {
-  std::unique_ptr<LoginWindow> login(new LoginWindow(this->_state));
+  // Qt handle destruction.
+  LoginWindow* login = new LoginWindow(this->_state);
+
   ELLE_WARN("Show login window");
   login->show();
 
