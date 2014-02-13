@@ -48,6 +48,8 @@ private:
   QLabel* _reset_password_link;
   QLabel* _create_account_link;
 
+  bool _is_logging;
+
 private:
   Q_OBJECT
 };

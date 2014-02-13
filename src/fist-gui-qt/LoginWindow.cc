@@ -6,6 +6,7 @@
 #include <QToolTip>
 #include <QVBoxLayout>
 
+#include <elle/finally.hh>
 #include <elle/log.hh>
 
 #include <fist-gui-qt/LoginWindow.hh>
@@ -23,7 +24,8 @@ LoginWindow::LoginWindow(gap_State* state):
   _message_field(new QLabel),
   _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
-  _create_account_link(new QLabel(view::login::links::need_an_account::text))
+  _create_account_link(new QLabel(view::login::links::need_an_account::text)),
+  _is_logging(false)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
@@ -154,6 +156,14 @@ LoginWindow::_login()
 {
   ELLE_TRACE_SCOPE("%s: login attempt", *this);
 
+  if (this->_is_logging)
+  {
+    ELLE_WARN("currently logging in");
+    return;
+  }
+  this->_is_logging = true;
+  elle::SafeFinally unlock_login([&] { this->_is_logging = false; });
+
   // this->_login_button->setDisabled(true);
   QString email = this->_email_field->text();
   QString pw = this->_password_field->text();
@@ -187,11 +197,11 @@ LoginWindow::_login()
 
   switch (status)
   {
-#define ERR(case, msg)                                                          \
-    case:                                                                       \
-      ELLE_WARN("%s", tr(msg));                                         \
-      this->_message_field->setText(tr(msg));                                   \
-      break                                                                     \
+#define ERR(case, msg)                                                         \
+    case:                                                                      \
+      ELLE_WARN("%s", tr(msg));                                                \
+      this->_message_field->setText(tr(msg));                                  \
+      break                                                                    \
 /**/
     ERR(case gap_network_error, "Not connected to internet");
     //: While login from login window
@@ -210,6 +220,7 @@ LoginWindow::keyPressEvent(QKeyEvent* event)
     this->_reduce();
   else if (event->key() == Qt::Key_Return)
     _login();
+
 }
 
 void
