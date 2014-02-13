@@ -51,6 +51,8 @@ SmoothLayout::resizeEvent(QResizeEvent* event)
   int growing = 0;
   for (QWidget* widget: widgets)
   {
+    if (widget->isHidden()) continue;
+
     total_height += widget->sizeHint().height();
     if ((widget->sizePolicy().verticalPolicy() & QSizePolicy::GrowFlag) &&
         (widget->sizeHint().height() != widget->size().height()))
@@ -60,6 +62,8 @@ SmoothLayout::resizeEvent(QResizeEvent* event)
   int y = 0;
   for (QWidget* widget: widgets)
   {
+    if (widget->isHidden()) continue;
+
     auto sizeHint = widget->sizeHint();
     auto policy = widget->sizePolicy().horizontalPolicy();
     int width = sizeHint.width();
@@ -127,6 +131,7 @@ SmoothLayout::_layout()
   int width = 0;
   for (QWidget* widget: widgets)
   {
+    if (widget->isHidden()) continue;
     QSize hint(widget->sizeHint());
     if (hint.height() > 0)
       height += hint.height();
