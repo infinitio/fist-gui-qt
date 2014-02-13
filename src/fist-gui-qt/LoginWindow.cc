@@ -1,17 +1,19 @@
+#include <QApplication>
+#include <QHBoxLayout>
+#include <QPixmap>
+#include <QRegExp>
+#include <QString>
+#include <QToolTip>
+#include <QVBoxLayout>
+
+#include <elle/log.hh>
+
 #include <fist-gui-qt/LoginWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
 
-#include <QToolTip>
-#include <QPixmap>
-#include <QString>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QApplication>
-#include <QRegExp>
-
-#include <iostream>
+ELLE_LOG_COMPONENT("infinti.FIST.LoginWindow");
 
 LoginWindow::LoginWindow(gap_State* state):
   RoundShadowWidget(5, 0),
@@ -23,6 +25,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text))
 {
+  ELLE_TRACE_SCOPE("%s: contruction", *this);
   {
     QPalette palette = this->palette();
     {
@@ -138,9 +141,16 @@ LoginWindow::LoginWindow(gap_State* state):
   this->update();
 }
 
+LoginWindow::~LoginWindow()
+{
+  ELLE_TRACE_SCOPE("%s: destruction", *this);
+}
+
 void
 LoginWindow::_login()
 {
+  ELLE_TRACE_SCOPE("%s: login attempt", *this);
+
   // this->_login_button->setDisabled(true);
   QString email = this->_email_field->text();
   QString pw = this->_password_field->text();
@@ -151,6 +161,7 @@ LoginWindow::_login()
 
   if (email.isEmpty() || !email_checker.exactMatch(email))
   {
+    ELLE_DEBUG("invalid email field");
     this->_message_field->setText("invalid email format");
     this->_email_field->setFocus();
     return;
@@ -175,6 +186,7 @@ LoginWindow::_login()
   {
 #define ERR(case, msg)                                                          \
     case:                                                                       \
+      ELLE_WARN("%s", tr(msg));                                         \
       this->_message_field->setText(tr(msg));                                   \
       break                                                                     \
 /**/
@@ -189,6 +201,8 @@ LoginWindow::_login()
 void
 LoginWindow::keyPressEvent(QKeyEvent* event)
 {
+  ELLE_TRACE_SCOPE("%s: key pressed (%s)", *this, event->key());
+
   if (event->key() == Qt::Key_Escape)
     this->_reduce();
   else if (event->key() == Qt::Key_Return)
@@ -198,12 +212,15 @@ LoginWindow::keyPressEvent(QKeyEvent* event)
 void
 LoginWindow::focusInEvent(QFocusEvent*)
 {
+  ELLE_TRACE_SCOPE("%s: give focus to email field", *this);
   this->_email_field->setFocus();
 }
 
 void
 LoginWindow::_quit()
 {
+  ELLE_TRACE_SCOPE("%s: quit", *this);
+
   this->deleteLater();
   this->hide();
 
@@ -214,5 +231,7 @@ LoginWindow::_quit()
 void
 LoginWindow::_reduce()
 {
+  ELLE_TRACE_SCOPE("%s: reduce", *this);
+
   this->setWindowState(Qt::WindowMinimized);
 }

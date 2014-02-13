@@ -21,6 +21,8 @@ private:
   gap_State* _state;
 public:
   LoginWindow(gap_State* state);
+  ~LoginWindow();
+
   void keyPressEvent(QKeyEvent* event);
 
 private slots:
