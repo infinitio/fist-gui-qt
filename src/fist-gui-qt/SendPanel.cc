@@ -239,7 +239,7 @@ SendPanel::_send()
 
     strcpy(filenames[i], this->_files.keys().at(i).toStdString().c_str());
   }
-  delete filenames[this->_files.size()];
+
   filenames[this->_files.size()] = nullptr;
 
   if (this->_peer_id != gap_null())
