@@ -13,26 +13,6 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
-static
-void
-center_window(QWidget& widget)
-{
-  int width = widget.frameGeometry().width();
-  int height = widget.frameGeometry().height();
-
-  QDesktopWidget wid;
-
-  // Main screen only.
-  int screenWidth = wid.screen(0)->width();
-  int screenHeight = wid.screen(0)->height();
-
-  widget.setGeometry((screenWidth / 2) - (width / 2),
-                     (screenHeight / 2) - (height / 2),
-                     width,
-                     height);
-}
-
-
 Fist::Fist(int argc, char** argv):
   _application(new QApplication(argc, argv)),
   _state(gap_new())
