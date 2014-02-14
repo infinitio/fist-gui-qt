@@ -96,6 +96,7 @@ SmoothScrollBar::_scroll_to(int value, int speed)
 
   if (value != this->_value_target)
   {
+    this->_value_animation->stop();
     this->_value_target = value;
     this->_value_animation->setDuration(speed);
     this->_value_animation->setEndValue(value);
