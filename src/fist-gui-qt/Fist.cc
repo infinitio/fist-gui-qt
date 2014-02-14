@@ -75,11 +75,13 @@ Fist::about_to_quit()
 int
 Fist::operator ()()
 {
+  ELLE_TRACE_SCOPE("%s: run application", *this);
+
   // Qt handle destruction.
   LoginWindow* login = new LoginWindow(this->_state);
 
-  ELLE_WARN("Show login window");
-  center_window(*login);
+  ELLE_DEBUG("show login window");
+
   login->show();
 
   return this->_application->exec();
