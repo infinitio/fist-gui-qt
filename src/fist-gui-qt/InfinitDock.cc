@@ -457,7 +457,7 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
   Super::focusOutEvent(event);
 
   if (event->reason() != Qt::MouseFocusReason)
-    this->hidePanel();
+    this->hide_dock();
 }
 
 
