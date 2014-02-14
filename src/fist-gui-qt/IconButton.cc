@@ -1,4 +1,8 @@
+#include <elle/log.hh>
+
 #include <fist-gui-qt/IconButton.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.IconButton");
 
 IconButton::IconButton(QPixmap const& pixmap,
                        bool shadow,
@@ -19,6 +23,8 @@ IconButton::IconButton(QPixmap const& pixmap,
 void
 IconButton::enable()
 {
+  ELLE_TRACE_SCOPE("%s: enable", *this);
+
   if (!this->isEnabled())
   {
     QPushButton::setDisabled(false);
@@ -28,6 +34,8 @@ IconButton::enable()
 void
 IconButton::disable()
 {
+  ELLE_TRACE_SCOPE("%s: disabled", *this);
+
   if (this->isEnabled())
   {
     QPushButton::setDisabled(true);
@@ -75,6 +83,7 @@ IconButton::paintEvent(QPaintEvent*)
 void
 IconButton::_clicked()
 {
+  ELLE_TRACE_SCOPE("%s: clicked", *this);
   if (this->_callback)
     this->_callback();
 }
