@@ -149,7 +149,6 @@ private:
   QSystemTrayIcon* _systray;
   QMenu* _systray_menu;
   QAction* _send_files;
-  std::unique_ptr<QFileDialog> _file_picker;
   QAction* _quit;
   gap_State* _state;
 

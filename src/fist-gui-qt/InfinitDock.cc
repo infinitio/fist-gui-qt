@@ -62,7 +62,6 @@ InfinitDock::InfinitDock(gap_State* state):
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),
-  _file_picker(nullptr),
   _quit(new QAction(tr("&Quit"), this)),
   _state(state)
 {
@@ -271,27 +270,15 @@ InfinitDock::_position_panel()
   ELLE_DEBUG("%s: new position: (%s, %s)", *this, this->x(), this->y());
 }
 
-static
-QFileDialog*
-spaw_dialog(InfinitDock* dock)
-{
-  ELLE_TRACE_SCOPE("Dock: spawn file picker");
-
-  std::unique_ptr<QFileDialog> file_picker(new QFileDialog(dock));
-  file_picker->setFileMode(QFileDialog::ExistingFiles);
-  return file_picker.release();
-}
 
 void
 InfinitDock::pick_files()
 {
   ELLE_TRACE_SCOPE("%s: spawn file picker", *this);
 
-  this->_file_picker.reset(spaw_dialog(this));
-  this->_file_picker->exec();
-  QStringList selected = this->_file_picker->selectedFiles();
-
-  ELLE_DEBUG_SCOPE("%s selected file(s)", selected.size());
+  QStringList selected = QFileDialog::getOpenFileNames(
+    this,
+    tr("Select files to send"));
 
   if (selected.size())
   {
@@ -300,7 +287,6 @@ InfinitDock::pick_files()
     this->_switch_view(this->_send_panel);
     this->show_dock();
   }
-  this->_file_picker.reset();
 }
 
 void
