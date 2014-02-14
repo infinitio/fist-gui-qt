@@ -143,7 +143,7 @@ void
 TransactionPanel::user_status_changed(uint32_t uid,
                                       gap_UserStatus status)
 {
-  ELLE_TRACE_SCOPE("%s: user %s status changed to %s", uid, status);
+  ELLE_TRACE_SCOPE("%s: user %s status changed to %s", *this, uid, status);
 
   // XXX: Do per user update.
   this->_list->update();
