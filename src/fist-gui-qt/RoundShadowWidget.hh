@@ -18,8 +18,9 @@ public:
 `-------------*/
 public:
   RoundShadowWidget(int radius = 5,
-                    int shadow = 3);
-
+                    int shadow = 3,
+                    Qt::WindowFlags = Qt::WindowStaysOnTopHint |
+                                      Qt::FramelessWindowHint);
 /*-------------------.
 | Display properties |
 `-------------------*/

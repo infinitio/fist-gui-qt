@@ -80,9 +80,6 @@ InfinitDock::InfinitDock(gap_State* state):
   this->_systray_menu->addAction(_quit);
   this->_systray->setContextMenu(_systray_menu);
 
-  this->setWindowFlags(Qt::FramelessWindowHint);
-  this->setAttribute(Qt::WA_TranslucentBackground, true);
-
   this->_transaction_panel = new TransactionPanel(state);
 
   this->_register_panel(this->_transaction_panel);

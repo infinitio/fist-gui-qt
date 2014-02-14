@@ -9,18 +9,18 @@
 `-------------*/
 
 RoundShadowWidget::RoundShadowWidget(int radius,
-                                     int shadow):
+                                     int shadow,
+                                     Qt::WindowFlags flags):
+  QMainWindow(nullptr, flags),
   _radius(radius),
   _shadow(shadow),
   _background(view::background)
 {
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setAttribute(Qt::WA_TranslucentBackground, true);
 
   auto margin = this->_radius + this->_shadow;
   this->setContentsMargins(this->_shadow, margin,
                            this->_shadow, margin);
-  this->setWindowFlags(Qt::FramelessWindowHint);
-  this->setAttribute(Qt::WA_TranslucentBackground, true);
   this->setMinimumSize(QSize(0, 0));
   this->setFocusPolicy(Qt::StrongFocus);
 }

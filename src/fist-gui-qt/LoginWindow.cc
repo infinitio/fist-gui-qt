@@ -17,7 +17,7 @@
 ELLE_LOG_COMPONENT("infinti.FIST.LoginWindow");
 
 LoginWindow::LoginWindow(gap_State* state):
-  RoundShadowWidget(5, 0),
+  RoundShadowWidget(5, 0, Qt::FramelessWindowHint),
   _state(state),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
@@ -40,7 +40,6 @@ LoginWindow::LoginWindow(gap_State* state):
 
   this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
-  this->setWindowFlags(view::login::flags);
 
   // Quit button.
   {
