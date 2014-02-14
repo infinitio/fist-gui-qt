@@ -93,6 +93,9 @@ public slots:
   void
   _show_menu();
 
+  void
+  _back_from_send_view();
+
 private:
   void
   focusOutEvent(QFocusEvent* event) override;

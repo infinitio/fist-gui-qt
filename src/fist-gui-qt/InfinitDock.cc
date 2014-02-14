@@ -102,17 +102,17 @@ InfinitDock::InfinitDock(gap_State* state):
     connect(this->_send_panel->footer()->back(),
             SIGNAL(released()),
             this,
-            SLOT(_show_transactions_view()));
+            SLOT(_back_from_send_view()));
+
+    connect(this->_send_panel,
+            SIGNAL(switch_signal()),
+            this,
+            SLOT(_back_from_send_view()));
 
     connect(this->_send_panel,
             SIGNAL(choose_files()),
             this,
             SLOT(pick_files()));
-
-    connect(this->_send_panel,
-            SIGNAL(switch_signal()),
-            this,
-            SLOT(_show_transactions_view()));
   }
 
   connect(this,
@@ -173,10 +173,9 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Unknown:
     case QSystemTrayIcon::MiddleClick:
-      this->toggle_dock();
+      this->show_dock();
       break;
     case QSystemTrayIcon::Context:
-      this->hide_dock();
       break;
     default:
       break;
@@ -425,6 +424,13 @@ InfinitDock::_show_menu()
 
   QPoint pos(this->geometry().bottomLeft());
   this->_menu->move(pos);
+}
+
+void
+InfinitDock::_back_from_send_view()
+{
+  this->_show_transactions_view();
+  this->hide_dock();
 }
 
 void
