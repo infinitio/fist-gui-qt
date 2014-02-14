@@ -405,6 +405,10 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
       ELLE_DEBUG("escape pressed");
       this->toggle_dock();
     }
+    else if (event->key() == Qt::Key_S)
+    {
+      this->_show_send_view();
+    }
   }
   else if (this->centralWidget() == this->_send_panel)
   {
@@ -439,6 +443,23 @@ InfinitDock::_show_menu()
   QPoint pos(this->geometry().bottomLeft());
   this->_menu->move(pos);
 }
+
+void
+InfinitDock::focusOutEvent(QFocusEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: focus lost (reason %s)", *this, event->reason());
+
+  if (this->centralWidget() == this->_send_panel)
+  {
+    event->accept();
+    return;
+  }
+  Super::focusOutEvent(event);
+
+  if (event->reason() != Qt::MouseFocusReason)
+    this->hidePanel();
+}
+
 
 void
 InfinitDock::_show_transactions_view()

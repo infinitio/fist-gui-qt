@@ -34,7 +34,7 @@ private:
 | Types |
 `------*/
 public:
-  typedef QWidget Super;
+  typedef RoundShadowWidget Super;
 
 /*-------------.
 | Construction |
@@ -83,12 +83,19 @@ public Q_SLOTS:
 public slots:
   void
   _show_send_view();
+
   void
   _show_user_view(uint32_t sender_id);
+
   void
   _show_transactions_view();
+
   void
   _show_menu();
+
+private:
+  void
+  focusOutEvent(QFocusEvent* event) override;
 
 private:
   void _switch_view(Panel* target);
