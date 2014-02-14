@@ -1,8 +1,9 @@
 ; Registry
 !define regkey "Software\${company}\${product_name}"
 !define uninstkey "Software\Microsoft\Windows\CurrentVersion\Uninstall\${product_name}"
-!define startmenu "$SMPROGRAMS\${company}\${product_name}"
-
+!define company_install "$PROGRAMFILES\${company}"
+!define company_startmenu "$SMPROGRAMS\${company}"
+!define startmenu "${'${company_startmenu}'}\${product_name}"
 !define uninstaller "uninstall.exe"
 
 ;------------------------------------------------------------------------------
@@ -13,6 +14,7 @@ XPStyle on
 ShowInstDetails show
 ShowUninstDetails hide
 AutoCloseWindow false
+RequestExecutionLevel highest
 
 Name "${product_name}"
 Caption "${product_name}"
@@ -24,7 +26,7 @@ SetDatablockOptimize on
 CRCCheck on
 SilentInstall normal
 
-InstallDir "$PROGRAMFILES\${company}\${product_name}"
+InstallDir "${'${company_install}'}\${product_name}"
 InstallDirRegKey HKLM "${'${regkey}'}" ""
 
 LicenseText "License"
@@ -111,9 +113,10 @@ Section
 	CreateShortCut "${'${startmenu}'}\${product_name}.lnk" "$INSTDIR\${executable}" "" "$INSTDIR\${icon}"
 	CreateShortCut "${'${startmenu}'}\Release Notes.lnk" "$INSTDIR\${release_notes}"
 	CreateShortCut "${'${startmenu}'}\Documentation.lnk" "$INSTDIR\${documentation}"
+	CreateShortCut "${'${startmenu}'}\Uninstall.lnk" "$INSTDIR\${'${uninstaller}'}" "" "$INSTDIR\${icon}"
 
-	WriteINIStr "${'${startmenu}'}\WebSite.url" "InternetShortcut" "URL" ${website}
-	CreateShortCut "${'${startmenu}'}\WebSite.lnk "${website}" "URL"
+	; WriteINIStr "${'${startmenu}'}\WebSite.url" "InternetShortcut" "URL" ${website}
+	CreateShortCut "${'${startmenu}'}\WebSite.lnk" "${website}" "URL"
 	; ExecShell "open" "$INSTDIR\${release_notes}"
 
 SectionEnd
@@ -123,11 +126,18 @@ SectionEnd
 ;------------------------------------------------------------------------------
 
 Section "Uninstall"
+        DELETE "$INSTDIR\${'${uninstaller}'}"
+
 	DeleteRegKey HKLM "${'${uninstkey}'}"
 	DeleteRegKey HKLM "${'${regkey}'}"
 
-	Delete "${'${startmenu}'}\*.*"
-	Delete "${'${startmenu}'}"
+        Delete "${'${startmenu}'}\${product_name}.lnk"
+        Delete "${'${startmenu}'}\Release Notes.lnk"
+        Delete "${'${startmenu}'}\Documentation.lnk"
+        Delete "${'${startmenu}'}\Uninstall.lnk"
+        Delete "${'${startmenu}'}\WebSite.lnk"
+	RMDir "${'${startmenu}'}"
+	RMDir "${'${company_startmenu}'}"
 
 	Delete "$INSTDIR\${license}"
         Delete "$INSTDIR\${release_notes}"
@@ -135,13 +145,12 @@ Section "Uninstall"
 	Delete "$INSTDIR\${documentation}"
 
 	Delete "$INSTDIR\${executable}"
-
         % for lib in libraries:
-          DELETE "$INSTDIR\${lib}"
+        Delete "$INSTDIR\${lib}"
         % endfor
 
-        DELETE "$INSTDIR\${'${uninstaller}'}"
 	RMDir "$INSTDIR"
+        RMDir "${'${company_install}'}"
 SectionEnd
 
 
