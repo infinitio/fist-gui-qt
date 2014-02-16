@@ -10,10 +10,10 @@
 
 // Diameter of the avatar
 static int const picture_size = 45;
-static int const shadow_width = 3;
-static int const border_width = 3;
+static int const shadow_width = 2;
+static int const border_width = 2;
 static int const progress_size = 4;
-static int const progress_offset = 3;
+static int const progress_offset = 2;
 static int const badge_size = 16;
 static int const badge_border_size = 2;
 static int const total_size = 2 * progress_size + 2 * progress_offset + picture_size;
