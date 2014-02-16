@@ -254,7 +254,7 @@ InfinitDock::_position_panel()
 {
   ELLE_TRACE_SCOPE("%s: move panel", *this);
 
-  ELLE_DEBUG("%s: old position: (%s, %s)", *this, this->x(), this->y());
+  ELLE_DUMP("%s: old position: (%s, %s)", *this, this->x(), this->y());
 
   QPoint systray_position(this->_systray->geometry().topLeft());
 
@@ -266,7 +266,7 @@ InfinitDock::_position_panel()
   this->move(qBound(screen.left(), x, screen.right()),
              qBound(screen.top(), y, screen.bottom()));
 
-  ELLE_DEBUG("%s: new position: (%s, %s)", *this, this->x(), this->y());
+  ELLE_DUMP("%s: new position: (%s, %s)", *this, this->x(), this->y());
 }
 
 
@@ -291,15 +291,15 @@ InfinitDock::pick_files()
 void
 InfinitDock::quit()
 {
-    this->hide();
-    this->_send_panel->hide();
-    this->_transaction_panel->hide();
-    this->_systray->hide();
-    this->_systray_menu->hide();
-    this->deleteLater();
+  this->hide();
+  this->_send_panel->hide();
+  this->_transaction_panel->hide();
+  this->_systray->hide();
+  this->_systray_menu->hide();
+  this->deleteLater();
 
-    QApplication::setQuitOnLastWindowClosed(true);
-    QApplication::quit();
+  QApplication::setQuitOnLastWindowClosed(true);
+  QApplication::quit();
 }
 
 /*--------------.
