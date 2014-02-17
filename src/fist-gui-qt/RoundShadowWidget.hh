@@ -20,7 +20,8 @@ public:
   RoundShadowWidget(int radius = 5,
                     int shadow = 3,
                     Qt::WindowFlags = Qt::WindowStaysOnTopHint |
-                                      Qt::FramelessWindowHint);
+                                      Qt::FramelessWindowHint |
+                                      Qt::Tool);
 /*-------------------.
 | Display properties |
 `-------------------*/
