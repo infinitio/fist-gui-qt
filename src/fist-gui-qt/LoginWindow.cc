@@ -2,6 +2,7 @@
 #include <QHBoxLayout>
 #include <QPixmap>
 #include <QRegExp>
+#include <QSettings>
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
@@ -15,6 +16,9 @@
 #include <fist-gui-qt/globals.hh>
 
 ELLE_LOG_COMPONENT("infinti.FIST.LoginWindow");
+
+static QRegExp email_checker(regexp::email,
+                             Qt::CaseInsensitive);
 
 LoginWindow::LoginWindow(gap_State* state):
   RoundShadowWidget(5, 0, Qt::FramelessWindowHint),
@@ -53,6 +57,14 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_email_field->setFixedSize(view::login::email::size);
     view::login::email::style(*this->_email_field);
     this->_email_field->setTextMargins(12, 0, 12, 0);
+
+    QSettings settings("Infinit.io", "Infinit");
+    settings.beginGroup("Login");
+    auto saved_email = settings.value("email", "").toString();
+    settings.endGroup();
+
+    if (!saved_email.isEmpty())
+      this->_email_field->setText(saved_email);
   }
 
   // Password field.
@@ -61,7 +73,18 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_password_field->setFixedSize(view::login::password::size);
     view::login::password::style(*this->_password_field);
     this->_password_field->setTextMargins(12, 0, 12, 0);
+
+    QSettings settings("Infinit.io", "Infinit");
+    settings.beginGroup("Login");
+    auto saved_password = settings.value("password", "").toString();
+    settings.endGroup();
+
+    if (!saved_password.isEmpty())
+      this->_password_field->setText(saved_password);
   }
+
+  if (!this->_email_field->text().isEmpty())
+    this->_password_field->setFocus();
 
   // Logo.
   auto logo = new QLabel;
@@ -142,6 +165,7 @@ LoginWindow::LoginWindow(gap_State* state):
   layout->addWidget(footer);
 
   this->setCentralWidget(central_widget);
+
   this->update();
 }
 
@@ -167,10 +191,6 @@ LoginWindow::_login()
   QString email = this->_email_field->text();
   QString pw = this->_password_field->text();
 
-  static QRegExp email_checker(regexp::email,
-                               Qt::CaseInsensitive);
-
-
   if (email.isEmpty() || !email_checker.exactMatch(email))
   {
     ELLE_DEBUG("invalid email field");
@@ -187,6 +207,11 @@ LoginWindow::_login()
 
   if (status == gap_ok)
   {
+    QSettings settings("Infinit.io", "Infinit");
+    settings.beginGroup("Login");
+    settings.setValue("email", email);
+    settings.endGroup();
+
     auto dock = new InfinitDock(_state);
     dock->show();
     this->_message_field->clear();
@@ -225,10 +250,23 @@ LoginWindow::keyPressEvent(QKeyEvent* event)
 }
 
 void
-LoginWindow::focusInEvent(QFocusEvent*)
+LoginWindow::focusInEvent(QFocusEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: give focus to email field", *this);
-  this->_email_field->setFocus();
+  ELLE_TRACE_SCOPE("%s: gain focus", *this);
+
+  Super::focusInEvent(event);
+
+  if (this->_email_field->text().isEmpty() ||
+      !email_checker.exactMatch(this->_email_field->text()))
+  {
+    ELLE_DEBUG("focus email field");
+    this->_email_field->setFocus();
+  }
+  else
+  {
+    ELLE_DEBUG("focus password field");
+    this->_password_field->setFocus();
+  }
 }
 
 void

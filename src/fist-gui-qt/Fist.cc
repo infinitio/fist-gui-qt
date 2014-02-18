@@ -64,6 +64,7 @@ Fist::operator ()()
   ELLE_DEBUG("show login window");
 
   login->show();
+  login->setFocus();
 
   return this->_application->exec();
 }

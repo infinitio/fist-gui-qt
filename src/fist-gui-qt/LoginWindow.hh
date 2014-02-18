@@ -17,6 +17,8 @@
 class LoginWindow:
   public RoundShadowWidget
 {
+  typedef RoundShadowWidget Super;
+
 private:
   gap_State* _state;
 public:
