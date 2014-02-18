@@ -203,8 +203,10 @@ LoginWindow::_login()
       break                                                                    \
 /**/
     ERR(case gap_network_error, "Not connected to internet");
-    //: While login from login window
-    ERR(case gap_email_password_dont_match, "Wrong login/password");
+    ERR(case gap_meta_unreachable, "Unable to contact main server");
+    ERR(case gap_meta_down_with_message, "Main server is down...");
+    ERR(case gap_trophonius_unreachable, "Unable to contact notification server");
+    ERR(case gap_email_password_dont_match, "Wrong email/password");
     ERR(default, "Internal error");
   }
   // ythis->_login_button->setDisabled(false);
