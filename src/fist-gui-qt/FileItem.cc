@@ -37,7 +37,7 @@ FileItem::FileItem(QString const& path):
   ListItem(nullptr, view::send::file::background, false),
   _layout(new QHBoxLayout(this)),
   _file(path),
-  _name(new QLabel(_file.fileName().split(QDir::separator()).last())),
+  _name(new QLabel(_file.fileName().split("/" /* QDir::separator() */).last())),
   _icon(new QLabel),
   _size(new QLabel(readable_size(_file.size()))),
   _remove(new IconButton(QPixmap(":/icons/delete.png"), // Remove.
