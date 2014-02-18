@@ -205,3 +205,12 @@ SmoothLayout::setMaximumWidth(int value)
     updateGeometry();
   }
 }
+
+/*----------.
+| Printable |
+`----------*/
+void
+SmoothLayout::print(std::ostream& stream) const
+{
+  stream << "SmoothLayout";
+}

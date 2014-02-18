@@ -8,8 +8,6 @@
 # include <QScrollArea>
 # include <QFrame>
 
-# include <elle/Printable.hh>
-
 # include <surface/gap/gap.h>
 
 # include <fist-gui-qt/ListWidget.hh>
@@ -18,8 +16,7 @@
 # include <fist-gui-qt/Panel.hh>
 
 class TransactionPanel:
-  public Panel,
-  public elle::Printable
+  public Panel
 {
 public:
   TransactionPanel(gap_State* state, QWidget* parent = nullptr);

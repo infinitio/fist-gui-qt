@@ -50,6 +50,14 @@ public:
   Footer*
   footer();
 
+private:
+  /*----------.
+  | Printable |
+  `----------*/
+  void
+  print(std::ostream& stream) const override;
+
+private:
   Q_OBJECT;
 };
 

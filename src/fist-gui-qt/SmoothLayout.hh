@@ -4,10 +4,13 @@
 # include <QWidget>
 # include <QPropertyAnimation>
 
+# include <elle/Printable.hh>
+
 # include <fist-gui-qt/utils.hh>
 
 class SmoothLayout:
-  public QWidget
+  public QWidget,
+  public elle::Printable
 {
 /*------.
 | Types |
@@ -80,6 +83,13 @@ Q_SIGNALS:
 private:
   QPropertyAnimation* _height_animation;
   QPropertyAnimation* _width_animation;
+
+private:
+  /*----------.
+  | Printable |
+  `----------*/
+  void
+  print(std::ostream& stream) const override;
 
 private:
   Q_OBJECT;

@@ -1,7 +1,11 @@
 #include <QSizePolicy>
 #include <QChildEvent>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/Panel.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.Panel");
 
 Panel::Panel(Footer* footer,
              QWidget* owner):
@@ -55,4 +59,13 @@ Panel::footer()
 {
   // XXX: assert.
   return this->_footer;
+}
+
+/*----------.
+| Printable |
+`----------*/
+void
+Panel::print(std::ostream& stream) const
+{
+  stream << "Panel";
 }

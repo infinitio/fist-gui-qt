@@ -15,8 +15,7 @@
 # include <fist-gui-qt/fwd.hh>
 
 class SendPanel:
-  public Panel,
-  public elle::Printable
+  public Panel
 {
 /*------.
 | Types |
