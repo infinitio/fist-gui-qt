@@ -162,6 +162,9 @@ void
 TransactionWidget::_update()
 {
   ELLE_TRACE_SCOPE("%s: update", *this);
+  this->_cancel_button->hide();
+  this->_accept_button->hide();
+  this->_reject_button->hide();
 
   if (this->_transaction.new_avatar())
   {
@@ -194,14 +197,9 @@ TransactionWidget::_update()
 
   if (this->_accept_button->isHidden())
   {
-    if (this->_cancel_button->isHidden() &&
-        !g_finals.contains(this->_transaction.status()))
+    if (!g_finals.contains(this->_transaction.status()))
     {
       this->_cancel_button->show();
-    }
-    else if (!this->_cancel_button->isHidden())
-    {
-      this->_cancel_button->hide();
     }
     this->_status->show();
   }
