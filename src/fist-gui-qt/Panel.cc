@@ -1,4 +1,5 @@
 #include <QSizePolicy>
+#include <QChildEvent>
 
 #include <fist-gui-qt/Panel.hh>
 
@@ -32,6 +33,22 @@ Panel::on_show()
 void
 Panel::on_hide()
 {}
+
+void
+Panel::childEvent(QChildEvent* event)
+{
+  Super::childEvent(event);
+
+  if (event->added() || event->removed())
+  {
+    if (this->_footer != nullptr)
+    {
+      // Ensure that the footer is always the last element added.
+      this->_footer->setParent(nullptr);
+      this->_footer->setParent(this);
+    }
+  }
+}
 
 Footer*
 Panel::footer()

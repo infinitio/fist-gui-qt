@@ -9,6 +9,8 @@
 class Panel:
   public SmoothLayout
 {
+  typedef SmoothLayout Super;
+
 public:
   Panel(Footer* footer,
         QWidget* owner = nullptr);
@@ -38,6 +40,10 @@ Q_SIGNALS:
 public:
   QSize
   minimumSizeHint() const override;
+
+protected:
+  void
+  childEvent(QChildEvent* event) override;
 
 public:
   virtual
