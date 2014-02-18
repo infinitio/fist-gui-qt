@@ -36,7 +36,9 @@ namespace
               QColor const& color = QColor(0x25, 0x25, 0x25)):
       _font(font),
       _color(color)
-    {}
+    {
+      this->_font.setStyleStrategy(QFont::PreferAntialias);
+    }
 
     void
     operator ()(QWidget& target) const

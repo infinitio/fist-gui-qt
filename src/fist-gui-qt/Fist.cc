@@ -34,6 +34,7 @@ void
 Fist::_initialize_application()
 {
   QFont arial("Arial", 11);
+  arial.setStyleStrategy(QFont::PreferAntialias);
   this->_application->setFont(arial);
   this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   this->_application->setQuitOnLastWindowClosed(false);
