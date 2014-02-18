@@ -170,11 +170,11 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
   switch (reason)
   {
     case QSystemTrayIcon::Trigger:
-    case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Unknown:
     case QSystemTrayIcon::MiddleClick:
-      this->show_dock();
+      this->toggle_dock();
       break;
+    case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Context:
       break;
     default:
@@ -226,8 +226,10 @@ InfinitDock::show_dock()
   ELLE_TRACE_SCOPE("%s: show dock", *this);
 
   this->show();
+  this->update();
   this->activateWindow();
   this->setFocus(Qt::ActiveWindowFocusReason);
+  this->_position_panel();
 }
 
 void
@@ -370,6 +372,11 @@ InfinitDock::focusInEvent(QFocusEvent* event)
 
   this->update();
   this->_position_panel();
+
+  if (this->centralWidget() == nullptr)
+  {
+    this->centralWidget()->setFocus(event->reason());
+  }
 }
 
 void
@@ -443,6 +450,7 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
     event->accept();
     return;
   }
+
   Super::focusOutEvent(event);
 
   if (event->reason() != Qt::MouseFocusReason)
