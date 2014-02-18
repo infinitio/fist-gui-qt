@@ -110,6 +110,8 @@ SendPanel::add_file(QString const& path)
 {
   ELLE_TRACE_SCOPE("%s: add file: %s", *this, path);
 
+  this->_search->setFocus();
+
   if (this->_files.contains(path))
     return;
 
