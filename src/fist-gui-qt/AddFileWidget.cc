@@ -60,12 +60,11 @@ AddFileWidget::sizeHint() const
 void
 AddFileWidget::pulse()
 {
-  QPropertyAnimation* animation =
-    new QPropertyAnimation(this, "pulseColor");
+  QPropertyAnimation* animation = new QPropertyAnimation(this, "pulseColor");
   animation->setDuration(600);
   animation->setEasingCurve(QEasingCurve::InOutQuad);
   animation->setStartValue(QColor(0xBC, 0xD2, 0xD6, 0x77));
-  animation->setEndValue(Qt::GlobalColor::white);
+  animation->setEndValue(view::send::file_adder::background);
   animation->start();
 }
 
