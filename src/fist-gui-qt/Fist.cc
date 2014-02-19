@@ -6,16 +6,49 @@
 #include <QPixmap>
 #include <QTextCodec>
 
+#include <elle/os/environ.hh>
+#include <elle/os/path.hh>
 #include <elle/log.hh>
+
+#include <common/common.hh>
 
 #include <fist-gui-qt/Fist.hh>
 #include <fist-gui-qt/LoginWindow.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
+class Fist::Prologue
+{
+  friend Fist;
+
+  Prologue()
+  {
+    if (!elle::os::inenv("ELLE_LOG_LEVEL"))
+    {
+      elle::os::setenv("ELLE_LOG_LEVEL",
+                       "*surface*:DEBUG,*frete*:TRACE,*station*:DEBUG,*FIST*:TRACE",
+                       true);
+    }
+
+    if (!elle::os::inenv("INFINIT_LOG_FILE"))
+    {
+      elle::os::setenv(
+        "ELLE_LOG_FILE",
+        elle::os::path::join(common::infinit::home(), "state.log"),
+        true);
+    }
+
+    ELLE_TRACE_SCOPE("ininitialize Prologue");
+  }
+};
+
 Fist::Fist(int argc, char** argv):
+  _prologue(new Fist::Prologue()),
   _application(new QApplication(argc, argv)),
-  _state(gap_new())
+  _state(gap_configurable_new(
+           "meta.8.0.api.production.infinit.io", 80,
+           "trophonius.8.0.api.production.infinit.io", 443,
+           "apertus.8.0.api.production.infinit.io", 443))
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
 

@@ -24,6 +24,18 @@ public:
   Fist(QApplication&& application);
   ~Fist();
 
+/*---------.
+| Prologue |
+`---------*/
+  // This class is used to create tasks that need done first.
+  // Using the same pattern than pimpl makes it easy to update without polluting
+  // the api.
+  // In that case, it will be use to initialize the log destination, the log
+  // levels, and so on...
+private:
+  class Prologue;
+  std::unique_ptr<Prologue> _prologue;
+
 /*---------------.
 | Initialization |
 `---------------*/
