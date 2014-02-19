@@ -146,7 +146,7 @@ TransactionPanel::user_status_changed(uint32_t uid,
   ELLE_TRACE_SCOPE("%s: user %s status changed to %s", *this, uid, status);
 
   // XXX: Do per user update.
-  this->_list->update();
+  this->_list->reload();
 }
 
 void
