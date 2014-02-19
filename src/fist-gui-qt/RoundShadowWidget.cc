@@ -210,3 +210,12 @@ RoundShadowWidget::_draw_corner(QPainter& painter,
                         (shadow + radius) * 2),
                   16 * angle, 16 * 90);
 }
+
+/*----------.
+| Printable |
+`----------*/
+void
+RoundShadowWidget::print(std::ostream& stream) const
+{
+  stream << "RoundShadowWidget";
+}

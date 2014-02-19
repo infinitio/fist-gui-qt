@@ -4,8 +4,11 @@
 # include <QMainWindow>
 # include <QWidget>
 
+# include <elle/Printable.hh>
+
 class RoundShadowWidget:
-  public QMainWindow
+  public QMainWindow,
+  public elle::Printable
 {
 /*------.
 | Types |
@@ -96,6 +99,13 @@ private:
                int left,
                int top,
                int angle);
+
+/*----------.
+| Printable |
+`----------*/
+private:
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif

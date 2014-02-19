@@ -10,16 +10,13 @@
 # include <QTimer>
 # include <QWidget>
 
-# include <elle/Printable.hh>
-
 # include <surface/gap/gap.h>
 
 # include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class InfinitDock:
-  public RoundShadowWidget,
-  public elle::Printable
+  public RoundShadowWidget
 {
   // This class is used to create tasks that need done first.
   // The need comes from initialization wich create some objects that have a

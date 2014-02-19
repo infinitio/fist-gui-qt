@@ -52,6 +52,14 @@ private:
 
   bool _is_logging;
 
+
+/*----------.
+| Printable |
+`----------*/
+private:
+  void
+  print(std::ostream& stream) const override;
+
 private:
   Q_OBJECT
 };

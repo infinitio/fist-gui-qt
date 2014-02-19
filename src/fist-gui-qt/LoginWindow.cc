@@ -288,3 +288,9 @@ LoginWindow::_reduce()
 
   this->setWindowState(Qt::WindowMinimized);
 }
+
+void
+LoginWindow::print(std::ostream& stream) const
+{
+  stream << "LoginWindow";
+}
