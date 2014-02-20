@@ -1,6 +1,8 @@
 #ifndef UTILS_HH
 # define UTILS_HH
 
+# include <QUrl>
+
 # define Q_PROPERTY_R(Type, Name, Read)                 \
   public:                                               \
     Type                                                \
@@ -54,6 +56,13 @@ operator << (std::ostream& out, QString const& s)
   if (s.isNull())
     return out;
   return out << s.toStdString();
+}
+
+inline
+std::ostream&
+operator << (std::ostream& out, QUrl const& u)
+{
+  return out << u.toString();
 }
 
 #endif
