@@ -256,7 +256,7 @@ SendPanel::_send()
   for (int i = 0; i < this->_files.size(); i++)
   {
     auto filepath =
-      QDir::toNativeSeparators(this->_files.keys().at(i).path()).toStdString();
+      QDir::toNativeSeparators(this->_files.keys().at(i).toLocalFile()).toStdString();
 
     ELLE_DEBUG("file to add: %s", filepath);
 
