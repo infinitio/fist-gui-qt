@@ -7,6 +7,7 @@
 # include <QLabel>
 # include <QListWidgetItem>
 # include <QString>
+# include <QUrl>
 
 # include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/ListItem.hh>
@@ -15,7 +16,8 @@ class FileItem:
   public ListItem
 {
 public:
-  FileItem(QString const& path);
+  FileItem(QUrl const& path);
+
   virtual ~FileItem() = default;
 
   virtual
@@ -24,10 +26,11 @@ public:
 
 Q_SIGNALS:
   void
-  remove(QString const&);
+  remove(QUrl const&);
 
 private:
   QHBoxLayout* _layout;
+  QUrl _path;
   QFile _file;
   QLabel* _name;
   QLabel* _icon;

@@ -1,8 +1,13 @@
+#include <QDir>
+#include <QHBoxLayout>
+
+#include <elle/log.hh>
+
 #include <fist-gui-qt/FileItem.hh>
 #include <fist-gui-qt/globals.hh>
 
-#include <QDir>
-#include <QHBoxLayout>
+
+ELLE_LOG_COMPONENT("infinit.FIST.FileItem");
 
 namespace
 {
@@ -21,37 +26,42 @@ static
 QString
 readable_size(qint64 size)
 {
-  int i = -1;
-  std::vector<QString> units = {"kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
-  do
+  int i = 0;
+  std::vector<QString> units = {
+    "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+
+  while (size > 1024)
   {
     size /= 1024.f;
     i++;
   }
-  while (size > 1024);
 
   return QString("%1").arg(size) + " " + units[i];
 };
 
-FileItem::FileItem(QString const& path):
+FileItem::FileItem(QUrl const& path):
   ListItem(nullptr, view::send::file::background, false),
   _layout(new QHBoxLayout(this)),
-  _file(path),
-  _name(new QLabel(_file.fileName().split("/" /* QDir::separator() */).last())),
+  _path(path),
+  _file(path.toLocalFile()),
+  _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last())),
   _icon(new QLabel),
-  _size(new QLabel(readable_size(_file.size()))),
+  _size(new QLabel(readable_size(this->_file.size()))),
   _remove(new IconButton(QPixmap(":/icons/delete.png"), // Remove.
                          false,
                          [this]
                          {
-                           emit remove(this->_file.fileName());
+                           emit remove(this->_path);
                          }))
 {
+  ELLE_TRACE_SCOPE("%s: construction with path %s", *this, path);
+
   this->setContentsMargins(6, 0, 6, 0);
 
   // Name.
   {
     view::send::file::name::style(*this->_name);
+    this->_name->setToolTip(this->_name->text());
   }
 
   // Size.
@@ -60,7 +70,11 @@ FileItem::FileItem(QString const& path):
   }
 
   QFileIconProvider icon_provider;
-  this->_icon->setPixmap(icon_provider.icon(_file).pixmap(18));
+  if (QFileInfo(this->_file).isDir())
+    this->_icon->setPixmap(icon_provider.icon(QFileIconProvider::Folder).pixmap(18));
+  else
+    this->_icon->setPixmap(icon_provider.icon(this->_file).pixmap(18));
+
   this->_layout->addWidget(this->_icon);
   this->_layout->addItem(new QSpacerItem(4, 0,
                                   QSizePolicy::Minimum, QSizePolicy::Minimum));

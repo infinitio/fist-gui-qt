@@ -1,3 +1,5 @@
+#include <QDir>
+
 #include <elle/log.hh>
 
 #include <fist-gui-qt/AddFileWidget.hh>
@@ -57,8 +59,8 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_file_adder->attach(), SIGNAL(released()),
           this, SIGNAL(choose_files()));
 
-  connect(this->_file_adder, SIGNAL(file_dropped(QString const&)),
-          this, SLOT(add_file(QString const&)));
+  connect(this->_file_adder, SIGNAL(file_dropped(QUrl const&)),
+          this, SLOT(add_file(QUrl const&)));
 
   connect(this->footer()->send(), SIGNAL(clicked()),
           this, SLOT(_send()));
@@ -106,7 +108,7 @@ SendPanel::_search_changed(QString const& search)
 `------*/
 
 void
-SendPanel::add_file(QString const& path)
+SendPanel::add_file(QUrl const& path)
 {
   ELLE_TRACE_SCOPE("%s: add file: %s", *this, path);
 
@@ -118,13 +120,13 @@ SendPanel::add_file(QString const& path)
   this->_adder_part_seperator->show();
 
   this->_files.insert(path, new FileItem(path));
-  connect(this->_files[path], SIGNAL(remove(QString const&)),
-          this, SLOT(remove_file(QString const&)));
+  connect(this->_files[path], SIGNAL(remove(QUrl const&)),
+          this, SLOT(remove_file(QUrl const&)));
   this->_file_list->add_widget(this->_files[path]);
 }
 
 void
-SendPanel::remove_file(QString const& path)
+SendPanel::remove_file(QUrl const& path)
 {
   ELLE_TRACE_SCOPE("%s: remove file: %s", *this, path);
 
@@ -134,6 +136,12 @@ SendPanel::remove_file(QString const& path)
   {
     this->_file_list->remove_widget(it.value());
     this->_files.remove(path);
+  }
+  else
+  {
+    ELLE_DEBUG_SCOPE("no file deleted");
+    for (auto const& file: this->_files.keys())
+      ELLE_DEBUG("%s", file);
   }
 
   if (this->_files.empty())
@@ -247,13 +255,17 @@ SendPanel::_send()
 
   for (int i = 0; i < this->_files.size(); i++)
   {
-    if ((filenames[i] = (char*)malloc((this->_files.keys().at(i).size() + 1)))
-        == nullptr)
+    auto filepath =
+      QDir::toNativeSeparators(this->_files.keys().at(i).path()).toStdString();
+
+    ELLE_DEBUG("file to add: %s", filepath);
+
+    if ((filenames[i] = (char*)malloc((filepath.size() + 1))) == nullptr)
     {
       ELLE_ERR("unable to allocate file name");
     }
 
-    strcpy(filenames[i], this->_files.keys().at(i).toStdString().c_str());
+    strcpy(filenames[i], filepath.c_str());
   }
 
   filenames[this->_files.size()] = nullptr;

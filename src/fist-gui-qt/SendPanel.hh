@@ -1,6 +1,7 @@
 #ifndef SENDPANEL_HH
 # define SENDPANEL_HH
 
+# include <QUrl>
 # include <QWidget>
 
 # include <unordered_map>
@@ -35,11 +36,11 @@ public:
 `------*/
 public Q_SLOTS:
   void
-  add_file(QString const& path);
+  add_file(QUrl const& path);
 
 private Q_SLOTS:
   void
-  remove_file(QString const& path);
+  remove_file(QUrl const& path);
 
 private slots:
   void _send();
@@ -91,7 +92,7 @@ protected:
 `-------*/
 private:
   std::unordered_map<uint32_t, UserModel> _user_models;
-  QHash<QString, FileItem*> _files;
+  QHash<QUrl, FileItem*> _files;
 
   void
   on_show() override;

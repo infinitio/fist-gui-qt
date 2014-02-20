@@ -122,8 +122,8 @@ AddFileWidget::dropEvent(QDropEvent *event)
       if (url.isLocalFile())
       {
         event->acceptProposedAction();
-        ELLE_DEBUG("%s dropped", url.toLocalFile());
-        emit file_dropped(url.toLocalFile());
+        ELLE_DEBUG("%s dropped", url);
+        emit file_dropped(url);
       }
 }
 

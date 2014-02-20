@@ -54,7 +54,7 @@ signals:
    clicked();
 
    void
-   file_dropped(QString const&);
+   file_dropped(QUrl const&);
 
 public slots:
   void
