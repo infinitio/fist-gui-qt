@@ -2,6 +2,7 @@
 # define UTILS_HH
 
 # include <QUrl>
+# include <QNetworkReply>
 
 # define Q_PROPERTY_R(Type, Name, Read)                 \
   public:                                               \
@@ -62,7 +63,14 @@ inline
 std::ostream&
 operator << (std::ostream& out, QUrl const& u)
 {
-  return out << u.toString();
+  return out << "QUrl(" << u.toString() << ")";
+}
+
+inline
+std::ostream&
+operator << (std::ostream& out, QNetworkReply const& r)
+{
+  return out << "Request(" << r.url() << ")";
 }
 
 #endif
