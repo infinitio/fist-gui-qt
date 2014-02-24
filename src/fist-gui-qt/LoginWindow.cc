@@ -21,7 +21,7 @@ static QRegExp email_checker(regexp::email,
                              Qt::CaseInsensitive);
 
 LoginWindow::LoginWindow(gap_State* state):
-  RoundShadowWidget(5, 0, Qt::FramelessWindowHint),
+  RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
@@ -32,15 +32,6 @@ LoginWindow::LoginWindow(gap_State* state):
   _is_logging(false)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
-
-  {
-    QPalette palette = this->palette();
-    {
-      palette.setColor(QPalette::Window, view::background);
-    }
-    this->setAutoFillBackground(true);
-    this->setPalette(palette);
-  }
 
   this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
