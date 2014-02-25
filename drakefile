@@ -1,5 +1,6 @@
 import drake
 import drake.cxx
+import drake.git
 import drake.nsis
 import drake.cxx.qt
 import drake.templating
@@ -7,11 +8,13 @@ import drake.templating
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
               prefix = '/usr',
+              git = None,
               qt = None,
               libraries = []):
 
   cxx_config = drake.cxx.Config(cxx_config)
   cxx_toolkit = cxx_toolkit or drake.cxx.Toolkit()
+  git = git or drake.git.Git(path = drake.path_source('..'))
 
   if qt is None:
     qt = drake.cxx.qt.Qt(prefix = prefix, gui = True)
@@ -182,5 +185,14 @@ def configure(cxx_toolkit = None,
       with templating_context:
         installer = drake.nodes('installer.nsi.tmpl')
 
+    templating_context = drake.templating.Context(
+      content = {
+        'version': git.description(),
+        })
+
+    with templating_context:
+      update = drake.node('update.xml.tmpl')
+
     installer_rule = drake.Rule('installer')
     installer_rule << drake.Node('bin/installer.exe')
+    installer_rule << drake.copy(drake.Node('update.xml'), 'bin', strip_prefix = True)
