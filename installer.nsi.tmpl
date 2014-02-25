@@ -117,8 +117,8 @@ Section
 
 	; WriteINIStr "${'${startmenu}'}\WebSite.url" "InternetShortcut" "URL" ${website}
 	CreateShortCut "${'${startmenu}'}\WebSite.lnk" "${website}" "URL"
-	; ExecShell "open" "$INSTDIR\${release_notes}"
-
+	; Run the exectuable.
+        Exec '"$WINDIR\explorer.exe" "$INSTDIR\${executable}"'
 SectionEnd
 
 ;------------------------------------------------------------------------------
