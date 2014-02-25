@@ -143,6 +143,13 @@ namespace view
       }
     }
 
+    namespace version
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 8.5), QColor(0x88, 0x88, 0x88));
+    }
+
     namespace footer
     {
       static

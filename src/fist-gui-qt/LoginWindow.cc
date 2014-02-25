@@ -9,6 +9,7 @@
 
 #include <elle/finally.hh>
 #include <elle/log.hh>
+#include <version.hh>
 
 #include <fist-gui-qt/LoginWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
@@ -29,6 +30,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
+  _version_field(new QLabel),
   _is_logging(false)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
@@ -109,6 +111,12 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_reset_password_link->setOpenExternalLinks(true);
   }
 
+  // Version
+  {
+    view::login::version::style(*this->_version_field);
+    this->_version_field->hide();
+  }
+
   // Footer.
   auto footer = new LoginFooter;
   {
@@ -123,12 +131,13 @@ LoginWindow::LoginWindow(gap_State* state):
 
   this->_password_field->setEchoMode(QLineEdit::Password);
   auto layout = new QVBoxLayout(central_widget);
-  layout->setContentsMargins(0, 10, 0, 0);
+  layout->setContentsMargins(0, 2, 0, 0);
   {
     auto hlayout = new QHBoxLayout();
+    hlayout->setContentsMargins(7, 0, 7, 0);
+    hlayout->addWidget(this->_version_field, 0, Qt::AlignCenter);
     hlayout->addStretch();
     hlayout->addWidget(this->_quit_button, 0, Qt::AlignRight);
-    hlayout->addSpacing(10);
     layout->addLayout(hlayout);
   }
 
@@ -226,6 +235,23 @@ LoginWindow::_login()
     ERR(default, "Internal error");
   }
   // ythis->_login_button->setDisabled(false);
+}
+
+void
+LoginWindow::set_message(QString const& message)
+{
+  this->_message_field->setText(message);
+}
+
+void
+LoginWindow::set_version()
+{
+  ELLE_TRACE_SCOPE("%s: set version: %s", *this, INFINIT_VERSION);
+  this->_version_field->setText(
+    QString::fromStdString(
+      elle::sprintf("v%s", INFINIT_VERSION)));
+  this->_version_field->show();
+  this->update();
 }
 
 void

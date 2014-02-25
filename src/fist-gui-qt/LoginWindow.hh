@@ -50,8 +50,16 @@ private:
   QLabel* _reset_password_link;
   QLabel* _create_account_link;
 
+  QLabel* _version_field;
+
   bool _is_logging;
 
+public Q_SLOTS:
+  void
+  set_message(QString const&);
+
+  void
+  set_version();
 
 /*----------.
 | Printable |
