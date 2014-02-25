@@ -150,7 +150,7 @@ InfinitDock::InfinitDock(gap_State* state):
   timer->start(1000);
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
-  this->connect(_quit, SIGNAL(triggered()), this, SLOT(quit()));
+  this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
   this->show();
   this->show_dock();
 
@@ -160,6 +160,11 @@ InfinitDock::InfinitDock(gap_State* state):
                          QSystemTrayIcon::Information);
 
   this->setAcceptDrops(true);
+}
+
+InfinitDock::~InfinitDock()
+{
+  ELLE_TRACE_SCOPE("%s: quit", *this);
 }
 
 void
@@ -290,20 +295,6 @@ InfinitDock::pick_files()
   }
 }
 
-void
-InfinitDock::quit()
-{
-  this->hide();
-  this->_send_panel->hide();
-  this->_transaction_panel->hide();
-  this->_systray->hide();
-  this->_systray_menu->hide();
-  this->deleteLater();
-
-  QApplication::setQuitOnLastWindowClosed(true);
-  QApplication::quit();
-}
-
 /*--------------.
 | Drag and drop |
 `--------------*/
@@ -344,9 +335,8 @@ InfinitDock::closeEvent(QCloseEvent* event)
 {
   ELLE_TRACE_SCOPE("%s: close", *this);
 
-  this->close();
   Super::closeEvent(event);
-  qApp->quit();
+  this->deleteLater();
 }
 
 void

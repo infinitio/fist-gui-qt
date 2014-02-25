@@ -29,13 +29,17 @@ public:
 
 private slots:
   void
-  _quit();
-
-  void
   _reduce();
 
   void
   _login();
+
+Q_SIGNALS:
+  void
+  logged_in();
+
+  void
+  quit_request();
 
 private:
   void
@@ -53,6 +57,10 @@ private:
   QLabel* _version_field;
 
   bool _is_logging;
+
+public:
+  void
+  closeEvent(QCloseEvent* event) override;
 
 public Q_SLOTS:
   void

@@ -12,6 +12,8 @@
 
 # include <surface/gap/gap.h>
 
+# include <fist-gui-qt/fwd.hh>
+
 class Fist:
   public QObject,
   public elle::Printable
@@ -52,6 +54,17 @@ public slots:
   void
   about_to_quit();
 
+  // This handle the process of killing the application.
+  void
+  quit();
+
+/*-----.
+| Dock |
+`-----*/
+private slots:
+  void
+  logged_in();
+
 /*----.
 | Run |
 `----*/
@@ -59,8 +72,15 @@ public:
   int
   operator ()();
 
+private slots:
+  void
+  _reposition_dialog();
+
 private:
   ELLE_ATTRIBUTE(std::unique_ptr<QApplication>, application);
+  ELLE_ATTRIBUTE(std::unique_ptr<Updater>, updater);
+  ELLE_ATTRIBUTE(std::unique_ptr<LoginWindow>, login_window);
+  ELLE_ATTRIBUTE(InfinitDock*, dock);
   ELLE_ATTRIBUTE(gap_State*, state);
 private:
   Q_OBJECT;

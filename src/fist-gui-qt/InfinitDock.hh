@@ -38,9 +38,23 @@ public:
 `-------------*/
 public:
   InfinitDock(gap_State* state);
+
+/*------------.
+| Destruction |
+`------------*/
+public:
+  ~InfinitDock();
+
+signals:
+  void
+  quit_request();
+
+public:
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
   static void avatar_available_cb(uint32_t id);
+
+
 
 public slots:
   void _update();
@@ -74,7 +88,6 @@ public Q_SLOTS:
 
   void pick_files();
 
-  void quit();
   void _position_panel();
 
 public slots:

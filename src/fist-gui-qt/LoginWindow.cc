@@ -41,7 +41,7 @@ LoginWindow::LoginWindow(gap_State* state):
   // Quit button.
   {
     connect(this->_quit_button, SIGNAL(released()),
-            this, SLOT(_quit()));
+            this, SIGNAL(quit_request()));
   }
 
   // Email field.
@@ -161,7 +161,6 @@ LoginWindow::LoginWindow(gap_State* state):
     layout->addLayout(hlayout, Qt::AlignCenter);
   }
 
-  layout->addStretch();
   layout->addWidget(footer);
 
   this->setCentralWidget(central_widget);
@@ -212,10 +211,12 @@ LoginWindow::_login()
     settings.setValue("email", email);
     settings.endGroup();
 
-    auto dock = new InfinitDock(_state);
-    dock->show();
     this->_message_field->clear();
+
+    emit logged_in();
+
     this->close();
+
     return;
   }
 
@@ -224,7 +225,7 @@ LoginWindow::_login()
 #define ERR(case, msg)                                                         \
     case:                                                                      \
       ELLE_WARN("%s", tr(msg));                                                \
-      this->_message_field->setText(tr(msg));                                  \
+      this->_message_field->setText(tr(msg));                           \
       break                                                                    \
 /**/
     ERR(case gap_network_error, "Not connected to internet");
@@ -287,18 +288,6 @@ LoginWindow::focusInEvent(QFocusEvent* event)
 }
 
 void
-LoginWindow::_quit()
-{
-  ELLE_TRACE_SCOPE("%s: quit", *this);
-
-  this->deleteLater();
-  this->hide();
-
-  QApplication::setQuitOnLastWindowClosed(true);
-  QApplication::quit();
-}
-
-void
 LoginWindow::_reduce()
 {
   ELLE_TRACE_SCOPE("%s: reduce", *this);
@@ -310,4 +299,12 @@ void
 LoginWindow::print(std::ostream& stream) const
 {
   stream << "LoginWindow";
+}
+
+void
+LoginWindow::closeEvent(QCloseEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: close", *this);
+
+  Super::closeEvent(event);
 }
