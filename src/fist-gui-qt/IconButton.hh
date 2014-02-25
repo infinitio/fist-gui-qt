@@ -8,7 +8,8 @@
 
 # include <functional>
 
-class IconButton: public QPushButton
+class IconButton:
+  public QPushButton
 {
   Q_OBJECT;
 
