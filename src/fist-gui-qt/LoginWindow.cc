@@ -34,16 +34,13 @@ LoginWindow::LoginWindow(gap_State* state):
   _is_logging(false)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
-
   this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
-
   // Quit button.
   {
     connect(this->_quit_button, SIGNAL(released()),
             this, SIGNAL(quit_request()));
   }
-
   // Email field.
   {
     this->_email_field->setPlaceholderText(view::login::email::placeholder);
@@ -59,38 +56,31 @@ LoginWindow::LoginWindow(gap_State* state):
     if (!saved_email.isEmpty())
       this->_email_field->setText(saved_email);
   }
-
   // Password field.
   {
     this->_password_field->setPlaceholderText(view::login::password::placeholder);
     this->_password_field->setFixedSize(view::login::password::size);
     view::login::password::style(*this->_password_field);
     this->_password_field->setTextMargins(12, 0, 12, 0);
-
     QSettings settings("Infinit.io", "Infinit");
     settings.beginGroup("Login");
     auto saved_password = settings.value("password", "").toString();
     settings.endGroup();
-
     if (!saved_password.isEmpty())
       this->_password_field->setText(saved_password);
   }
-
   if (!this->_email_field->text().isEmpty())
     this->_password_field->setFocus();
-
   // Logo.
   auto logo = new QLabel;
   {
     logo->setScaledContents(true);
     logo->setPixmap(QPixmap(QString(":/images/logo-complete.png")));
   }
-
   // Message field.
   {
     view::login::message::style(*this->_message_field);
   }
-
   // Create account.
   {
     view::login::links::style(*this->_create_account_link);
@@ -100,7 +90,6 @@ LoginWindow::LoginWindow(gap_State* state):
       QSizePolicy::Minimum, QSizePolicy::Maximum);
     this->_create_account_link->setOpenExternalLinks(true);
   }
-
   // Forgotten password.
   {
     view::login::links::style(*this->_reset_password_link);
@@ -110,25 +99,21 @@ LoginWindow::LoginWindow(gap_State* state):
       QSizePolicy::Minimum, QSizePolicy::Maximum);
     this->_reset_password_link->setOpenExternalLinks(true);
   }
-
   // Version
   {
     view::login::version::style(*this->_version_field);
     this->_version_field->hide();
   }
-
   // Footer.
   auto footer = new LoginFooter;
   {
     connect(footer, SIGNAL(released()),
             this, SLOT(_login()));
   }
-
   auto central_widget = new QWidget;
   {
     central_widget->setFixedSize(this->width(), this->height());
   }
-
   this->_password_field->setEchoMode(QLineEdit::Password);
   auto layout = new QVBoxLayout(central_widget);
   layout->setContentsMargins(0, 2, 0, 0);
@@ -140,7 +125,6 @@ LoginWindow::LoginWindow(gap_State* state):
     hlayout->addWidget(this->_quit_button, 0, Qt::AlignRight);
     layout->addLayout(hlayout);
   }
-
   layout->addSpacing(15);
   layout->addWidget(logo, 0, Qt::AlignCenter);
   layout->addStretch();
@@ -160,9 +144,8 @@ LoginWindow::LoginWindow(gap_State* state):
     hlayout->addStretch();
     layout->addLayout(hlayout, Qt::AlignCenter);
   }
-
+  layout->addStretch();
   layout->addWidget(footer);
-
   this->setCentralWidget(central_widget);
 
   this->update();
