@@ -102,7 +102,10 @@ Updater::check_for_updates()
     QString::fromStdString(elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
 
   this->_reply.reset(this->_network_manager->get(request));
-  this->_loading_dialog->exec();
+
+  this->_loading_dialog->setModal(true);
+  this->_loading_dialog->show();
+  // this->_loading_dialog->exec();
 }
 
 void
@@ -302,8 +305,8 @@ Updater::_update(QNetworkReply* reply)
     HINSTANCE answer = ShellExecuteW(NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
     if(answer > (HINSTANCE) 32)
     {
-      emit quit_request();
       this->_close_dialog();
+      emit quit_request();
     }
     else
     {
@@ -332,7 +335,7 @@ void
 Updater::_close_dialog()
 {
   ELLE_TRACE_SCOPE("%s: close dialog", *this);
-  this->_loading_dialog->close ();
+  this->_loading_dialog->hide();
 }
 
 void

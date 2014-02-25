@@ -163,5 +163,5 @@ void
 LoadingDialog::close()
 {
   ELLE_TRACE_SCOPE("%s: hide loading dialog", *this);
-  this->hide();
+  this->done(0);
 }

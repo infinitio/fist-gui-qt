@@ -118,9 +118,9 @@ Fist::quit()
       this->_dock->close();
     }
 
-  ELLE_DEBUG("quit");
   this->_application->setQuitOnLastWindowClosed(true);
   this->_application->quit();
+  ELLE_DEBUG("quit");
 }
 
 int
