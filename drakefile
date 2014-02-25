@@ -27,6 +27,7 @@ def configure(cxx_toolkit = None,
   # Add file config first.
   cxx_config += qt.config
   cxx_config += qt.config_gui
+  cxx_config += qt.config_network
 
   cxx_config.lib_path_runtime('../lib')
 
@@ -46,6 +47,8 @@ def configure(cxx_toolkit = None,
     cxx_config.lib('comdlg32')
     cxx_config.lib('imm32')
     cxx_config.lib('winspool')
+    cxx_config.lib('shell32')
+    cxx_config.lib('kernel32')
     cxx_config.lib('QtCore')
     # Remove the command line windows on qt.
     cxx_config.flag("-Wl,-subsystem,windows")
@@ -119,6 +122,12 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/UserWidget.cc",
     "src/fist-gui-qt/UserWidget.hh",
     "src/fist-gui-qt/globals.hh",
+
+    "src/fist-gui-qt/Updater.hh",
+    "src/fist-gui-qt/Updater.cc",
+    "src/fist-gui-qt/LoadingDialog.hh",
+    "src/fist-gui-qt/LoadingDialog.cc",
+
     "src/fist-gui-qt/main.cc",
   )
 
@@ -168,7 +177,6 @@ def configure(cxx_toolkit = None,
         })
     nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
                                      resources = installer_resources)
-
 
     with nsi_context:
       with templating_context:

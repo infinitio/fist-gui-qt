@@ -1,6 +1,13 @@
 #ifndef FWD_HH
 # define FWD_HH
 
+// Windows.
+class InfinitDock;
+class LoadingDialog;
+class LoginWindow;
+class Updater;
+
+// Dock Elements.
 class AddFileWidget;
 class AvatarWidget;
 class FileItem;
