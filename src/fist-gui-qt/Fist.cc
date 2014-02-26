@@ -150,6 +150,9 @@ Fist::operator ()()
   connect(this->_updater->loading_dialog(), SIGNAL(resized()),
           this, SLOT(_reposition_dialog()));
 
+  connect(this->_login_window.get(), SIGNAL(version_rejected()),
+          this->_updater.get(), SLOT(check_for_updates()));
+
   ELLE_DEBUG("show login window");
 
   this->_login_window->show();

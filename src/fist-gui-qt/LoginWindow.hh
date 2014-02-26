@@ -41,6 +41,8 @@ Q_SIGNALS:
   void
   quit_request();
 
+  void
+  version_rejected();
 private:
   void
   focusInEvent(QFocusEvent* event) override;

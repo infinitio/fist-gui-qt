@@ -195,6 +195,10 @@ LoginWindow::_login()
 
     return;
   }
+  else if (status == gap_deprecated)
+  {
+    emit version_rejected();
+  }
 
   switch (status)
   {
