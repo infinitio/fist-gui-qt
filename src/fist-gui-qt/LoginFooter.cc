@@ -17,9 +17,15 @@ LoginFooter::LoginFooter():
 }
 
 void
-LoginFooter::mouseReleaseEvent(QMouseEvent*)
+LoginFooter::click()
 {
   emit released();
+}
+
+void
+LoginFooter::mouseReleaseEvent(QMouseEvent*)
+{
+  this->click();
 }
 
 void

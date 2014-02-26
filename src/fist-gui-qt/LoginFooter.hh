@@ -12,6 +12,10 @@ public:
   virtual
   ~LoginFooter() = default;
 
+public slots:
+  void
+  click();
+
 Q_SIGNALS:
   void
   released();

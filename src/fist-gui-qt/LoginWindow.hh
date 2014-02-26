@@ -55,6 +55,7 @@ private:
   QLabel* _create_account_link;
 
   QLabel* _version_field;
+  LoginFooter* _footer;
 
   bool _is_logging;
 

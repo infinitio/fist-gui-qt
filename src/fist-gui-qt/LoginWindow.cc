@@ -30,8 +30,7 @@ LoginWindow::LoginWindow(gap_State* state):
   _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
-  _version_field(new QLabel),
-  _is_logging(false)
+  _version_field(new QLabel)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
   this->setWindowIcon(QIcon(":/images/logo.png"));
@@ -105,9 +104,9 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_version_field->hide();
   }
   // Footer.
-  auto footer = new LoginFooter;
+  this->_footer = new LoginFooter;
   {
-    connect(footer, SIGNAL(released()),
+    connect(this->_footer, SIGNAL(released()),
             this, SLOT(_login()));
   }
   auto central_widget = new QWidget;
@@ -145,7 +144,7 @@ LoginWindow::LoginWindow(gap_State* state):
     layout->addLayout(hlayout, Qt::AlignCenter);
   }
   layout->addStretch();
-  layout->addWidget(footer);
+  layout->addWidget(this->_footer);
   this->setCentralWidget(central_widget);
 
   this->update();
@@ -159,17 +158,11 @@ LoginWindow::~LoginWindow()
 void
 LoginWindow::_login()
 {
+  this->_footer->setDisabled(true);
+
+  elle::SafeFinally unlock_login([&] { this->_footer->setDisabled(false); });
   ELLE_TRACE_SCOPE("%s: login attempt", *this);
 
-  if (this->_is_logging)
-  {
-    ELLE_WARN("currently logging in");
-    return;
-  }
-  this->_is_logging = true;
-  elle::SafeFinally unlock_login([&] { this->_is_logging = false; });
-
-  // this->_login_button->setDisabled(true);
   QString email = this->_email_field->text();
   QString pw = this->_password_field->text();
 
@@ -218,7 +211,6 @@ LoginWindow::_login()
     ERR(case gap_email_password_dont_match, "Wrong email/password");
     ERR(default, "Internal error");
   }
-  // ythis->_login_button->setDisabled(false);
 }
 
 void
@@ -246,8 +238,7 @@ LoginWindow::keyPressEvent(QKeyEvent* event)
   if (event->key() == Qt::Key_Escape)
     this->_reduce();
   else if (event->key() == Qt::Key_Return)
-    _login();
-
+    emit this->_footer->click();
 }
 
 void

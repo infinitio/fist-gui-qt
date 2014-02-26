@@ -12,6 +12,8 @@ class AddFileWidget;
 class AvatarWidget;
 class FileItem;
 class IconButton;
+class Footer;
+class LoginFooter;
 class ListWidget;
 class NoNotificationWidget;
 class Panel;
