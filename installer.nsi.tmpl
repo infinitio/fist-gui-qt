@@ -38,6 +38,11 @@ DirText "Choose the install directory"
 UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
+Function .OnInstSuccess
+  ;; Run the exectuable.
+  Exec '"$WINDIR\explorer.exe" "$INSTDIR\${executable}"'
+FunctionEnd
+
 ;------------------------------------------------------------------------------
 ; Pages
 ;------------------------------------------------------------------------------
@@ -57,20 +62,20 @@ UninstPage instfiles
 
 !ifdef background
 
-	Function .onGUIInit
-		; extract background BMP into temp plugin directory
-		InitPluginsDir
-		File /oname=$PLUGINSDIR\1.bmp "${resources_folder}/${background}"
+  Function .onGUIInit
+    ; extract background BMP into temp plugin directory
+    InitPluginsDir
+    File /oname=$PLUGINSDIR\1.bmp "${resources_folder}/${background}"
 
-		BgImage::SetBg /NOUNLOAD /FILLSCREEN $PLUGINSDIR\1.bmp
-		BgImage::Redraw /NOUNLOAD
-	FunctionEnd
+    BgImage::SetBg /NOUNLOAD /FILLSCREEN $PLUGINSDIR\1.bmp
+    BgImage::Redraw /NOUNLOAD
+  FunctionEnd
 
-	Function .onGUIEnd
-		; Destroy must not have /NOUNLOAD so NSIS will be able to unload and
-		; delete BgImage before it exits
-		BgImage::Destroy
-	FunctionEnd
+  Function .onGUIEnd
+    ; Destroy must not have /NOUNLOAD so NSIS will be able to unload and
+    ; delete BgImage before it exits
+    BgImage::Destroy
+  FunctionEnd
 
 !endif
 
@@ -80,24 +85,24 @@ UninstPage instfiles
 
 Section "Install ${product_name}"
 
-	WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
-	WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
-	WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
-	WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
+  WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
+  WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
+  WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
 
-	; Main binaries
-	SetOutPath $INSTDIR
-	File "${resources_folder}\${executable}"
-        % for lib in libraries:
-          File "${resources_folder}/${lib}"
-        % endfor
+  ; Main binaries
+  SetOutPath $INSTDIR
+  File "${resources_folder}\${executable}"
+  % for lib in libraries:
+    File "${resources_folder}/${lib}"
+  % endfor
 
-	File "${resources_folder}\${license}"
-	File "${resources_folder}\${release_notes}"
-	File "${resources_folder}\${documentation}"
-	File "${resources_folder}\${icon}"
+  File "${resources_folder}\${license}"
+  File "${resources_folder}\${release_notes}"
+  File "${resources_folder}\${documentation}"
+  File "${resources_folder}\${icon}"
 
-	WriteUninstaller "${'${uninstaller}'}"
+  WriteUninstaller "${'${uninstaller}'}"
 
 SectionEnd
 
@@ -107,18 +112,16 @@ SectionEnd
 ;------------------------------------------------------------------------------
 
 Section
-	CreateDirectory "${'${startmenu}'}"
-	SetOutPath $INSTDIR ; for working directory
+  CreateDirectory "${'${startmenu}'}"
+  SetOutPath $INSTDIR ; for working directory
 
-	CreateShortCut "${'${startmenu}'}\${product_name}.lnk" "$INSTDIR\${executable}" "" "$INSTDIR\${icon}"
-	CreateShortCut "${'${startmenu}'}\Release Notes.lnk" "$INSTDIR\${release_notes}"
-	CreateShortCut "${'${startmenu}'}\Documentation.lnk" "$INSTDIR\${documentation}"
-	CreateShortCut "${'${startmenu}'}\Uninstall.lnk" "$INSTDIR\${'${uninstaller}'}" "" "$INSTDIR\${icon}"
+  CreateShortCut "${'${startmenu}'}\${product_name}.lnk" "$INSTDIR\${executable}" "" "$INSTDIR\${icon}"
+  CreateShortCut "${'${startmenu}'}\Release Notes.lnk" "$INSTDIR\${release_notes}"
+  CreateShortCut "${'${startmenu}'}\Documentation.lnk" "$INSTDIR\${documentation}"
+  CreateShortCut "${'${startmenu}'}\Uninstall.lnk" "$INSTDIR\${'${uninstaller}'}" "" "$INSTDIR\${icon}"
 
-	; WriteINIStr "${'${startmenu}'}\WebSite.url" "InternetShortcut" "URL" ${website}
-	CreateShortCut "${'${startmenu}'}\WebSite.lnk" "${website}" "URL"
-	; Run the exectuable.
-        Exec '"$WINDIR\explorer.exe" "$INSTDIR\${executable}"'
+  ; WriteINIStr "${'${startmenu}'}\WebSite.url" "InternetShortcut" "URL" ${website}
+  CreateShortCut "${'${startmenu}'}\WebSite.lnk" "${website}" "URL"
 SectionEnd
 
 ;------------------------------------------------------------------------------
@@ -126,31 +129,31 @@ SectionEnd
 ;------------------------------------------------------------------------------
 
 Section "Uninstall"
-        DELETE "$INSTDIR\${'${uninstaller}'}"
+  DELETE "$INSTDIR\${'${uninstaller}'}"
 
-	DeleteRegKey HKLM "${'${uninstkey}'}"
-	DeleteRegKey HKLM "${'${regkey}'}"
+  DeleteRegKey HKLM "${'${uninstkey}'}"
+  DeleteRegKey HKLM "${'${regkey}'}"
 
-        Delete "${'${startmenu}'}\${product_name}.lnk"
-        Delete "${'${startmenu}'}\Release Notes.lnk"
-        Delete "${'${startmenu}'}\Documentation.lnk"
-        Delete "${'${startmenu}'}\Uninstall.lnk"
-        Delete "${'${startmenu}'}\WebSite.lnk"
-	RMDir "${'${startmenu}'}"
-	RMDir "${'${company_startmenu}'}"
+  Delete "${'${startmenu}'}\${product_name}.lnk"
+  Delete "${'${startmenu}'}\Release Notes.lnk"
+  Delete "${'${startmenu}'}\Documentation.lnk"
+  Delete "${'${startmenu}'}\Uninstall.lnk"
+  Delete "${'${startmenu}'}\WebSite.lnk"
+  RMDir "${'${startmenu}'}"
+  RMDir "${'${company_startmenu}'}"
 
-	Delete "$INSTDIR\${license}"
-        Delete "$INSTDIR\${release_notes}"
-	Delete "$INSTDIR\${icon}"
-	Delete "$INSTDIR\${documentation}"
+  Delete "$INSTDIR\${license}"
+  Delete "$INSTDIR\${release_notes}"
+  Delete "$INSTDIR\${icon}"
+  Delete "$INSTDIR\${documentation}"
 
-	Delete "$INSTDIR\${executable}"
-        % for lib in libraries:
-        Delete "$INSTDIR\${lib}"
-        % endfor
+  Delete "$INSTDIR\${executable}"
+  % for lib in libraries:
+  Delete "$INSTDIR\${lib}"
+  % endfor
 
-	RMDir "$INSTDIR"
-        RMDir "${'${company_install}'}"
+  RMDir "$INSTDIR"
+  RMDir "${'${company_install}'}"
 SectionEnd
 
 
