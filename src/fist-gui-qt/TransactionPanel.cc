@@ -223,12 +223,11 @@ TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
           QSystemTrayIcon::Warning);
       break;
     case gap_transaction_canceled:
-      if (transaction.is_sender())
-        emit systray_message(
-          "Nuts!",
-          elle::sprintf("Your transfer with %s was cancelled.",
-                        transaction.peer_fullname().toStdString()).c_str());
-      break;
+      // Should only be displayed if the user is not the one who cancelled.
+      emit systray_message(
+        "Nuts!",
+        elle::sprintf("Your transfer with %s was cancelled.",
+                      transaction.peer_fullname().toStdString()).c_str());
     case gap_transaction_failed:
       if (transaction.is_sender())
         emit systray_message(
