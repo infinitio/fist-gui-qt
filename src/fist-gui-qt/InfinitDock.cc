@@ -63,7 +63,8 @@ InfinitDock::InfinitDock(gap_State* state):
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),
   _quit(new QAction(tr("&Quit"), this)),
-  _state(state)
+  _state(state),
+  _first_hide(true)
 {
   g_dock = this;
 
@@ -154,11 +155,6 @@ InfinitDock::InfinitDock(gap_State* state):
   this->show();
   this->show_dock();
 
-  this->_systray_message(QString("Infinit is started!"),
-                         QString("Make sure the Infinit icon is always visible "
-                                 "by clicking customize!"),
-                         QSystemTrayIcon::Information);
-
   this->setAcceptDrops(true);
 }
 
@@ -243,6 +239,16 @@ InfinitDock::hide_dock()
   ELLE_TRACE_SCOPE("%s: hide dock", *this);
 
   this->hide();
+
+  if (this->_first_hide)
+  {
+    this->_first_hide = false;
+    this->_systray->showMessage(QString("Infinit is minimized!"),
+                                QString("Make sure the Infinit icon is always "
+                                        "visible by clicking customize!"),
+                                QSystemTrayIcon::Information,
+                                60000);
+  }
 }
 
 void

@@ -164,6 +164,7 @@ private:
   QAction* _send_files;
   QAction* _quit;
   gap_State* _state;
+  bool _first_hide;
 
   Q_OBJECT
 
