@@ -1,10 +1,39 @@
+;------------------------------------------------------------------------------
 ; Registry
+;------------------------------------------------------------------------------
 !define regkey "Software\${company}\${product_name}"
 !define uninstkey "Software\Microsoft\Windows\CurrentVersion\Uninstall\${product_name}"
 !define company_install "$PROGRAMFILES\${company}"
 !define company_startmenu "$SMPROGRAMS\${company}"
 !define startmenu "${'${company_startmenu}'}\${product_name}"
 !define uninstaller "uninstall.exe"
+
+;------------------------------------------------------------------------------
+; Variables.
+;------------------------------------------------------------------------------
+Var AutoUpdate
+Var PreviousInstallDir
+
+;------------------------------------------------------------------------------
+; Includes
+;------------------------------------------------------------------------------
+;; System.
+!include FileFunc.nsh
+!insertmacro GetParameters
+!insertmacro GetOptions
+!include x64.nsh
+!include WinVer.nsh
+
+;; Add custom plugins folders.
+!addincludedir ${NSIS_Includes}
+!addplugindir ${NSIS_Plugins}
+
+;; Add custom plugins.
+!include UAC.nsh
+!include nsProcess.nsh
+!include "MUI.nsh"
+
+!include utils.nsh
 
 ;------------------------------------------------------------------------------
 ; General configuration
@@ -14,13 +43,16 @@ XPStyle on
 ShowInstDetails show
 ShowUninstDetails hide
 AutoCloseWindow false
-RequestExecutionLevel highest
 
 Name "${product_name}"
 Caption "${product_name}"
 
 Icon "${resources_folder}/${icon}"
 
+; If admin / highest is passed, command line argument cannot be read.
+RequestExecutionLevel admin
+
+SetOverwrite ifdiff
 SetDateSave on
 SetDatablockOptimize on
 CRCCheck on
@@ -38,23 +70,110 @@ DirText "Choose the install directory"
 UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
+Function .onInit
+  Call KillRunningProcess
+  Call CheckArchitecture
+
+  ;; Search for a previous install folder.
+  ReadRegStr $INSTDIR HKLM "${'${regkey}'}" "Install_Dir"
+
+  ;; If none has been found, High execution level is requiered.
+  StrCmp $INSTDIR "" 0 UAC_Elevate
+  StrCpy $INSTDIR ${'${company_install}'}\${product_name}
+
+UAC_Elevate:
+  MessageBox mb_iconstop "Elevate"
+  !insertmacro UAC_RunElevated
+  StrCmp 1223 $0 UAC_ElevationAborted
+  StrCmp 0 $0 0 UAC_Err
+  StrCmp 1 $1 0 UAC_Success
+  Quit
+
+  StrCmp 1223 $0 UAC_ElevationAborted
+  StrCmp 0 $0 0 UAC_Err
+  StrCmp 1 $1 0 UAC_Success
+  Quit
+
+UAC_Err:
+  MessageBox mb_iconstop "Unable to elevate, error $0$\nPlease try to run this installer with admin privileges."
+  Abort
+
+UAC_ElevationAborted:
+  MessageBox mb_iconstop "This installer requires admin privileges, aborting!"
+  Abort
+
+UAC_Success:
+  MessageBox mb_iconstop "Success"
+  StrCmp 1 $3 +4
+  StrCmp 3 $1 0 UAC_ElevationAborted
+  MessageBox mb_iconstop "This installer requires admin privileges, try again."
+  goto UAC_Elevate
+
+  ;; Look for autoupdate.
+  Call ParseCommandline
+
+  ${'${If}'} $AutoUpdate == 1
+    SetAutoClose true
+    SetSilent silent
+  ${'${Else}'}
+    SetSilent normal
+  ${'${Endif}'}
+
+FunctionEnd
+
 Function .OnInstSuccess
-  ;; Run the exectuable.
-  Exec '"$WINDIR\explorer.exe" "$INSTDIR\${executable}"'
+  Push "$INSTDIR\${executable}"
+  Call RunExecutable
 FunctionEnd
 
 ;------------------------------------------------------------------------------
 ; Pages
 ;------------------------------------------------------------------------------
 
-Page license
+;;; Used during upgrade to skip most pages
+Function PageSkipIfUpdate
+  ${'${If}'} $PerformUpdate == 1
+    Abort
+  ${'${EndIf}'}
+FunctionEnd
 
-; Page components
-Page directory
-Page instfiles
+; MUI Settings
+  !define MUI_ABORTWARNING
+  !define MUI_ICON "${resources_folder}/${icon}"
+  !define MUI_UNICON "${resources_folder}/${icon}"
+  !define MUI_COMPONENTSPAGE_SMALLDESC
 
-UninstPage uninstConfirm
-UninstPage instfiles
+;; Installer pages.
+  ;; Welcome page.
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipIfUpdate
+    !define MUI_WELCOMEPAGE_TITLE_3LINES
+    !insertmacro MUI_PAGE_WELCOME
+  ;; License page.
+    !define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
+    !define MUI_LICENSEPAGE_TEXT_BOTTOM "Licence"
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageFastUpdatePre
+    !insertmacro MUI_PAGE_LICENSE "${resources_folder}\${license}"
+  ;; Directory page.
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipPre
+    !insertmacro MUI_PAGE_DIRECTORY
+  ;; Instfiles page.
+    !insertmacro MUI_PAGE_INSTFILES
+  ;; Finish page
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageDirectoryPre
+    !define MUI_FINISHPAGE_LINK ${website}
+    !define MUI_FINISHPAGE_LINK_LOCATION ${website}
+    !define MUI_FINISHPAGE_NOREBOOTSUPPORT
+    !insertmacro MUI_PAGE_FINISH
+
+;; Uninstaller pages.
+    !insertmacro MUI_UNPAGE_WELCOME
+    !insertmacro MUI_UNPAGE_CONFIRM
+    !insertmacro MUI_UNPAGE_COMPONENTS
+    !insertmacro MUI_UNPAGE_INSTFILES
+    !insertmacro MUI_UNPAGE_FINISH
+
+; Language files
+  !insertmacro MUI_LANGUAGE "English" # first language is the default language
 
 ;------------------------------------------------------------------------------
 ; Installer background
@@ -63,7 +182,7 @@ UninstPage instfiles
 !ifdef background
 
   Function .onGUIInit
-    ; extract background BMP into temp plugin directory
+    ;; extract background BMP into temp plugin directory
     InitPluginsDir
     File /oname=$PLUGINSDIR\1.bmp "${resources_folder}/${background}"
 
@@ -72,8 +191,8 @@ UninstPage instfiles
   FunctionEnd
 
   Function .onGUIEnd
-    ; Destroy must not have /NOUNLOAD so NSIS will be able to unload and
-    ; delete BgImage before it exits
+    ;; Destroy must not have /NOUNLOAD so NSIS will be able to unload and
+    ;; delete BgImage before it exits
     BgImage::Destroy
   FunctionEnd
 
@@ -85,23 +204,27 @@ UninstPage instfiles
 
 Section "Install ${product_name}"
 
+  ;; Registers.
   WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
   WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
   WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
 
-  ; Main binaries
   SetOutPath $INSTDIR
+
+  ;; Executable and libraries.
   File "${resources_folder}\${executable}"
   % for lib in libraries:
     File "${resources_folder}/${lib}"
   % endfor
 
+  ;; Documentation.
   File "${resources_folder}\${license}"
   File "${resources_folder}\${release_notes}"
   File "${resources_folder}\${documentation}"
   File "${resources_folder}\${icon}"
 
+  ;; Uninstaller.
   WriteUninstaller "${'${uninstaller}'}"
 
 SectionEnd
@@ -111,7 +234,8 @@ SectionEnd
 ; Create shortcuts section
 ;------------------------------------------------------------------------------
 
-Section
+
+Section "Create shortcuts"
   CreateDirectory "${'${startmenu}'}"
   SetOutPath $INSTDIR ; for working directory
 
@@ -128,12 +252,12 @@ SectionEnd
 ; Uninstall section
 ;------------------------------------------------------------------------------
 
-Section "Uninstall"
-  DELETE "$INSTDIR\${'${uninstaller}'}"
-
+Section "un.install"
+  ;; Registers
   DeleteRegKey HKLM "${'${uninstkey}'}"
   DeleteRegKey HKLM "${'${regkey}'}"
 
+  ;; Start menu
   Delete "${'${startmenu}'}\${product_name}.lnk"
   Delete "${'${startmenu}'}\Release Notes.lnk"
   Delete "${'${startmenu}'}\Documentation.lnk"
@@ -142,19 +266,23 @@ Section "Uninstall"
   RMDir "${'${startmenu}'}"
   RMDir "${'${company_startmenu}'}"
 
+  ;; Documentation.
   Delete "$INSTDIR\${license}"
   Delete "$INSTDIR\${release_notes}"
   Delete "$INSTDIR\${icon}"
   Delete "$INSTDIR\${documentation}"
 
+
+  ;; Executable and libraries.
   Delete "$INSTDIR\${executable}"
   % for lib in libraries:
-  Delete "$INSTDIR\${lib}"
+    Delete "$INSTDIR\${lib}"
   % endfor
 
+  ;; Uninstaller.
+  Delete "$INSTDIR\${'${uninstaller}'}"
+
+  ;; Install dir.
   RMDir "$INSTDIR"
   RMDir "${'${company_install}'}"
 SectionEnd
-
-
-

@@ -144,6 +144,13 @@ def configure(cxx_toolkit = None,
   build_rule << application
 
   if cxx_toolkit.os == drake.os.windows:
+
+    nsis_includes = drake.nodes('NSIS/nsProcess.nsh',
+                                'NSIS/utils.nsh',
+                                'NSIS/UAC.nsh',
+                                'NSIS/UACHelper.nsh')
+    nsis_plugins = drake.nodes('NSIS/nsProcess.dll', 'NSIS/UAC.dll')
+
     # Installer.
     installer_resources = drake.nodes(
       'resources/icons/icon.ico',
@@ -154,11 +161,18 @@ def configure(cxx_toolkit = None,
       )
 
     installer_resources_folder = drake.Node('installer_resources')
+    nsis_folder = drake.Node('NSISPlugins')
+
+    nsis_includes = drake.copy(nsis_includes, 'NSISPlugins', strip_prefix = True)
+    nsis_plugins = drake.copy(nsis_plugins, 'NSISPlugins', strip_prefix = True)
+
     installer_resources = list(map(
         lambda x: drake.copy(x,
                              installer_resources_folder.name().basename(),
                              strip_prefix = True),
-        installer_resources + [application] + libraries))
+        installer_resources + [application] + libraries)) + nsis_plugins + nsis_includes
+
+    list(map(lambda x: print(x.path()), installer_resources))
 
     templating_context = drake.templating.Context(
       content = {
@@ -177,14 +191,19 @@ def configure(cxx_toolkit = None,
         'license': 'License.txt',
         'release_notes': 'Release notes.txt',
         'documentation': 'Documentation.txt',
-        })
+
+        'NSIS_Plugins': str(drake.path_build(nsis_folder.name())),
+        'NSIS_Includes': str(drake.path_build(nsis_folder.name())),
+      })
+
     nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
-                                     resources = installer_resources)
+                                     resources = installer_resources,
+                                     )
 
     with nsi_context:
       with templating_context:
-        installer = drake.nodes('installer.nsi.tmpl')
-
+        installer = drake.nodes(
+          'installer.nsi.tmpl')
     templating_context = drake.templating.Context(
       content = {
         'version': git.description(),
