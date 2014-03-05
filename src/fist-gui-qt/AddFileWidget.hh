@@ -3,6 +3,7 @@
 
 # include <QLabel>
 # include <QWidget>
+# include <QPropertyAnimation>
 # include <QColor>
 
 # include <elle/Printable.hh>
@@ -45,10 +46,10 @@ private:
 
 public slots:
   void
-  on_drag_entered();
+  on_entered();
 
   void
-  on_drag_left();
+  on_left();
 
   void
   dropEvent(QDropEvent*) override;

@@ -81,6 +81,19 @@ Q_SIGNALS:
   void
   choose_files();
 
+/*--------------.
+| Drag and drop |
+`--------------*/
+public:
+  void
+  dragEnterEvent(QDragEnterEvent *event) override;
+
+  void
+  dragLeaveEvent(QDragLeaveEvent *event) override;
+
+  void
+  dropEvent(QDropEvent *event) override;
+
 private:
   gap_State* _state;
   SearchField* _search;

@@ -69,14 +69,16 @@ SendPanel::SendPanel(gap_State* state):
           this, SLOT(_search_changed(QString const&)));
 
   connect(this, SIGNAL(drag_entered()),
-          this->_file_adder, SLOT(on_drag_entered()));
+          this->_file_adder, SLOT(on_entered()));
 
   connect(this, SIGNAL(drag_left()),
-          this->_file_adder, SLOT(on_drag_left()));
+          this->_file_adder, SLOT(on_left()));
 
   //XXX: Could be factored.
   this->_users_part_separator->hide();
   this->_adder_part_seperator->hide();
+
+  this->setAcceptDrops(true);
 }
 
 void
@@ -357,4 +359,40 @@ void
 SendPanel::print(std::ostream& stream) const
 {
   stream << "SendPanel";
+}
+
+void
+SendPanel::dragEnterEvent(QDragEnterEvent *event)
+{
+  ELLE_TRACE_SCOPE("%s: drag entered", *this);
+
+  if (event->mimeData()->hasUrls())
+    for (auto const& url: event->mimeData()->urls())
+      if (url.isLocalFile())
+      {
+        event->acceptProposedAction();
+        emit drag_entered();
+        return;
+      }
+}
+
+void
+SendPanel::dragLeaveEvent(QDragLeaveEvent *event)
+{
+  ELLE_TRACE_SCOPE("%s: drag left", *this);
+  emit drag_left();
+}
+
+void
+SendPanel::dropEvent(QDropEvent *event)
+{
+  ELLE_TRACE_SCOPE("%s: drop", *this);
+
+  if (event->mimeData()->hasUrls())
+    for (auto const& url: event->mimeData()->urls())
+      if (url.isLocalFile())
+      {
+        event->acceptProposedAction();
+        this->add_file(url);
+      }
 }

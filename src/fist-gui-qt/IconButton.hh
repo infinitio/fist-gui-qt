@@ -1,6 +1,8 @@
 #ifndef ICONBUTTON_HH
 # define ICONBUTTON_HH
 
+# include <memory>
+
 # include <QPainter>
 # include <QPushButton>
 
@@ -23,7 +25,8 @@ public:
   Q_PROPERTY_R(bool, has_shadow, hasShadow);
 
 private:
-  void _draw_shape(QPixmap& pixmap, QColor const& color);
+  void _draw_shape(QPixmap& pixmap,
+                   QColor const& color = QColor());
   void _refresh();
 
 public:
@@ -52,6 +55,10 @@ public:
 private slots:
   void
   _clicked();
+
+public slots:
+  void
+  set_pixmap(QPixmap const& pixmap);
 
 private:
   QPixmap _cache;

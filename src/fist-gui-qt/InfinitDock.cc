@@ -114,16 +114,6 @@ InfinitDock::InfinitDock(gap_State* state):
             SIGNAL(choose_files()),
             this,
             SLOT(pick_files()));
-
-    connect(this,
-            SIGNAL(drag_entered()),
-            this->_send_panel,
-            SIGNAL(drag_entered()));
-
-    connect(this,
-            SIGNAL(drag_left()),
-            this->_send_panel,
-            SIGNAL(drag_left()));
   }
 
   connect(this,
@@ -164,8 +154,6 @@ InfinitDock::InfinitDock(gap_State* state):
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
   this->show();
   this->show_dock();
-
-  this->setAcceptDrops(true);
 }
 
 InfinitDock::~InfinitDock()
@@ -311,47 +299,14 @@ InfinitDock::pick_files()
   }
 }
 
-/*--------------.
-| Drag and drop |
-`--------------*/
-
 void
-InfinitDock::dragEnterEvent(QDragEnterEvent *event)
+InfinitDock::enterEvent(QEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: drag entered", *this);
+  if (this->centralWidget() != nullptr)
+    ELLE_DEBUG("%s currently active", *this->centralWidget());
 
-  if (event->mimeData()->hasUrls())
-    for (auto const& url: event->mimeData()->urls())
-      if (url.isLocalFile())
-      {
-        event->acceptProposedAction();
-        emit drag_entered();
-        return;
-      }
-}
-
-void
-InfinitDock::dragLeaveEvent(QDragLeaveEvent *event)
-{
-  ELLE_TRACE_SCOPE("%s: drag left", *this);
-  emit drag_left();
-}
-
-void
-InfinitDock::dropEvent(QDropEvent *event)
-{
-  ELLE_TRACE_SCOPE("%s: drop", *this);
-
-  if (event->mimeData()->hasUrls())
-    for (auto const& url: event->mimeData()->urls())
-      if (url.isLocalFile())
-      {
-        event->acceptProposedAction();
-        this->_send_panel->add_file(url);
-      }
-
-  this->_switch_view(this->_send_panel);
-  this->show_dock();
+  if (this->centralWidget() == this->_send_panel)
+    this->setFocus();
 }
 
 void

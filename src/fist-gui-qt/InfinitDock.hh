@@ -49,12 +49,6 @@ signals:
   void
   quit_request();
 
-  void
-  drag_entered();
-
-  void
-  drag_left();
-
 public:
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
@@ -137,22 +131,7 @@ private:
 private:
   QMenu* _menu;
 
-/*--------------.
-| Drag and drop |
-`--------------*/
-protected:
-  virtual
-  void
-  dragEnterEvent(QDragEnterEvent *event) override;
-
-  virtual
-  void
-  dragLeaveEvent(QDragLeaveEvent *event) override;
-
-  virtual
-  void
-  dropEvent(QDropEvent *event) override;
-
+public:
   virtual
   void
   keyPressEvent(QKeyEvent* event) override;
@@ -161,9 +140,14 @@ protected:
   virtual
   void
   closeEvent(QCloseEvent* event) override;
+
   virtual
   void
   mouseReleaseEvent(QMouseEvent* event) override;
+
+  virtual
+  void
+  enterEvent(QEvent* event) override;
 
   void
   focusInEvent(QFocusEvent* event) override;

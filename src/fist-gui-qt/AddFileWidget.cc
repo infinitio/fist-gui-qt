@@ -80,14 +80,14 @@ AddFileWidget::setPulseColor(QColor const& color)
 void
 AddFileWidget::enterEvent(QEvent*)
 {
-  view::send::file_adder::hover_style(*this->_text);
+  this->on_entered();
   this->setCursor(QCursor(Qt::PointingHandCursor));
 }
 
 void
 AddFileWidget::leaveEvent(QEvent*)
 {
-  view::send::file_adder::style(*this->_text);
+  this->on_left();
   this->setCursor(QCursor(Qt::ArrowCursor));
 }
 
@@ -98,17 +98,21 @@ AddFileWidget::mousePressEvent(QMouseEvent*)
 }
 
 void
-AddFileWidget::on_drag_entered()
+AddFileWidget::on_entered()
 {
-  ELLE_DEBUG_SCOPE("%s: drag entered", *this);
+  ELLE_DEBUG_SCOPE("%s: mouse entered", *this);
   view::send::file_adder::hover_style(*this->_text);
+  this->_attach->set_pixmap(QPixmap(":/icons/files-hover.png"));
+  this->repaint();
 }
 
 void
-AddFileWidget::on_drag_left()
+AddFileWidget::on_left()
 {
-  ELLE_DEBUG_SCOPE("%s: drag left", *this);
+  ELLE_DEBUG_SCOPE("%s: mouse left", *this);
   view::send::file_adder::style(*this->_text);
+  this->_attach->set_pixmap(QPixmap(":/icons/files.png"));
+  this->repaint();
 }
 
 void

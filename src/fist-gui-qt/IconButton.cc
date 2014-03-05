@@ -9,13 +9,13 @@ IconButton::IconButton(QPixmap const& pixmap,
                        Callback const& cb):
   _has_shadow(shadow),
   _cache(),
-  _original(pixmap),
+  _original(),
   _icon(),
   _shadow(),
   _callback(cb)
 {
-  this->_draw_shape(this->_shadow, Qt::black);
-  this->_refresh();
+  this->set_pixmap(pixmap);
+
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   connect(this, SIGNAL(released()), SLOT(_clicked()));
 }
@@ -62,13 +62,29 @@ IconButton::disable()
 }
 
 void
+IconButton::set_pixmap(QPixmap const& pixmap)
+{
+  ELLE_TRACE_SCOPE("%s: set pixmap", *this);
+  this->_original = pixmap;
+  this->_draw_shape(this->_icon);
+  this->_draw_shape(this->_shadow, Qt::black);
+  this->_refresh();
+}
+
+void
 IconButton::_draw_shape(QPixmap& pixmap, QColor const& color)
 {
+  static QColor empty{};
   pixmap = QPixmap(this->_original.size());
   pixmap.fill(Qt::transparent); // Triggers the pixmap alpha channel.
-  pixmap.fill(color);
+
   QPainter painter(&pixmap);
-  painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+  if (color != empty)
+  {
+    pixmap.fill(color);
+    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+  }
+
   painter.drawPixmap(QPoint(0, 0), this->_original);
 }
 
@@ -89,14 +105,14 @@ IconButton::_refresh()
 QSize
 IconButton::sizeHint() const
 {
-  return this->_original.size();
+  return this->_cache.size();
 }
 
 void
 IconButton::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.drawPixmap(QPoint(0, 0), this->_original);
+  painter.drawPixmap(QPoint(0, 0), this->_cache);
 }
 
 void
