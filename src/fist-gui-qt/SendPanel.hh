@@ -34,6 +34,13 @@ public:
 /*------.
 | Files |
 `------*/
+signals:
+  void
+  drag_entered();
+
+  void
+  drag_left();
+
 public Q_SLOTS:
   void
   add_file(QUrl const& path);
@@ -43,10 +50,17 @@ private Q_SLOTS:
   remove_file(QUrl const& path);
 
 private slots:
-  void _send();
-  void _search_changed(QString const& search);
-  void _set_peer(uint32_t uid);
-  void _pick_user();
+  void
+  _send();
+
+  void
+  _search_changed(QString const& search);
+
+  void
+  _set_peer(uint32_t uid);
+
+  void
+  _pick_user();
 public slots:
   void
   avatar_available(uint32_t uid);
@@ -61,8 +75,11 @@ public:
   clearUsers();
 
 Q_SIGNALS:
-  void switch_signal();
-  void choose_files();
+  void
+  switch_signal();
+
+  void
+  choose_files();
 
 private:
   gap_State* _state;

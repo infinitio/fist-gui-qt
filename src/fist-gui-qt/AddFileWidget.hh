@@ -43,8 +43,12 @@ private:
   void
   mousePressEvent(QMouseEvent*) override;
 
+public slots:
   void
-  dragEnterEvent(QDragEnterEvent *) override;
+  on_drag_entered();
+
+  void
+  on_drag_left();
 
   void
   dropEvent(QDropEvent*) override;

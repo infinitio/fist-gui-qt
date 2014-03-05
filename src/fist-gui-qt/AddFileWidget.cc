@@ -78,15 +78,17 @@ AddFileWidget::setPulseColor(QColor const& color)
 }
 
 void
-AddFileWidget::enterEvent(QEvent* event)
+AddFileWidget::enterEvent(QEvent*)
 {
   view::send::file_adder::hover_style(*this->_text);
+  this->setCursor(QCursor(Qt::PointingHandCursor));
 }
 
 void
-AddFileWidget::leaveEvent(QEvent* event)
+AddFileWidget::leaveEvent(QEvent*)
 {
   view::send::file_adder::style(*this->_text);
+  this->setCursor(QCursor(Qt::ArrowCursor));
 }
 
 void
@@ -96,20 +98,17 @@ AddFileWidget::mousePressEvent(QMouseEvent*)
 }
 
 void
-AddFileWidget::dragEnterEvent(QDragEnterEvent *event)
+AddFileWidget::on_drag_entered()
 {
-  ELLE_TRACE_SCOPE("%s: drag entered", *this);
-  if (event->mimeData()->hasUrls())
-    for (auto const& url: event->mimeData()->urls())
-    {
-      ELLE_DEBUG_SCOPE("file: %s", url.path());
-      if (url.isLocalFile())
-      {
-        ELLE_DEBUG("local file: %s", url.toLocalFile());
-        event->acceptProposedAction();
-        return;
-      }
-    }
+  ELLE_DEBUG_SCOPE("%s: drag entered", *this);
+  view::send::file_adder::hover_style(*this->_text);
+}
+
+void
+AddFileWidget::on_drag_left()
+{
+  ELLE_DEBUG_SCOPE("%s: drag left", *this);
+  view::send::file_adder::style(*this->_text);
 }
 
 void
@@ -125,6 +124,7 @@ AddFileWidget::dropEvent(QDropEvent *event)
         ELLE_DEBUG("%s dropped", url);
         emit file_dropped(url);
       }
+  view::send::file_adder::style(*this->_text);
 }
 
 void

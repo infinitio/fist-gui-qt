@@ -114,6 +114,16 @@ InfinitDock::InfinitDock(gap_State* state):
             SIGNAL(choose_files()),
             this,
             SLOT(pick_files()));
+
+    connect(this,
+            SIGNAL(drag_entered()),
+            this->_send_panel,
+            SIGNAL(drag_entered()));
+
+    connect(this,
+            SIGNAL(drag_left()),
+            this->_send_panel,
+            SIGNAL(drag_left()));
   }
 
   connect(this,
@@ -315,8 +325,16 @@ InfinitDock::dragEnterEvent(QDragEnterEvent *event)
       if (url.isLocalFile())
       {
         event->acceptProposedAction();
+        emit drag_entered();
         return;
       }
+}
+
+void
+InfinitDock::dragLeaveEvent(QDragLeaveEvent *event)
+{
+  ELLE_TRACE_SCOPE("%s: drag left", *this);
+  emit drag_left();
 }
 
 void

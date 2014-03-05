@@ -68,6 +68,12 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_search, SIGNAL(search_ready(QString const&)),
           this, SLOT(_search_changed(QString const&)));
 
+  connect(this, SIGNAL(drag_entered()),
+          this->_file_adder, SLOT(on_drag_entered()));
+
+  connect(this, SIGNAL(drag_left()),
+          this->_file_adder, SLOT(on_drag_left()));
+
   //XXX: Could be factored.
   this->_users_part_separator->hide();
   this->_adder_part_seperator->hide();
