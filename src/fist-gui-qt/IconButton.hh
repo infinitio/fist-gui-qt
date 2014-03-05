@@ -37,9 +37,17 @@ protected:
   virtual
   QSize
   sizeHint() const override;
+
   virtual
   void
   paintEvent(QPaintEvent*) override;
+
+public:
+  void
+  enterEvent(QEvent*) override;
+
+  void
+  leaveEvent(QEvent*) override;
 
 private slots:
   void

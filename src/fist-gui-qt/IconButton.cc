@@ -21,6 +21,25 @@ IconButton::IconButton(QPixmap const& pixmap,
 }
 
 void
+IconButton::enterEvent(QEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: enter", *this);
+
+  if (this->isEnabled())
+    this->setCursor(QCursor(Qt::PointingHandCursor));
+  QPushButton::enterEvent(event);
+}
+
+void
+IconButton::leaveEvent(QEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: leave", *this);
+
+  this->setCursor(QCursor(Qt::ArrowCursor));
+  QPushButton::enterEvent(event);
+}
+
+void
 IconButton::enable()
 {
   ELLE_TRACE_SCOPE("%s: enable", *this);
