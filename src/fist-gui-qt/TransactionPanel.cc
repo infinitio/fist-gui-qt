@@ -180,6 +180,10 @@ TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 void
 TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
+  if (gap_transaction_status(this->_state, id) <
+      gap_transaction_waiting_for_accept)
+    return; // Ignore early status because data may not be fully merged.
+
   if (this->_transactions.find(id) == this->_transactions.end())
   {
     this->_transactions.emplace(id, TransactionModel(this->_state, id));
