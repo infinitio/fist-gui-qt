@@ -267,15 +267,22 @@ InfinitDock::_position_panel()
 
   ELLE_DUMP("%s: old position: (%s, %s)", *this, this->x(), this->y());
 
-  QPoint systray_position(this->_systray->geometry().topLeft());
+  QPoint systray_position(this->_systray->geometry().center());
 
   auto screen = QDesktopWidget().availableGeometry();
 
-  auto x = systray_position.x() - this->width() + 24;
-  auto y = systray_position.y() - this->height() - 16;
+  auto x = systray_position.x() - this->width() / 2;
+  auto y = systray_position.y() - this->height() / 2;
 
-  this->move(qBound(screen.left(), x, screen.right()),
-             qBound(screen.top(), y, screen.bottom()));
+  static int margin = 5;
+
+  this->move(
+    qBound(screen.left() + margin,
+           x,
+           screen.right() - margin - this->width()),
+    qBound(screen.top() + margin,
+           y,
+           screen.bottom() - margin - this->height()));
 
   ELLE_DUMP("%s: new position: (%s, %s)", *this, this->x(), this->y());
 }
