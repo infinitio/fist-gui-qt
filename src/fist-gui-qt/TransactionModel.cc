@@ -125,6 +125,13 @@ TransactionModel::status() const
   return gap_transaction_status(this->_state, this->_id);
 }
 
+QDateTime const&
+TransactionModel::mtime() const
+{
+  this->_mtime.setTime_t(gap_transaction_mtime(this->_state, this->_id));
+  return this->_mtime;
+}
+
 bool
 TransactionModel::new_avatar() const
 {
@@ -156,7 +163,6 @@ TransactionModel::avatar() const
       reader.setDevice(&buff);
       this->_avatar =  QPixmap::fromImageReader(&reader);
       this->_default_avatar = false;
-
     }
     else if(this->_avatar.isNull())
     {

@@ -55,48 +55,56 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   this->_layout = layout;
   layout->addWidget(this->_peer_avatar, 0, Qt::AlignLeft);
 
-  auto texts = new QVBoxLayout;
-  texts->setContentsMargins(5, 0, 5, 0);
-
-  layout->addLayout(texts);
-
-  texts->addStretch();
-  auto user_and_status = new QHBoxLayout;
-  texts->addLayout(user_and_status);
-  auto username = new QLabel(this->_transaction.peer_fullname());
   {
-    view::transaction::peer::style(*username);
-    username->setMaximumWidth(150);
-    username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-    user_and_status->addWidget(username);
-  }
-  user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
-  user_and_status->addStretch(0);
-  texts->addSpacing(4);
+    auto texts = new QVBoxLayout;
+    texts->setContentsMargins(5, 0, 5, 0);
 
-  auto filename = this->_transaction.files().size() == 1 ?
-    new QLabel(this->_transaction.files().first()) :
-    new QLabel(QString("%1 files").arg(this->_transaction.files().size()));
+    layout->addLayout(texts);
+
+    texts->addStretch();
+    auto user_and_status = new QHBoxLayout;
+    texts->addLayout(user_and_status);
+    auto username = new QLabel(this->_transaction.peer_fullname());
+    {
+      view::transaction::peer::style(*username);
+      username->setMaximumWidth(150);
+      username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+      user_and_status->addWidget(username);
+    }
+    user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
+    user_and_status->addStretch(0);
+    texts->addSpacing(4);
+
+    auto filename = this->_transaction.files().size() == 1 ?
+      new QLabel(this->_transaction.files().first()) :
+      new QLabel(QString("%1 files").arg(this->_transaction.files().size()));
+    {
+      filename->setToolTip(this->_transaction.tooltip());
+      view::transaction::files::style(*filename);
+      filename->setFixedWidth(170);
+      filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+      texts->addWidget(filename);
+    }
+    texts->addStretch();
+  }
+  layout->addStretch();
   {
-    filename->setToolTip(this->_transaction.tooltip());
-    view::transaction::files::style(*filename);
-    filename->setFixedWidth(170);
-    filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-    texts->addWidget(filename);
+    auto time_and_status = new QVBoxLayout;
+    view::transaction::date::style(*this->_mtime);
+    layout->addLayout(time_and_status);
+    time_and_status->addWidget(this->_mtime, 0, Qt::AlignCenter | Qt::AlignRight);
+    time_and_status->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
+  }
+  layout->addStretch();
+  {
+    auto infos = new QVBoxLayout;
+    layout->addLayout(infos);
+
+    infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+    infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+    infos->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignLeft);
   }
 
-  texts->addStretch();
-  layout->addStretch();
-  auto infos = new QVBoxLayout;
-  infos->setContentsMargins(0, 0, 0, 0);
-  layout->addLayout(infos);
-
-  infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-  infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-  infos->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-
-  layout->addStretch();
-  layout->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
   this->_update();
 
   setSizePolicy(QSizePolicy::Minimum,
@@ -187,12 +195,14 @@ TransactionWidget::_update()
     ELLE_DEBUG("show accept / reject buttons");
     this->_accept_button->show();
     this->_reject_button->show();
+    this->_mtime->hide();
   }
   else if (!this->_accept_button->isHidden())
   {
     ELLE_DEBUG("hide accept / reject buttons");
     this->_accept_button->hide();
     this->_reject_button->hide();
+    this->_mtime->show();
   }
 
   if (this->_accept_button->isHidden())
@@ -268,6 +278,24 @@ TransactionWidget::cancel()
   ELLE_TRACE_SCOPE("%s: cancel transaction", *this);
 
   emit on_transaction_canceled(this->_transaction.id());
+}
+
+static
+QString
+QDateTime_to_friendly_duration(QDateTime const& time)
+{
+  auto secs = time.secsTo(QDateTime::currentDateTimeUtc());
+  std::vector<std::pair<uint32_t, QString>> printers{
+    {86400, "day"}, {3600, "hour"}, {60, "min"}, {1, "sec"}};
+
+  for (auto const& dur: printers)
+    if (secs > dur.first)
+      return QString::fromStdString(
+        elle::sprintf("%s %s%s ago",
+                      secs / dur.first,
+                      dur.second,
+                      ((secs / dur.first) > 1) ? "s" : ""));
+  return "...";
 }
 
 /*-------.
@@ -360,6 +388,9 @@ TransactionWidget::update_status()
       this->_status->setToolTip(QString("Downloading"));
     }
   }
+
+  this->_mtime->setText(
+    QDateTime_to_friendly_duration(this->_transaction.mtime()));
 }
 
 void

@@ -188,6 +188,13 @@ namespace view
       TextStyle const
       style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
     }
+
+    namespace date
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
+    }
   }
 
   namespace send

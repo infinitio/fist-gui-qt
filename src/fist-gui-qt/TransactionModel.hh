@@ -6,6 +6,7 @@
 # include <QVector>
 # include <QString>
 # include <QPixmap>
+# include <QDateTime>
 
 # include <elle/Printable.hh>
 
@@ -48,6 +49,9 @@ public:
   gap_TransactionStatus
   status() const;
 
+  QDateTime const&
+  mtime() const;
+
   // XXX: Avatar fetching duplicated from UserModel.
   QPixmap const&
   avatar() const;
@@ -68,6 +72,7 @@ private:
   mutable uint32_t _peer_id;
   mutable QVector<QString> _files;
   mutable QString _tooltip;
+  mutable QDateTime _mtime;
 
   // XXX/ Should be there.
   mutable QPixmap _avatar;
