@@ -1,8 +1,13 @@
 #include <QEvent>
 #include <QPainter>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/RoundShadowWidget.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/utils.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.RoundShadowWidget");
 
 /*-------------.
 | Construction |
@@ -16,6 +21,7 @@ RoundShadowWidget::RoundShadowWidget(int radius,
   _shadow(shadow),
   _background(view::background)
 {
+  ELLE_DEBUG_SCOPE("%s: construction", *this);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
 
   auto margin = this->_radius + this->_shadow;
@@ -83,10 +89,14 @@ RoundShadowWidget::event(QEvent* event)
     {
       QSize hint(widget->sizeHint());
       hint.setHeight(std::min(500, hint.height()));
+      hint.setWidth(hint.width() + 2 * this->_shadow);
+      hint.setHeight(hint.height() + 2 * (this->_shadow + this->_radius));
       if (this->size() != hint)
+      {
         this->resize(hint);
+        Q_EMIT onSizeChanged();
+      }
     }
-    Q_EMIT onSizeChanged();
     return res;
   }
   else
@@ -98,7 +108,6 @@ RoundShadowWidget::resizeEvent(QResizeEvent* event)
 {
   this->update();
 }
-
 
 /*--------.
 | Drawing |
