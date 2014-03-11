@@ -31,6 +31,10 @@ public Q_SLOTS:
   void
   body(QString const& text);
 
+signals:
+  void
+  quit_request();
+
 public Q_SLOTS:
   void
   close();

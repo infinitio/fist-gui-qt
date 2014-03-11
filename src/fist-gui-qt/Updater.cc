@@ -63,6 +63,8 @@ Updater::Updater(QUrl const& version_url,
           this, SLOT(_on_error(QString const&)));
   connect(this->_network_manager, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(_handle_reply(QNetworkReply*)));
+  connect(this->_loading_dialog, SIGNAL(quit_request()),
+          this, SIGNAL(quit_request()));
 
   // Delete the old installer file.
   if (this->_installer->exists())

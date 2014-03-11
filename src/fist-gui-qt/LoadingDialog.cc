@@ -4,6 +4,7 @@
 #include <QKeyEvent>
 #include <QCloseEvent>
 #include <QPixmap>
+#include <QMessageBox>
 #include <QPainter>
 
 #include <elle/log.hh>
@@ -15,7 +16,7 @@
 ELLE_LOG_COMPONENT("infinit.FIST.LoadingWindow");
 
 LoadingDialog::LoadingDialog(QObject* parent):
-  QDialog(nullptr, Qt::CustomizeWindowHint | Qt::WindowTitleHint),
+  QDialog(nullptr, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
   _text(new QLabel(tr("Search for update"), this)),
   _body(new QTextEdit(this)),
   _loading_icon(new QLabel(this)),
@@ -149,7 +150,19 @@ void
 LoadingDialog::closeEvent(QCloseEvent * event)
 {
   ELLE_TRACE_SCOPE("%s: close event aborted", *this);
-  event->ignore();
+
+  QMessageBox b(QMessageBox::Question,
+                tr("Quit"),
+                tr("Are you sure you want to quit?"),
+                QMessageBox::Ok | QMessageBox::Cancel,
+                this);
+  connect(&b, SIGNAL(accepted()),
+          this, SIGNAL(quit_request()));
+  auto res = b.exec();
+  if (res == QMessageBox::Ok)
+    emit quit_request();
+  else
+    event->ignore();
 }
 
 void
