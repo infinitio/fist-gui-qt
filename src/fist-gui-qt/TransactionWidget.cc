@@ -285,16 +285,16 @@ QString
 QDateTime_to_friendly_duration(QDateTime const& time)
 {
   auto secs = time.secsTo(QDateTime::currentDateTimeUtc());
-  std::vector<std::pair<uint32_t, QString>> printers{
+  std::vector<std::pair<int, QString>> printers{
     {86400, "day"}, {3600, "hour"}, {60, "min"}, {1, "sec"}};
 
-  for (auto const& dur: printers)
-    if (secs > dur.first)
+  for (auto const& duration_pair: printers)
+    if (secs > duration_pair.first)
       return QString::fromStdString(
         elle::sprintf("%s %s%s ago",
-                      secs / dur.first,
-                      dur.second,
-                      ((secs / dur.first) > 1) ? "s" : ""));
+                      secs / duration_pair.first,
+                      duration_pair.second,
+                      ((secs / duration_pair.first) > 1) ? "s" : ""));
   return "...";
 }
 
