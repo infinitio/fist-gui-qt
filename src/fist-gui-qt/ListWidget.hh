@@ -7,11 +7,14 @@
 # include <QVector>
 # include <QColor>
 
+# include <elle/Printable.hh>
+
 # include <fist-gui-qt/SmoothScrollBar.hh>
 # include <fist-gui-qt/ListItem.hh>
 
 class ListWidget:
-  public QWidget
+  public QWidget,
+  public elle::Printable
 {
 public:
   class Separator
@@ -138,6 +141,12 @@ protected:
   virtual
   void
   paintEvent(QPaintEvent*) override;
+
+/*----------.
+| Printable |
+`----------*/
+  void
+  print(std::ostream& stream) const override;
 };
 
 #endif

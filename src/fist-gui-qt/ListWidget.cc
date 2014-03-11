@@ -3,9 +3,11 @@
 #include <QPainter>
 #include <QWheelEvent>
 
-#include <iostream>
+#include <elle/log.hh>
 
 #include <fist-gui-qt/ListWidget.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.ListWidget");
 
 static int const items = 5;
 
@@ -25,6 +27,7 @@ ListWidget::ListWidget(QWidget* parent,
   _wheel_event(false),
   _keyboard_index(0)
 {
+  ELLE_DEBUG_SCOPE("%s: creation", *this);
   this->_scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
   this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
@@ -37,10 +40,16 @@ ListWidget::ListWidget(QWidget* parent,
 void
 ListWidget::add_widget(ListItem* widget, Position position)
 {
+  ELLE_DEBUG_SCOPE("%s: add widget %s on %s",
+                   *this,
+                   *widget,
+                   (position == Position::Top) ? "top" : "bottom");
   if (position == Position::Bottom)
     this->_widgets.push_back(widget);
   else if (position == Position::Top)
     this->_widgets.push_front(widget);
+  else
+    ELLE_ERR("%s: unknown widget position %s", *this, position);
 
   widget->setParent(this);
   widget->show();
@@ -51,6 +60,7 @@ ListWidget::add_widget(ListItem* widget, Position position)
 void
 ListWidget::remove_widget(ListItem* widget, bool all)
 {
+  ELLE_DEBUG_SCOPE("%s: remove widget%s %s", *this, all ? "s" : "", *widget);
   if (all)
     this->_widgets.removeAll(widget);
   else
@@ -68,11 +78,17 @@ ListWidget::remove_widget(ListItem* widget, bool all)
 void
 ListWidget::move_widget(ListItem* widget, Position position)
 {
+  ELLE_DEBUG_SCOPE("%s: move widget %s to position %s",
+                     *this, widget, position);
   auto index = this->_widgets.indexOf(widget);
   if (index != -1)
   {
     this->_widgets.removeAt(index);
     this->add_widget(widget, position);
+  }
+  else
+  {
+    ELLE_WARN("%s: widget %s not in children", *this, widget);
   }
 }
 
@@ -296,4 +312,10 @@ ListWidget::paintEvent(QPaintEvent* e)
       height += 1;
     }
   }
+}
+
+void
+ListWidget::print(std::ostream& stream) const
+{
+  stream << "ListWidget";
 }
