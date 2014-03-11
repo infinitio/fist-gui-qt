@@ -50,10 +50,18 @@ Fist::Fist(int argc, char** argv):
   _updater(nullptr),
   _login_window(nullptr),
   _dock(nullptr),
-  _state(gap_configurable_new(
-           "meta.8.0.api.production.infinit.io", 80,
-           "trophonius.8.0.api.production.infinit.io", 443,
-           "apertus.8.0.api.production.infinit.io", 443))
+  _state(
+    gap_configurable_new(
+#ifdef INFINIT_PRODUCTION_BUILD
+      "https",
+      "meta.8.0.api.production.infinit.io", 80,
+      "trophonius.8.0.api.production.infinit.io", 443
+#else
+      "http",
+      "development.infinit.io", 80,
+      "development.infinit.io", 444
+#endif
+      ))
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
 
