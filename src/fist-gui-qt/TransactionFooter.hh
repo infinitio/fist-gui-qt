@@ -4,8 +4,8 @@
 # include <fist-gui-qt/Footer.hh>
 # include <fist-gui-qt/IconButton.hh>
 
-#include <QHBoxLayout>
-#include <QSpacerItem>
+# include <QHBoxLayout>
+# include <QSpacerItem>
 
 class TransactionFooter:
   public Footer
