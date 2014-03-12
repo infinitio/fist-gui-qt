@@ -57,7 +57,6 @@ LoadingDialog::LoadingDialog(QObject* parent):
     this->_body->setAcceptRichText(true);
     layout->addWidget(this->_body, 0, Qt::AlignCenter);
     this->_text->setFrameStyle(QFrame::NoFrame);
-    this->_body->setFixedWidth(180);
     this->_body->setSizePolicy(QSizePolicy::Fixed,
                                QSizePolicy::MinimumExpanding);
   }
@@ -72,6 +71,7 @@ LoadingDialog::LoadingDialog(QObject* parent):
 
     layout->addLayout(hlayout);
   }
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   this->loading_mode();
 }
@@ -88,9 +88,7 @@ LoadingDialog::accept_reject_mode(bool mandatory)
   if (!mandatory)
     this->_reject_button->show();
 
-  // this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
   this->adjustSize();
-  // this->show();
 }
 
 void
@@ -102,9 +100,7 @@ LoadingDialog::loading_mode()
   this->_accept_button->hide();
   this->_reject_button->hide();
   this->_body->hide();
-  // this->setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
   this->adjustSize();
-  // this->show();
 }
 
 void
@@ -168,7 +164,11 @@ LoadingDialog::closeEvent(QCloseEvent * event)
 void
 LoadingDialog::resizeEvent(QResizeEvent* event)
 {
-  Super::resizeEvent(event);
+  ELLE_TRACE("resized");
+  if (event->spontaneous())
+  {
+    Super::resizeEvent(event);
+  }
   emit resized();
 }
 
