@@ -36,16 +36,18 @@ Updater::Updater(QUrl const& version_url,
   QObject(parent),
   _version_url(version_url),
   _updater_url(),
+  _installer_folder(
+    QDir::toNativeSeparators(QString::fromStdString(common::infinit::home()))),
   _installer(
-    new QFile(
-      QDir::toNativeSeparators(
-        QString::fromStdString(common::infinit::home()) + QDir::separator() +
+    new QFile(QDir::toNativeSeparators(
+                this->_installer_folder.path() +
+                QDir::separator() +
 #ifdef INFINIT_WINDOWS
-                 "installer.exe"
+                "installer.exe"
 #else
-                 "installer"
+                "installer"
 #endif
-                 ))),
+                ))),
   _loading_dialog(new LoadingDialog(this)),
   _network_manager(new QNetworkAccessManager(this))
 {
@@ -288,9 +290,23 @@ Updater::_update(QNetworkReply* reply)
 #ifdef INFINIT_WINDOWS
   ELLE_TRACE("Downloading new installer");
 
+  if (!this->_installer_folder.exists())
+    if (!this->_installer_folder.mkpath(this->_installer_folder.path()))
+          emit update_error(
+      QString::fromStdString(
+        elle::sprintf(
+          "unable to create installer destination folder %s.",
+          QDir::toNativeSeparators(this->_installer_folder.path()))));
+
   if (!this->_installer->open(QIODevice::WriteOnly))
   {
     ELLE_ERR("unable to open location: %s", this->_installer->fileName());
+    emit update_error(
+      QString::fromStdString(
+        elle::sprintf(
+          "unable to download installer to %s.",
+          QDir::toNativeSeparators(this->_installer->fileName()))));
+
     return;
   }
 

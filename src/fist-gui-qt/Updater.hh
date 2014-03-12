@@ -3,12 +3,13 @@
 
 # include <memory>
 
-# include <QNetworkAccessManager>
 # include <QDialog>
+# include <QDir>
 # include <QFile>
+# include <QNetworkAccessManager>
+# include <QNetworkReply>
 # include <QObject>
 # include <QUrl>
-# include <QNetworkReply>
 
 # include <elle/Printable.hh>
 # include <elle/attribute.hh>
@@ -79,6 +80,7 @@ private:
   ELLE_ATTRIBUTE(QUrl, version_url);
   ELLE_ATTRIBUTE(QUrl, updater_url);
 
+  ELLE_ATTRIBUTE(QDir, installer_folder);
   ELLE_ATTRIBUTE(std::unique_ptr<QFile>, installer);
   ELLE_ATTRIBUTE_X(LoadingDialog*, loading_dialog);
   ELLE_ATTRIBUTE(QNetworkAccessManager*, network_manager);
