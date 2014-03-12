@@ -37,16 +37,11 @@ Function ParseCommandline
   ${GetParameters} $R0
   ${If} ${Errors}
     MessageBox MB_OK "An error occured"
-  ${Else}
-    MessageBox MB_OK "No Error"
   ${EndIf}
-  MessageBox MB_OK "Command line: $R0"
-  ClearErrors
   ${GetOptions} $R0 "/autoupdate" $R1
   ${If} ${Errors}
     StrCpy $AutoUpdate 0
   ${Else}
-    MessageBox MB_OK "Update"
     StrCpy $AutoUpdate 1
   ${EndIf}
 FunctionEnd
