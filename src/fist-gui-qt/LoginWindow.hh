@@ -67,7 +67,8 @@ public:
 
 public Q_SLOTS:
   void
-  set_message(QString const&);
+  set_message(QString const& message,
+              QString const& tooltip);
 
   void
   set_version();

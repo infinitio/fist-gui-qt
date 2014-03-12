@@ -149,8 +149,8 @@ Fist::operator ()()
   connect(this->_login_window.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
 
-  connect(this->_updater.get(), SIGNAL(update_error(QString const&)),
-          this->_login_window.get(), SLOT(set_message(QString const&)));
+  connect(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
+          this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
 
   connect(this->_updater.get(), SIGNAL(no_update_available()),
           this->_login_window.get(), SLOT(set_version()));

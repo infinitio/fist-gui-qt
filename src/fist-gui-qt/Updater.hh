@@ -59,14 +59,15 @@ Q_SIGNALS:
 
   // Signal that an error has occured.
   void
-  update_error(QString const&);
+  update_error(QString const& message,
+               QString const& detail);
 
 private Q_SLOTS:
   void
   _handle_reply(QNetworkReply*);
 
   void
-  _on_error(QString const&);
+  _on_error(QString const& message, QString const&);
 
   void
   _close_dialog();

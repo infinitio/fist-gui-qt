@@ -61,8 +61,8 @@ Updater::Updater(QUrl const& version_url,
           this, SLOT(update()));
   connect(this->_loading_dialog->reject_button(), SIGNAL(released()),
           this, SLOT(_close_dialog()));
-  connect(this, SIGNAL(update_error(QString const&)),
-          this, SLOT(_on_error(QString const&)));
+  connect(this, SIGNAL(update_error(QString const&, QString const&)),
+          this, SLOT(_on_error(QString const&, QString const&)));
   connect(this->_network_manager, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(_handle_reply(QNetworkReply*)));
   connect(this->_loading_dialog, SIGNAL(quit_request()),
@@ -122,7 +122,7 @@ Updater::_handle_reply(QNetworkReply* reply)
   {
     ELLE_WARN("something went wrong: %s", this->_reply->error());
 
-    emit update_error(reply->errorString());
+    emit update_error("network error", reply->errorString());
 
     if (this->_reply->url() == this->_updater_url)
     {
@@ -234,7 +234,8 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
 
   if (xr.hasError())
   {
-    emit update_error("unable to get update data"); return;
+    emit update_error("update to get update data",
+                      "unable to get update data"); return;
   }
 
   ELLE_TRACE("update data:")
@@ -243,7 +244,8 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
 
   if (!updater_info.contains("version"))
   {
-    emit update_error("unable to read the update file");
+    emit update_error("unable to read the update file",
+                      "unable to read the update file");
   }
   else if (updater_info["version"].toStdString() == INFINIT_VERSION)
   {
@@ -258,7 +260,8 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
   }
   else
   {
-    emit update_error("update file unavailable"); return;
+    emit update_error("update file unavailable",
+                      "update file unavailable"); return;
   }
 
   ELLE_TRACE("an updater is available at %s", this->_updater_url);
@@ -293,9 +296,10 @@ Updater::_update(QNetworkReply* reply)
   if (!this->_installer_folder.exists())
     if (!this->_installer_folder.mkpath(this->_installer_folder.path()))
           emit update_error(
+            "unable to download installer",
       QString::fromStdString(
         elle::sprintf(
-          "unable to create installer destination folder %s.",
+          "destination folder %s is unreachable.",
           QDir::toNativeSeparators(this->_installer_folder.path()))));
 
   if (!this->_installer->open(QIODevice::WriteOnly))
@@ -303,8 +307,9 @@ Updater::_update(QNetworkReply* reply)
     ELLE_ERR("unable to open location: %s", this->_installer->fileName());
     emit update_error(
       QString::fromStdString(
+        "unable to download installer",
         elle::sprintf(
-          "unable to download installer to %s.",
+          "destination folder %s may be write protected.",
           QDir::toNativeSeparators(this->_installer->fileName()))));
 
     return;
@@ -335,9 +340,10 @@ Updater::_update(QNetworkReply* reply)
     else
     {
       emit update_error(
+        "unable to run installer",
         QString::fromStdString(
           elle::sprintf(
-            "unable to run installer.\nYou can run it manually at %s",
+            "You can run it manually at %s",
             QDir::toNativeSeparators(this->_installer->fileName()))));
       return;
     }
@@ -349,9 +355,9 @@ Updater::_update(QNetworkReply* reply)
 }
 
 void
-Updater::_on_error(QString const& error)
+Updater::_on_error(QString const& error, QString const& details)
 {
-  ELLE_ERR("%s: an error occured: %s", *this, error);
+  ELLE_ERR("%s: an error occured: %s (%s)", *this, error, details);
   this->_close_dialog();
 }
 

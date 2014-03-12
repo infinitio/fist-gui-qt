@@ -205,7 +205,7 @@ LoginWindow::_login()
 #define ERR(case, msg)                                                         \
     case:                                                                      \
       ELLE_WARN("%s", tr(msg));                                                \
-      this->_message_field->setText(tr(msg));                           \
+      this->set_message(tr(msg), tr(msg));                               \
       break                                                                    \
 /**/
     ERR(case gap_network_error, "Not connected to internet");
@@ -218,9 +218,11 @@ LoginWindow::_login()
 }
 
 void
-LoginWindow::set_message(QString const& message)
+LoginWindow::set_message(QString const& message,
+                         QString const& tooltip)
 {
   this->_message_field->setText(message);
+  this->_message_field->setToolTip(tooltip);
 }
 
 void
