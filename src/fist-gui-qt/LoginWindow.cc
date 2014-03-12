@@ -285,4 +285,6 @@ LoginWindow::closeEvent(QCloseEvent* event)
   ELLE_TRACE_SCOPE("%s: close", *this);
 
   Super::closeEvent(event);
+
+  emit quit_request();
 }
