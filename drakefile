@@ -5,6 +5,8 @@ import drake.nsis
 import drake.cxx.qt
 import drake.templating
 
+from functools import partial
+
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
               prefix = '/usr',
@@ -172,8 +174,6 @@ def configure(cxx_toolkit = None,
                              strip_prefix = True),
         installer_resources + [application] + libraries)) + nsis_plugins + nsis_includes
 
-    list(map(lambda x: print(x.path()), installer_resources))
-
     templating_context = drake.templating.Context(
       content = {
         'company': 'Infinit.io',
@@ -204,10 +204,20 @@ def configure(cxx_toolkit = None,
       with templating_context:
         installer = drake.nodes(
           'installer.nsi.tmpl')
+    import os
+
+    def set_size(context, target):
+      context['size'] = os.path.getsize(str(target.path()))
+
     templating_context = drake.templating.Context(
       content = {
         'version': git.description(),
-        })
+      },
+      sources = [ drake.Node('bin/installer.exe'), ],
+      hooks = {
+        drake.Node('bin/installer.exe'): [ set_size, ]
+      },
+    )
 
     with templating_context:
       update = drake.node('update.xml.tmpl')
