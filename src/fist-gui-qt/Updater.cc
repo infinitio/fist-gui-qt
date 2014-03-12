@@ -178,7 +178,7 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
 
   while(!xr.atEnd() && !xr.hasError())
   {
-    ELLE_TRACE_SCOPE("read a new element");
+    ELLE_DEBUG_SCOPE("read a new element");
     // Read the next element.
     QXmlStreamReader::TokenType token = xr.readNext();
 
@@ -191,10 +191,16 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
 
       if (name == "rich_description")
       {
+        xr.readNext();
         while (!(xr.tokenType() == QXmlStreamReader::EndElement && xr.name() == "rich_description"))
         {
           elle::SafeFinally next([&] { xr.readNext(); });
-          updater_info[name].append(xr.text().toString());
+          if (xr.isStartElement())
+            updater_info[name].append(QString::fromStdString(elle::sprintf("<%s>", xr.name().toString())));
+          else if (xr.isEndElement())
+            updater_info[name].append(QString::fromStdString(elle::sprintf("</%s>", xr.name().toString())));
+          else if (xr.isCharacters())
+            updater_info[name].append(xr.text().toString());
         }
       }
       else
