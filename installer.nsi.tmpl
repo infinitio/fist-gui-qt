@@ -151,15 +151,15 @@ FunctionEnd
   ;; License page.
     !define MUI_LICENSEPAGE_BUTTON $(^NextBtn)
     !define MUI_LICENSEPAGE_TEXT_BOTTOM "Licence"
-    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageFastUpdatePre
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipIfUpdate
     !insertmacro MUI_PAGE_LICENSE "${resources_folder}\${license}"
   ;; Directory page.
-    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipPre
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipIfUpdate
     !insertmacro MUI_PAGE_DIRECTORY
   ;; Instfiles page.
     !insertmacro MUI_PAGE_INSTFILES
   ;; Finish page
-    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageDirectoryPre
+    !define MUI_PAGE_CUSTOMFUNCTION_PRE PageSkipIfUpdate
     !define MUI_FINISHPAGE_LINK ${website}
     !define MUI_FINISHPAGE_LINK_LOCATION ${website}
     !define MUI_FINISHPAGE_NOREBOOTSUPPORT
