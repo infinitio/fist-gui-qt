@@ -295,22 +295,22 @@ Updater::_update(QNetworkReply* reply)
 
   if (!this->_installer_folder.exists())
     if (!this->_installer_folder.mkpath(this->_installer_folder.path()))
-          emit update_error(
-            "unable to download installer",
-      QString::fromStdString(
-        elle::sprintf(
-          "destination folder %s is unreachable.",
-          QDir::toNativeSeparators(this->_installer_folder.path()))));
+      emit update_error(
+        "unable to download installer",
+        QString::fromStdString(
+          elle::sprintf(
+            "destination folder %s is unreachable.",
+            QDir::toNativeSeparators(this->_installer_folder.path()))));
 
   if (!this->_installer->open(QIODevice::WriteOnly))
   {
     ELLE_ERR("unable to open location: %s", this->_installer->fileName());
     emit update_error(
-      QString::fromStdString(
         "unable to download installer",
-        elle::sprintf(
-          "destination folder %s may be write protected.",
-          QDir::toNativeSeparators(this->_installer->fileName()))));
+        QString::fromStdString(
+          elle::sprintf(
+            "destination folder %s may be write protected.",
+            QDir::toNativeSeparators(this->_installer->fileName()))));
 
     return;
   }
