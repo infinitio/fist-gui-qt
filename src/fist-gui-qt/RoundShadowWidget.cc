@@ -94,7 +94,6 @@ RoundShadowWidget::event(QEvent* event)
       if (this->size() != hint)
       {
         this->resize(hint);
-        Q_EMIT onSizeChanged();
       }
     }
     return res;
@@ -107,6 +106,7 @@ void
 RoundShadowWidget::resizeEvent(QResizeEvent* event)
 {
   this->update();
+  Q_EMIT onSizeChanged();
 }
 
 /*--------.
