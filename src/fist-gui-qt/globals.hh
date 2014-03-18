@@ -132,14 +132,18 @@ namespace view
       {
         static
         QString const
-        text("<a style=\"text-decoration: none;\" href=\"https://infinit.io/forgot_password\">forgot password?</a>");
+        text("<a style=\"text-decoration: none; color: #489FCE;\" "
+             "href=\"https://infinit.io/forgot_password\">"
+             "forgot password?</a>");
       }
 
       namespace need_an_account
       {
         static
         QString const
-        text("<a style=\"text-decoration: none;\" href=\"https://infinit.io/register\">need an account?</a>");
+        text("<a style=\"text-decoration: none; color: #489FCE;\" "
+             "href=\"https://infinit.io/register\">"
+             "need an account?</a>");
       }
     }
 
