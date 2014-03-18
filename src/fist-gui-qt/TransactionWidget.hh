@@ -75,6 +75,7 @@ public slots:
   void cancel();
   void update_progress();
   void update_status();
+  void update_mtime();
 
 private:
   TransactionModel const& _transaction;
@@ -83,9 +84,11 @@ private:
   QLayout* _layout;
   IconButton* _accept_button;
   IconButton* _reject_button;
+  QWidget* _accept_reject_area;
   IconButton* _cancel_button;
   QLabel* _mtime;
   QLabel* _status;
+  QWidget* _info_area;
   QTimer* _timer;
 
 /*----------.

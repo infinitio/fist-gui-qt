@@ -31,9 +31,11 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _layout(nullptr),
   _accept_button(new IconButton(QPixmap(":/buttons/accept.png"))),
   _reject_button(new IconButton(QPixmap(":/buttons/reject.png"))),
+  _accept_reject_area(new QWidget),
   _cancel_button(new IconButton(QPixmap(":/buttons/cancel.png"))),
   _mtime(new QLabel),
   _status(new QLabel),
+  _info_area(new QWidget),
   _timer(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
@@ -71,7 +73,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
       username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
       user_and_status->addWidget(username);
     }
-    user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
+     user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
+    this->_peer_status->setToolTip(tr("Online"));
     user_and_status->addStretch(0);
     texts->addSpacing(4);
 
@@ -89,20 +92,29 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   }
   layout->addStretch();
   {
-    auto time_and_status = new QVBoxLayout;
+    auto time_and_info = new QVBoxLayout;
+    this->_info_area->setLayout(time_and_info);
     view::transaction::date::style(*this->_mtime);
-    layout->addLayout(time_and_status);
-    time_and_status->addWidget(this->_mtime, 0, Qt::AlignCenter | Qt::AlignRight);
-    time_and_status->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
+    time_and_info->addWidget(this->_mtime, 0, Qt::AlignCenter | Qt::AlignRight);
+    auto status_and_cancel = new QHBoxLayout;
+    time_and_info->addLayout(status_and_cancel);
+    {
+      status_and_cancel->addStretch();
+      status_and_cancel->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
+      status_and_cancel->addSpacing(3);
+      status_and_cancel->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignRight);
+    }
+    layout->addWidget(this->_info_area);
   }
   layout->addStretch();
   {
     auto infos = new QVBoxLayout;
-    layout->addLayout(infos);
+    this->_accept_reject_area->setLayout(infos);
 
     infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
     infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-    infos->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+
+    layout->addWidget(this->_accept_reject_area);
   }
 
   this->_update();
@@ -116,6 +128,11 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
           SIGNAL(onProgressChanged(float)),
           SIGNAL(onProgressChanged(float)));
 #endif
+
+  auto mtime_updater = new QTimer(this);
+  connect(mtime_updater, SIGNAL(timeout()),
+          this, SLOT(update_mtime()));
+  mtime_updater->start(5000);
   this->update();
 }
 
@@ -170,9 +187,9 @@ void
 TransactionWidget::_update()
 {
   ELLE_TRACE_SCOPE("%s: update", *this);
+  this->_info_area->show();
   this->_cancel_button->hide();
-  this->_accept_button->hide();
-  this->_reject_button->hide();
+  this->_accept_reject_area->hide();
 
   if (this->_transaction.new_avatar())
   {
@@ -193,30 +210,31 @@ TransactionWidget::_update()
       !this->_transaction.is_sender())
   {
     ELLE_DEBUG("show accept / reject buttons");
-    this->_accept_button->show();
-    this->_reject_button->show();
+    this->_accept_reject_area->show();
+    this->_info_area->show();
     this->_mtime->hide();
   }
-  else if (!this->_accept_button->isHidden())
+  else if (!this->_accept_reject_area->isHidden())
   {
     ELLE_DEBUG("hide accept / reject buttons");
-    this->_accept_button->hide();
-    this->_reject_button->hide();
+    this->_accept_reject_area->hide();
     this->_mtime->show();
+    this->_info_area->show();
   }
 
-  if (this->_accept_button->isHidden())
+  if (this->_accept_reject_area->isHidden())
   {
     if (!g_finals.contains(this->_transaction.status()))
     {
       this->_cancel_button->show();
     }
     this->_status->show();
+    this->_mtime->show();
+    this->_info_area->show();
   }
   else
   {
-    this->_cancel_button->hide();
-    this->_status->hide();
+     this->_info_area->hide();
   }
 
   if (this->_transaction.status() == gap_transaction_running &&
@@ -227,7 +245,7 @@ TransactionWidget::_update()
 
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
-    _timer->start(300);
+    _timer->start(1000);
 
     connect(this,
             SIGNAL(onProgressChanged(float)),
@@ -389,6 +407,13 @@ TransactionWidget::update_status()
     }
   }
 
+  this->update_mtime();
+}
+
+void
+TransactionWidget::update_mtime()
+{
+  ELLE_DUMP_SCOPE("mtime updated");
   this->_mtime->setText(
     QDateTime_to_friendly_duration(this->_transaction.mtime()));
 }
