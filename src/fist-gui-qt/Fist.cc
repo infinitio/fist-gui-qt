@@ -181,14 +181,15 @@ Fist::operator ()()
 void
 Fist::logged_in()
 {
-  this->_dock = new InfinitDock(this->_state);
-  this->_dock->show();
-
-  connect(this->_dock, SIGNAL(quit_request()),
-          this, SLOT(quit()));
-
   this->_login_window->hide();
-  this->_login_window->close();
+
+  this->_dock = new InfinitDock(this->_state);
+      this->_dock->show();
+
+      connect(this->_dock, SIGNAL(quit_request()),
+      this, SLOT(quit()));
+
+      //  this->_login_window->close();
 }
 
 void

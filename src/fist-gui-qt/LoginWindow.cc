@@ -158,6 +158,7 @@ LoginWindow::~LoginWindow()
 void
 LoginWindow::_login()
 {
+  this->_message_field->clear();
   this->_footer->setDisabled(true);
 
   elle::SafeFinally unlock_login([&] { this->_footer->setDisabled(false); });
@@ -187,11 +188,7 @@ LoginWindow::_login()
     settings.setValue("email", email);
     settings.endGroup();
 
-    this->_message_field->clear();
-
     emit logged_in();
-
-    this->close();
 
     return;
   }
