@@ -44,24 +44,28 @@ class Fist::Prologue
   }
 };
 
+static
+gap_State*
+gap_state()
+{
+#ifdef INFINIT_PRODUCTION_BUILD
+  return gap_configurable_new(
+    "https",
+    "meta.8.0.api.production.infinit.io", 80,
+    "trophonius.8.0.api.production.infinit.io", 443);
+#else
+    return gap_new();
+#endif
+
+}
+
 Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
   _application(new QApplication(argc, argv)),
   _updater(nullptr),
   _login_window(nullptr),
   _dock(nullptr),
-  _state(
-    gap_configurable_new(
-#ifdef INFINIT_PRODUCTION_BUILD
-      "https",
-      "meta.8.0.api.production.infinit.io", 80,
-      "trophonius.8.0.api.production.infinit.io", 443
-#else
-      "http",
-      "development.infinit.io", 80,
-      "development.infinit.io", 444
-#endif
-      ))
+  _state(gap_state())
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
 
