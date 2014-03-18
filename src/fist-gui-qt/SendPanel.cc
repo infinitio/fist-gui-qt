@@ -98,7 +98,7 @@ SendPanel::_search_changed(QString const& search)
   if (this->_peer_id != gap_null())
   {
     ELLE_DEBUG("reset selection");
-    this->_search->setIcon(QPixmap(":/icons/search@2x.png"));
+    this->_search->setIcon(QPixmap(":/icons/search.png"));
     this->_peer_id = gap_null();
   }
 
@@ -344,6 +344,7 @@ SendPanel::on_hide()
   this->_results.clear();
   this->_peer_id = gap_null();
   this->_adder_part_seperator->hide();
+  this->_search->setIcon(QPixmap(":/icons/search.png"));
 }
 
 /*-------.
