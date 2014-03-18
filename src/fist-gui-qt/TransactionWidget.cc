@@ -84,7 +84,6 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
     {
       filename->setToolTip(this->_transaction.tooltip());
       view::transaction::files::style(*filename);
-      filename->setFixedWidth(170);
       filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
       texts->addWidget(filename);
     }
@@ -106,7 +105,6 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
     }
     layout->addWidget(this->_info_area);
   }
-  layout->addStretch();
   {
     auto infos = new QVBoxLayout;
     this->_accept_reject_area->setLayout(infos);
@@ -200,9 +198,7 @@ TransactionWidget::_update()
   ELLE_DEBUG("peer is %sconnected",
              this->_transaction.peer_connection_status() ? "" : "dis");
   if (this->_transaction.peer_connection_status())
-  {
     this->_peer_status->show();
-  }
   else
     this->_peer_status->hide();
 
