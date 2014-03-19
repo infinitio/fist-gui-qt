@@ -146,8 +146,18 @@ def configure(cxx_toolkit = None,
     cxx_toolkit,
     cxx_config)
 
+  experiment = drake.cxx.Executable(
+    'bin/Experiment',
+    drake.nodes(
+      "src/exp/FakeUserModel.hh",
+      "src/exp/FakeTransactionModel.hh",
+      "src/exp/main.cc",) + [fist] + libraries,
+    cxx_toolkit,
+    cxx_config)
+
   build_rule = drake.Rule('build')
   build_rule << application
+  build_rule << experiment
 
   if cxx_toolkit.os == drake.os.windows:
 
