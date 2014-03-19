@@ -20,7 +20,7 @@ public:
   class Separator
   {
   public:
-    Separator(QVector<QColor> const& colors):
+    Separator(QVector<QColor> const& colors = QVector<QColor>()):
       _colors(colors)
     {}
   private:
@@ -49,10 +49,10 @@ public:
 | Construction |
 `-------------*/
 public:
- ListWidget(QWidget* parent = nullptr,
-            Separator const& separator = Separator({QColor(0xE3, 0xE3, 0xE3),
+  ListWidget(QWidget* parent = nullptr,
+             Separator const& separator = Separator({QColor(0xE3, 0xE3, 0xE3),
                                                    Qt::white}));
-
+  ~ListWidget();
 /*--------.
 | Widgets |
 `--------*/

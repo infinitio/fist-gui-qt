@@ -50,11 +50,17 @@ signals:
   quit_request();
 
 public:
-  static void connection_status_cb(gap_UserStatus const status);
-  static void user_status_cb(uint32_t id, gap_UserStatus const status);
-  static void avatar_available_cb(uint32_t id);
+  static
+  void
+  connection_status_cb(gap_UserStatus const status);
 
+  static
+  void
+  user_status_cb(uint32_t id, gap_UserStatus const status);
 
+  static
+  void
+  avatar_available_cb(uint32_t id);
 
 public slots:
   void _update();
@@ -72,7 +78,13 @@ Q_SIGNALS:
 `------*/
 public Q_SLOTS:
   TransactionPanel&
-  transactionPanel();
+  transaction_panel();
+
+  UserPanel&
+  user_panel();
+
+  SendPanel&
+  send_panel();
 
   void
   _register_panel(Panel* panel);
@@ -95,10 +107,10 @@ public slots:
   _show_send_view();
 
   void
-  _show_user_view(uint32_t sender_id);
+  _show_user_view();
 
   void
-  _show_transactions_view();
+  _show_transactions_view(uint32_t sender_id);
 
   void
   _show_menu();
@@ -113,8 +125,9 @@ private:
 private:
   void _switch_view(Panel* target);
 
-  TransactionPanel* _transaction_panel;
-//  RoundShadowWidget* _panel;
+  std::unique_ptr<UserPanel> _user_panel;
+  std::unique_ptr<TransactionPanel> _transaction_panel;
+  std::unique_ptr<SendPanel> _send_panel;
 
 private Q_SLOTS:
   void
@@ -123,7 +136,7 @@ private Q_SLOTS:
                    QSystemTrayIcon::MessageIcon icon);
 
 private:
-  SendPanel* _send_panel;
+
 
 /*-----.
 | Menu |

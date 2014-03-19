@@ -25,42 +25,36 @@ public:
   uint32_t
   id() const;
 
+  virtual
   bool
   is_sender() const;
 
+  virtual
   uint32_t
   peer_id() const;
 
-  QString const&
-  peer_fullname() const;
-
-  gap_UserStatus
-  peer_connection_status() const;
-
+  virtual
   float
   progress() const;
 
+  virtual
   QVector<QString> const&
   files() const;
 
   QString
   tooltip() const;
 
+  virtual
+  QString const&
+  message() const;
+
+  virtual
   gap_TransactionStatus
   status() const;
 
+  virtual
   QDateTime const&
   mtime() const;
-
-  // XXX: Avatar fetching duplicated from UserModel.
-  QPixmap const&
-  avatar() const;
-
-  bool
-  new_avatar() const;
-
-  void
-  avatar_available();
 
 private:
   gap_State* _state;
@@ -68,16 +62,18 @@ private:
 
   // Every attributes are marked as mutable in order to allow lazy evaluation.
   mutable boost::logic::tribool _is_sender;
-  mutable QString _peer_fullname;
   mutable uint32_t _peer_id;
   mutable QVector<QString> _files;
   mutable QString _tooltip;
   mutable QDateTime _mtime;
+  mutable QString _message;
 
-  // XXX/ Should be there.
-  mutable QPixmap _avatar;
-  mutable bool _default_avatar;
-  mutable bool _new_avatar;
+public:
+  bool
+  operator ==(TransactionModel const& t) const;
+
+  bool
+  operator <(TransactionModel const& t) const;
 
   /*----------.
   | Printable |
@@ -86,5 +82,6 @@ private:
   print(std::ostream& stream) const override;
 };
 
+# include <fist-gui-qt/TransactionModel.hxx>
 
 #endif

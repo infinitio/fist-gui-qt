@@ -7,9 +7,9 @@
 
 #include <fist-gui-qt/ListWidget.hh>
 
-ELLE_LOG_COMPONENT("infinit.FIST.ListWidget");
-
 static int const items = 5;
+
+ELLE_LOG_COMPONENT("infinit.FIST.ListWidget");
 
 /*-------------.
 | Construction |
@@ -33,6 +33,11 @@ ListWidget::ListWidget(QWidget* parent,
   this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 }
 
+ListWidget::~ListWidget()
+{
+  this->clearWidgets();
+  ELLE_TRACE_SCOPE("%s: destruction", *this);
+}
 /*--------.
 | Widgets |
 `--------*/
@@ -233,8 +238,6 @@ ListWidget::keyPressEvent(QKeyEvent*)
     _keyboard_index += 1;
   else if (event->key() == Qt::Key_Return)
     _widgets[_widgets.size() - _keyboard_index]->trigger();
-
-  std::cout << _widgets.size() << " " << _keyboard_index << std::endl;
 
   if (_keyboard_index == 0)
   {

@@ -26,12 +26,12 @@ SearchResultWidget::SearchResultWidget(UserModel const& model,
     auto texts = new QVBoxLayout();
     {
       auto fullname = new QLabel(this->_model.fullname());
-      view::send::user::fullname::style(*fullname);
+      view::send::search::fullname::style(*fullname);
       texts->addWidget(fullname);
     }
     {
       auto handle = new QLabel(this->_model.handle());
-      view::send::user::handle::style(*handle);
+      view::send::search::handle::style(*handle);
       texts->addWidget(handle);
     }
     this->_layout->addLayout(texts);

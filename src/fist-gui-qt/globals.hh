@@ -179,14 +179,14 @@ namespace view
     QMargins const
     margins(13, 13, 13, 13);
 
-    namespace peer
+    namespace files
     {
       static
       TextStyle const
       style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
     }
 
-    namespace files
+    namespace note
     {
       static
       TextStyle const
@@ -198,6 +198,23 @@ namespace view
       static
       TextStyle const
       style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
+    }
+  }
+
+  namespace user
+  {
+    namespace fullname
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
+    }
+
+    namespace notification
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9.5), QColor(0xC4, 0xC4, 0xC4));
     }
   }
 
@@ -254,7 +271,7 @@ namespace view
       text("Search for a friend...");
     }
 
-    namespace user
+    namespace search
     {
       namespace fullname
       {
@@ -270,7 +287,6 @@ namespace view
         style(QFont("Arial", 8), QColor(0xC4, 0xC4, 0xC4));
       }
     }
-
   }
 }
 

@@ -18,6 +18,7 @@
 #include <fist-gui-qt/RoundShadowWidget.hh>
 #include <fist-gui-qt/SendPanel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
+#include <fist-gui-qt/UserPanel.hh>
 #include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Dock");
@@ -54,9 +55,9 @@ class InfinitDock::Prologue
 // the graphical part is fully load, and then, initialize it.
 InfinitDock::InfinitDock(gap_State* state):
   _prologue(new Prologue(state)),
+  _user_panel(nullptr),
   _transaction_panel(nullptr),
-//  _panel(new RoundShadowWidget),
-  _send_panel(new SendPanel(state)),
+  _send_panel(nullptr),
   _menu(new QMenu(this)),
   _logo(":/icons/menu-bar-fire@2x.png"),
   _systray(new QSystemTrayIcon(this)),
@@ -66,6 +67,7 @@ InfinitDock::InfinitDock(gap_State* state):
   _state(state),
   _first_hide(true)
 {
+  ELLE_TRACE_SCOPE("%s: creation", *this);
   g_dock = this;
 
   QIcon icon(this->_logo);
@@ -80,56 +82,8 @@ InfinitDock::InfinitDock(gap_State* state):
   this->_systray_menu->addAction(_quit);
   this->_systray->setContextMenu(_systray_menu);
 
-  this->_transaction_panel = new TransactionPanel(state);
-
-  this->_register_panel(this->_transaction_panel);
-  this->_register_panel(this->_send_panel);
-
   connect(this, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
-
-  {
-    connect(&this->_transaction_panel->footer()->send(),
-            SIGNAL(released()),
-            this,
-            SLOT(_show_send_view()));
-    connect(&this->_transaction_panel->footer()->menu(),
-            SIGNAL(released()),
-            this,
-            SLOT(_show_menu()));
-  }
-
-  {
-    connect(this->_send_panel->footer()->back(),
-            SIGNAL(released()),
-            this,
-            SLOT(_back_from_send_view()));
-
-    connect(this->_send_panel,
-            SIGNAL(switch_signal()),
-            this,
-            SLOT(_back_from_send_view()));
-
-    connect(this->_send_panel,
-            SIGNAL(choose_files()),
-            this,
-            SLOT(pick_files()));
-  }
-
-  connect(this,
-          SIGNAL(avatar_available(uint32_t)),
-          this->_send_panel,
-          SLOT(avatar_available(uint32_t)));
-
-  connect(this,
-          SIGNAL(avatar_available(uint32_t)),
-          this->_transaction_panel,
-          SLOT(avatar_available(uint32_t)));
-
-  connect(this,
-          SIGNAL(user_status_changed(uint32_t, gap_UserStatus)),
-          this->_transaction_panel,
-          SLOT(user_status_changed(uint32_t, gap_UserStatus)));
 
   // XXX: Specialize a QWidgetAction to add a better visual and for example,
   // to copy the version in the user clipboard on click.
@@ -144,7 +98,8 @@ InfinitDock::InfinitDock(gap_State* state):
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
   gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
 
-  this->_switch_view(this->_transaction_panel);
+  ELLE_TRACE("show user view")
+    this->_show_user_view();
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
@@ -158,7 +113,7 @@ InfinitDock::InfinitDock(gap_State* state):
 
 InfinitDock::~InfinitDock()
 {
-  ELLE_TRACE_SCOPE("%s: quit", *this);
+  ELLE_TRACE_SCOPE("%s: destruction", *this);
 }
 
 void
@@ -214,9 +169,95 @@ InfinitDock::_register_panel(Panel* panel)
 }
 
 TransactionPanel&
-InfinitDock::transactionPanel()
+InfinitDock::transaction_panel()
 {
+  if (this->_transaction_panel == nullptr)
+  {
+    this->_transaction_panel.reset(new TransactionPanel(this->_state));
+    this->_register_panel(this->_transaction_panel.get());
+
+    connect(this,
+            SIGNAL(avatar_available(uint32_t)),
+            this->_transaction_panel.get(),
+            SLOT(avatar_available(uint32_t)));
+
+    connect(this,
+            SIGNAL(user_status_changed(uint32_t, gap_UserStatus)),
+            this->_transaction_panel.get(),
+            SLOT(user_status_changed(uint32_t, gap_UserStatus)));
+
+    connect(&this->_transaction_panel->footer()->send(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_send_view()));
+    connect(&this->_transaction_panel->footer()->back(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_user_view()));
+  }
+
   return *this->_transaction_panel;
+}
+
+UserPanel&
+InfinitDock::user_panel()
+{
+  if (this->_user_panel == nullptr)
+  {
+    this->_user_panel.reset(new UserPanel(this->_state));
+    this->_register_panel(this->_user_panel.get());
+
+    {
+      connect(this->_user_panel.get(), SIGNAL(user_clicked(uint32_t)),
+              this, SLOT(_show_transactions_view(uint32_t)));
+
+    connect(&this->_user_panel->footer()->send(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_send_view()));
+    connect(&this->_user_panel->footer()->menu(),
+            SIGNAL(released()),
+            this,
+            SLOT(_show_menu()));
+
+    }
+  }
+
+  return *this->_user_panel;
+}
+
+SendPanel&
+InfinitDock::send_panel()
+{
+  if (this->_send_panel == nullptr)
+  {
+    this->_send_panel.reset(new SendPanel(this->_state));
+    this->_register_panel(this->_send_panel.get());
+
+    {
+      connect(this->_send_panel->footer()->back(),
+              SIGNAL(released()),
+              this,
+              SLOT(_back_from_send_view()));
+
+      connect(this->_send_panel.get(),
+              SIGNAL(switch_signal()),
+              this,
+              SLOT(_back_from_send_view()));
+
+      connect(this->_send_panel.get(),
+              SIGNAL(choose_files()),
+              this,
+              SLOT(pick_files()));
+
+      connect(this,
+              SIGNAL(avatar_available(uint32_t)),
+              this->_send_panel.get(),
+              SLOT(avatar_available(uint32_t)));
+    }
+  }
+
+  return *this->_send_panel;
 }
 
 void
@@ -301,7 +342,7 @@ InfinitDock::pick_files()
   {
     for (auto const& file: selected)
       this->_send_panel->add_file(QUrl::fromLocalFile(file));
-    this->_switch_view(this->_send_panel);
+    this->_show_send_view();
     this->show_dock();
   }
 }
@@ -312,7 +353,7 @@ InfinitDock::enterEvent(QEvent* event)
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
 
-  if (this->centralWidget() == this->_send_panel)
+  if (this->centralWidget() == this->_send_panel.get())
     this->setFocus();
 }
 
@@ -362,8 +403,7 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
 
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
-
-  if (this->centralWidget() == this->_transaction_panel)
+  else if (this->centralWidget() == this->_user_panel.get())
   {
     if (event->key() == Qt::Key_Escape)
     {
@@ -375,12 +415,19 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
       this->_show_send_view();
     }
   }
-  else if (this->centralWidget() == this->_send_panel)
+  else if (this->centralWidget() == this->_send_panel.get())
   {
     if (event->key() == Qt::Key_Escape)
     {
       ELLE_DEBUG("escape pressed");
       this->toggle_dock();
+    }
+  }
+  else if (this->centralWidget() == this->_transaction_panel.get())
+  {
+    if (event->key() == Qt::Key_R)
+    {
+      this->transaction_panel().update();
     }
   }
 }
@@ -389,13 +436,14 @@ void
 InfinitDock::_show_send_view()
 {
   ELLE_TRACE_SCOPE("%s: show send view", *this);
-  this->_switch_view(this->_send_panel);
+  this->_switch_view(&this->send_panel());
 }
 
 void
-InfinitDock::_show_user_view(uint32_t /* sender_id */)
+InfinitDock::_show_user_view()
 {
   ELLE_TRACE_SCOPE("%s: show user view", *this);
+  this->_switch_view(&this->user_panel());
 }
 
 void
@@ -412,7 +460,7 @@ InfinitDock::_show_menu()
 void
 InfinitDock::_back_from_send_view()
 {
-  this->_show_transactions_view();
+  this->_show_user_view();
   this->hide_dock();
 }
 
@@ -421,7 +469,8 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
 {
   ELLE_TRACE_SCOPE("%s: focus lost (reason %s)", *this, event->reason());
 
-  if (this->centralWidget() == this->_send_panel)
+  if (this->centralWidget() != nullptr &&
+      this->centralWidget() == this->_send_panel.get())
   {
     event->accept();
     return;
@@ -435,11 +484,12 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
 
 
 void
-InfinitDock::_show_transactions_view()
+InfinitDock::_show_transactions_view(uint32_t sender_id)
 {
   ELLE_TRACE_SCOPE("%s: show transaction view", *this);
 
-  this->_switch_view(this->_transaction_panel);
+  this->transaction_panel().peer(&this->user_panel().users().at(sender_id));
+  this->_switch_view(&this->transaction_panel());
 }
 
 void

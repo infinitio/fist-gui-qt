@@ -27,20 +27,7 @@ public:
 | Properties |
 `-----------*/
 
-public:
-  Q_PROPERTY(float progress
-             READ progress
-             WRITE setProgress
-             NOTIFY onProgressChanged);
-
-public:
-  float progress() const;
-
-public Q_SLOTS:
-  void setProgress(float value);
-
 Q_SIGNALS:
-  void onProgressChanged(float);
   void
   on_transaction_accepted(uint32_t);
   void
@@ -69,6 +56,13 @@ public:
   void
   _update() override;
 
+private:
+  void
+  _show_accept_reject();
+
+  void
+  _hide_accept_reject();
+
 public slots:
   void accept();
   void reject();
@@ -79,16 +73,12 @@ public slots:
 
 private:
   TransactionModel const& _transaction;
-  AvatarWidget* _peer_avatar;
-  QLabel* _peer_status;
   QLayout* _layout;
   IconButton* _accept_button;
   IconButton* _reject_button;
-  QWidget* _accept_reject_area;
   IconButton* _cancel_button;
   QLabel* _mtime;
   QLabel* _status;
-  QWidget* _info_area;
   QTimer* _timer;
 
 /*----------.

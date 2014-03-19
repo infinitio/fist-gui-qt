@@ -48,10 +48,10 @@ static
 gap_State*
 gap_state()
 {
-#ifdef INFINIT_PRODUCTION_BUILD
+#if 0
   return gap_configurable_new(
     "https",
-    "meta.8.0.api.production.infinit.io", 80,
+    "meta.8.0.api.production.infinit.io", 443,
     "trophonius.8.0.api.production.infinit.io", 443);
 #else
     return gap_new();

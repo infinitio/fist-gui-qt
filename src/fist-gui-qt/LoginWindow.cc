@@ -186,10 +186,10 @@ LoginWindow::_login()
     QSettings settings("Infinit.io", "Infinit");
     settings.beginGroup("Login");
     settings.setValue("email", email);
+    settings.setValue("password", pw);
     settings.endGroup();
 
     emit logged_in();
-
     return;
   }
   else if (status == gap_deprecated)

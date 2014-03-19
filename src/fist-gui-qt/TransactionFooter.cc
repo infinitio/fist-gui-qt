@@ -2,10 +2,10 @@
 
 TransactionFooter::TransactionFooter():
   Footer(nullptr),
-  _menu(new IconButton(QPixmap(":/icons/gear.png"))),
+  _back(new IconButton(QPixmap(":/icons/gear.png"))),
   _send(new IconButton(QPixmap(":/icons/transfer.png")))
 {
-  this->_layout->addWidget(this->_menu);
+  this->_layout->addWidget(this->_back);
   this->_layout->addItem(new QSpacerItem(0, 0,
                                          QSizePolicy::MinimumExpanding,
                                          QSizePolicy::Minimum));
@@ -19,7 +19,7 @@ TransactionFooter::send() const
 }
 
 IconButton const&
-TransactionFooter::menu() const
+TransactionFooter::back() const
 {
-  return *this->_menu;
+  return *this->_back;
 }

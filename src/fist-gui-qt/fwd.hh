@@ -11,6 +11,7 @@ class Updater;
 class AddFileWidget;
 class AvatarWidget;
 class FileItem;
+class HorizontalSeparator;
 class IconButton;
 class Footer;
 class LoginFooter;
@@ -19,12 +20,20 @@ class NoNotificationWidget;
 class Panel;
 class RoundShadowWidget;
 class SearchField;
+class SearchResultWidget;
+class SendFooter;
 class SendPanel;
+
+// Transaction.
 class TransactionList;
+class TransactionFooter;
+class TransactionModel;
 class TransactionPanel;
 class TransactionWidget;
-class SearchResultWidget;
-class HorizontalSeparator;
-class SendFooter;
+
+// User.
+class UserModel;
+class UserPanel;
+class UserWidget;
 
 #endif

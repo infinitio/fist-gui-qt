@@ -21,6 +21,7 @@ public:
            bool clickable = true);
   virtual
   ~ListItem() = default;
+
   void
   mousePressEvent(QMouseEvent* e) override;
   void

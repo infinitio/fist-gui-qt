@@ -2,6 +2,7 @@
 
 #include <QSpacerItem>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QLabel>
 #include <QMovie>
 
@@ -9,7 +10,7 @@
 
 #include <fist-gui-qt/AvatarWidget.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
-#include <fist-gui-qt/TransactionWindow.hh>
+#include <fist-gui-qt/TransactionBody.hh>
 #include <fist-gui-qt/globals.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
@@ -23,24 +24,44 @@ QVector<gap_TransactionStatus> g_finals =
   gap_transaction_rejected,
 };
 
+  // If the peer is the recipient.
+  /*-------------------------------------------------
+  |        _______________________________________  |
+  |       |                                       | |
+  |       |  Name of the file                     | |
+  |       |  .---------------------------------.  | |
+  |       |  | Note                            |  | |
+  |       |  |                                 |  | |
+  |       |  `---------------------------------'  | |
+  |       |_______________________________________| |
+  |                                                 |
+  ---------------------------------------------------*/
+  // Else
+  /*-------------------------------------------------
+  |  ________________________________________       |
+  | |                                        |      |
+  | |  Name of the file                      |      |
+  | |  .---------------------------------.   |      |
+  | |  | Note                            |   |      |
+  | |  |                                 |   |      |
+  | |  `---------------------------------'   |      |
+  | |                                        |      |
+  | [============                            ]      |
+  |                                 progress        |
+  ---------------------------------------------------*/
+
 TransactionWidget::TransactionWidget(TransactionModel const& model):
   ListItem(nullptr, view::background, false),
   _transaction(model),
-  _peer_avatar(new AvatarWidget(this->_transaction.avatar())),
-  _peer_status(new QLabel),
   _layout(nullptr),
   _accept_button(new IconButton(QPixmap(":/buttons/accept.png"))),
   _reject_button(new IconButton(QPixmap(":/buttons/reject.png"))),
-  _accept_reject_area(new QWidget),
   _cancel_button(new IconButton(QPixmap(":/buttons/cancel.png"))),
   _mtime(new QLabel),
   _status(new QLabel),
-  _info_area(new QWidget),
   _timer(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
-
-  this->_peer_status->setPixmap(QPixmap(":/icons/status.png"));
 
   connect(this->_accept_button, SIGNAL(released()),
           this, SLOT(accept()));
@@ -49,71 +70,44 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   connect(this->_cancel_button, SIGNAL(released()),
           this, SLOT(cancel()));
 
-  this->_peer_avatar = new AvatarWidget(this->_transaction.avatar());
+  auto layout = new QVBoxLayout(this);
+  layout->setContentsMargins(13, 8, 18, 8);
 
-  auto layout = new QHBoxLayout(this);
-  // XXX: should but 13, 13, 13, 13 but avatar widget size is strange.
-  layout->setContentsMargins(8, 8, 13, 8);
+  view::transaction::date::style(*this->_mtime);
+  layout->addWidget(this->_mtime, 0, Qt::AlignCenter);
+  layout->addSpacing(6);
+
+  auto bodylayout = new QHBoxLayout();
+
+  auto alignment = (this->_transaction.is_sender()? Qt::AlignRight: Qt::AlignLeft);
+  auto body = new TransactionBody(this->_transaction, alignment);
+  body->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+
+  auto info_layout = new QVBoxLayout();
+  info_layout->addStretch();
+  info_layout->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+  info_layout->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+  info_layout->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignLeft);
+  info_layout->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
+  info_layout->addStretch();
+
+  if (this->_transaction.is_sender())
+  {
+    bodylayout->addLayout(info_layout);
+    bodylayout->addSpacing(15);
+    bodylayout->addWidget(body);
+  }
+  else
+  {
+    bodylayout->addWidget(body);
+    bodylayout->addSpacing(15);
+    bodylayout->addLayout(info_layout);
+  }
+
+  body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+  layout->addLayout(bodylayout);
   this->_layout = layout;
-  layout->addWidget(this->_peer_avatar, 0, Qt::AlignLeft);
-
-  {
-    auto texts = new QVBoxLayout;
-    texts->setContentsMargins(5, 0, 5, 0);
-
-    layout->addLayout(texts);
-
-    texts->addStretch();
-    auto user_and_status = new QHBoxLayout;
-    texts->addLayout(user_and_status);
-    auto username = new QLabel(this->_transaction.peer_fullname());
-    {
-      view::transaction::peer::style(*username);
-      username->setMaximumWidth(150);
-      username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-      user_and_status->addWidget(username);
-    }
-     user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
-    this->_peer_status->setToolTip(tr("Online"));
-    user_and_status->addStretch(0);
-    texts->addSpacing(4);
-
-    auto filename = this->_transaction.files().size() == 1 ?
-      new QLabel(this->_transaction.files().first()) :
-      new QLabel(QString("%1 files").arg(this->_transaction.files().size()));
-    {
-      filename->setToolTip(this->_transaction.tooltip());
-      view::transaction::files::style(*filename);
-      filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-      texts->addWidget(filename);
-    }
-    texts->addStretch();
-  }
-  layout->addStretch();
-  {
-    auto time_and_info = new QVBoxLayout;
-    this->_info_area->setLayout(time_and_info);
-    view::transaction::date::style(*this->_mtime);
-    time_and_info->addWidget(this->_mtime, 0, Qt::AlignCenter | Qt::AlignRight);
-    auto status_and_cancel = new QHBoxLayout;
-    time_and_info->addLayout(status_and_cancel);
-    {
-      status_and_cancel->addStretch();
-      status_and_cancel->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
-      status_and_cancel->addSpacing(3);
-      status_and_cancel->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignRight);
-    }
-    layout->addWidget(this->_info_area);
-  }
-  {
-    auto infos = new QVBoxLayout;
-    this->_accept_reject_area->setLayout(infos);
-
-    infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-    infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-
-    layout->addWidget(this->_accept_reject_area);
-  }
 
   this->_update();
 
@@ -131,24 +125,9 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   connect(mtime_updater, SIGNAL(timeout()),
           this, SLOT(update_mtime()));
   mtime_updater->start(5000);
+
   this->update();
-}
-
-/*-----------.
-| Properties |
-`-----------*/
-
-float
-TransactionWidget::progress() const
-{
-  return this->_peer_avatar->progress();
-}
-
-void
-TransactionWidget::setProgress(float value)
-{
-  ELLE_DEBUG("%s: update progress to %s", *this, value);
-  this->_peer_avatar->setProgress(value);
+  this->_status->hide();
 }
 
 /*-------.
@@ -182,83 +161,63 @@ TransactionWidget::trigger()
 }
 
 void
+TransactionWidget::_show_accept_reject()
+{
+  this->_accept_button->show();
+  this->_reject_button->show();
+  this->_cancel_button->hide();
+  this->_status->hide();
+}
+
+void
+TransactionWidget::_hide_accept_reject()
+{
+  this->_accept_button->hide();
+  this->_reject_button->hide();
+  this->_cancel_button->show();
+}
+
+void
 TransactionWidget::_update()
 {
   ELLE_TRACE_SCOPE("%s: update", *this);
-  this->_info_area->show();
-  this->_cancel_button->hide();
-  this->_accept_reject_area->hide();
-
-  if (this->_transaction.new_avatar())
-  {
-    ELLE_DEBUG("new avatar");
-    this->_peer_avatar->setPicture(this->_transaction.avatar());
-  }
-
-  ELLE_DEBUG("peer is %sconnected",
-             this->_transaction.peer_connection_status() ? "" : "dis");
-  if (this->_transaction.peer_connection_status())
-    this->_peer_status->show();
-  else
-    this->_peer_status->hide();
 
   if (this->_transaction.status() == gap_transaction_waiting_for_accept &&
       !this->_transaction.is_sender())
   {
     ELLE_DEBUG("show accept / reject buttons");
-    this->_accept_reject_area->show();
-    this->_info_area->show();
-    this->_mtime->hide();
-  }
-  else if (!this->_accept_reject_area->isHidden())
-  {
-    ELLE_DEBUG("hide accept / reject buttons");
-    this->_accept_reject_area->hide();
-    this->_mtime->show();
-    this->_info_area->show();
-  }
-
-  if (this->_accept_reject_area->isHidden())
-  {
-    if (!g_finals.contains(this->_transaction.status()))
-    {
-      this->_cancel_button->show();
-    }
-    this->_status->show();
-    this->_mtime->show();
-    this->_info_area->show();
+    this->_show_accept_reject();
   }
   else
   {
-     this->_info_area->hide();
+    this->_hide_accept_reject();
+  }
+
+  if (g_finals.contains(this->_transaction.status()))
+  {
+    this->_cancel_button->hide();
+    this->_status->show();
   }
 
   if (this->_transaction.status() == gap_transaction_running &&
       this->_timer == nullptr)
   {
     ELLE_TRACE("run progress timer");
-    this->_peer_avatar->setTransactionCount(this->_transaction.files().size());
 
     _timer = new QTimer;
     connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
     _timer->start(1000);
-
-    connect(this,
-            SIGNAL(onProgressChanged(float)),
-            this->_peer_avatar,
-            SLOT(setProgress(float)));
   }
   else if (this->_transaction.status() != gap_transaction_running &&
            this->_timer != nullptr)
   {
-    setProgress(0);
     delete this->_timer;
     this->_timer = nullptr;
   }
 
   if (g_finals.contains(this->_transaction.status()))
   {
-    this->_peer_avatar->setTransactionCount(0);
+    // this->_peer_avatar->setTransactionCount(0);
   }
 
   this->update_status();
@@ -269,7 +228,7 @@ TransactionWidget::update_progress()
 {
   ELLE_DUMP("%s: update progress", *this);
   float progress = this->_transaction.progress();
-  emit onProgressChanged(progress);
+  // emit on_progress_changed(progress);
 }
 
 void
