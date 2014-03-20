@@ -5,7 +5,9 @@
 # include <vector>
 
 # include <QApplication>
+# include <QFile>
 # include <QObject>
+# include <QLocalServer>
 
 # include <elle/Printable.hh>
 # include <elle/attribute.hh>
@@ -36,7 +38,6 @@ public:
   // levels, and so on...
 private:
   class Prologue;
-  std::unique_ptr<Prologue> _prologue;
 
 /*---------------.
 | Initialization |
@@ -45,6 +46,8 @@ private:
   void
   _initialize_application();
 
+  bool
+  _set_lock();
 /*------------------.
 | Desinitialization |
 `------------------*/
@@ -65,6 +68,8 @@ private slots:
   void
   logged_in();
 
+  void
+  _new_local_socket_connection();
 /*----.
 | Run |
 `----*/
@@ -77,11 +82,23 @@ private slots:
   _reposition_dialog();
 
 private:
+  ELLE_ATTRIBUTE(std::unique_ptr<Prologue>, prologue);
+  ELLE_ATTRIBUTE(gap_State*, state);
+  // The local server can be used as a 'only one instance running' lock.
+  // They are 3 ways usually used:
+  // - QLocalServer.
+  // - QSharedMemory.
+  // - QtSingleApplication (deprecated).
+  // See: http://developer.nokia.com/community/wiki/Run_only_one_instance_of_a_Qt_application
+  typedef QLocalServer Lock;
+  ELLE_ATTRIBUTE(std::unique_ptr<Lock>, lock);
+  ELLE_ATTRIBUTE(std::unique_ptr<QLocalSocket>, other_instance);
+  ELLE_ATTRIBUTE(QFile, filelock);
   ELLE_ATTRIBUTE(std::unique_ptr<QApplication>, application);
   ELLE_ATTRIBUTE(std::unique_ptr<Updater>, updater);
   ELLE_ATTRIBUTE(std::unique_ptr<LoginWindow>, login_window);
   ELLE_ATTRIBUTE(InfinitDock*, dock);
-  ELLE_ATTRIBUTE(gap_State*, state);
+
 private:
   Q_OBJECT;
 

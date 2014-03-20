@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <QApplication>
 
 #include <elle/log.hh>
@@ -10,7 +12,16 @@
 int
 main(int argc, char** argv)
 {
-  Fist application(argc, argv);
+  try
+  {
+    Fist application(argc, argv);
 
-  return application();
+    return application();
+  }
+  catch (std::runtime_error const& e)
+  {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
+  return 0;
 }
