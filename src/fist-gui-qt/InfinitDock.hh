@@ -88,6 +88,9 @@ public Q_SLOTS:
 
   void pick_files();
 
+  void
+  report_a_problem();
+
   void _position_panel();
 
 public slots:
@@ -157,6 +160,7 @@ private:
   QSystemTrayIcon* _systray;
   QMenu* _systray_menu;
   QAction* _send_files;
+  QAction* _report_a_problem;
   QAction* _quit;
   gap_State* _state;
   bool _first_hide;

@@ -1,18 +1,21 @@
 #include <QAction>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QDesktopWidget>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QDesktopWidget>
 #include <QSystemTrayIcon>
 #include <QUrl>
 #include <QWidgetAction>
 
 #include <version.hh>
+#include <common/common.hh>
 
 #include <elle/log.hh>
+#include <elle/os/environ.hh>
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
@@ -62,6 +65,7 @@ InfinitDock::InfinitDock(gap_State* state):
   _systray(new QSystemTrayIcon(this)),
   _systray_menu(new QMenu(this)),
   _send_files(new QAction(tr("&Send files..."), this)),
+  _report_a_problem(new QAction(tr("&Report a problem"), this)),
   _quit(new QAction(tr("&Quit"), this)),
   _state(state),
   _first_hide(true)
@@ -133,9 +137,11 @@ InfinitDock::InfinitDock(gap_State* state):
 
   // XXX: Specialize a QWidgetAction to add a better visual and for example,
   // to copy the version in the user clipboard on click.
-  QWidgetAction* version = new QWidgetAction(this->_menu);
+  QWidgetAction* version = new QWidgetAction(this);
   version->setDefaultWidget(new QLabel(QString(INFINIT_VERSION)));
   this->_menu->addAction(version);
+  this->_menu->addSeparator();
+  this->_menu->addAction(_report_a_problem);
   this->_menu->addSeparator();
   this->_menu->addAction(_quit);
 
@@ -151,6 +157,8 @@ InfinitDock::InfinitDock(gap_State* state):
   timer->start(1000);
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
+  this->connect(_report_a_problem, SIGNAL(triggered()),
+                this, SLOT(report_a_problem()));
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
   this->show();
   this->show_dock();
@@ -258,6 +266,44 @@ InfinitDock::toggle_dock(bool toggle_only)
     this->hide_dock();
   else
     this->show_dock();
+}
+
+
+void
+InfinitDock::report_a_problem()
+{
+  bool ok;
+  QString text = QInputDialog::getText(this,
+                                       tr("Report a problem"),
+                                       tr("Please describe the problem you had"),
+                                       QLineEdit::Normal,
+                                       QDir::home().dirName(),
+                                       &ok);
+  if (ok)
+  {
+    auto log_file_picker = [] () -> std::string
+    {
+      for (std::string var: {"INFINIT_LOG_FILE", "ELLE_LOG_FILE"})
+      {
+        if (elle::os::inenv(var))
+          return elle::os::getenv(var);
+      }
+      return "";
+    };
+
+    auto logfile = log_file_picker();
+
+    if (!logfile.empty())
+      gap_send_user_report(
+        gap_self_email(this->_state),
+        text.toStdString().c_str(),
+        logfile.c_str(),
+        elle::sprintf("%s on %s",
+                      common::system::platform(),
+                      INFINIT_VERSION).c_str());
+  }
+
+  this->setFocus();
 }
 
 void
@@ -406,7 +452,11 @@ InfinitDock::_show_menu()
   this->_menu->show();
 
   QPoint pos(this->geometry().bottomLeft());
-  this->_menu->move(pos);
+
+  int margin = 3;
+  this->_menu->move(pos.x() + margin,
+                    pos.y() - this->_menu->size().height() - margin);
+
 }
 
 void
