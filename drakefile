@@ -7,12 +7,16 @@ import drake.templating
 
 from functools import partial
 
+build = None
+installer = None
+
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
               prefix = '/usr',
               git = None,
               qt = None,
               libraries = []):
+  global build, installer
 
   cxx_config = drake.cxx.Config(cxx_config)
   cxx_toolkit = cxx_toolkit or drake.cxx.Toolkit()
@@ -146,8 +150,8 @@ def configure(cxx_toolkit = None,
     cxx_toolkit,
     cxx_config)
 
-  build_rule = drake.Rule('build')
-  build_rule << application
+  build = drake.Rule('build')
+  build << application
 
   if cxx_toolkit.os == drake.os.windows:
 
@@ -226,6 +230,6 @@ def configure(cxx_toolkit = None,
     with templating_context:
       update = drake.node('update.xml.tmpl')
 
-    installer_rule = drake.Rule('installer')
-    installer_rule << drake.Node('bin/installer.exe')
-    installer_rule << drake.copy(drake.Node('update.xml'), 'bin', strip_prefix = True)
+    installer = drake.Rule('installer')
+    installer << drake.Node('bin/installer.exe')
+    installer << drake.copy(drake.Node('update.xml'), 'bin', strip_prefix = True)
