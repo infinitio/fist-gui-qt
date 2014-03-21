@@ -70,6 +70,10 @@ private slots:
 
   void
   _new_local_socket_connection();
+
+  void
+  _kicked();
+
 /*----.
 | Run |
 `----*/
@@ -98,6 +102,7 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<Updater>, updater);
   ELLE_ATTRIBUTE(std::unique_ptr<LoginWindow>, login_window);
   ELLE_ATTRIBUTE(InfinitDock*, dock);
+  ELLE_ATTRIBUTE(bool, lolerror);
 
 private:
   Q_OBJECT;

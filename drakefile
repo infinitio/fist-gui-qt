@@ -133,6 +133,10 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/LoadingDialog.hh",
     "src/fist-gui-qt/LoadingDialog.cc",
 
+    "src/fist-gui-qt/log/Selector.cc",
+    "src/fist-gui-qt/log/Selector.hh",
+    "src/fist-gui-qt/log/CircularSelector.cc",
+    "src/fist-gui-qt/log/CircularSelector.hh",
     "src/fist-gui-qt/main.cc",
   )
 
