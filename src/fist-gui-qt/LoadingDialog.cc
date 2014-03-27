@@ -139,7 +139,7 @@ LoadingDialog::keyPressEvent(QKeyEvent* event)
     this->_accept_button->click();
   else if (event->key() == Qt::Key_Escape &&
            (this->windowFlags() & Qt::WindowCloseButtonHint))
-    this->close();
+    QDialog::close();
 }
 
 void
