@@ -58,7 +58,13 @@ class Fist::Prologue
       ELLE_DEBUG("set ELLE_LOG_LEVEL");
       elle::os::setenv(
         "ELLE_LOG_LEVEL",
-        "*surface*:DEBUG,*frete*:TRACE,*station*:DEBUG,*FIST*:DEBUG",
+          "*trophonius*:TRACE,"
+          "*meta*:TRACE,"
+          "*gap*:TRACE,"
+          "*frete*:TRACE,"
+          "*station*:DEBUG,"
+          "*FIST*:DEBUG,"
+          "elle.CrashReporter:DEBUG",
         true);
     }
 
@@ -290,7 +296,7 @@ Fist::_set_lock()
   // If it's a case, send a crash report and take ownership of the lock.
   if (this->_filelock.exists()) // Previous session has not be cleaned.
   {
-    ELLE_DEBUG_SCOPE("a lock file is present");
+    ELLE_TRACE_SCOPE("a lock file is present");
 #ifdef INFINIT_PRODUCTION_BUILD
     auto previous_log = logger ? logger->previous_log_file() : "";
 
@@ -310,11 +316,17 @@ Fist::_set_lock()
 #else
     ELLE_WARN("Previous session crashed");
 #endif
-    this->_filelock.setPermissions(QFile::WriteOwner);
-    this->_filelock.remove();
+    ELLE_DEBUG("remove previous lock");
+    {
+      this->_filelock.setPermissions(QFile::WriteOwner);
+      this->_filelock.remove();
+    }
   }
-  this->_filelock.open(QIODevice::WriteOnly);
-  this->_filelock.setPermissions(QFile::ReadOwner);
+  ELLE_DEBUG("set new lock")
+  {
+    this->_filelock.open(QIODevice::WriteOnly);
+    this->_filelock.setPermissions(QFile::ReadOwner);
+  }
   return true;
 }
 
