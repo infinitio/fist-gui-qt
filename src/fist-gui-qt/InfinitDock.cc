@@ -277,10 +277,13 @@ InfinitDock::report_a_problem()
                                        tr("Report a problem"),
                                        tr("Please describe the problem you had"),
                                        QLineEdit::Normal,
-                                       QDir::home().dirName(),
+                                       "Enter your message",
                                        &ok);
+
   if (ok)
   {
+    ELLE_DEBUG("user message: %s", text);
+
     auto log_file_picker = [] () -> std::string
     {
       for (std::string var: {"INFINIT_LOG_FILE", "ELLE_LOG_FILE"})
@@ -292,15 +295,25 @@ InfinitDock::report_a_problem()
     };
 
     auto logfile = log_file_picker();
+    ELLE_TRACE("file to report: %s", logfile);
 
     if (!logfile.empty())
+    {
+      auto std_text = text.toStdString();
+      ELLE_DEBUG("user message as std::string: %s", std_text);
       gap_send_user_report(
         gap_self_email(this->_state),
-        text.toStdString().c_str(),
+        std_text.c_str(),
         logfile.c_str(),
         elle::sprintf("%s on %s",
                       common::system::platform(),
                       INFINIT_VERSION).c_str());
+      ELLE_DEBUG("report sent");
+    }
+    else
+    {
+      ELLE_WARN("Fist: No log file to send");
+    }
   }
 
   this->setFocus();
@@ -471,6 +484,7 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
 {
   ELLE_TRACE_SCOPE("%s: focus lost (reason %s)", *this, event->reason());
 
+  // Swallow focus lost event to keep the send view on top
   if (this->centralWidget() == this->_send_panel)
   {
     event->accept();
