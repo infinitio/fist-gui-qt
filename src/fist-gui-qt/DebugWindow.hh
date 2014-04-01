@@ -2,7 +2,8 @@
 # define DEBUGWINDOW_HH
 
 # include <QMainWindow>
-# include <surface/gap/gap.h>
+
+# include <surface/gap/fwd.hh>
 
 class DebugWindow:
   public QMainWindow

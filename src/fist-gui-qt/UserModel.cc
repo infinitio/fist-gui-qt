@@ -1,11 +1,13 @@
-#include <fist-gui-qt/UserModel.hh>
-#include <fist-gui-qt/utils.hh>
-
-#include <elle/log.hh>
-
 #include <QByteArray>
 #include <QBuffer>
 #include <QImageReader>
+
+#include <elle/log.hh>
+
+#include <surface/gap/gap.hh>
+
+#include <fist-gui-qt/UserModel.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.UserModel");
 

@@ -12,7 +12,7 @@
 # include <elle/Printable.hh>
 # include <elle/attribute.hh>
 
-# include <surface/gap/gap.h>
+# include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/fwd.hh>
 

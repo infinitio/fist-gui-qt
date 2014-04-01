@@ -8,7 +8,7 @@
 # include <QScrollArea>
 # include <QFrame>
 
-# include <surface/gap/gap.h>
+# include <surface/gap/gap.hh>
 
 # include <fist-gui-qt/ListWidget.hh>
 # include <fist-gui-qt/TransactionFooter.hh>

@@ -11,11 +11,12 @@
 #include <QUrl>
 #include <QWidgetAction>
 
-#include <version.hh>
-#include <common/common.hh>
-
 #include <elle/log.hh>
 #include <elle/os/environ.hh>
+
+#include <version.hh>
+#include <common/common.hh>
+#include <surface/gap/gap.hh>
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>

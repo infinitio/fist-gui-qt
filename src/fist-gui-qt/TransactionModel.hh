@@ -11,7 +11,7 @@
 # include <elle/Printable.hh>
 
 # include <fist-gui-qt/fwd.hh>
-# include <surface/gap/gap.h>
+# include <surface/gap/gap.hh>
 
 class TransactionModel:
   public elle::Printable

@@ -8,7 +8,7 @@
 # include <QLineEdit>
 # include <QMainWindow>
 
-# include <surface/gap/gap.h>
+# include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/InfinitDock.hh>

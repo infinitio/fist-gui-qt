@@ -10,7 +10,8 @@
 # include <QTimer>
 # include <QWidget>
 
-# include <surface/gap/gap.h>
+# include <surface/gap/enums.hh>
+# include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/fwd.hh>

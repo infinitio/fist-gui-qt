@@ -19,6 +19,7 @@
 #include <elle/os/path.hh>
 
 #include <common/common.hh>
+#include <surface/gap/gap.hh>
 #include <version.hh>
 
 #include <fist-gui-qt/log/CircularSelector.hh>

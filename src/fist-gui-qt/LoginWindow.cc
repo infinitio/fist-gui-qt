@@ -9,6 +9,8 @@
 
 #include <elle/finally.hh>
 #include <elle/log.hh>
+
+#include <surface/gap/gap.hh>
 #include <version.hh>
 
 #include <fist-gui-qt/LoginWindow.hh>

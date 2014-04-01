@@ -1,9 +1,11 @@
 #ifndef USERMODEL_HH
 # define USERMODEL_HH
 
-# include <surface/gap/gap.h>
+# include <surface/gap/gap.hh>
 
 # include <elle/Printable.hh>
+
+#include <surface/gap/fwd.hh>
 
 # include <QString>
 # include <QPixmap>

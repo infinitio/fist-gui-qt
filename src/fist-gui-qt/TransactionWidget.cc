@@ -7,6 +7,9 @@
 
 #include <elle/log.hh>
 
+#include <surface/gap/gap.hh>
+
+
 #include <fist-gui-qt/AvatarWidget.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/TransactionWindow.hh>

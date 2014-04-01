@@ -8,8 +8,6 @@
 # include <QTimer>
 # include <QLabel>
 
-# include <surface/gap/gap.h>
-
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>

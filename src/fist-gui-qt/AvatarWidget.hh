@@ -6,7 +6,6 @@
 # include <QPixmap>
 
 # include <map>
-# include <surface/gap/gap.h>
 
 # include <fist-gui-qt/utils.hh>
 

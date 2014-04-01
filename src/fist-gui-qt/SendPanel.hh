@@ -8,7 +8,7 @@
 
 # include <elle/Printable.hh>
 
-# include <surface/gap/gap.h>
+# include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/Panel.hh>
 # include <fist-gui-qt/SendFooter.hh>

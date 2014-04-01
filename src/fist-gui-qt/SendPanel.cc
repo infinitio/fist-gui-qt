@@ -2,6 +2,8 @@
 
 #include <elle/log.hh>
 
+#include <surface/gap/gap.hh>
+
 #include <fist-gui-qt/AddFileWidget.hh>
 #include <fist-gui-qt/AvatarIcon.hh>
 #include <fist-gui-qt/FileItem.hh>

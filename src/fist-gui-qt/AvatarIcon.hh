@@ -6,8 +6,6 @@
 # include <QPainter>
 # include <QSize>
 
-# include <surface/gap/gap.h>
-
 class AvatarIcon:
   public QWidget
 {
