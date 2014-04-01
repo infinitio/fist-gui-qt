@@ -97,7 +97,11 @@ static
 gap_State*
 gap_state()
 {
-  return gap_new();
+#ifdef INFINIT_PRODUCTION_BUILD
+  return gap_new(true);
+#else
+  return gap_new(false);
+#endif
 }
 
 Fist::Fist(int argc, char** argv):
