@@ -181,7 +181,7 @@ void
 TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
   if (gap_transaction_status(this->_state, id) <
-      gap_transaction_waiting_for_accept)
+      gap_transaction_waiting_accept)
     return; // Ignore early status because data may not be fully merged.
 
   if (this->_transactions.find(id) == this->_transactions.end())
@@ -206,18 +206,18 @@ TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 
   switch (transaction.status())
   {
-    case gap_transaction_accepted:
-      if (transaction.is_sender())
-        emit systray_message(
-          "Accepted!",
-          elle::sprintf(
-            "%s accepted %s.",
-            transaction.peer_fullname().toStdString(),
-            (transaction.files().size() == 1)
-            ? transaction.files()[0].toStdString()
-            : elle::sprintf("your %s files", transaction.files().size())
-          ).c_str());
-      break;
+    // case gap_transaction_accepted:
+    //   if (transaction.is_sender())
+    //     emit systray_message(
+    //       "Accepted!",
+    //       elle::sprintf(
+    //         "%s accepted %s.",
+    //         transaction.peer_fullname().toStdString(),
+    //         (transaction.files().size() == 1)
+    //         ? transaction.files()[0].toStdString()
+    //         : elle::sprintf("your %s files", transaction.files().size())
+    //       ).c_str());
+    //   break;
     case gap_transaction_rejected:
       if (transaction.is_sender())
         emit systray_message(

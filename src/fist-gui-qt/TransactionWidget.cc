@@ -19,7 +19,6 @@ ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 
 QVector<gap_TransactionStatus> g_finals =
 {
-  gap_transaction_cleaning,
   gap_transaction_finished,
   gap_transaction_failed,
   gap_transaction_canceled,
@@ -205,7 +204,7 @@ TransactionWidget::_update()
   else
     this->_peer_status->hide();
 
-  if (this->_transaction.status() == gap_transaction_waiting_for_accept &&
+  if (this->_transaction.status() == gap_transaction_waiting_accept &&
       !this->_transaction.is_sender())
   {
     ELLE_DEBUG("show accept / reject buttons");
@@ -236,7 +235,7 @@ TransactionWidget::_update()
      this->_info_area->hide();
   }
 
-  if (this->_transaction.status() == gap_transaction_running &&
+  if (this->_transaction.status() == gap_transaction_transferring &&
       this->_timer == nullptr)
   {
     ELLE_TRACE("run progress timer");
@@ -251,7 +250,7 @@ TransactionWidget::_update()
             this->_peer_avatar,
             SLOT(setProgress(float)));
   }
-  else if (this->_transaction.status() != gap_transaction_running &&
+  else if (this->_transaction.status() != gap_transaction_transferring &&
            this->_timer != nullptr)
   {
     setProgress(0);
@@ -363,24 +362,21 @@ TransactionWidget::update_status()
   };
 
   static std::map<gap_TransactionStatus, StatusUpdater> tooltips{
-    { gap_transaction_none, StatusUpdater(QString(), false, "None") },
-    { gap_transaction_pending, StatusUpdater(QString(), false, "Pending") },
-    { gap_transaction_copying, StatusUpdater(QString(), false, "Copying") },
-    { gap_transaction_waiting_for_accept,
+    { gap_transaction_new, StatusUpdater(QString(), false, "New") },
+    { gap_transaction_waiting_accept,
         StatusUpdater(QString(":/icons/loading.gif"),
                       true,
                       "Wait for user to accept") },
-    { gap_transaction_accepted,
-        StatusUpdater(QString(":/icons/loading.gif"),
-                      true,
-                      "Waiting for peer to be online") },
-    { gap_transaction_preparing,
-        StatusUpdater(QString(":/icons/loading.gif"),
-                      true,
-                      "Waiting for peer to be online") },
-    { gap_transaction_running, StatusUpdater(QString(), false, "Running") },
-    { gap_transaction_cleaning,
-        StatusUpdater(QString(), false, "Cleaning") },
+    // { gap_transaction_accepted,
+    //     StatusUpdater(QString(":/icons/loading.gif"),
+    //                   true,
+    //                   "Waiting for peer to be online") },
+    // { gap_transaction_preparing,
+    //     StatusUpdater(QString(":/icons/loading.gif"),
+    //                   true,
+    //                   "Waiting for peer to be online") },
+    { gap_transaction_transferring,
+        StatusUpdater(QString(), false, "Transferring") },
     { gap_transaction_finished,
         StatusUpdater(QString(":/icons/check.png"), false, "Finished") },
     { gap_transaction_failed,
@@ -392,7 +388,7 @@ TransactionWidget::update_status()
   };
 
   tooltips.at(this->_transaction.status())(*this->_status);
-  if (this->_transaction.status() == gap_transaction_running)
+  if (this->_transaction.status() == gap_transaction_transferring)
   {
     if (this->_transaction.is_sender())
     {
