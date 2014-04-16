@@ -312,6 +312,7 @@ Fist::_set_lock()
     auto email = settings.value("email", "unknown").toString();
 
     gap_send_user_report(
+      this->_state,
       email.toStdString().c_str(),
       "CrashReport",
       previous_log.c_str(),

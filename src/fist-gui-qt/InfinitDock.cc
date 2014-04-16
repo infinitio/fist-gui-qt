@@ -303,6 +303,7 @@ InfinitDock::report_a_problem()
       auto std_text = text.toStdString();
       ELLE_DEBUG("user message as std::string: %s", std_text);
       gap_send_user_report(
+        this->_state,
         gap_self_email(this->_state),
         std_text.c_str(),
         logfile.c_str(),
