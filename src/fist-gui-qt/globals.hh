@@ -3,6 +3,7 @@
 
 # include <QFont>
 # include <QColor>
+# include <QLabel>
 
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
@@ -33,11 +34,20 @@ namespace
   struct TextStyle
   {
     TextStyle(QFont const& font,
-              QColor const& color = QColor(0x25, 0x25, 0x25)):
+              QColor const& color = QColor(0x25, 0x25, 0x25),
+              Qt::Alignment const& aligment = Qt::AlignLeft):
       _font(font),
-      _color(color)
+      _color(color),
+      _alignement(aligment)
     {
       this->_font.setStyleStrategy(QFont::PreferAntialias);
+    }
+
+    void
+    operator ()(QLabel& target) const
+    {
+      target.setAlignment(this->_alignement);
+      this->operator ()(*(static_cast<QWidget*>(&target)));
     }
 
     void
@@ -54,6 +64,7 @@ namespace
   private:
     QFont _font;
     QColor _color;
+    Qt::Alignment _alignement;
   };
 }
 
@@ -112,7 +123,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 11), QColor(0xEE, 0x11, 0x11));
+      style(QFont("Arial", 11), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
     }
 
     namespace links
