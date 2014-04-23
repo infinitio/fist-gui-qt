@@ -162,6 +162,7 @@ LoginWindow::_login()
 {
   this->_message_field->clear();
   this->_footer->setDisabled(true);
+  this->update();
 
   elle::SafeFinally unlock_login([&] { this->_footer->setDisabled(false); });
   ELLE_TRACE_SCOPE("%s: login attempt", *this);
@@ -199,20 +200,27 @@ LoginWindow::_login()
     emit version_rejected();
   }
 
+  auto fill_error_field = [&] (std::string const& error_message)
+    {
+      ELLE_WARN("%s", error_message);
+      this->set_message(error_message.c_str(), error_message.c_str());
+    };
   switch (status)
   {
-#define ERR(case, msg)                                                         \
-    case:                                                                      \
-      ELLE_WARN("%s", tr(msg));                                                \
-      this->set_message(tr(msg), tr(msg));                               \
-      break                                                                    \
-/**/
-    ERR(case gap_network_error, "Not connected to internet");
-    ERR(case gap_meta_unreachable, "Unable to contact main server");
-    ERR(case gap_meta_down_with_message, "Main server is down...");
-    ERR(case gap_trophonius_unreachable, "Unable to contact notification server");
-    ERR(case gap_email_password_dont_match, "Wrong email/password");
-    ERR(default, "Internal error");
+#define ERR(error_code, msg)                    \
+    case error_code:                            \
+      fill_error_field(msg);                    \
+      break                                     \
+        /**/
+    ERR(gap_network_error, "Not connected to internet");
+    ERR(gap_meta_unreachable, "Unable to contact main server");
+    ERR(gap_meta_down_with_message, "Main server is down");
+    ERR(gap_trophonius_unreachable, "Unable to contact notification server");
+    ERR(gap_email_password_dont_match, "Wrong email/password");
+    ERR(gap_deprecated, "Your version is no longer supported");
+    ERR(gap_email_not_confirmed, "You need to confirm your email\nCheck your inbox");
+    default:
+      fill_error_field(elle::sprintf("Internal error (%s)", status));
   }
 }
 
