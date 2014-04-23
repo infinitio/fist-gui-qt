@@ -1,5 +1,6 @@
 import drake
 import drake.cxx
+import drake.cxx.boost
 import drake.git
 import drake.nsis
 import drake.cxx.qt
@@ -15,6 +16,7 @@ def configure(cxx_toolkit = None,
               prefix = '/usr',
               git = None,
               qt = None,
+              boost = None,
               libraries = []):
   global build, installer
 
@@ -24,8 +26,14 @@ def configure(cxx_toolkit = None,
 
   if qt is None:
     qt = drake.cxx.qt.Qt(prefix = prefix, gui = True)
-  libraries = list(map(lambda lib: drake.copy(lib, 'lib', strip_prefix = True),
-                       libraries))
+
+  dynamic_libraries = []
+  for lib in [lib for lib in libraries if isinstance(lib, drake.cxx.DynLib)]:
+    dynamic_libraries.append(drake.copy(lib, 'lib', strip_prefix = True))
+
+  if boost is None:
+    boost = drake.cxx.boost.Boost(cxx_toolkit = cxx_toolkit)
+    cxx_config += boost.config()
 
   qt.plug(cxx_toolkit)
 
@@ -72,8 +80,8 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/AvatarIcon.hh",
     "src/fist-gui-qt/AvatarWidget.cc",
     "src/fist-gui-qt/AvatarWidget.hh",
-    "src/fist-gui-qt/DebugWindow.cc",
-    "src/fist-gui-qt/DebugWindow.hh",
+    # "src/fist-gui-qt/DebugWindow.cc",
+    # "src/fist-gui-qt/DebugWindow.hh",
     "src/fist-gui-qt/FileItem.cc",
     "src/fist-gui-qt/FileItem.hh",
     "src/fist-gui-qt/Fist.cc",
@@ -144,6 +152,11 @@ def configure(cxx_toolkit = None,
     "src/fist-gui-qt/main.cc",
   )
 
+  if cxx_toolkit.os == drake.os.windows:
+    cxx_config.define('BOOST_THREAD_USE_LIB', '1')
+    cxx_config += boost.config_thread(static = True)
+    cxx_config += boost.config_date_time(static = True)
+
   application = drake.cxx.Executable(
     'bin/Infinit',
     sources + libraries,
@@ -180,7 +193,7 @@ def configure(cxx_toolkit = None,
         lambda x: drake.copy(x,
                              installer_resources_folder.name().basename(),
                              strip_prefix = True),
-        installer_resources + [application] + libraries)) + nsis_plugins + nsis_includes
+        installer_resources + [application] + dynamic_libraries)) + nsis_plugins + nsis_includes
 
     templating_context = drake.templating.Context(
       content = {
@@ -193,7 +206,7 @@ def configure(cxx_toolkit = None,
           str(drake.path_build(installer_resources_folder.name())),
         'executable': str(application.name().basename()),
         'libraries':
-          list(map(lambda lib: str(lib.name().basename()), libraries)),
+          list(map(lambda lib: str(lib.name().basename()), dynamic_libraries)),
         'icon': 'icon.ico',
         'background': 'installer_background.png',
         'license': 'License.txt',
