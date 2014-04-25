@@ -107,7 +107,7 @@ SendPanel::_search_changed(QString const& search)
   if (search.size() != 0)
   {
     std::string text(search.toStdString());
-    this->setUsers(gap_search_users(_state, text.c_str()));
+    this->setUsers(gap_users_search(_state, text.c_str()));
   }
   else
     this->clearUsers();
@@ -163,23 +163,22 @@ SendPanel::remove_file(QUrl const& path)
 `------*/
 
 void
-SendPanel::setUsers(uint32_t* uids)
+SendPanel::_clean_results()
+{
+  this->_users->clearWidgets();
+  this->_results.clear();
+  this->update();
+}
+
+void
+SendPanel::setUsers(std::vector<uint32_t> const& users)
 {
   ELLE_TRACE_SCOPE("%s: set users", *this);
 
-  this->_users->clearWidgets();
-  this->_results.clear();
+  this->_clean_results();
 
-  if (uids == nullptr)
+  for (auto uid: users)
   {
-    ELLE_DEBUG("reset");
-    return;
-  }
-
-  uint32_t* uidscopy = uids;
-  while (*uidscopy != gap_null())
-  {
-    auto uid = *uidscopy;
     this->_results.push_back(uid);
     if (this->_user_models.find(uid) == this->_user_models.end())
       this->_user_models.emplace(uid, UserModel(this->_state, uid));
@@ -190,7 +189,6 @@ SendPanel::setUsers(uint32_t* uids)
             SLOT(_set_peer(uint32_t)));
     this->_users->add_widget(widget, ListWidget::Position::Top);
     this->_users_part_separator->show();
-    ++uidscopy;
   }
 }
 
@@ -198,7 +196,7 @@ void
 SendPanel::clearUsers()
 {
   ELLE_TRACE_SCOPE("%s: clear user list", *this);
-  this->setUsers(nullptr);
+  this->_clean_results();
   this->_users_part_separator->hide();
 }
 

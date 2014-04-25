@@ -70,7 +70,11 @@ public slots:
 `------*/
 public:
   void
-  setUsers(uint32_t* uids = nullptr);
+  _clean_results();
+
+  void
+  setUsers(std::vector<uint32_t> const&);
+
   void
   clearUsers();
 
