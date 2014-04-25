@@ -19,7 +19,8 @@ LoginFooter::LoginFooter(QWidget* parent):
 void
 LoginFooter::click()
 {
-  emit released();
+  if (this->isEnabled())
+    emit released();
 }
 
 void
