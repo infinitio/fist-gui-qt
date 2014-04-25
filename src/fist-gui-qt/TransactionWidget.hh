@@ -88,6 +88,7 @@ private:
   QLabel* _status;
   QWidget* _info_area;
   QTimer* _timer;
+  QTimer* _mtime_updater;
 
 /*----------.
 | Printable |

@@ -38,7 +38,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _mtime(new QLabel),
   _status(new QLabel),
   _info_area(new QWidget),
-  _timer(nullptr)
+  _timer(nullptr),
+  _mtime_updater(new QTimer(this))
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
@@ -129,10 +130,10 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
           SIGNAL(onProgressChanged(float)));
 #endif
 
-  auto mtime_updater = new QTimer(this);
-  connect(mtime_updater, SIGNAL(timeout()),
+  connect(this->_mtime_updater, SIGNAL(timeout()),
           this, SLOT(update_mtime()));
-  mtime_updater->start(5000);
+  this->_mtime_updater->setSingleShot(true);
+  this->_mtime_updater->start(1000);
   this->update();
 }
 
@@ -296,8 +297,9 @@ TransactionWidget::cancel()
   emit on_transaction_canceled(this->_transaction.id());
 }
 
+typedef std::pair<QString, uint32_t> Time;
 static
-QString
+Time
 QDateTime_to_friendly_duration(QDateTime const& time)
 {
   auto secs = time.secsTo(QDateTime::currentDateTimeUtc());
@@ -306,12 +308,13 @@ QDateTime_to_friendly_duration(QDateTime const& time)
 
   for (auto const& duration_pair: printers)
     if (secs > duration_pair.first)
-      return QString::fromStdString(
-        elle::sprintf("%s %s%s ago",
-                      secs / duration_pair.first,
-                      duration_pair.second,
-                      ((secs / duration_pair.first) > 1) ? "s" : ""));
-  return "...";
+      return Time(QString::fromStdString(
+                    elle::sprintf("%s %s%s ago",
+                                  secs / duration_pair.first,
+                                  duration_pair.second,
+                                  ((secs / duration_pair.first) > 1) ? "s" : "")),
+                  duration_pair.first);
+  return Time("...", 1);
 }
 
 /*-------.
@@ -409,8 +412,9 @@ void
 TransactionWidget::update_mtime()
 {
   ELLE_DUMP_SCOPE("mtime updated");
-  this->_mtime->setText(
-    QDateTime_to_friendly_duration(this->_transaction.mtime()));
+  auto res = QDateTime_to_friendly_duration(this->_transaction.mtime());
+  this->_mtime->setText(res.first);
+  this->_mtime_updater->start(res.second);
 }
 
 void
