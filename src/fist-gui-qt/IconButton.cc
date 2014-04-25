@@ -23,7 +23,7 @@ IconButton::IconButton(QPixmap const& pixmap,
 void
 IconButton::enterEvent(QEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: enter", *this);
+  ELLE_DEBUG_SCOPE("%s: enter", *this);
 
   if (this->isEnabled())
     this->setCursor(QCursor(Qt::PointingHandCursor));
@@ -33,7 +33,7 @@ IconButton::enterEvent(QEvent* event)
 void
 IconButton::leaveEvent(QEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: leave", *this);
+  ELLE_DEBUG_SCOPE("%s: leave", *this);
 
   this->setCursor(QCursor(Qt::ArrowCursor));
   QPushButton::enterEvent(event);
@@ -42,7 +42,7 @@ IconButton::leaveEvent(QEvent* event)
 void
 IconButton::enable()
 {
-  ELLE_TRACE_SCOPE("%s: enable", *this);
+  ELLE_DEBUG_SCOPE("%s: enable", *this);
 
   if (!this->isEnabled())
   {
@@ -53,7 +53,7 @@ IconButton::enable()
 void
 IconButton::disable()
 {
-  ELLE_TRACE_SCOPE("%s: disabled", *this);
+  ELLE_DEBUG_SCOPE("%s: disabled", *this);
 
   if (this->isEnabled())
   {
@@ -118,7 +118,7 @@ IconButton::paintEvent(QPaintEvent*)
 void
 IconButton::_clicked()
 {
-  ELLE_TRACE_SCOPE("%s: clicked", *this);
+  ELLE_DEBUG_SCOPE("%s: clicked", *this);
   if (this->_callback)
     this->_callback();
 }

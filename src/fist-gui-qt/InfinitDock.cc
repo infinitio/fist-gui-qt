@@ -324,7 +324,7 @@ InfinitDock::report_a_problem()
 void
 InfinitDock::_position_panel()
 {
-  ELLE_TRACE_SCOPE("%s: move panel", *this);
+  ELLE_DEBUG_SCOPE("%s: move panel", *this);
 
   ELLE_DUMP("%s: old position: (%s, %s)", *this, this->x(), this->y());
 
@@ -504,7 +504,6 @@ void
 InfinitDock::_show_transactions_view()
 {
   ELLE_TRACE_SCOPE("%s: show transaction view", *this);
-
   this->_switch_view(this->_transaction_panel);
 }
 

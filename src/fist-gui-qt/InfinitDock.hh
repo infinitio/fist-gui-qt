@@ -55,8 +55,6 @@ public:
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
   static void avatar_available_cb(uint32_t id);
 
-
-
 public slots:
   void _update();
 
