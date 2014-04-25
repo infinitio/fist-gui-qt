@@ -8,8 +8,8 @@
 
 #include <iostream>
 
-LoginFooter::LoginFooter():
-  Footer()
+LoginFooter::LoginFooter(QWidget* parent):
+  Footer(parent)
 {
   auto text = new QLabel(view::login::footer::text);
   view::login::footer::style(*this);

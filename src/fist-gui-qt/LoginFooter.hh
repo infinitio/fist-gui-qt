@@ -7,7 +7,7 @@ class LoginFooter:
   public Footer
 {
 public:
-  LoginFooter();
+  LoginFooter(QWidget* parent = nullptr);
 
   virtual
   ~LoginFooter() = default;
