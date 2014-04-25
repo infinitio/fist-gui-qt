@@ -46,7 +46,7 @@ class SmoothScrollBar:
   PROPERTY_W(Type, Name, Write, Notify);                              \
 
 #define PROPERTY_RW(Type, Name, Read, Write)                          \
-  PROPERTY_RW(Type, Name, Read, Write,)                               \
+  PROPERTY_RWN(Type, Name, Read, Write,)                              \
 
 #define PROPERTY_Rw(Type, Name, Read, Write)                          \
   PROPERTY(Type, Name);                                               \
@@ -97,9 +97,6 @@ private:
     );
   QPropertyAnimation* _opacity_animation;
 
-  Q_PROPERTY(int step READ step WRITE setStep);
-  PROPERTY_RWN(int, step, step, setStep, );
-
 private Q_SLOTS:
   void
   fade();
@@ -123,13 +120,9 @@ protected:
   void
   showEvent(QShowEvent*) override;
 
-public:
-  void
-  reload();
-
 private:
   void
-  _scroll(bool up);
+  _scroll(int delta);
 
   void
   _scroll_to(int destination, int speed = 600);

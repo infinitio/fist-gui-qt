@@ -167,7 +167,6 @@ ListWidget::_layout()
   this->_scroll->setMinimum(0);
   this->_scroll->setMaximum(height);
   this->_scroll->setPageSize(this->height());
-  this->_scroll->setStep(height / 5);
 
   if (this->height() < height)
     this->_scroll->show();

@@ -16,8 +16,7 @@ SmoothScrollBar::SmoothScrollBar(QWidget* parent):
   _value(0),
   _value_animation(new QPropertyAnimation(this, "value")),
   _opacity(0.5),
-  _opacity_animation(new QPropertyAnimation(this, "opacity")),
-  _step(1)
+  _opacity_animation(new QPropertyAnimation(this, "opacity"))
 {
   this->_value_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
@@ -110,17 +109,16 @@ SmoothScrollBar::_scroll_to(int value, int speed)
 }
 
 void
-SmoothScrollBar::_scroll(bool up)
+SmoothScrollBar::_scroll(int delta)
 {
   int value = this->_value_target;
-  if (up)
+  value += delta;
+  if (delta > 0)
   {
-    value += this->step();
     value = std::min(value, this->maximum() - this->pageSize());
   }
   else
   {
-    value -= this->step();
     value = std::max(value, 0);
   }
 
@@ -130,7 +128,7 @@ SmoothScrollBar::_scroll(bool up)
 void
 SmoothScrollBar::wheelEvent(QWheelEvent* event)
 {
-  this->_scroll(event->delta() < 0);
+  this->_scroll(event->delta());
 }
 
 void
@@ -138,15 +136,6 @@ SmoothScrollBar::showEvent(QShowEvent*)
 {
   this->setOpacity(0.5);
   this->fade();
-}
-
-void
-SmoothScrollBar::reload()
-{
-  this->_value_target = 0;
-  this->_value_animation->setDuration(600);
-  this->_value_animation->setEndValue(0);
-  this->_value_animation->start();
 }
 
 void
