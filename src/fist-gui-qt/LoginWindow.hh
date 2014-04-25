@@ -7,6 +7,10 @@
 # include <QVBoxLayout>
 # include <QLineEdit>
 # include <QMainWindow>
+# include <QMovie>
+# include <QFutureWatcher>
+
+# include <elle/attribute.hh>
 
 # include <surface/gap/fwd.hh>
 
@@ -48,18 +52,17 @@ private:
   focusInEvent(QFocusEvent* event) override;
 
 private:
-  QLineEdit* _email_field;
-  QLineEdit* _password_field;
-  QLabel* _message_field;
+  ELLE_ATTRIBUTE(QLineEdit*, email_field);
+  ELLE_ATTRIBUTE(QLineEdit*, password_field);
+  ELLE_ATTRIBUTE(QLabel*, message_field);
+  ELLE_ATTRIBUTE(QMovie*, loading_icon);
 
-  IconButton* _quit_button;
-  QLabel* _reset_password_link;
-  QLabel* _create_account_link;
+  ELLE_ATTRIBUTE(IconButton*, quit_button);
+  ELLE_ATTRIBUTE(QLabel*, reset_password_link);
+  ELLE_ATTRIBUTE(QLabel*, create_account_link);
 
-  QLabel* _version_field;
-  LoginFooter* _footer;
-
-  bool _is_logging;
+  ELLE_ATTRIBUTE(QLabel*, version_field);
+  ELLE_ATTRIBUTE(LoginFooter*, footer);
 
 public:
   void

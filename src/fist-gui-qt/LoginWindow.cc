@@ -6,7 +6,8 @@
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
-
+#include <QFuture>
+#include <QtConcurrentRun>
 #include <elle/finally.hh>
 #include <elle/log.hh>
 
@@ -29,11 +30,14 @@ LoginWindow::LoginWindow(gap_State* state):
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
   _message_field(new QLabel),
+  _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this)),
   _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
-  _version_field(new QLabel)
+  _version_field(new QLabel),
+  _footer(new LoginFooter(this))
 {
+
   ELLE_TRACE_SCOPE("%s: contruction", *this);
   this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
@@ -82,6 +86,9 @@ LoginWindow::LoginWindow(gap_State* state):
   {
     view::login::message::style(*this->_message_field);
   }
+  // Loading icon.
+  {
+  }
   // Create account.
   {
     view::login::links::style(*this->_create_account_link);
@@ -106,7 +113,6 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_version_field->hide();
   }
   // Footer.
-  this->_footer = new LoginFooter;
   {
     connect(this->_footer, SIGNAL(released()),
             this, SLOT(_login()));
@@ -162,7 +168,6 @@ LoginWindow::_login()
 {
   this->_message_field->clear();
   this->_footer->setDisabled(true);
-
   elle::SafeFinally unlock_login([&] { this->_footer->setDisabled(false); });
   ELLE_TRACE_SCOPE("%s: login attempt", *this);
 
@@ -179,10 +184,22 @@ LoginWindow::_login()
 
   char* hash = gap_hash_password(
     _state, email.toStdString().c_str(), pw.toStdString().c_str());
-  gap_Status status;
-  status = gap_login(_state, email.toStdString().c_str(), hash);
-  gap_hash_free(hash);
 
+  this->_message_field->setMovie(this->_loading_icon);
+  this->_message_field->movie()->start();
+
+  QFuture<gap_Status> login = QtConcurrent::run(
+    [&] {
+      elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
+      return gap_login(_state, email.toStdString().c_str(), hash);
+    });
+
+  this->_message_field->setMovie(this->_loading_icon);
+  this->_message_field->movie()->start();
+
+  login.waitForFinished();
+
+  auto status = login.result();
   if (status == gap_ok)
   {
     QSettings settings("Infinit.io", "Infinit");
