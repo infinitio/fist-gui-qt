@@ -15,7 +15,7 @@ class IconButton;
 class Footer;
 class LoginFooter;
 class ListWidget;
-class NoNotificationWidget;
+class TextListItem;
 class Panel;
 class RoundShadowWidget;
 class SearchField;

@@ -2,7 +2,7 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
-#include <fist-gui-qt/NoNotificationWidget.hh>
+#include <fist-gui-qt/TextListItem.hh>
 
 #include <elle/log.hh>
 
@@ -52,7 +52,7 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 
   if (transactions_list.empty())
   {
-    this->_list->add_widget(new NoNotificationWidget);
+    this->_list->add_widget(new TextListItem("No notification"));
     return;
   }
 

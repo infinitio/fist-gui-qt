@@ -1,16 +1,17 @@
-#ifndef NONOTIFICATIONWIDGET_HH
-# define NONOTIFICATIONWIDGET_HH
+#ifndef FIST_GUI_QT_TEXTLISTITEM_HH
+# define FIST_GUI_QT_TEXTLISTITEM_HH
 
 # include <fist-gui-qt/ListItem.hh>
 
 # include <QWidget>
 # include <QHBoxLayout>
 
-class NoNotificationWidget:
+class TextListItem:
   public ListItem
 {
 public:
-  NoNotificationWidget(QWidget* parent = nullptr);
+  TextListItem(QString const& text,
+               QWidget* parent = nullptr);
 
   QSize
   sizeHint() const override;
