@@ -35,7 +35,9 @@ LoginWindow::LoginWindow(gap_State* state):
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
   _version_field(new QLabel),
-  _footer(new LoginFooter(this))
+  _footer(new LoginFooter(this)),
+  _login_future(),
+  _login_watcher()
 {
 
   ELLE_TRACE_SCOPE("%s: contruction", *this);
@@ -164,47 +166,16 @@ LoginWindow::~LoginWindow()
 }
 
 void
-LoginWindow::_login()
+LoginWindow::_login_attempt()
 {
-  this->_message_field->clear();
-  this->_footer->setDisabled(true);
-  elle::SafeFinally unlock_login([&] { this->_footer->setDisabled(false); });
-  ELLE_TRACE_SCOPE("%s: login attempt", *this);
+  elle::SafeFinally unlock_login([&] { this->_enable(); });
 
-  QString email = this->_email_field->text();
-  QString pw = this->_password_field->text();
-
-  if (email.isEmpty() || !email_checker.exactMatch(email))
-  {
-    ELLE_DEBUG("invalid email field");
-    this->_message_field->setText("invalid email format");
-    this->_email_field->setFocus();
-    return;
-  }
-
-  char* hash = gap_hash_password(
-    _state, email.toStdString().c_str(), pw.toStdString().c_str());
-
-  this->_message_field->setMovie(this->_loading_icon);
-  this->_message_field->movie()->start();
-
-  QFuture<gap_Status> login = QtConcurrent::run(
-    [&] {
-      elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
-      return gap_login(_state, email.toStdString().c_str(), hash);
-    });
-
-  this->_message_field->setMovie(this->_loading_icon);
-  this->_message_field->movie()->start();
-
-  login.waitForFinished();
-
-  auto status = login.result();
+  auto status = this->_login_future.result();
   if (status == gap_ok)
   {
     QSettings settings("Infinit.io", "Infinit");
     settings.beginGroup("Login");
-    settings.setValue("email", email);
+    // settings.setValue("email", email);
     settings.endGroup();
 
     emit logged_in();
@@ -218,12 +189,12 @@ LoginWindow::_login()
 
   switch (status)
   {
-#define ERR(case, msg)                                                         \
-    case:                                                                      \
-      ELLE_WARN("%s", tr(msg));                                                \
-      this->set_message(tr(msg), tr(msg));                               \
-      break                                                                    \
-/**/
+#define ERR(case, msg)                          \
+    case:                                       \
+      ELLE_WARN("%s", tr(msg));                 \
+      this->set_message(tr(msg), tr(msg));      \
+      break                                     \
+        /**/
     ERR(case gap_network_error, "Not connected to internet");
     ERR(case gap_meta_unreachable, "Unable to contact main server");
     ERR(case gap_meta_down_with_message, "Main server is down...");
@@ -231,6 +202,66 @@ LoginWindow::_login()
     ERR(case gap_email_password_dont_match, "Wrong email/password");
     ERR(default, "Internal error");
   }
+}
+
+void
+LoginWindow::_enable()
+{
+  this->_footer->setDisabled(false);
+  this->_email_field->setDisabled(false);
+  this->_password_field->setDisabled(false);
+}
+
+void
+LoginWindow::_disable()
+{
+  this->_footer->setDisabled(true);
+  this->_email_field->setDisabled(true);
+  this->_password_field->setDisabled(true);
+
+}
+
+void
+LoginWindow::_login()
+{
+  elle::SafeFinally unlock_login([&] { this->_enable(); });
+  this->_message_field->clear();
+  this->_disable();
+
+  ELLE_TRACE_SCOPE("%s: login attempt", *this);
+
+  QString email = this->_email_field->text();
+  QString pw = this->_password_field->text();
+
+  if (email.isEmpty() || !email_checker.exactMatch(email))
+  {
+    ELLE_DEBUG("invalid email field");
+    this->_message_field->setText("invalid email format");
+    this->_email_field->setFocus();
+    return;
+  }
+
+  this->_message_field->setMovie(this->_loading_icon);
+  this->_message_field->movie()->start();
+
+  this->_login_future = QtConcurrent::run(
+    [=] {
+      char* hash = gap_hash_password(
+        _state, email.toStdString().c_str(), pw.toStdString().c_str());
+
+      elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
+      return gap_login(_state, email.toStdString().c_str(), hash);
+    });
+
+  connect(&this->_login_watcher, SIGNAL(finished()),
+          this, SLOT(_login_attempt()));
+
+  this->_message_field->setMovie(this->_loading_icon);
+  this->_message_field->movie()->start();
+
+  this->_login_watcher.setFuture(this->_login_future);
+
+  unlock_login.abort();
 }
 
 void

@@ -1,6 +1,8 @@
 #ifndef LOGINWINDOW_HH
 # define LOGINWINDOW_HH
 
+# include <memory>
+
 # include <QLabel>
 # include <QKeyEvent>
 # include <QPushButton>
@@ -8,6 +10,7 @@
 # include <QLineEdit>
 # include <QMainWindow>
 # include <QMovie>
+# include <QFuture>
 # include <QFutureWatcher>
 
 # include <elle/attribute.hh>
@@ -38,6 +41,9 @@ private slots:
   void
   _login();
 
+  void
+  _login_attempt();
+
 Q_SIGNALS:
   void
   logged_in();
@@ -64,6 +70,8 @@ private:
   ELLE_ATTRIBUTE(QLabel*, version_field);
   ELLE_ATTRIBUTE(LoginFooter*, footer);
 
+  ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
+  ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
 public:
   void
   closeEvent(QCloseEvent* event) override;
@@ -75,6 +83,12 @@ public Q_SLOTS:
 
   void
   set_version();
+
+  void
+  _enable();
+
+  void
+  _disable();
 
 /*----------.
 | Printable |
