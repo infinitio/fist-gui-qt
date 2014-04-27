@@ -3,13 +3,15 @@
 
 # include <QLineEdit>
 # include <QKeyEvent>
+# include <QLabel>
 # include <QTimer>
+# include <QMovie>
 
 # include <fist-gui-qt/utils.hh>
 # include <fist-gui-qt/ListWidget.hh>
 
 class SearchField:
-  public QLineEdit
+  public QWidget
 {
 /*-------------.
 | Construction |
@@ -21,11 +23,23 @@ public:
 | Display |
 `--------*/
 public:
-  Q_PROPERTY(QPixmap icon READ icon WRITE setIcon);
-  Q_PROPERTY_R(QPixmap, icon, icon);
+  ELLE_ATTRIBUTE(QLabel*, icon);
+  ELLE_ATTRIBUTE(QLineEdit*, search_field);
 public:
   void
-  setIcon(QPixmap const& pixmap);
+  set_icon(QPixmap const& pixmap);
+
+  void
+  set_icon(QMovie& movie);
+
+  void
+  set_text(QString const& text);
+
+  QString
+  text() const;
+
+  void
+  clear();
 
 protected:
   void keyPressEvent(QKeyEvent* event);
@@ -57,13 +71,6 @@ public:
   virtual
   QSize
   sizeHint() const override;
-
-/*---------.
-| Painting |
-`---------*/
-public:
-  void
-  paintEvent(QPaintEvent* event) override;
 
 private:
   Q_OBJECT;

@@ -3,10 +3,14 @@
 
 # include <QUrl>
 # include <QWidget>
+# include <QFuture>
+# include <QFutureWatcher>
 
 # include <unordered_map>
+# include <vector>
 
 # include <elle/Printable.hh>
+# include <elle/attribute.hh>
 
 # include <surface/gap/fwd.hh>
 
@@ -73,10 +77,14 @@ public:
   _clean_results();
 
   void
-  setUsers(std::vector<uint32_t> const&);
+  set_users(std::vector<uint32_t> const& users);
 
   void
   clearUsers();
+
+protected slots:
+  void
+  _set_users();
 
 Q_SIGNALS:
   void
@@ -99,23 +107,25 @@ public:
   dropEvent(QDropEvent *event) override;
 
 private:
-  gap_State* _state;
-  SearchField* _search;
-  HorizontalSeparator* _users_part_separator;
-  ListWidget* _users;
-  HorizontalSeparator* _file_part_seperator;
-  ListWidget* _file_list;
-  HorizontalSeparator* _adder_part_seperator;
-  AddFileWidget* _file_adder;
+  ELLE_ATTRIBUTE(gap_State*, state);
+  ELLE_ATTRIBUTE(SearchField*, search);
+  ELLE_ATTRIBUTE(HorizontalSeparator*, users_part_separator);
+  ELLE_ATTRIBUTE(ListWidget*, users);
+  ELLE_ATTRIBUTE(HorizontalSeparator*, file_part_seperator);
+  ELLE_ATTRIBUTE(ListWidget*, file_list);
+  ELLE_ATTRIBUTE(HorizontalSeparator*, adder_part_seperator);
+  ELLE_ATTRIBUTE(AddFileWidget*, file_adder);
 
 /*-------------.
 | SearchResult |
 `-------------*/
-  uint32_t _peer_id;
-
-  // FreeSearch is an functor to replace standard unique_ptr default delete.
-  QVector<uint32_t> _results;
-  bool _ignore_search_result;
+  ELLE_ATTRIBUTE(uint32_t, peer_id);
+  typedef QFuture<std::vector<uint32_t>> FutureSearchResult;
+  ELLE_ATTRIBUTE(FutureSearchResult, search_future);
+  ELLE_ATTRIBUTE(QFutureWatcher<std::vector<uint32_t>>, search_watcher);
+  ELLE_ATTRIBUTE(QMovie*, loading_icon);
+  ELLE_ATTRIBUTE(QVector<uint32_t>, results);
+  ELLE_ATTRIBUTE(bool, ignore_search_result);
 
 protected:
   void

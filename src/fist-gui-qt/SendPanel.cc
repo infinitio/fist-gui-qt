@@ -1,5 +1,8 @@
 #include <QDir>
+#include <QFuture>
+#include <QtConcurrentRun>
 
+#include <elle/finally.hh>
 #include <elle/log.hh>
 
 #include <surface/gap/gap.hh>
@@ -11,6 +14,7 @@
 #include <fist-gui-qt/HorizontalSeparator.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
+#include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/SearchResultWidget.hh>
@@ -21,6 +25,12 @@
 /*-------------.
 | Construction |
 `-------------*/
+
+namespace
+{
+  static QRegExp email_checker(regexp::email,
+                               Qt::CaseInsensitive);
+}
 
 ELLE_LOG_COMPONENT("infinit.FIST.SendPanel");
 
@@ -35,6 +45,9 @@ SendPanel::SendPanel(gap_State* state):
   _adder_part_seperator(new HorizontalSeparator(this)),
   _file_adder(new AddFileWidget(this)),
   _peer_id(gap_null()),
+  _search_future(),
+  _search_watcher(),
+  _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this)),
   _results(),
   _ignore_search_result(false)
 {
@@ -53,7 +66,7 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_search, SIGNAL(returnPressed()),
           this, SLOT(_pick_user()));
 
-  this->_search->setIcon(QPixmap(":/icons/search.png"));
+  this->_search->set_icon(QPixmap(":/icons/search.png"));
 
   connect(this->_file_adder, SIGNAL(clicked()),
           this, SIGNAL(choose_files()));
@@ -100,17 +113,33 @@ SendPanel::_search_changed(QString const& search)
   if (this->_peer_id != gap_null())
   {
     ELLE_DEBUG("reset selection");
-    this->_search->setIcon(QPixmap(":/icons/search.png"));
+    this->_search->set_icon(QPixmap(":/icons/search.png"));
     this->_peer_id = gap_null();
   }
 
   if (search.size() != 0)
   {
     std::string text(search.toStdString());
-    this->setUsers(gap_users_search(_state, text.c_str()));
+
+    this->_search->set_icon(*this->_loading_icon);
+    this->_search_future.cancel();
+    this->_search_future = QtConcurrent::run(
+      [&] {
+        if (search.count('@') == 1 && email_checker.exactMatch(search))
+          return std::vector<uint32_t>{gap_user_by_email(this->_state, text.c_str())};
+        else
+          return gap_users_search(this->_state, text.c_str());
+      });
+    connect(&this->_search_watcher, SIGNAL(finished()),
+            this, SLOT(_set_users()));
+
+    this->_search_watcher.setFuture(this->_search_future);
   }
   else
+  {
+    this->_search_future = FutureSearchResult();
     this->clearUsers();
+  }
 }
 
 /*------.
@@ -171,26 +200,40 @@ SendPanel::_clean_results()
 }
 
 void
-SendPanel::setUsers(std::vector<uint32_t> const& users)
+SendPanel::_set_users()
+{
+  this->set_users(this->_search_watcher.result());
+}
+
+void
+SendPanel::set_users(std::vector<uint32_t> const& users)
 {
   ELLE_TRACE_SCOPE("%s: set users", *this);
-
+  elle::SafeFinally restore_magnifier([&] { this->_search->set_icon(QPixmap(":/icons/search.png")); });
   this->_clean_results();
 
-  for (auto uid: users)
+  if (users.size() == 0)
   {
-    this->_results.push_back(uid);
-    if (this->_user_models.find(uid) == this->_user_models.end())
-      this->_user_models.emplace(uid, UserModel(this->_state, uid));
-    auto widget = new SearchResultWidget(this->_user_models.at(uid), this);
-    connect(widget,
-            SIGNAL(clicked_signal(uint32_t)),
-            this,
-            SLOT(_set_peer(uint32_t)));
-    this->_users->add_widget(widget, ListWidget::Position::Top);
+    this->_users->add_widget(new TextListItem("No result", this), ListWidget::Position::Top);
+  }
+  else
+  {
+    for (auto uid: users)
+    {
+      this->_results.push_back(uid);
+      if (this->_user_models.find(uid) == this->_user_models.end())
+        this->_user_models.emplace(uid, UserModel(this->_state, uid));
+      auto widget = new SearchResultWidget(this->_user_models.at(uid), this);
+      connect(widget,
+              SIGNAL(clicked_signal(uint32_t)),
+              this,
+              SLOT(_set_peer(uint32_t)));
+      this->_users->add_widget(widget, ListWidget::Position::Top);
+    }
     this->_users_part_separator->show();
   }
 }
+
 
 void
 SendPanel::clearUsers()
@@ -209,8 +252,8 @@ SendPanel::_set_peer(uint32_t uid)
   ELLE_TRACE_SCOPE("%s: set peer: %s", *this, this->_user_models.at(uid));
   this->clearUsers();
   this->_ignore_search_result = true;
-  this->_search->setText(this->_user_models.at(uid).fullname());
-  this->_search->setIcon(this->_user_models.at(uid).avatar());
+  this->_search->set_text(this->_user_models.at(uid).fullname());
+  this->_search->set_icon(this->_user_models.at(uid).avatar());
   this->_peer_id = uid;
 }
 
@@ -344,7 +387,7 @@ SendPanel::on_hide()
   this->_results.clear();
   this->_peer_id = gap_null();
   this->_adder_part_seperator->hide();
-  this->_search->setIcon(QPixmap(":/icons/search.png"));
+  this->_search->set_icon(QPixmap(":/icons/search.png"));
 }
 
 /*-------.
