@@ -54,6 +54,7 @@ FileItem::FileItem(QUrl const& path):
                            emit remove(this->_path);
                          }))
 {
+  this->_layout->setAlignment(Qt::AlignVCenter);
   ELLE_TRACE_SCOPE("%s: construction with path %s", *this, path);
 
   this->setContentsMargins(6, 0, 6, 0);

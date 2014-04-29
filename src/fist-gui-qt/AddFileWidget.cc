@@ -34,6 +34,7 @@ AddFileWidget::AddFileWidget(QWidget* parent):
   }
 
   auto* layout = new QHBoxLayout(this);
+  layout->setAlignment(Qt::AlignVCenter);
   this->setContentsMargins(6, 0, 6, 0);
   layout->addWidget(this->_attach);
   layout->addItem(new QSpacerItem(0, 0,
