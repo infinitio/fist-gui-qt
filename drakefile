@@ -171,6 +171,8 @@ def configure(cxx_toolkit = None,
   build = drake.Rule('build')
   build << application
 
+  check = drake.Rule('check')
+
   if cxx_toolkit.os == drake.os.windows:
 
     nsis_includes = drake.nodes('NSIS/nsProcess.nsh',
