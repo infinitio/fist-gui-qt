@@ -16,7 +16,8 @@ ELLE_LOG_COMPONENT("infinit.FIST.AddFileWidget");
 AddFileWidget::AddFileWidget(QWidget* parent):
   QWidget(parent),
   _text(new QLabel(view::send::file_adder::text)),
-  _attach(new IconButton(QPixmap(":/icons/files.png")))
+  _attach(new IconButton(QPixmap(":/icons/files.png"))),
+  _pulse_animation(new QPropertyAnimation(this, "pulseColor"))
 {
   // Background.
   {
@@ -31,6 +32,14 @@ AddFileWidget::AddFileWidget(QWidget* parent):
   // Text.
   {
     view::send::file_adder::style(*this->_text);
+  }
+
+  // Animation
+  {
+    this->_pulse_animation->setDuration(600);
+    this->_pulse_animation->setEasingCurve(QEasingCurve::InOutQuad);
+    this->_pulse_animation->setStartValue(view::send::file_adder::pulse);
+    this->_pulse_animation->setEndValue(view::send::file_adder::background);
   }
 
   auto* layout = new QHBoxLayout(this);
@@ -61,12 +70,8 @@ AddFileWidget::sizeHint() const
 void
 AddFileWidget::pulse()
 {
-  QPropertyAnimation* animation = new QPropertyAnimation(this, "pulseColor");
-  animation->setDuration(600);
-  animation->setEasingCurve(QEasingCurve::InOutQuad);
-  animation->setStartValue(QColor(0xBC, 0xD2, 0xD6, 0x77));
-  animation->setEndValue(view::send::file_adder::background);
-  animation->start();
+  this->_pulse_animation->stop();
+  this->_pulse_animation->start();
 }
 
 void

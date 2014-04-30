@@ -250,6 +250,10 @@ namespace view
       background(0xF8, 0xF8, 0xF8);
 
       static
+      QColor const
+      pulse(0xBC, 0xD2, 0xD6, 0x77);
+
+      static
       QString const
       text("Add files...");
     }

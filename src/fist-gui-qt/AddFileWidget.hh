@@ -68,7 +68,7 @@ public slots:
 private:
   QLabel* _text;
   IconButton* _attach;
-
+  QPropertyAnimation* _pulse_animation;
 private:
   Q_OBJECT;
 
