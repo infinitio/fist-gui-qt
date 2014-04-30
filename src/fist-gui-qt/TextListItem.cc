@@ -4,9 +4,11 @@
 #include <QLabel>
 
 TextListItem::TextListItem(QString const& string,
-                           QWidget* parent):
-  ListItem(parent, Qt::transparent, false),
-  _layout(new QHBoxLayout(this))
+                           int height,
+                           QWidget* parent)
+  : ListItem(parent, Qt::transparent, false)
+  , _layout(new QHBoxLayout(this))
+  , _height(height)
 {
   QLabel* text = new QLabel(string);
   view::transaction::no_notification::style(*text);
@@ -20,7 +22,7 @@ TextListItem::TextListItem(QString const& string,
 QSize
 TextListItem::sizeHint() const
 {
-  return QSize(this->widthHint(), 50);
+  return QSize(this->widthHint(), this->_height);
 }
 
 QSize

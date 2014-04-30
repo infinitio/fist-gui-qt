@@ -33,11 +33,20 @@ namespace
   struct TextStyle
   {
     TextStyle(QFont const& font,
-              QColor const& color = QColor(0x25, 0x25, 0x25)):
+              QColor const& color = QColor(0x25, 0x25, 0x25),
+              Qt::Alignment const& aligment = Qt::AlignLeft):
       _font(font),
-      _color(color)
+      _color(color),
+      _alignement(aligment)
     {
       this->_font.setStyleStrategy(QFont::PreferAntialias);
+    }
+
+    void
+    operator ()(QLabel& target) const
+    {
+      target.setAlignment(this->_alignement);
+      this->operator ()(*(static_cast<QWidget*>(&target)));
     }
 
     void
@@ -54,6 +63,7 @@ namespace
   private:
     QFont _font;
     QColor _color;
+    Qt::Alignment _alignement;
   };
 }
 
@@ -112,7 +122,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 11), QColor(0xEE, 0x11, 0x11));
+      style(QFont("Arial", 11), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
     }
 
     namespace links
@@ -209,14 +219,14 @@ namespace view
       {
         static
         TextStyle const
-        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
+        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       namespace size
       {
         static
         TextStyle const
-        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
+        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       static
@@ -228,11 +238,11 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3));
+      style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
 
       static
       TextStyle const
-      hover_style(QFont("Arial", 9), QColor(0x3C, 0x91, 0xD4));
+      hover_style(QFont("Arial", 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
 
       static
       QColor const
@@ -247,7 +257,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9));
+      style(QFont("Arial", 9), Qt::AlignVCenter);
 
       static
       QString const

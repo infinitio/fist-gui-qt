@@ -11,6 +11,7 @@ class TextListItem:
 {
 public:
   TextListItem(QString const& text,
+               int height = 40,
                QWidget* parent = nullptr);
 
   QSize
@@ -23,8 +24,8 @@ public:
   trigger() override;
 
 private:
-  QHBoxLayout*
-  _layout;
+  ELLE_ATTRIBUTE(QHBoxLayout*, layout);
+  ELLE_ATTRIBUTE(int, height);
 };
 
 #endif
