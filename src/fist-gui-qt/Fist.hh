@@ -95,14 +95,14 @@ private slots:
   _reposition_dialog();
 
 private:
+  ELLE_ATTRIBUTE(std::unique_ptr<Prologue>, prologue);
+  // Handle gap destruction automatically.
   struct GapDeleter
   {
     void
     operator () (gap_State* state) const;
   };
-
   typedef std::unique_ptr<gap_State, GapDeleter> StatePtr;
-  ELLE_ATTRIBUTE(std::unique_ptr<Prologue>, prologue);
   ELLE_ATTRIBUTE(StatePtr, state);
   // The local server can be used as a 'only one instance running' lock.
   // They are 3 ways usually used:
