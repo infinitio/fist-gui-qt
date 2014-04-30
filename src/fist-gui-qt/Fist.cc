@@ -117,13 +117,10 @@ Fist::Fist(int argc, char** argv):
   _dock(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
-
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
-
   if (!this->_set_lock())
     throw elle::Exception("unable to set lock");
-
   this->_initialize_application();
 }
 
@@ -140,7 +137,6 @@ Fist::_initialize_application()
   this->_application->setFont(arial);
   this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   this->_application->setQuitOnLastWindowClosed(false);
-
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
   QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 }
@@ -149,6 +145,10 @@ void
 Fist::about_to_quit()
 {
   ELLE_TRACE_SCOPE("%s: run cleaning operations", *this);
+  if (this->_dock)
+  {
+    this->_dock.reset();
+  }
   if (this->_state != nullptr)
   {
     gap_free(this->_state);
@@ -341,11 +341,8 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
-
-  this->_dock = new InfinitDock(this->_state);
-  this->_dock->show();
-
-  connect(this->_dock, SIGNAL(quit_request()),
+  this->_dock.reset(new InfinitDock(this->_state));
+  connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
 }
 

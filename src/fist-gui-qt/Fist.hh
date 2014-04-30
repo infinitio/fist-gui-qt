@@ -101,8 +101,7 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<QApplication>, application);
   ELLE_ATTRIBUTE(std::unique_ptr<Updater>, updater);
   ELLE_ATTRIBUTE(std::unique_ptr<LoginWindow>, login_window);
-  ELLE_ATTRIBUTE(InfinitDock*, dock);
-  ELLE_ATTRIBUTE(bool, lolerror);
+  ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
 
 private:
   Q_OBJECT;
