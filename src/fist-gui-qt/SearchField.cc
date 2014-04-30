@@ -125,6 +125,12 @@ SearchField::delay_expired()
   emit search_ready(this->_search_field->text());
 }
 
+void
+SearchField::focusInEvent(QFocusEvent* event)
+{
+  this->_search_field->setFocus();
+}
+
 QSize
 SearchField::sizeHint() const
 {

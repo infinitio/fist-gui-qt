@@ -145,6 +145,9 @@ private:
   void
   on_hide() override;
 
+  void
+  focusInEvent(QFocusEvent* event) override;
+
 /*-------.
 | Footer |
 `-------*/

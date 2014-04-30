@@ -389,10 +389,12 @@ void
 SendPanel::on_hide()
 {
   emit set_background_color(view::background);
+
+  this->_clean_results();
+
   this->_search->clear();
   this->_file_list->clearWidgets();
   this->_files.clear();
-  this->_results.clear();
   this->_peer_id = gap_null();
   this->_adder_part_seperator->hide();
   this->_search->set_icon(this->_magnifier);
@@ -447,4 +449,10 @@ SendPanel::dropEvent(QDropEvent *event)
         event->acceptProposedAction();
         this->add_file(url);
       }
+}
+
+void
+SendPanel::focusInEvent(QFocusEvent* event)
+{
+  this->_search->setFocus();
 }

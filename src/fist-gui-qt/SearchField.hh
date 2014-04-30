@@ -79,6 +79,9 @@ private slots:
   void
   text_changed(QString const& text);
 
+  void
+  focusInEvent(QFocusEvent* event) override;
+
 private:
   QTimer _search_delay;
 
