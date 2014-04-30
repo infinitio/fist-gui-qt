@@ -441,14 +441,10 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
       this->_show_send_view();
     }
   }
-  else if (this->centralWidget() == this->_send_panel)
-  {
-    if (event->key() == Qt::Key_Escape)
-    {
-      ELLE_DEBUG("escape pressed");
-      this->toggle_dock();
-    }
-  }
+
+  if (this->centralWidget() != nullptr)
+    static_cast<QObject*>(this->centralWidget())->event(event);
+
 }
 
 void
