@@ -72,7 +72,16 @@ private slots:
   _new_local_socket_connection();
 
   void
-  _kicked();
+  _kicked_by_another_instance();
+
+private:
+  static
+  void
+  _kicked_out_callback();
+
+public:
+  void
+  kicked_out();
 
 /*----.
 | Run |
@@ -86,8 +95,15 @@ private slots:
   _reposition_dialog();
 
 private:
+  struct GapDeleter
+  {
+    void
+    operator () (gap_State* state) const;
+  };
+
+  typedef std::unique_ptr<gap_State, GapDeleter> StatePtr;
   ELLE_ATTRIBUTE(std::unique_ptr<Prologue>, prologue);
-  ELLE_ATTRIBUTE(gap_State*, state);
+  ELLE_ATTRIBUTE(StatePtr, state);
   // The local server can be used as a 'only one instance running' lock.
   // They are 3 ways usually used:
   // - QLocalServer.

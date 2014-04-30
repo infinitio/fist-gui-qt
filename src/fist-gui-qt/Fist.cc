@@ -31,6 +31,13 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
+// XXX: This is dirty but there is no good way to emit a signal from a static
+// method. Unfortunately, gap api, which is in C, forces to attach C callbacks.
+// Attaching a static method works but make signal emission impossible.
+// The only 'good' way found, while there is only one instance of Fist
+// is to add a global pointer to the dock and makes it emit the signal.
+Fist* g_fist = nullptr;
+
 static std::unique_ptr<infinit::fist::log::Selector> logger;
 namespace
 {
@@ -104,6 +111,12 @@ gap_state()
 #endif
 }
 
+void
+Fist::GapDeleter::operator() (gap_State* state) const
+{
+  gap_free(state);
+}
+
 Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
   _state(gap_state()),
@@ -117,6 +130,8 @@ Fist::Fist(int argc, char** argv):
   _dock(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
+  g_fist = this;
+  gap_kicked_out_callback(this->_state.get(), Fist::_kicked_out_callback);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
   if (!this->_set_lock())
@@ -145,15 +160,8 @@ void
 Fist::about_to_quit()
 {
   ELLE_TRACE_SCOPE("%s: run cleaning operations", *this);
-  if (this->_dock)
-  {
-    this->_dock.reset();
-  }
-  if (this->_state != nullptr)
-  {
-    gap_free(this->_state);
-    this->_state = nullptr;
-  }
+  this->_dock.reset();
+  this->_state.reset();
   ELLE_DEBUG("cleaning done");
 }
 
@@ -202,7 +210,7 @@ Fist::operator ()()
     "http://download.infinit.io/windows/64/update.xml");
 
   this->_updater.reset(new Updater(QString::fromStdString(update_url), this));
-  this->_login_window.reset(new LoginWindow(this->_state));
+  this->_login_window.reset(new LoginWindow(this->_state.get()));
 
   connect(this->_updater.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
@@ -274,7 +282,7 @@ Fist::_set_lock()
     this->_other_instance.reset(new QLocalSocket(this));
   // Violent but if you receive something, it's a succide signal.
   connect(this->_other_instance.get(), SIGNAL(readyRead()),
-          this, SLOT(_kicked()));
+          this, SLOT(_kicked_by_another_instance()));
   ELLE_DEBUG("try connecting to %s", lock_name)
     this->_other_instance->connectToServer(lock_name);
   if (this->_other_instance->waitForConnected(500))
@@ -341,7 +349,7 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
-  this->_dock.reset(new InfinitDock(this->_state));
+  this->_dock.reset(new InfinitDock(this->_state.get()));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
 }
@@ -361,9 +369,25 @@ Fist::_new_local_socket_connection()
 }
 
 void
-Fist::_kicked()
+Fist::_kicked_out_callback()
 {
-  ELLE_TRACE_SCOPE("%s: kicked", *this);
+  g_fist->kicked_out();
+}
+
+void
+Fist::kicked_out()
+{
+  this->_dock.reset();
+  this->_state.reset(gap_state());
+
+  this->_login_window->show();
+  this->_login_window->set_message("You have been disconnected", "");
+}
+
+void
+Fist::_kicked_by_another_instance()
+{
+  ELLE_TRACE_SCOPE("%s: kicked by an other instance", *this);
   remove_current_log();
   this->quit();
 }
