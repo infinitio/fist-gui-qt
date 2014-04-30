@@ -28,8 +28,8 @@
 
 namespace
 {
-  static QRegExp email_checker(regexp::email,
-                               Qt::CaseInsensitive);
+  static const QRegExp email_checker(regexp::email,
+                                     Qt::CaseInsensitive);
 }
 
 ELLE_LOG_COMPONENT("infinit.FIST.SendPanel");
@@ -47,6 +47,7 @@ SendPanel::SendPanel(gap_State* state):
   _peer_id(gap_null()),
   _search_future(),
   _search_watcher(),
+  _magnifier(":/icons/search@2x.png"),
   _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this)),
   _results(),
   _ignore_search_result(false)
@@ -66,7 +67,7 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->_search, SIGNAL(return_pressed()),
           this, SLOT(_pick_user()));
 
-  this->_search->set_icon(QPixmap(":/icons/search.png"));
+  this->_search->set_icon(this->_magnifier);
 
   connect(this->_file_adder, SIGNAL(clicked()),
           this, SIGNAL(choose_files()));
@@ -116,7 +117,7 @@ SendPanel::_search_changed(QString const& search)
   if (this->_peer_id != gap_null())
   {
     ELLE_DEBUG("reset selection");
-    this->_search->set_icon(QPixmap(":/icons/search.png"));
+    this->_search->set_icon(this->_magnifier);
     this->_peer_id = gap_null();
   }
 
@@ -211,12 +212,14 @@ void
 SendPanel::set_users(std::vector<uint32_t> const& users)
 {
   ELLE_TRACE_SCOPE("%s: set users", *this);
-  elle::SafeFinally restore_magnifier([&] { this->_search->set_icon(QPixmap(":/icons/search.png")); });
+  elle::SafeFinally restore_magnifier(
+    [&] { this->_search->set_icon(this->_magnifier); });
   this->_clean_results();
 
   if (users.size() == 0)
   {
-    this->_users->add_widget(new TextListItem("No result", this), ListWidget::Position::Top);
+    this->_users->add_widget(
+      new TextListItem("No result", 30, this), ListWidget::Position::Top);
   }
   else
   {
@@ -364,8 +367,7 @@ SendPanel::avatar_available(uint32_t uid)
 void
 SendPanel::keyPressEvent(QKeyEvent* event)
 {
-  ELLE_DEBUG("key pressed: %s", event->key());
-
+  ELLE_DEBUG_SCOPE("key pressed: %s", event->key());
   if (event->key() == Qt::Key_Escape)
     emit switch_signal();
   if (!event->text().isEmpty())
@@ -393,7 +395,7 @@ SendPanel::on_hide()
   this->_results.clear();
   this->_peer_id = gap_null();
   this->_adder_part_seperator->hide();
-  this->_search->set_icon(QPixmap(":/icons/search.png"));
+  this->_search->set_icon(this->_magnifier);
 }
 
 /*-------.

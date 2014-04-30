@@ -58,8 +58,8 @@ SearchField::set_icon(QPixmap const& pixmap)
 {
   this->_icon->show();
   this->_icon->setPixmap(pixmap.scaled(icon_size,
-                                      Qt::KeepAspectRatioByExpanding,
-                                      Qt::SmoothTransformation));
+                                       Qt::KeepAspectRatioByExpanding,
+                                       Qt::SmoothTransformation));
   this->update();
 }
 

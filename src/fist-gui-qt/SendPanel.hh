@@ -123,6 +123,7 @@ private:
   typedef QFuture<std::vector<uint32_t>> FutureSearchResult;
   ELLE_ATTRIBUTE(FutureSearchResult, search_future);
   ELLE_ATTRIBUTE(QFutureWatcher<std::vector<uint32_t>>, search_watcher);
+  ELLE_ATTRIBUTE(QPixmap, magnifier);
   ELLE_ATTRIBUTE(QMovie*, loading_icon);
   ELLE_ATTRIBUTE(QVector<uint32_t>, results);
   ELLE_ATTRIBUTE(bool, ignore_search_result);
