@@ -93,6 +93,9 @@ SendPanel::SendPanel(gap_State* state):
   this->_users_part_separator->hide();
   this->_adder_part_seperator->hide();
 
+  connect(&this->_search_watcher, SIGNAL(finished()),
+          this, SLOT(_set_users()));
+
   this->setAcceptDrops(true);
 }
 
@@ -124,14 +127,12 @@ SendPanel::_search_changed(QString const& search)
     this->_search->set_icon(*this->_loading_icon);
     this->_search_future.cancel();
     this->_search_future = QtConcurrent::run(
-      [&] {
+      [&,search,text] {
         if (search.count('@') == 1 && email_checker.exactMatch(search))
           return std::vector<uint32_t>{gap_user_by_email(this->_state, text.c_str())};
         else
           return gap_users_search(this->_state, text.c_str());
       });
-    connect(&this->_search_watcher, SIGNAL(finished()),
-            this, SLOT(_set_users()));
 
     this->_search_watcher.setFuture(this->_search_future);
   }
