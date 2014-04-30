@@ -24,6 +24,7 @@ SearchField::Field::keyPressEvent(QKeyEvent* event)
 {
   ELLE_DEBUG("key pressed: %s", event->key())
     QLineEdit::keyPressEvent(event);
+  event->accept();
 }
 
 SearchField::SearchField(QWidget* owner):
@@ -104,7 +105,7 @@ SearchField::keyPressEvent(QKeyEvent* event)
     emit up_pressed();
   else if (event->key() == Qt::Key_Down)
     emit down_pressed();
-  else if (event->key() == Qt::Key_Return)
+  else if (event->key() == Qt::Key_Return && !event->isAccepted())
     emit return_pressed();
 }
 
