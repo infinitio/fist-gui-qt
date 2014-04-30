@@ -207,7 +207,7 @@ Fist::operator ()()
 
   auto update_url = elle::os::getenv(
     "FIST_UPDATE_FILE",
-    "http://download.infinit.io/windows/64/update.xml");
+    "http://download.infinit.io/windows/${architecture}/update.xml");
 
   this->_updater.reset(new Updater(QString::fromStdString(update_url), this));
   this->_login_window.reset(new LoginWindow(this->_state.get()));

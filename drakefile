@@ -10,6 +10,14 @@ from functools import partial
 build = None
 installer = None
 
+def architecture_dictionary(cxx_toolkit):
+  if cxx_toolkit.architecture == drake.architecture.x86_64:
+    return {"architecture": "64"}
+  elif cxx_toolkit.architecture == drake.architecture.x86:
+    return {"architecture": "32"}
+  else:
+    raise Exception("unknown architecture: %s" % cxx_toolkit.architecture)
+
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
               prefix = '/usr',
@@ -73,85 +81,86 @@ def configure(cxx_toolkit = None,
 
   cxx_config.add_local_include_path('src')
 
-  sources = drake.nodes(
-    "resources/fist-gui-qt/resources.qrc",
-    "src/fist-gui-qt/AddFileWidget.cc",
-    "src/fist-gui-qt/AddFileWidget.hh",
-    "src/fist-gui-qt/AvatarIcon.cc",
-    "src/fist-gui-qt/AvatarIcon.hh",
-    "src/fist-gui-qt/AvatarWidget.cc",
-    "src/fist-gui-qt/AvatarWidget.hh",
-    "src/fist-gui-qt/FileItem.cc",
-    "src/fist-gui-qt/FileItem.hh",
-    "src/fist-gui-qt/Fist.cc",
-    "src/fist-gui-qt/Fist.hh",
-    "src/fist-gui-qt/Footer.cc",
-    "src/fist-gui-qt/Footer.hh",
-    "src/fist-gui-qt/HorizontalSeparator.cc",
-    "src/fist-gui-qt/HorizontalSeparator.hh",
-    "src/fist-gui-qt/IconButton.cc",
-    "src/fist-gui-qt/IconButton.hh",
-    "src/fist-gui-qt/InfinitDock.cc",
-    "src/fist-gui-qt/InfinitDock.hh",
-    "src/fist-gui-qt/ListItem.cc",
-    "src/fist-gui-qt/ListItem.hh",
-    "src/fist-gui-qt/ListWidget.cc",
-    "src/fist-gui-qt/ListWidget.hh",
-    "src/fist-gui-qt/LoginFooter.cc",
-    "src/fist-gui-qt/LoginFooter.hh",
-    "src/fist-gui-qt/LoginWindow.cc",
-    "src/fist-gui-qt/LoginWindow.hh",
-    "src/fist-gui-qt/Panel.cc",
-    "src/fist-gui-qt/Panel.hh",
-    "src/fist-gui-qt/RoundButton.cc",
-    "src/fist-gui-qt/RoundButton.hh",
-    "src/fist-gui-qt/RoundShadowWidget.cc",
-    "src/fist-gui-qt/RoundShadowWidget.hh",
-    "src/fist-gui-qt/SearchField.cc",
-    "src/fist-gui-qt/SearchField.hh",
-    "src/fist-gui-qt/SearchResultWidget.cc",
-    "src/fist-gui-qt/SearchResultWidget.hh",
-    "src/fist-gui-qt/SendFooter.cc",
-    "src/fist-gui-qt/SendFooter.hh",
-    "src/fist-gui-qt/SendPanel.cc",
-    "src/fist-gui-qt/SendPanel.hh",
-    "src/fist-gui-qt/ShapeButton.cc",
-    "src/fist-gui-qt/ShapeButton.hh",
-    "src/fist-gui-qt/SmoothLayout.cc",
-    "src/fist-gui-qt/SmoothLayout.hh",
-    "src/fist-gui-qt/SmoothScrollBar.cc",
-    "src/fist-gui-qt/SmoothScrollBar.hh",
-    "src/fist-gui-qt/TextListItem.cc",
-    "src/fist-gui-qt/TextListItem.hh",
-    "src/fist-gui-qt/TransactionFooter.cc",
-    "src/fist-gui-qt/TransactionFooter.hh",
-    "src/fist-gui-qt/TransactionModel.cc",
-    "src/fist-gui-qt/TransactionModel.hh",
-    "src/fist-gui-qt/TransactionPanel.cc",
-    "src/fist-gui-qt/TransactionPanel.hh",
-    "src/fist-gui-qt/TransactionWidget.cc",
-    "src/fist-gui-qt/TransactionWidget.hh",
-    "src/fist-gui-qt/TransactionWindow.cc",
-    "src/fist-gui-qt/TransactionWindow.hh",
-    "src/fist-gui-qt/UserModel.cc",
-    "src/fist-gui-qt/UserModel.hh",
-    "src/fist-gui-qt/UserWidget.cc",
-    "src/fist-gui-qt/UserWidget.hh",
-    "src/fist-gui-qt/globals.hh",
-    "src/fist-gui-qt/settings.cc",
-    "src/fist-gui-qt/settings.hh",
+  with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
+    sources = drake.nodes(
+      "resources/fist-gui-qt/resources.qrc",
+      "src/fist-gui-qt/AddFileWidget.cc",
+      "src/fist-gui-qt/AddFileWidget.hh",
+      "src/fist-gui-qt/AvatarIcon.cc",
+      "src/fist-gui-qt/AvatarIcon.hh",
+      "src/fist-gui-qt/AvatarWidget.cc",
+      "src/fist-gui-qt/AvatarWidget.hh",
+      "src/fist-gui-qt/FileItem.cc",
+      "src/fist-gui-qt/FileItem.hh",
+      "src/fist-gui-qt/Fist.cc.tmpl",
+      "src/fist-gui-qt/Fist.hh",
+      "src/fist-gui-qt/Footer.cc",
+      "src/fist-gui-qt/Footer.hh",
+      "src/fist-gui-qt/HorizontalSeparator.cc",
+      "src/fist-gui-qt/HorizontalSeparator.hh",
+      "src/fist-gui-qt/IconButton.cc",
+      "src/fist-gui-qt/IconButton.hh",
+      "src/fist-gui-qt/InfinitDock.cc",
+      "src/fist-gui-qt/InfinitDock.hh",
+      "src/fist-gui-qt/ListItem.cc",
+      "src/fist-gui-qt/ListItem.hh",
+      "src/fist-gui-qt/ListWidget.cc",
+      "src/fist-gui-qt/ListWidget.hh",
+      "src/fist-gui-qt/LoginFooter.cc",
+      "src/fist-gui-qt/LoginFooter.hh",
+      "src/fist-gui-qt/LoginWindow.cc",
+      "src/fist-gui-qt/LoginWindow.hh",
+      "src/fist-gui-qt/Panel.cc",
+      "src/fist-gui-qt/Panel.hh",
+      "src/fist-gui-qt/RoundButton.cc",
+      "src/fist-gui-qt/RoundButton.hh",
+      "src/fist-gui-qt/RoundShadowWidget.cc",
+      "src/fist-gui-qt/RoundShadowWidget.hh",
+      "src/fist-gui-qt/SearchField.cc",
+      "src/fist-gui-qt/SearchField.hh",
+      "src/fist-gui-qt/SearchResultWidget.cc",
+      "src/fist-gui-qt/SearchResultWidget.hh",
+      "src/fist-gui-qt/SendFooter.cc",
+      "src/fist-gui-qt/SendFooter.hh",
+      "src/fist-gui-qt/SendPanel.cc",
+      "src/fist-gui-qt/SendPanel.hh",
+      "src/fist-gui-qt/ShapeButton.cc",
+      "src/fist-gui-qt/ShapeButton.hh",
+      "src/fist-gui-qt/SmoothLayout.cc",
+      "src/fist-gui-qt/SmoothLayout.hh",
+      "src/fist-gui-qt/SmoothScrollBar.cc",
+      "src/fist-gui-qt/SmoothScrollBar.hh",
+      "src/fist-gui-qt/TextListItem.cc",
+      "src/fist-gui-qt/TextListItem.hh",
+      "src/fist-gui-qt/TransactionFooter.cc",
+      "src/fist-gui-qt/TransactionFooter.hh",
+      "src/fist-gui-qt/TransactionModel.cc",
+      "src/fist-gui-qt/TransactionModel.hh",
+      "src/fist-gui-qt/TransactionPanel.cc",
+      "src/fist-gui-qt/TransactionPanel.hh",
+      "src/fist-gui-qt/TransactionWidget.cc",
+      "src/fist-gui-qt/TransactionWidget.hh",
+      "src/fist-gui-qt/TransactionWindow.cc",
+      "src/fist-gui-qt/TransactionWindow.hh",
+      "src/fist-gui-qt/UserModel.cc",
+      "src/fist-gui-qt/UserModel.hh",
+      "src/fist-gui-qt/UserWidget.cc",
+      "src/fist-gui-qt/UserWidget.hh",
+      "src/fist-gui-qt/globals.hh",
+      "src/fist-gui-qt/settings.cc",
+      "src/fist-gui-qt/settings.hh",
 
-    "src/fist-gui-qt/Updater.hh",
-    "src/fist-gui-qt/Updater.cc",
-    "src/fist-gui-qt/LoadingDialog.hh",
-    "src/fist-gui-qt/LoadingDialog.cc",
+      "src/fist-gui-qt/Updater.hh",
+      "src/fist-gui-qt/Updater.cc",
+      "src/fist-gui-qt/LoadingDialog.hh",
+      "src/fist-gui-qt/LoadingDialog.cc",
 
-    "src/fist-gui-qt/log/Selector.cc",
-    "src/fist-gui-qt/log/Selector.hh",
-    "src/fist-gui-qt/log/CircularSelector.cc",
-    "src/fist-gui-qt/log/CircularSelector.hh",
-    "src/fist-gui-qt/main.cc",
-  )
+      "src/fist-gui-qt/log/Selector.cc",
+      "src/fist-gui-qt/log/Selector.hh",
+      "src/fist-gui-qt/log/CircularSelector.cc",
+      "src/fist-gui-qt/log/CircularSelector.hh",
+      "src/fist-gui-qt/main.cc",
+    )
 
   application = drake.cxx.Executable(
     'bin/Infinit',
@@ -211,16 +220,15 @@ def configure(cxx_toolkit = None,
 
         'NSIS_Plugins': str(drake.path_build(nsis_folder.name())),
         'NSIS_Includes': str(drake.path_build(nsis_folder.name())),
+        'architecture': cxx_toolkit.architecture()
       })
+    content.update(architecture_dictionary(cxx_toolkit))
 
     nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
-                                     resources = installer_resources,
-                                     )
-
+                                     resources = installer_resources)
     with nsi_context:
       with templating_context:
-        installer = drake.nodes(
-          'installer.nsi.tmpl')
+        installer = drake.nodes('installer.nsi.tmpl')
     import os
 
     def set_size(context, target):

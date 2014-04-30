@@ -50,10 +50,11 @@ FunctionEnd
 ; Check if the user is running installer on 32 of 64 windows.
 ;!include x64.nsh
 Function CheckArchitecture
+  ; XXX: Template to pop an error is the installer bundles the 32-bit and the
+  ; plateform is 64-bit and vice versa.
+  ; As long as we only use the 32-bit version, this is not mandatory.
   ${If} ${RunningX64}
   ${Else}
-    MessageBox MB_OK "Not running on x64"
-    Abort
   ${Endif}
 FunctionEnd
 
