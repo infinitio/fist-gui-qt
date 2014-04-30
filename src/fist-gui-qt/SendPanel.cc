@@ -63,7 +63,7 @@ SendPanel::SendPanel(gap_State* state):
     this->_file_list->setAutoFillBackground(true);
   }
 
-  connect(this->_search, SIGNAL(returnPressed()),
+  connect(this->_search, SIGNAL(return_pressed()),
           this, SLOT(_pick_user()));
 
   this->_search->set_icon(QPixmap(":/icons/search.png"));
@@ -197,6 +197,7 @@ SendPanel::_clean_results()
 {
   this->_users->clearWidgets();
   this->_results.clear();
+  this->_users_part_separator->hide();
   this->update();
 }
 
@@ -231,8 +232,8 @@ SendPanel::set_users(std::vector<uint32_t> const& users)
               SLOT(_set_peer(uint32_t)));
       this->_users->add_widget(widget, ListWidget::Position::Top);
     }
-    this->_users_part_separator->show();
   }
+  this->_users_part_separator->show();
 }
 
 
@@ -363,8 +364,12 @@ SendPanel::avatar_available(uint32_t uid)
 void
 SendPanel::keyPressEvent(QKeyEvent* event)
 {
+  ELLE_DEBUG("key pressed: %s", event->key());
+
   if (event->key() == Qt::Key_Escape)
     emit switch_signal();
+  if (!event->text().isEmpty())
+    this->_search->insert_text(event->text());
 }
 
 /*------------.

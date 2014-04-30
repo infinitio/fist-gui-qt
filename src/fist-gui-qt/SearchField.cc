@@ -1,17 +1,39 @@
 #include <QPainter>
 #include <QHBoxLayout>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/globals.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.SearchField");
 
 static int const margin = 7;
 static QSize const icon_size(20, 20);
 
+SearchField::Field::Field(QWidget* parent)
+  : QLineEdit(parent)
+{}
+
+SearchField::Field::Field(QString const& text, QWidget* parent)
+  : QLineEdit(text, parent)
+{}
+
+void
+SearchField::Field::keyPressEvent(QKeyEvent* event)
+{
+  ELLE_DEBUG("key pressed: %s", event->key())
+    QLineEdit::keyPressEvent(event);
+}
+
 SearchField::SearchField(QWidget* owner):
   QWidget(owner),
   _icon(new QLabel(this)),
-  _search_field(new QLineEdit(this))
+  _search_field(new Field(this))
 {
+  connect(this->_search_field, SIGNAL(returnPressed()),
+          this, SIGNAL(return_pressed()));
+
   this->setContentsMargins(margin, 0, margin, 0);
   this->_icon->hide();
   this->_icon->setFixedSize(icon_size);
@@ -56,6 +78,13 @@ SearchField::set_text(QString const& text)
   this->_search_field->setText(text);
 }
 
+void
+SearchField::insert_text(QString const& text)
+{
+  this->_search_field->insert(text);
+  this->_search_field->setFocus();
+}
+
 QString
 SearchField::text() const
 {
@@ -75,8 +104,8 @@ SearchField::keyPressEvent(QKeyEvent* event)
     emit up_pressed();
   else if (event->key() == Qt::Key_Down)
     emit down_pressed();
-  // else
-  //   this->_search_field->keyPressEvent(event);
+  else if (event->key() == Qt::Key_Return)
+    emit return_pressed();
 }
 
 void

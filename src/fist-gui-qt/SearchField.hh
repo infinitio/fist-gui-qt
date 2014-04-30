@@ -13,6 +13,18 @@
 class SearchField:
   public QWidget
 {
+  class Field:
+    public QLineEdit
+  {
+  public:
+    Field(QWidget* parent = nullptr);
+    Field(QString const& text, QWidget* parent = nullptr);
+
+  public:
+    void
+    keyPressEvent(QKeyEvent * event) override;
+  };
+
 /*-------------.
 | Construction |
 `-------------*/
@@ -24,7 +36,7 @@ public:
 `--------*/
 public:
   ELLE_ATTRIBUTE(QLabel*, icon);
-  ELLE_ATTRIBUTE(QLineEdit*, search_field);
+  ELLE_ATTRIBUTE(Field*, search_field);
 public:
   void
   set_icon(QPixmap const& pixmap);
@@ -34,6 +46,9 @@ public:
 
   void
   set_text(QString const& text);
+
+  void
+  insert_text(QString const& text);
 
   QString
   text() const;
@@ -50,6 +65,9 @@ Q_SIGNALS:
 
   void
   down_pressed();
+
+  void
+  return_pressed();
 
   void
   search_ready(QString const& text);
