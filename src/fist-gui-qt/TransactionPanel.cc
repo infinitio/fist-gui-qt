@@ -70,8 +70,7 @@ TransactionPanel::add_transaction(gap_State* state,
                                   uint32_t tid,
                                   bool init)
 {
-  if (this->_list->widgets().size() == 1 &&
-      this->_transactions.size() == 0)
+  if (this->_transactions.size() == 0)
   {
     this->_list->clearWidgets();
   }
@@ -186,14 +185,13 @@ TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
 
   if (this->_transactions.find(id) == this->_transactions.end())
   {
-    this->_transactions.emplace(id, TransactionModel(this->_state, id));
-    ELLE_DEBUG("new transaction");
-    this->add_transaction(this->_state, id);
+    ELLE_TRACE("new transaction: %s", id)
+      this->add_transaction(this->_state, id);
   }
   else
   {
-    ELLE_DEBUG("update transaction");
-    this->updateTransaction(this->_state, id);
+    ELLE_DEBUG("update transaction: %s", id)
+      this->updateTransaction(this->_state, id);
   }
 }
 
