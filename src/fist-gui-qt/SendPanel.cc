@@ -219,7 +219,7 @@ SendPanel::set_users(std::vector<uint32_t> const& users)
   if (users.size() == 0)
   {
     this->_users->add_widget(
-      new TextListItem("No result", 30, this), ListWidget::Position::Top);
+      new TextListItem("<b>No result</b><br />Send to an email address instead", 40, this), ListWidget::Position::Top);
   }
   else
   {

@@ -52,7 +52,7 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 
   if (transactions_list.empty())
   {
-    this->_list->add_widget(new TextListItem("No notification"));
+    this->_list->add_widget(new TextListItem("You haven't sent or received any files yet", 70, this));
     return;
   }
 

@@ -183,7 +183,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
+      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     static

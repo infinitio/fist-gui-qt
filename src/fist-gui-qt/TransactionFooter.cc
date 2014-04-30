@@ -5,6 +5,8 @@ TransactionFooter::TransactionFooter():
   _menu(new IconButton(QPixmap(":/icons/gear.png"))),
   _send(new IconButton(QPixmap(":/icons/transfer.png")))
 {
+  this->_menu->setToolTip("Options");
+  this->_send->setToolTip("Send files");
   this->_layout->addWidget(this->_menu);
   this->_layout->addItem(new QSpacerItem(0, 0,
                                          QSizePolicy::MinimumExpanding,
