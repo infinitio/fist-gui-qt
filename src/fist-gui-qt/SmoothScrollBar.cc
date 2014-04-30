@@ -112,8 +112,8 @@ void
 SmoothScrollBar::_scroll(int delta)
 {
   int value = this->_value_target;
-  value += delta;
-  if (delta > 0)
+  value -= delta;
+  if (delta < 0)
   {
     value = std::min(value, this->maximum() - this->pageSize());
   }
