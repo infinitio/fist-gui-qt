@@ -23,6 +23,7 @@
 #include <fist-gui-qt/SendPanel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/settings.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Dock");
 
@@ -250,14 +251,15 @@ InfinitDock::hide_dock()
 
   this->hide();
 
-  if (this->_first_hide)
+  if (!fist::settings()["dock"].exists("first_minimizing_popup"))
   {
-    this->_first_hide = false;
+    fist::settings()["dock"].set("first_minimizing_popup", "1");
     this->_systray->showMessage(QString("Infinit is minimized!"),
                                 QString("Make sure the Infinit icon is always "
                                         "visible by clicking customize!"),
                                 QSystemTrayIcon::Information,
                                 60000);
+
   }
 }
 

@@ -18,6 +18,7 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
+# include <fist-gui-qt/settings.hh>
 
 ELLE_LOG_COMPONENT("infinti.FIST.LoginWindow");
 
@@ -55,11 +56,7 @@ LoginWindow::LoginWindow(gap_State* state):
     view::login::email::style(*this->_email_field);
     this->_email_field->setTextMargins(12, 0, 12, 0);
 
-    QSettings settings("Infinit.io", "Infinit");
-    settings.beginGroup("Login");
-    auto saved_email = settings.value("email", "").toString();
-    settings.endGroup();
-
+    auto saved_email = fist::settings()["Login"].get("email", "").toString();
     if (!saved_email.isEmpty())
       this->_email_field->setText(saved_email);
   }
@@ -69,10 +66,7 @@ LoginWindow::LoginWindow(gap_State* state):
     this->_password_field->setFixedSize(view::login::password::size);
     view::login::password::style(*this->_password_field);
     this->_password_field->setTextMargins(12, 0, 12, 0);
-    QSettings settings("Infinit.io", "Infinit");
-    settings.beginGroup("Login");
-    auto saved_password = settings.value("password", "").toString();
-    settings.endGroup();
+    auto saved_password = fist::settings()["Login"].get("password", "").toString();
     if (!saved_password.isEmpty())
       this->_password_field->setText(saved_password);
   }
@@ -157,6 +151,9 @@ LoginWindow::LoginWindow(gap_State* state):
   layout->addWidget(this->_footer);
   this->setCentralWidget(central_widget);
 
+  connect(&this->_login_watcher, SIGNAL(finished()),
+          this, SLOT(_login_attempt()));
+
   this->update();
 }
 
@@ -173,13 +170,8 @@ LoginWindow::_login_attempt()
   auto status = this->_login_future.result();
   if (status == gap_ok)
   {
-    QSettings settings("Infinit.io", "Infinit");
-    settings.beginGroup("Login");
-    // settings.setValue("email", email);
-    settings.endGroup();
-
     emit logged_in();
-
+    fist::settings()["Login"].set("email", this->_email_field->text());
     return;
   }
   else if (status == gap_deprecated)
@@ -187,20 +179,28 @@ LoginWindow::_login_attempt()
     emit version_rejected();
   }
 
+  static auto fill_error_field = [&] (std::string const& error_message)
+    {
+      ELLE_WARN("%s", error_message);
+      this->set_message(error_message.c_str(), error_message.c_str());
+    };
+
   switch (status)
   {
-#define ERR(case, msg)                          \
-    case:                                       \
-      ELLE_WARN("%s", tr(msg));                 \
-      this->set_message(tr(msg), tr(msg));      \
+#define ERR(error_code, msg)                    \
+    case error_code:                            \
+      fill_error_field(msg);                    \
       break                                     \
         /**/
-    ERR(case gap_network_error, "Not connected to internet");
-    ERR(case gap_meta_unreachable, "Unable to contact main server");
-    ERR(case gap_meta_down_with_message, "Main server is down...");
-    ERR(case gap_trophonius_unreachable, "Unable to contact notification server");
-    ERR(case gap_email_password_dont_match, "Wrong email/password");
-    ERR(default, "Internal error");
+    ERR(gap_network_error, "Not connected to internet");
+    ERR(gap_meta_unreachable, "Unable to contact main server");
+    ERR(gap_meta_down_with_message, "Main server is down");
+    ERR(gap_trophonius_unreachable, "Unable to contact notification server");
+    ERR(gap_email_password_dont_match, "Wrong email/password");
+    ERR(gap_deprecated, "Your version is no longer supported");
+    ERR(gap_email_not_confirmed, "You need to confirm your email\nCheck your inbox");
+    default:
+      fill_error_field(elle::sprintf("Internal error (%s)", status));
   }
 }
 
@@ -252,9 +252,6 @@ LoginWindow::_login()
       elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
       return gap_login(_state, email.toStdString().c_str(), hash);
     });
-
-  connect(&this->_login_watcher, SIGNAL(finished()),
-          this, SLOT(_login_attempt()));
 
   this->_message_field->setMovie(this->_loading_icon);
   this->_message_field->movie()->start();
