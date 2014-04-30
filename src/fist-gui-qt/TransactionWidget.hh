@@ -8,6 +8,8 @@
 # include <QTimer>
 # include <QLabel>
 
+# include <elle/attribute.hh>
+
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>
@@ -76,16 +78,17 @@ public slots:
   void update_mtime();
 
 private:
-  TransactionModel const& _transaction;
-  AvatarWidget* _peer_avatar;
+  ELLE_ATTRIBUTE_R(TransactionModel const&, transaction);
+  ELLE_ATTRIBUTE_R(AvatarWidget*, peer_avatar);
+  ELLE_ATTRIBUTE_R(QLabel*, peer_fullname);
   QLabel* _peer_status;
   QLayout* _layout;
-  IconButton* _accept_button;
+  ELLE_ATTRIBUTE_R(IconButton*, accept_button);
   IconButton* _reject_button;
   QWidget* _accept_reject_area;
   IconButton* _cancel_button;
   QLabel* _mtime;
-  QLabel* _status;
+  ELLE_ATTRIBUTE_R(QLabel*, status);
   QWidget* _info_area;
   QTimer* _timer;
   QTimer* _mtime_updater;

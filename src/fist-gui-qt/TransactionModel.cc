@@ -59,7 +59,7 @@ TransactionModel::peer_id() const
 QString const&
 TransactionModel::peer_fullname() const
 {
-  if (this->_peer_fullname.isNull())
+  if (this->_peer_fullname.isNull() || this->_peer_fullname.isEmpty())
   {
     this->_peer_fullname =
       QString::fromUtf8(

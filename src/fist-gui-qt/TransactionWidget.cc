@@ -23,6 +23,7 @@ QVector<gap_TransactionStatus> g_finals =
   gap_transaction_failed,
   gap_transaction_canceled,
   gap_transaction_rejected,
+  gap_transaction_cloud_buffered,
 };
 
 TransactionWidget::TransactionWidget(TransactionModel const& model):
@@ -76,7 +77,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
       username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
       user_and_status->addWidget(username);
     }
-     user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
+    this->_peer_fullname = username;
+    user_and_status->addWidget(this->_peer_status, 0, Qt::AlignLeft);
     this->_peer_status->setToolTip(tr("Online"));
     user_and_status->addStretch(0);
     texts->addSpacing(4);
@@ -370,18 +372,20 @@ TransactionWidget::update_status()
         StatusUpdater(QString(":/icons/loading.gif"),
                       true,
                       "Wait for user to accept") },
-    // { gap_transaction_accepted,
-    //     StatusUpdater(QString(":/icons/loading.gif"),
-    //                   true,
-    //                   "Waiting for peer to be online") },
-    // { gap_transaction_preparing,
-    //     StatusUpdater(QString(":/icons/loading.gif"),
-    //                   true,
-    //                   "Waiting for peer to be online") },
+    { gap_transaction_waiting_data,
+        StatusUpdater(QString(":/icons/loading.gif"),
+                      true,
+                      "Waiting for data") },
+    { gap_transaction_connecting,
+        StatusUpdater(QString(":/icons/loading.gif"),
+                      true,
+                      "Connecting") },
     { gap_transaction_transferring,
         StatusUpdater(QString(), false, "Transferring") },
     { gap_transaction_finished,
         StatusUpdater(QString(":/icons/check.png"), false, "Finished") },
+    { gap_transaction_cloud_buffered,
+        StatusUpdater(QString(":/icons/check.png"), false, "Cloud Buffered") },
     { gap_transaction_failed,
         StatusUpdater(QString(":/icons/error.png"), false, "Failed") },
     { gap_transaction_canceled,
@@ -406,6 +410,9 @@ TransactionWidget::update_status()
   }
 
   this->update_mtime();
+
+  if (this->_peer_fullname->text().isEmpty())
+    this->_peer_fullname->setText(this->_transaction.peer_fullname());
 }
 
 void
