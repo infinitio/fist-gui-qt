@@ -155,7 +155,7 @@ InfinitDock::InfinitDock(gap_State* state):
   gap_user_status_callback(_state, InfinitDock::user_status_cb);
   gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
 
-  this->_switch_view(this->_transaction_panel);
+  this->_show_transactions_view();
 
   QTimer *timer = new QTimer;
   connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
@@ -165,8 +165,8 @@ InfinitDock::InfinitDock(gap_State* state):
   this->connect(_report_a_problem, SIGNAL(triggered()),
                 this, SLOT(report_a_problem()));
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
-  this->show();
-  this->show_dock();
+
+  this->hide_dock();
 }
 
 InfinitDock::~InfinitDock()
@@ -534,6 +534,12 @@ InfinitDock::_switch_view(Panel* panel)
 
   this->setCentralWidget(panel);
   panel->on_show();
+
+  // XXX: Dirty, but Qt is in trouble to calculate the size of hidden widget.
+  // So everty time a new panel is shown, make sure that the size matches the
+  // content.
+  this->update();
+  this->adjustSize();
   this->update();
 }
 
