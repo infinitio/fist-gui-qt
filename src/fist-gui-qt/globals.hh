@@ -3,6 +3,7 @@
 
 # include <QFont>
 # include <QColor>
+# include <QLabel>
 
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
