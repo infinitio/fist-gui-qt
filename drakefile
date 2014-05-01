@@ -235,10 +235,12 @@ def configure(cxx_toolkit = None,
     def set_size(context, target):
       context['size'] = os.path.getsize(str(target.path()))
 
-    templating_context = drake.templating.Context(
-      content = {
+    content = {
         'version': git.description(),
-      },
+      }
+    content.update(architecture_dictionary(cxx_toolkit))
+    templating_context = drake.templating.Context(
+      content = content,
       sources = [ drake.Node('bin/installer.exe'), ],
       hooks = {
         drake.Node('bin/installer.exe'): [ set_size, ]
