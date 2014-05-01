@@ -202,8 +202,7 @@ def configure(cxx_toolkit = None,
                              strip_prefix = True),
         installer_resources + [application] + dynamic_libraries)) + nsis_plugins + nsis_includes
 
-    templating_context = drake.templating.Context(
-      content = {
+    content = {
         'company': 'Infinit.io',
         'website': 'www.infinit.io',
         'product_name': 'Infinit',
@@ -222,9 +221,9 @@ def configure(cxx_toolkit = None,
 
         'NSIS_Plugins': str(drake.path_build(nsis_folder.name())),
         'NSIS_Includes': str(drake.path_build(nsis_folder.name())),
-      })
+    }
     content.update(architecture_dictionary(cxx_toolkit))
-
+    templating_context = drake.templating.Context(content = content)
     nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
                                      resources = installer_resources)
     with nsi_context:
