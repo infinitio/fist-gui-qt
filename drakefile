@@ -21,19 +21,21 @@ def architecture_dictionary(cxx_toolkit):
 
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
-              prefix = '/usr',
+              prefix = drake.Path('/usr/local'),
               boost = None,
               git = None,
               qt = None,
               libraries = []):
   global build, installer
 
+  prefix = drake.Path(prefix)
+
   cxx_config = drake.cxx.Config(cxx_config)
   cxx_toolkit = cxx_toolkit or drake.cxx.Toolkit()
   git = git or drake.git.Git(path = drake.path_source('..'))
 
   if qt is None:
-    qt = drake.cxx.qt.Qt(prefix = prefix, gui = True)
+    qt = drake.cxx.qt.Qt(gui = True)
 
   dynamic_libraries = []
   libraries = [drake.copy(lib, 'lib', strip_prefix = True) for lib in libraries]
@@ -250,6 +252,12 @@ def configure(cxx_toolkit = None,
     with templating_context:
       update = drake.node('update.xml.tmpl')
 
+    def install_nodes(where, f = drake.install):
+      where = drake.Path(where)
+      res = []
+      res.append(f(drake.Node('bin/installer.exe'), where, strip_prefix = True))
+      res.append(f(drake.Node('update.xml'), where))
+      return res
+
     install = drake.Rule('install')
-    install << drake.Node('bin/installer.exe')
-    install << drake.copy(drake.Node('update.xml'), 'bin', strip_prefix = True)
+    install << install_nodes(prefix)
