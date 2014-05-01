@@ -34,6 +34,8 @@ SearchField::SearchField(QWidget* owner):
 {
   connect(this->_search_field, SIGNAL(returnPressed()),
           this, SIGNAL(return_pressed()));
+  connect(this->_search_field, SIGNAL(textChanged(QString const&)),
+          this, SLOT(text_changed(QString const&)));
 
   this->setContentsMargins(margin, 0, margin, 0);
   this->_icon->hide();
@@ -47,8 +49,6 @@ SearchField::SearchField(QWidget* owner):
   this->_search_field->setPlaceholderText(view::send::search_field::text);
   this->_search_field->setFixedHeight(this->height());
   this->_search_field->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-  connect(this->_search_field, SIGNAL(textChanged(QString const&)),
-          this, SLOT(text_changed(QString const&)));
   this->_search_delay.setSingleShot(true);
   connect(&this->_search_delay, SIGNAL(timeout()),
           this, SLOT(delay_expired()));
@@ -76,7 +76,13 @@ SearchField::set_icon(QMovie& movie)
 void
 SearchField::set_text(QString const& text)
 {
+  ELLE_TRACE_SCOPE("%s: set text: %s", *this, text);
+
+  disconnect(this->_search_field, SIGNAL(textChanged(QString const&)),
+             this, SLOT(text_changed(QString const&)));
   this->_search_field->setText(text);
+  connect(this->_search_field, SIGNAL(textChanged(QString const&)),
+          this, SLOT(text_changed(QString const&)));
 }
 
 void

@@ -49,8 +49,7 @@ SendPanel::SendPanel(gap_State* state):
   _search_watcher(),
   _magnifier(":/icons/search@2x.png"),
   _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this)),
-  _results(),
-  _ignore_search_result(false)
+  _results()
 {
   this->footer()->setParent(this);
 
@@ -104,46 +103,39 @@ void
 SendPanel::_search_changed(QString const& search)
 {
   ELLE_TRACE_SCOPE("%s: search changed: %s", *this, search);
-
-  if (this->_ignore_search_result)
-  {
-    ELLE_DEBUG("result ignored");
-    this->_ignore_search_result = false;
-    return;
-  }
-
-  QStringList res;
-
   if (this->_peer_id != gap_null())
   {
     ELLE_DEBUG("reset selection");
     this->_search->set_icon(this->_magnifier);
     this->_peer_id = gap_null();
   }
-
+  this->_search_future.cancel();
   QString trimmed_search = search.trimmed();
   if (trimmed_search.size() != 0)
   {
     std::string text(trimmed_search.toStdString());
 
     this->_search->set_icon(*this->_loading_icon);
-    this->_search_future.cancel();
-    this->_search_future = QtConcurrent::run(
-      [&,search,text] {
-        if (search.count('@') == 1 && email_checker.exactMatch(trimmed_search))
-          return std::vector<uint32_t>{gap_user_by_email(this->_state, text.c_str())};
-        else
-          return gap_users_search(this->_state, text.c_str());
-      });
-    this->_search_watcher.setFuture(this->_search_future);
+    ELLE_DEBUG("set future")
+      this->_search_future = QtConcurrent::run(
+        [&,search,text] {
+          if (search.count('@') == 1 && email_checker.exactMatch(trimmed_search))
+            return std::vector<uint32_t>{gap_user_by_email(this->_state, text.c_str())};
+          else
+            return gap_users_search(this->_state, text.c_str());
+        });
   }
   else
   {
-    // Destroy future.
-    this->_search_watcher.cancel();
-    this->clearUsers();
+    ELLE_DEBUG("reset search future")
+    {
+      this->clearUsers();
+      this->_search_future = FutureSearchResult();
+    }
   }
 
+  ELLE_DEBUG("attach watcher")
+    this->_search_watcher.setFuture(this->_search_future);
 }
 
 /*------.
@@ -207,17 +199,30 @@ SendPanel::_clean_results()
 void
 SendPanel::_set_users()
 {
-  this->set_users(this->_search_watcher.result());
+  ELLE_TRACE_SCOPE("got result from future");
+  if (this->_peer_id != gap_null())
+  {
+    ELLE_DEBUG("ignore result because a user has already been picked");
+    return;
+  }
+
+  elle::SafeFinally restore_magnifier(
+    [&] { this->_search->set_icon(this->_magnifier); });
+
+  auto const& future = this->_search_watcher.future();
+  if (future.constBegin() != future.constEnd())
+    this->set_users(this->_search_watcher.result());
+  else
+  {
+    ELLE_DEBUG("future empty");
+  }
 }
 
 void
 SendPanel::set_users(std::vector<uint32_t> const& users)
 {
   ELLE_TRACE_SCOPE("%s: set users", *this);
-  elle::SafeFinally restore_magnifier(
-    [&] { this->_search->set_icon(this->_magnifier); });
   this->_clean_results();
-
   if (users.size() == 0)
   {
     this->_users->add_widget(
@@ -258,7 +263,6 @@ SendPanel::_set_peer(uint32_t uid)
 {
   ELLE_TRACE_SCOPE("%s: set peer: %s", *this, this->_user_models.at(uid));
   this->clearUsers();
-  this->_ignore_search_result = true;
   this->_search->set_text(this->_user_models.at(uid).fullname());
   this->_search->set_icon(this->_user_models.at(uid).avatar());
   this->_peer_id = uid;
@@ -277,6 +281,7 @@ SendPanel::_pick_user()
   }
   else
   {
+    ELLE_DEBUG("try to send to %s", this->_peer_id);
     this->_send();
   }
 }

@@ -126,7 +126,6 @@ private:
   ELLE_ATTRIBUTE(QPixmap, magnifier);
   ELLE_ATTRIBUTE(QMovie*, loading_icon);
   ELLE_ATTRIBUTE(QVector<uint32_t>, results);
-  ELLE_ATTRIBUTE(bool, ignore_search_result);
 
 protected:
   void
