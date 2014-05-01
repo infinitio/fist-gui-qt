@@ -222,7 +222,6 @@ def configure(cxx_toolkit = None,
 
         'NSIS_Plugins': str(drake.path_build(nsis_folder.name())),
         'NSIS_Includes': str(drake.path_build(nsis_folder.name())),
-        'architecture': cxx_toolkit.architecture()
       })
     content.update(architecture_dictionary(cxx_toolkit))
 
