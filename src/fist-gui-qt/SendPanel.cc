@@ -121,27 +121,29 @@ SendPanel::_search_changed(QString const& search)
     this->_peer_id = gap_null();
   }
 
-  if (search.size() != 0)
+  QString trimmed_search = search.trimmed();
+  if (trimmed_search.size() != 0)
   {
-    std::string text(search.toStdString());
+    std::string text(trimmed_search.toStdString());
 
     this->_search->set_icon(*this->_loading_icon);
     this->_search_future.cancel();
     this->_search_future = QtConcurrent::run(
       [&,search,text] {
-        if (search.count('@') == 1 && email_checker.exactMatch(search))
+        if (search.count('@') == 1 && email_checker.exactMatch(trimmed_search))
           return std::vector<uint32_t>{gap_user_by_email(this->_state, text.c_str())};
         else
           return gap_users_search(this->_state, text.c_str());
       });
-
     this->_search_watcher.setFuture(this->_search_future);
   }
   else
   {
-    this->_search_future = FutureSearchResult();
+    // Destroy future.
+    this->_search_watcher.cancel();
     this->clearUsers();
   }
+
 }
 
 /*------.
