@@ -84,13 +84,20 @@ UserModel::avatar() const
 
     if (res == gap_ok)
     {
-      ELLE_DEBUG("%s: get avatar data", *this);
-      QByteArray raw((char *) data, len);
-      QBuffer buff(&raw);
-      QImageReader reader;
-      reader.setDecideFormatFromContent(true);
-      reader.setDevice(&buff);
-      this->_avatar =  QPixmap::fromImageReader(&reader);
+      if (len > 0) // An avatar is avalaible. If not, keep the default.
+      {
+        ELLE_DEBUG("%s: get avatar data", *this);
+        QByteArray raw((char *) data, len);
+        QBuffer buff(&raw);
+        QImageReader reader;
+        reader.setDecideFormatFromContent(true);
+        reader.setDevice(&buff);
+        this->_avatar =  QPixmap::fromImageReader(&reader);
+      }
+      else if(this->_avatar.isNull())
+      {
+        this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
+      }
       this->_default_avatar = false;
     }
     else if(this->_avatar.isNull())
