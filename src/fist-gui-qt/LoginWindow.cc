@@ -241,6 +241,14 @@ LoginWindow::_login()
     return;
   }
 
+  if (pw.isEmpty())
+  {
+    ELLE_DEBUG("no password");
+    this->_message_field->setText("please enter your password");
+    this->_password_field->setFocus();
+    return;
+  }
+
   this->_message_field->setMovie(this->_loading_icon);
   this->_message_field->movie()->start();
 
