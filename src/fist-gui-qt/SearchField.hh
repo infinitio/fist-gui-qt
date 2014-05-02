@@ -36,7 +36,7 @@ public:
 `--------*/
 public:
   ELLE_ATTRIBUTE(QLabel*, icon);
-  ELLE_ATTRIBUTE(Field*, search_field);
+  ELLE_ATTRIBUTE_X(Field*, search_field);
 public:
   void
   set_icon(QPixmap const& pixmap);

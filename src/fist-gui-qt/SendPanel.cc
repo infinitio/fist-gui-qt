@@ -389,8 +389,8 @@ SendPanel::keyPressEvent(QKeyEvent* event)
     emit switch_signal();
   else if (event->key() == Qt::Key_Return)
     this->_pick_user();
-  else if (!event->text().isEmpty())
-    this->_search->insert_text(event->text());
+  else if (this->_search->search_field() != nullptr)
+    static_cast<QObject*>(this->_search->search_field())->event(event);
 }
 
 /*------------.
