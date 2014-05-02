@@ -44,7 +44,7 @@ SearchField::SearchField(QWidget* owner):
   {
     this->_icon->hide();
     this->_icon->setFixedSize(icon_size);
-    layout->addWidget(this->_icon, 0, Qt::AlignVCenter);
+    layout->addWidget(this->_icon);
   }
   // Search field.
   {
@@ -58,7 +58,7 @@ SearchField::SearchField(QWidget* owner):
             this, SLOT(text_changed(QString const&)));
     connect(this->_search_field, SIGNAL(returnPressed()),
             this, SIGNAL(return_pressed()));
-    layout->addWidget(this->_search_field, 0, Qt::AlignVCenter);
+    layout->addWidget(this->_search_field);
 
   }
   // Search delay.
@@ -104,6 +104,7 @@ SearchField::set_text(QString const& text)
 void
 SearchField::insert_text(QString const& text)
 {
+  ELLE_TRACE_SCOPE("%s: insert text: %s", *this, text);
   this->_search_field->insert(text);
   this->_search_field->setFocus();
 }
