@@ -192,10 +192,10 @@ LoginWindow::_login_attempt()
       fill_error_field(msg);                    \
       break                                     \
         /**/
-    ERR(gap_network_error, "Not connected to internet");
-    ERR(gap_meta_unreachable, "Unable to contact main server");
-    ERR(gap_meta_down_with_message, "Main server is down");
-    ERR(gap_trophonius_unreachable, "Unable to contact notification server");
+    ERR(gap_network_error, "No connection to the Internet");
+    ERR(gap_meta_unreachable, "Unable to contact Infinit server");
+    ERR(gap_meta_down_with_message, "Infinit server unavailable");
+    ERR(gap_trophonius_unreachable, "Unable to contact Infinit server");
     ERR(gap_email_password_dont_match, "Wrong email/password");
     ERR(gap_deprecated, "Your version is no longer supported");
     ERR(gap_email_not_confirmed, "You need to confirm your email\nCheck your inbox");
