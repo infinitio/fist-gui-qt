@@ -121,9 +121,7 @@ Updater::_handle_reply(QNetworkReply* reply)
   if (this->_reply->error() != QNetworkReply::NoError)
   {
     ELLE_WARN("something went wrong: %s", this->_reply->error());
-
-    emit update_error("network error", reply->errorString());
-
+    emit update_error("check your internet connection", reply->errorString());
     if (this->_reply->url() == this->_updater_url)
     {
       if (this->_installer->exists())
