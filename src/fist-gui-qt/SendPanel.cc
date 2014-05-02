@@ -390,7 +390,10 @@ SendPanel::keyPressEvent(QKeyEvent* event)
   else if (event->key() == Qt::Key_Return)
     this->_pick_user();
   else if (this->_search->search_field() != nullptr)
+  {
+    this->_search->search_field()->setFocus();
     static_cast<QObject*>(this->_search->search_field())->event(event);
+  }
 }
 
 /*------------.
