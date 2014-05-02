@@ -236,7 +236,8 @@ LoginWindow::_login()
   if (email.isEmpty() || !email_checker.exactMatch(email))
   {
     ELLE_DEBUG("invalid email field");
-    this->_message_field->setText("invalid email format");
+    this->_message_field->setText("this email address is invalid");
+    this->_email_field->setDisabled(false);
     this->_email_field->setFocus();
     return;
   }
@@ -244,7 +245,8 @@ LoginWindow::_login()
   if (pw.isEmpty())
   {
     ELLE_DEBUG("no password");
-    this->_message_field->setText("please enter your password");
+    this->_message_field->setText("enter your password");
+    this->_password_field->setDisabled(false);
     this->_password_field->setFocus();
     return;
   }
