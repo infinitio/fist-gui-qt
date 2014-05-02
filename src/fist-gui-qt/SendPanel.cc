@@ -118,8 +118,8 @@ SendPanel::_search_changed(QString const& search)
     this->_search->set_icon(*this->_loading_icon);
     ELLE_DEBUG("set future")
       this->_search_future = QtConcurrent::run(
-        [&,search,text] {
-          if (search.count('@') == 1 && email_checker.exactMatch(trimmed_search))
+        [&,trimmed_search,text] {
+          if (trimmed_search.count('@') == 1 && email_checker.exactMatch(trimmed_search))
             return std::vector<uint32_t>{gap_user_by_email(this->_state, text.c_str())};
           else
             return gap_users_search(this->_state, text.c_str());
@@ -234,6 +234,11 @@ SendPanel::set_users(std::vector<uint32_t> const& users)
   {
     for (auto uid: users)
     {
+      if (uid == gap_null())
+      {
+        ELLE_WARN("got a user with an null id");
+        continue;
+      }
       this->_results.push_back(uid);
       if (this->_user_models.find(uid) == this->_user_models.end())
         this->_user_models.emplace(uid, UserModel(this->_state, uid));
@@ -245,7 +250,8 @@ SendPanel::set_users(std::vector<uint32_t> const& users)
       this->_users->add_widget(widget, ListWidget::Position::Top);
     }
   }
-  this->_users_part_separator->show();
+  if (!this->_users->widgets().isEmpty())
+    this->_users_part_separator->show();
 }
 
 
@@ -263,10 +269,13 @@ SendPanel::clearUsers()
 void
 SendPanel::_set_peer(uint32_t uid)
 {
-  ELLE_TRACE_SCOPE("%s: set peer: %s", *this, this->_user_models.at(uid));
+  ELLE_TRACE_SCOPE("%s: set peer: %s", *this, uid);
   this->clearUsers();
-  this->_search->set_text(this->_user_models.at(uid).fullname());
-  this->_search->set_icon(this->_user_models.at(uid).avatar());
+  if (uid != gap_null()) // For email invitation.
+  {
+    this->_search->set_text(this->_user_models.at(uid).fullname());
+    this->_search->set_icon(this->_user_models.at(uid).avatar());
+  }
   this->_peer_id = uid;
 }
 
@@ -274,10 +283,8 @@ void
 SendPanel::_pick_user()
 {
   ELLE_TRACE_SCOPE("%s: pick user", *this);
-  if (this->_peer_id == gap_null())
+  if (this->_peer_id == gap_null() && !this->_results.empty())
   {
-    if (this->_results.empty())
-      return;
     auto uid = this->_results.last();
     this->_set_peer(uid);
   }
@@ -335,18 +342,19 @@ SendPanel::_send()
 
   filenames[this->_files.size()] = nullptr;
 
-  if (this->_peer_id != gap_null())
-  {
-    ELLE_TRACE_SCOPE("send files to %s", this->_user_models.at(this->_peer_id));
-    gap_send_files(_state, this->_peer_id, filenames, "");
-  }
-  else
+  if (this->_peer_id == gap_null()) // Email invitation
   {
     ELLE_TRACE_SCOPE("send files to %s", this->_search->text());
-    gap_send_files_by_email(_state,
+    gap_send_files_by_email(this->_state,
                             this->_search->text().toStdString().c_str(),
                             filenames,
                             "");
+
+  }
+  else
+  {
+    ELLE_TRACE_SCOPE("send files to %s", this->_user_models.at(this->_peer_id));
+    gap_send_files(this->_state, this->_peer_id, filenames, "");
   }
 
   auto** cpy = filenames;
@@ -379,7 +387,9 @@ SendPanel::keyPressEvent(QKeyEvent* event)
   ELLE_DEBUG_SCOPE("key pressed: %s", event->key());
   if (event->key() == Qt::Key_Escape)
     emit switch_signal();
-  if (!event->text().isEmpty())
+  else if (event->key() == Qt::Key_Return)
+    this->_pick_user();
+  else if (!event->text().isEmpty())
     this->_search->insert_text(event->text());
 }
 
