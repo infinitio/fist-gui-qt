@@ -9,7 +9,7 @@
 ELLE_LOG_COMPONENT("infinit.FIST.SearchField");
 
 static int const margin = 7;
-static QSize const icon_size(20, 20);
+static QSize const icon_size(16, 16);
 
 SearchField::Field::Field(QWidget* parent)
   : QLineEdit(parent)
@@ -38,20 +38,36 @@ SearchField::SearchField(QWidget* owner):
           this, SLOT(text_changed(QString const&)));
 
   this->setContentsMargins(margin, 0, margin, 0);
-  this->_icon->hide();
-  this->_icon->setFixedSize(icon_size);
   auto* layout = new QHBoxLayout(this);
-  layout->addWidget(this->_icon);
-  layout->addWidget(this->_search_field);
-  this->_search_field->setFrame(false);
-  view::send::search_field::style(*this->_search_field);
-  this->_search_field->setContentsMargins(margin, 0, margin, 0);
-  this->_search_field->setPlaceholderText(view::send::search_field::text);
-  this->_search_field->setFixedHeight(this->height());
-  this->_search_field->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-  this->_search_delay.setSingleShot(true);
-  connect(&this->_search_delay, SIGNAL(timeout()),
-          this, SLOT(delay_expired()));
+
+  // Icon.
+  {
+    this->_icon->hide();
+    this->_icon->setFixedSize(icon_size);
+    layout->addWidget(this->_icon, 0, Qt::AlignVCenter);
+  }
+  // Search field.
+  {
+    this->_search_field->setFrame(false);
+    view::send::search_field::style(*this->_search_field);
+    this->_search_field->setContentsMargins(margin, 0, margin, 0);
+    this->_search_field->setPlaceholderText(view::send::search_field::text);
+    this->_search_field->setFixedHeight(this->height());
+    this->_search_field->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    connect(this->_search_field, SIGNAL(textChanged(QString const&)),
+            this, SLOT(text_changed(QString const&)));
+    connect(this->_search_field, SIGNAL(returnPressed()),
+            this, SIGNAL(return_pressed()));
+    layout->addWidget(this->_search_field, 0, Qt::AlignVCenter);
+
+  }
+  // Search delay.
+  {
+    this->_search_delay.setSingleShot(true);
+    connect(&this->_search_delay, SIGNAL(timeout()),
+            this, SLOT(delay_expired()));
+  }
+
 }
 
 void
