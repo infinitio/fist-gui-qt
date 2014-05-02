@@ -59,7 +59,7 @@ class Fist::Prologue
 
   Prologue()
   {
-#ifdef INFINIT_PRODUCTION_BUILD
+#ifdef FIST_PRODUCTION_BUILD
 
     if (!elle::os::inenv("ELLE_LOG_LEVEL"))
     {
@@ -94,7 +94,7 @@ class Fist::Prologue
           elle::os::getenv("INFINIT_LOG_FILE",
                            elle::os::getenv("ELLE_LOG_FILE"))));
     }
-#endif // INFINIT_PRODUCTION_BUILD
+#endif // FIST_PRODUCTION_BUILD
 
     ELLE_TRACE_SCOPE("ininitialize Prologue");
   }
@@ -104,7 +104,7 @@ static
 gap_State*
 gap_state()
 {
-#ifdef INFINIT_PRODUCTION_BUILD
+#ifdef FIST_PRODUCTION_BUILD
   return gap_new(true);
 #else
   return gap_new(false);
@@ -310,7 +310,7 @@ Fist::_set_lock()
   if (this->_filelock.exists()) // Previous session has not be cleaned.
   {
     ELLE_TRACE_SCOPE("a lock file is present");
-#ifdef INFINIT_PRODUCTION_BUILD
+#ifdef FIST_PRODUCTION_BUILD
     auto previous_log = logger ? logger->previous_log_file() : "";
 
     // gap_self_email could be great but the user is not logged at this stage
