@@ -22,6 +22,7 @@ def architecture_dictionary(cxx_toolkit):
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
               prefix = drake.Path('/usr/local'),
+              fist_production_build = False,
               boost = None,
               git = None,
               qt = None,
@@ -47,6 +48,8 @@ def configure(cxx_toolkit = None,
     boost = drake.cxx.boost.Boost(cxx_toolkit = cxx_toolkit)
     cxx_config += boost.config()
 
+  if fist_production_build:
+    cxx_config.define('FIST_PRODUCTION_BUILD')
   qt.plug(cxx_toolkit)
 
   # Qt use file generation tools, which create function with
@@ -81,7 +84,6 @@ def configure(cxx_toolkit = None,
     cxx_config.lib('QtCore')
     # Remove the command line windows on qt.
     cxx_config.flag("-Wl,-subsystem,windows")
-
   cxx_config.add_local_include_path('src')
 
   with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
