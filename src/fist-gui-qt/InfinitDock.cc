@@ -69,8 +69,7 @@ InfinitDock::InfinitDock(gap_State* state):
   _send_files(new QAction(tr("&Send files..."), this)),
   _report_a_problem(new QAction(tr("&Report a problem"), this)),
   _quit(new QAction(tr("&Quit"), this)),
-  _state(state),
-  _first_hide(true)
+  _state(state)
 {
   g_dock = this;
 

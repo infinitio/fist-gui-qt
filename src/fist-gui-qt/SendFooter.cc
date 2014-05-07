@@ -14,15 +14,3 @@ SendFooter::SendFooter():
                                   QSizePolicy::Minimum));
   this->_layout->addWidget(this->_send);
 }
-
-IconButton*
-SendFooter::back() const
-{
-  return this->_back;
-}
-
-IconButton*
-SendFooter::send() const
-{
-  return this->_send;
-}

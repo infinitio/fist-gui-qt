@@ -349,7 +349,6 @@ SendPanel::_send()
                             this->_search->text().toStdString().c_str(),
                             filenames,
                             "");
-
   }
   else
   {

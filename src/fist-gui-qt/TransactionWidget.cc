@@ -117,6 +117,9 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
     infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
     infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
 
+    this->_accept_button->setToolTip("Accept");
+    this->_reject_button->setToolTip("Reject");
+
     layout->addWidget(this->_accept_reject_area);
   }
 

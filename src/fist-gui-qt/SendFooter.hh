@@ -1,6 +1,8 @@
 #ifndef SENDFOOTER_HH
 # define SENDFOOTER_HH
 
+# include <elle/attribute.hh>
+
 # include <fist-gui-qt/Footer.hh>
 # include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/ShapeButton.hh>
@@ -17,16 +19,9 @@ public:
   virtual
   ~SendFooter() = default;
 
-public:
-  IconButton*
-  back() const;
-
-  IconButton*
-  send() const;
-
 private:
-  IconButton* _back;
-  IconButton* _send;
+  ELLE_ATTRIBUTE_R(IconButton*, back);
+  ELLE_ATTRIBUTE_R(IconButton*, send);
 };
 
 

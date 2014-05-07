@@ -165,8 +165,7 @@ private:
   QAction* _send_files;
   QAction* _report_a_problem;
   QAction* _quit;
-  gap_State* _state;
-  bool _first_hide;
+  ELLE_ATTRIBUTE_X(gap_State*, state);
 
   Q_OBJECT
 

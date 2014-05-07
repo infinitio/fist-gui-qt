@@ -36,8 +36,6 @@ UserWidget::UserWidget(UserModel const& model,
     }
     this->_layout->addLayout(texts);
   }
-  // this->_layout->addWidget(new QLabel(this->_model.fullname()));
-  // this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 }
 
 QSize

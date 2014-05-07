@@ -84,9 +84,9 @@ private:
   QLabel* _peer_status;
   QLayout* _layout;
   ELLE_ATTRIBUTE_R(IconButton*, accept_button);
-  IconButton* _reject_button;
+  ELLE_ATTRIBUTE_R(IconButton*, reject_button);
   QWidget* _accept_reject_area;
-  IconButton* _cancel_button;
+  ELLE_ATTRIBUTE_R(IconButton*, cancel_button);
   QLabel* _mtime;
   ELLE_ATTRIBUTE_R(QLabel*, status);
   QWidget* _info_area;

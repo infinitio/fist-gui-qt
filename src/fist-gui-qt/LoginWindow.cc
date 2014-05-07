@@ -18,9 +18,9 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
-# include <fist-gui-qt/settings.hh>
+#include <fist-gui-qt/settings.hh>
 
-ELLE_LOG_COMPONENT("infinti.FIST.LoginWindow");
+ELLE_LOG_COMPONENT("infinit.FIST.LoginWindow");
 
 static QRegExp email_checker(regexp::email,
                              Qt::CaseInsensitive);
