@@ -97,11 +97,11 @@ InfinitDock::InfinitDock(gap_State* state):
           SLOT(_position_panel()));
 
   {
-    connect(&this->_transaction_panel->footer()->send(),
+    connect(this->_transaction_panel->footer()->send(),
             SIGNAL(released()),
             this,
             SLOT(_show_send_view()));
-    connect(&this->_transaction_panel->footer()->menu(),
+    connect(this->_transaction_panel->footer()->menu(),
             SIGNAL(released()),
             this,
             SLOT(_show_menu()));

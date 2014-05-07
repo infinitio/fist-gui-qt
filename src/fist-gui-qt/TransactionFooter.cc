@@ -13,15 +13,3 @@ TransactionFooter::TransactionFooter():
                                          QSizePolicy::Minimum));
   this->_layout->addWidget(this->_send);
 }
-
-IconButton const&
-TransactionFooter::send() const
-{
-  return *this->_send;
-}
-
-IconButton const&
-TransactionFooter::menu() const
-{
-  return *this->_menu;
-}
