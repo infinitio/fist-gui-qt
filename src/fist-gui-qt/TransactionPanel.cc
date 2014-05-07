@@ -79,6 +79,7 @@ TransactionPanel::add_transaction(gap_State* state,
     this->_transactions.emplace(tid, TransactionModel(state, tid));
 
   auto const& transaction = this->_transactions.at(tid);
+  emit new_transaction(tid);
 
   if (!transaction.is_sender())
   {
@@ -92,20 +93,22 @@ TransactionPanel::add_transaction(gap_State* state,
           : elle::sprintf("%s files", transaction.files().size())
       ).c_str());
   }
-
   auto widget = new TransactionWidget(this->_transactions.at(tid));
 
-  connect(widget, SIGNAL(on_transaction_accepted(uint32_t)),
+  connect(widget, SIGNAL(transaction_accepted(uint32_t)),
           this, SLOT(_on_transaction_accepted(uint32_t)));
-  connect(widget, SIGNAL(on_transaction_rejected(uint32_t)),
+  connect(widget, SIGNAL(transaction_rejected(uint32_t)),
           this, SLOT(_on_transaction_rejected(uint32_t)));
-  connect(widget, SIGNAL(on_transaction_canceled(uint32_t)),
+  connect(widget, SIGNAL(transaction_canceled(uint32_t)),
           this, SLOT(_on_transaction_canceled(uint32_t)));
 
   this->_list->add_widget(widget,
                           init ?
                             ListWidget::Position::Bottom :
                             ListWidget::Position::Top);
+  this->update();
+  this->updateGeometry();
+  emit new_transaction_shown(widget);
   return widget;
 }
 

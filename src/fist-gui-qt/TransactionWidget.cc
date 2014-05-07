@@ -284,14 +284,14 @@ void
 TransactionWidget::accept()
 {
   ELLE_TRACE_SCOPE("%s: accept transaction", *this);
-  emit on_transaction_accepted(this->_transaction.id());
+  emit transaction_accepted(this->_transaction.id());
 }
 
 void
 TransactionWidget::reject()
 {
   ELLE_TRACE_SCOPE("%s: reject transaction", *this);
-  emit on_transaction_rejected(this->_transaction.id());
+  emit transaction_rejected(this->_transaction.id());
 }
 
 void
@@ -299,7 +299,7 @@ TransactionWidget::cancel()
 {
   ELLE_TRACE_SCOPE("%s: cancel transaction", *this);
 
-  emit on_transaction_canceled(this->_transaction.id());
+  emit transaction_canceled(this->_transaction.id());
 }
 
 typedef std::pair<QString, uint32_t> Time;
@@ -309,7 +309,7 @@ QDateTime_to_friendly_duration(QDateTime const& time)
 {
   auto secs = time.secsTo(QDateTime::currentDateTimeUtc());
   std::vector<std::pair<int, QString>> printers{
-    {86400, "day"}, {3600, "hour"}, {60, "min"}, {1, "sec"}};
+    {31556926, "year"}, {2419200, "month"}, {604800, "week"}, {86400, "day"}, {3600, "hour"}, {60, "min"}, {1, "sec"}};
 
   for (auto const& duration_pair: printers)
     if (secs > duration_pair.first)
@@ -396,6 +396,9 @@ TransactionWidget::update_status()
     { gap_transaction_rejected,
         StatusUpdater(QString(":/icons/error.png"), false, "Rejected") },
   };
+
+  if (this->_transaction.status() == gap_transaction_finished)
+    emit transaction_finished(this->_transaction.id());
 
   tooltips.at(this->_transaction.status())(*this->_status);
   if (this->_transaction.status() == gap_transaction_transferring)

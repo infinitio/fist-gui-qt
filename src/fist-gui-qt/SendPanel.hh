@@ -45,6 +45,15 @@ signals:
   void
   drag_left();
 
+  void
+  shown();
+
+  void
+  peer_found();
+
+  void
+  file_added();
+
 public Q_SLOTS:
   void
   add_file(QUrl const& path);
@@ -82,6 +91,9 @@ public:
   void
   clearUsers();
 
+  bool
+  peer_valid() const;
+
 protected slots:
   void
   _set_users();
@@ -92,6 +104,12 @@ Q_SIGNALS:
 
   void
   choose_files();
+
+  void
+  sent();
+
+  void
+  canceled();
 
 /*--------------.
 | Drag and drop |
@@ -108,13 +126,13 @@ public:
 
 private:
   ELLE_ATTRIBUTE(gap_State*, state);
-  ELLE_ATTRIBUTE(SearchField*, search);
+  ELLE_ATTRIBUTE_R(SearchField*, search);
   ELLE_ATTRIBUTE(HorizontalSeparator*, users_part_separator);
   ELLE_ATTRIBUTE(ListWidget*, users);
   ELLE_ATTRIBUTE(HorizontalSeparator*, file_part_seperator);
   ELLE_ATTRIBUTE(ListWidget*, file_list);
   ELLE_ATTRIBUTE(HorizontalSeparator*, adder_part_seperator);
-  ELLE_ATTRIBUTE(AddFileWidget*, file_adder);
+  ELLE_ATTRIBUTE_R(AddFileWidget*, file_adder);
 
 /*-------------.
 | SearchResult |
@@ -136,7 +154,8 @@ protected:
 `-------*/
 private:
   std::unordered_map<uint32_t, UserModel> _user_models;
-  QHash<QUrl, FileItem*> _files;
+  typedef QHash<QUrl, FileItem*> Files;
+  ELLE_ATTRIBUTE_R(Files, files);
 
   void
   on_show() override;

@@ -50,6 +50,13 @@ public:
   updateTransaction(gap_State* state,
                     uint32_t tid);
 
+signals:
+  void
+  new_transaction(uint32_t id);
+
+  void
+  new_transaction_shown(TransactionWidget* widget);
+
 private:
   ListWidget* _list;
   gap_State* _state;

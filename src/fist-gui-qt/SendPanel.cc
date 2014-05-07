@@ -80,6 +80,9 @@ SendPanel::SendPanel(gap_State* state):
   connect(this->footer()->send(), SIGNAL(clicked()),
           this, SLOT(_send()));
 
+  connect(this->footer()->back(), SIGNAL(clicked()),
+          this, SIGNAL(canceled()));
+
   connect(this->_search, SIGNAL(search_ready(QString const&)),
           this, SLOT(_search_changed(QString const&)));
 
@@ -88,6 +91,12 @@ SendPanel::SendPanel(gap_State* state):
 
   connect(this, SIGNAL(drag_left()),
           this->_file_adder, SLOT(on_left()));
+
+  connect(this, SIGNAL(sent()),
+          this, SIGNAL(switch_signal()));
+
+  connect(this, SIGNAL(canceled()),
+          this, SIGNAL(switch_signal()));
 
   //XXX: Could be factored.
   this->_users_part_separator->hide();
@@ -151,6 +160,8 @@ SendPanel::add_file(QUrl const& path)
 
   if (this->_files.contains(path))
     return;
+
+  emit file_added();
 
   this->_adder_part_seperator->show();
 
@@ -252,6 +263,8 @@ SendPanel::set_users(std::vector<uint32_t> const& users)
   }
   if (!this->_users->widgets().isEmpty())
     this->_users_part_separator->show();
+  else
+    emit peer_found();
 }
 
 
@@ -277,6 +290,7 @@ SendPanel::_set_peer(uint32_t uid)
     this->_search->set_icon(this->_user_models.at(uid).avatar());
   }
   this->_peer_id = uid;
+  emit peer_found();
 }
 
 void
@@ -295,16 +309,22 @@ SendPanel::_pick_user()
   }
 }
 
+bool
+SendPanel::peer_valid() const
+{
+  static QRegExp email_checker(regexp::email,
+                               Qt::CaseInsensitive);
+
+  return this->_peer_id != gap_null() ||
+    email_checker.exactMatch(this->_search->text());
+}
+
 void
 SendPanel::_send()
 {
   ELLE_TRACE_SCOPE("%s: send", *this);
 
-  static QRegExp email_checker(regexp::email,
-                               Qt::CaseInsensitive);
-
-  if (this->_peer_id == gap_null() &&
-      !email_checker.exactMatch(this->_search->text()))
+  if (!this->peer_valid())
   {
     ELLE_DEBUG("peer is not set");
     this->_search->setFocus();
@@ -364,7 +384,7 @@ SendPanel::_send()
   }
   ::free((void*) filenames);
 
-  emit switch_signal();
+  emit sent();
 }
 
 void
@@ -385,7 +405,7 @@ SendPanel::keyPressEvent(QKeyEvent* event)
 {
   ELLE_DEBUG_SCOPE("key pressed: %s", event->key());
   if (event->key() == Qt::Key_Escape)
-    emit switch_signal();
+    emit canceled();
   else if (event->key() == Qt::Key_Return)
     this->_pick_user();
   else if (this->_search->search_field() != nullptr)
@@ -402,6 +422,7 @@ void
 SendPanel::on_show()
 {
   emit set_background_color(Qt::white);
+  emit shown();
   this->_search->setFocus();
   this->update();
 }
