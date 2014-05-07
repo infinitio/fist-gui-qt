@@ -10,6 +10,8 @@
 # include <QTimer>
 # include <QWidget>
 
+# include <elle/attribute.hh>
+
 # include <surface/gap/enums.hh>
 # include <surface/gap/fwd.hh>
 
@@ -19,9 +21,7 @@
 class InfinitDock:
   public RoundShadowWidget
 {
-  // This class is used to create tasks that need done first.
-  // The need comes from initialization wich create some objects that have a
-  // behavior in their contructor, which may require attributes from the dock.
+  // This class is used to create tasks that need to be done first.
   // Using the same pattern than pimpl makes it easy to update without polluting
   // the api.
 private:
@@ -77,12 +77,6 @@ public Q_SLOTS:
   _register_panel(Panel* panel);
 
   void
-  hide_dock();
-
-  void
-  show_dock();
-
-  void
   toggle_dock(bool toogle_only = false);
 
   void pick_files();
@@ -108,6 +102,16 @@ public slots:
   void
   _back_from_send_view();
 
+  void
+  _systray_message_clicked();
+
+private:
+  void
+  showEvent(QShowEvent* event) override;
+
+  void
+  hideEvent(QHideEvent* event) override;
+
 private:
   void
   focusOutEvent(QFocusEvent* event) override;
@@ -115,7 +119,7 @@ private:
 private:
   void _switch_view(Panel* target);
 
-  TransactionPanel* _transaction_panel;
+  ELLE_ATTRIBUTE(TransactionPanel*, transaction_panel);
 //  RoundShadowWidget* _panel;
 
 private Q_SLOTS:

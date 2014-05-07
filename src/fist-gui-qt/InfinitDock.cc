@@ -87,7 +87,7 @@ InfinitDock::InfinitDock(gap_State* state):
   this->_systray->setContextMenu(_systray_menu);
 
   this->connect(this->_systray, SIGNAL(messageClicked()),
-                this, SLOT(show_dock()));
+                this, SLOT(_systray_message_clicked()));
 
   this->_transaction_panel = new TransactionPanel(state);
 
@@ -157,16 +157,17 @@ InfinitDock::InfinitDock(gap_State* state):
 
   this->_show_transactions_view();
 
-  QTimer *timer = new QTimer;
-  connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
-  timer->start(1000);
+  ELLE_DEBUG("start the update loop")
+  {
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
+    timer->start(1000);
+  }
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_report_a_problem, SIGNAL(triggered()),
                 this, SLOT(report_a_problem()));
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
-
-  this->hide_dock();
 }
 
 InfinitDock::~InfinitDock()
@@ -184,9 +185,9 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::Unknown:
     case QSystemTrayIcon::MiddleClick:
+    case QSystemTrayIcon::DoubleClick:
       this->toggle_dock();
       break;
-    case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Context:
       break;
     default:
@@ -201,7 +202,14 @@ InfinitDock::_systray_message(QString const& title,
 {
   ELLE_TRACE_SCOPE("%s: show system tray message: %s - %s",
                    *this, title, message);
-  this->_systray->showMessage(title, message, icon, 3000);
+  if (!this->isVisible())
+    this->_systray->showMessage(title, message, icon, 3000);
+}
+
+void
+InfinitDock::_systray_message_clicked()
+{
+  this->show();
 }
 
 /*------.
@@ -233,11 +241,11 @@ InfinitDock::transactionPanel()
 }
 
 void
-InfinitDock::show_dock()
+InfinitDock::showEvent(QShowEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: show dock", *this);
+  ELLE_LOG_SCOPE("%s: show dock", *this);
 
-  this->show();
+  this->updateGeometry();
   this->update();
   this->activateWindow();
   this->setFocus(Qt::ActiveWindowFocusReason);
@@ -245,11 +253,9 @@ InfinitDock::show_dock()
 }
 
 void
-InfinitDock::hide_dock()
+InfinitDock::hideEvent(QHideEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: hide dock", *this);
-
-  this->hide();
+  ELLE_LOG_SCOPE("%s: hide dock", *this);
 
   if (!fist::settings()["dock"].exists("first_minimizing_popup"))
   {
@@ -269,9 +275,9 @@ InfinitDock::toggle_dock(bool toggle_only)
   ELLE_TRACE_SCOPE("%s: toggle dock", *this);
 
   if (this->isVisible() and !toggle_only)
-    this->hide_dock();
+    this->hide();
   else
-    this->show_dock();
+    this->show();
 }
 
 
@@ -368,7 +374,7 @@ InfinitDock::pick_files()
     for (auto const& file: selected)
       this->_send_panel->add_file(QUrl::fromLocalFile(file));
     this->_switch_view(this->_send_panel);
-    this->show_dock();
+    this->show();
   }
 }
 
@@ -479,7 +485,7 @@ void
 InfinitDock::_back_from_send_view()
 {
   this->_show_transactions_view();
-  this->hide_dock();
+  this->hide();
 }
 
 void
@@ -493,11 +499,11 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
     event->accept();
     return;
   }
-
   Super::focusOutEvent(event);
-
   if (event->reason() != Qt::MouseFocusReason)
-    this->hide_dock();
+  {
+    this->hide();
+  }
 }
 
 
@@ -532,7 +538,7 @@ InfinitDock::_switch_view(Panel* panel)
   panel->on_show();
 
   // XXX: Dirty, but Qt is in trouble to calculate the size of hidden widget.
-  // So everty time a new panel is shown, make sure that the size matches the
+  // So every time a new panel is shown, make sure that the size matches the
   // content.
   this->update();
   this->adjustSize();

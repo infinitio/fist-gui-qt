@@ -352,6 +352,7 @@ Fist::logged_in()
   this->_dock.reset(new InfinitDock(this->_state.get()));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
+  this->_dock->hide();
 }
 
 void
@@ -359,7 +360,7 @@ Fist::_new_local_socket_connection()
 {
   ELLE_TRACE_SCOPE("%s: someone attempting to connect", *this);
   if (this->_dock)
-    this->_dock->show_dock();
+    this->_dock->show();
   else if (this->_login_window)
     this->_login_window->setFocus();
   auto socket = this->_lock->nextPendingConnection();
