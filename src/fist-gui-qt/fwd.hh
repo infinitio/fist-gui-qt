@@ -1,5 +1,5 @@
-#ifndef FWD_HH
-# define FWD_HH
+#ifndef FIST_GUI_QT_FWD_HH
+# define FIST_GUI_QT_FWD_HH
 
 // Windows.
 class InfinitDock;
