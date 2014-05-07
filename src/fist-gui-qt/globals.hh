@@ -79,6 +79,13 @@ namespace view
   QColor const
   background(0xF8, 0xF8, 0xF8);
 
+  namespace tooltip
+  {
+    static
+    TextStyle const
+    style(QFont("Arial", 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
+  }
+
   namespace login
   {
     static
