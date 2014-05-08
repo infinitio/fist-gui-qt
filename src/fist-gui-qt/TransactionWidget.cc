@@ -39,7 +39,7 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _mtime(new QLabel),
   _status(new QLabel),
   _info_area(new QWidget),
-  _timer(nullptr),
+  _progress_timer(nullptr),
   _mtime_updater(new QTimer(this))
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
@@ -242,14 +242,15 @@ TransactionWidget::_update()
   }
 
   if (this->_transaction.status() == gap_transaction_transferring &&
-      this->_timer == nullptr)
+      this->_progress_timer == nullptr)
   {
     ELLE_TRACE("run progress timer");
     this->_peer_avatar->setTransactionCount(this->_transaction.files().size());
 
-    _timer = new QTimer;
-    connect(_timer, SIGNAL(timeout()), this, SLOT(update_progress()));
-    _timer->start(1000);
+    this->_progress_timer.reset(new QTimer);
+    connect(this->_progress_timer.get(), SIGNAL(timeout()),
+            this, SLOT(update_progress()));
+    this->_progress_timer->start(AvatarWidget::progress_update_interval);
 
     connect(this,
             SIGNAL(onProgressChanged(float)),
@@ -257,11 +258,10 @@ TransactionWidget::_update()
             SLOT(setProgress(float)));
   }
   else if (this->_transaction.status() != gap_transaction_transferring &&
-           this->_timer != nullptr)
+           this->_progress_timer != nullptr)
   {
     setProgress(0);
-    delete this->_timer;
-    this->_timer = nullptr;
+    this->_progress_timer.reset();
   }
 
   if (g_finals.contains(this->_transaction.status()))

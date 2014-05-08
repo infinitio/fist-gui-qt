@@ -26,14 +26,21 @@ static QColor const progress_color(
 
 std::map<uint32_t, QPixmap> g_avatars;
 
-AvatarWidget::AvatarWidget():
-  _picture(total_size, total_size),
-  _transaction_count(0),
-  _progress(0)
+AvatarWidget::AvatarWidget()
+  : _picture(total_size, total_size)
+  , _transaction_count(0)
+  , _progress(0)
+  , _smooth_progress(0)
+  , _progress_animation(new QPropertyAnimation(this, "smooth_progress"))
 {
   this->setMinimumSize(total_size, total_size);
   this->setMaximumSize(total_size, total_size);
   this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+  {
+    this->_progress_animation->setDuration(AvatarWidget::progress_update_interval);
+    this->_progress_animation->setEasingCurve(QEasingCurve::Linear);
+  }
 }
 
 AvatarWidget::AvatarWidget(QPixmap const& pixmap):
@@ -137,16 +144,27 @@ void
 AvatarWidget::setTransactionCount(int transactionCount)
 {
   this->_transaction_count = transactionCount;
-  update();
+  this->update();
   Q_EMIT onTransactionCountChanged(transactionCount);
 }
 
 void
 AvatarWidget::setProgress(float progress)
 {
+  this->_progress_animation->stop();
+  this->_progress_animation->setStartValue(this->_progress);
+  this->_progress_animation->setEndValue(progress);
+  this->_progress_animation->start();
   this->_progress = progress;
-  update();
+  this->update();
   Q_EMIT onProgressChanged(progress);
+}
+
+void
+AvatarWidget::set_smooth_progress(float progress)
+{
+  this->_smooth_progress = progress;
+  this->update();
 }
 
 /*--------.
@@ -193,7 +211,7 @@ AvatarWidget::paintEvent(QPaintEvent*)
     painter.setPen(pen);
     painter.drawArc(progress_region,
                     badge_angle * 16,
-                    -this->_progress * 360 * 16);
+                    -this->_smooth_progress * 360 * 16);
   }
   // Transaction count badge
   if (this->_transaction_count > 0)

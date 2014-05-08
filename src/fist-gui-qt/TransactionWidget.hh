@@ -92,7 +92,7 @@ private:
   QLabel* _mtime;
   ELLE_ATTRIBUTE_R(QLabel*, status);
   QWidget* _info_area;
-  QTimer* _timer;
+  ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);
   QTimer* _mtime_updater;
 
 /*----------.

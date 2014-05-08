@@ -1,11 +1,14 @@
 #ifndef AVATARWIDGET_HH
 # define AVATARWIDGET_HH
 
+# include <map>
+
 # include <QWidget>
 # include <QByteArray>
 # include <QPixmap>
+# include <QPropertyAnimation>
 
-# include <map>
+# include <elle/attribute.hh>
 
 # include <fist-gui-qt/utils.hh>
 
@@ -39,6 +42,14 @@ class AvatarWidget:
 `-------------*/
 
 public:
+  static
+  const int
+  progress_update_interval = 1000; // in ms.
+
+  Q_PROPERTY(float smooth_progress
+             READ smooth_progress
+             WRITE set_smooth_progress);
+
   Q_PROPERTY(float progress
              READ progress
              WRITE setProgress
@@ -51,6 +62,8 @@ public:
 public Q_SLOTS:
   void setTransactionCount(int value);
   void setProgress(float value);
+  void
+  set_smooth_progress(float value);
 
 Q_SIGNALS:
   void onTransactionCountChanged(int);
@@ -61,6 +74,8 @@ private:
 
   Q_PROPERTY_R(int, transaction_count, transactionCount);
   Q_PROPERTY_R(float, progress, progress);
+  Q_PROPERTY_R(float, smooth_progress, smooth_progress);
+  ELLE_ATTRIBUTE(QPropertyAnimation*, progress_animation);
 
 /*--------.
 | Drawing |
