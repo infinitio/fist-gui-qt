@@ -166,14 +166,43 @@ private:
   QAction* _report_a_problem;
   QAction* _quit;
   ELLE_ATTRIBUTE_X(gap_State*, state);
-
-  Q_OBJECT
+  ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
 
   /*----------.
   | Printable |
   `----------*/
   void
   print(std::ostream& stream) const override;
+
+  /*-----------.
+  | Friendship |
+  `-----------*/
+  friend fist::onboarding::Onboarder;
+
+  /*-----------.
+  | Onboarding |
+  `-----------*/
+#ifndef FIST_PRODUCTION_BUILD
+private:
+  QAction* _start_onboarding_action;
+#endif
+
+private slots:
+  void
+  _start_onboarded_reception();
+
+  void
+  _start_onboarded_sending();
+
+private slots:
+  void
+  _on_onboarded_reception_completed();
+
+  void
+  _on_onboarded_sending_completed();
+
+private:
+  Q_OBJECT
 };
 
 inline

@@ -167,6 +167,9 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/log/CircularSelector.cc",
       "src/fist-gui-qt/log/CircularSelector.hh",
       "src/fist-gui-qt/main.cc",
+
+      "src/fist-gui-qt/onboarding/Onboarder.hh",
+      "src/fist-gui-qt/onboarding/Onboarder.cc",
     )
 
   application = drake.cxx.Executable(

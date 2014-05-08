@@ -26,5 +26,11 @@ class TransactionWidget;
 class SearchResultWidget;
 class HorizontalSeparator;
 class SendFooter;
-
+namespace fist
+{
+  namespace onboarding
+  {
+    class Onboarder;
+  }
+}
 #endif
