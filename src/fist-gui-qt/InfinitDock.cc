@@ -28,11 +28,14 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.Dock");
 
+static const QString
+onboarded_reception_complete("reception_complete");
+static const QString
+onboarded_sending_complete("sending_complete");
+
 /*-------------.
 | Construction |
 `-------------*/
-
-static int const dock_size = 60;
 
 // XXX: This is dirty but there is no good way to emit a signal from a static
 // method. Unfortunately, gap api, which is in C, forces to attach C callbacks.
@@ -172,7 +175,7 @@ InfinitDock::InfinitDock(gap_State* state)
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
 
   ELLE_DEBUG("check if onboarded reception has been done")
-    if (!fist::settings()["onboarding"].exists("receive_complete"))
+    if (!fist::settings()["onboarding"].exists(onboarded_reception_complete))
     {
       int delay = 1000;
       ELLE_TRACE_SCOPE("run onboarded reception in %s ms", delay);
@@ -279,7 +282,7 @@ InfinitDock::hideEvent(QHideEvent* event)
 {
   ELLE_LOG_SCOPE("%s: hide dock", *this);
 
-  if (fist::settings()["onboarding"].exists("reception_complete") &&
+  if (fist::settings()["onboarding"].exists(onboarded_reception_complete) &&
       !fist::settings()["dock"].exists("first_minimizing_popup"))
   {
     fist::settings()["dock"].set("first_minimizing_popup", "1");
@@ -625,10 +628,10 @@ InfinitDock::_on_onboarded_reception_completed()
   // Store the version to allow to rerun the onboarding on future version by
   // checking the previously stored one.
   fist::settings()["onboarding"].set(
-    "reception_completed", QString(INFINIT_VERSION));
+    onboarded_reception_complete, QString(INFINIT_VERSION));
 
   ELLE_DEBUG("check if onboarded sending has been done")
-    if (!fist::settings()["onboarding"].exists("sending_completed"))
+    if (!fist::settings()["onboarding"].exists(onboarded_sending_complete))
     {
       int delay = 4000;
       ELLE_TRACE_SCOPE("run onboarded sending in %s ms", delay);
@@ -649,7 +652,7 @@ InfinitDock::_on_onboarded_sending_completed()
   // Store the version to allow to rerun the onboarding on future version by
   // checking the previously stored one.
   fist::settings()["onboarding"].set(
-    "sending_completed", QString(INFINIT_VERSION));
+    onboarded_sending_complete, QString(INFINIT_VERSION));
 }
 
 void
