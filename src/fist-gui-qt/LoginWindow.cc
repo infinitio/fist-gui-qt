@@ -18,7 +18,7 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
-#include <fist-gui-qt/settings.hh>
+#include <fist-gui-qt/Settings.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.LoginWindow");
 

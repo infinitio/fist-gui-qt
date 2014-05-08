@@ -23,7 +23,7 @@
 #include <fist-gui-qt/SendPanel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
-#include <fist-gui-qt/settings.hh>
+#include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Dock");
