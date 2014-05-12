@@ -8,6 +8,7 @@
 
 # include <unordered_map>
 # include <vector>
+# include <unordered_set>
 
 # include <elle/Printable.hh>
 # include <elle/attribute.hh>
@@ -18,10 +19,29 @@
 # include <fist-gui-qt/SendFooter.hh>
 # include <fist-gui-qt/UserModel.hh>
 # include <fist-gui-qt/fwd.hh>
+# include <fist-gui-qt/State.hh>
 
 class SendPanel:
   public Panel
 {
+public:
+  class Selected
+  {
+  public:
+    Selected(QString const& email)
+      : _id(gap_null())
+      , _email(email)
+    {}
+
+    Selected(uint32_t id)
+      : _id(id)
+      , _email()
+    {}
+
+    ELLE_ATTRIBUTE_R(uint32_t, id);
+    ELLE_ATTRIBUTE_R(QString, email);
+  };
+
 /*------.
 | Types |
 `------*/
@@ -33,7 +53,7 @@ public:
 | Construction |
 `-------------*/
 public:
-  SendPanel(gap_State* state);
+  SendPanel(fist::State& state);
 
 /*------.
 | Files |
@@ -67,13 +87,20 @@ private slots:
   _send();
 
   void
+  _search_ready(QString const& search);
+
+  void
   _search_changed(QString const& search);
 
   void
-  _set_peer(uint32_t uid);
+  _add_peer(uint32_t uid);
+
+  void
+  _remove_peer(uint32_t uid);
 
   void
   _pick_user();
+
 public slots:
   void
   avatar_available(uint32_t uid);
@@ -86,7 +113,7 @@ public:
   _clean_results();
 
   void
-  set_users(std::vector<uint32_t> const& users);
+  set_users(fist::State::Users const&, bool local);
 
   void
   clearUsers();
@@ -97,6 +124,14 @@ public:
 protected slots:
   void
   _set_users();
+
+
+  // XXX
+  void
+  _expand_files();
+
+  void
+  _shrink_files();
 
 Q_SIGNALS:
   void
@@ -125,25 +160,24 @@ public:
   dropEvent(QDropEvent *event) override;
 
 private:
-  ELLE_ATTRIBUTE(gap_State*, state);
+  ELLE_ATTRIBUTE(fist::State&, state);
   ELLE_ATTRIBUTE_R(SearchField*, search);
   ELLE_ATTRIBUTE(HorizontalSeparator*, users_part_separator);
   ELLE_ATTRIBUTE(ListWidget*, users);
   ELLE_ATTRIBUTE(HorizontalSeparator*, file_part_seperator);
-  ELLE_ATTRIBUTE(ListWidget*, file_list);
-  ELLE_ATTRIBUTE(HorizontalSeparator*, adder_part_seperator);
   ELLE_ATTRIBUTE_R(AddFileWidget*, file_adder);
+  ELLE_ATTRIBUTE(HorizontalSeparator*, adder_part_seperator);
+  ELLE_ATTRIBUTE(ListWidget*, file_list);
 
 /*-------------.
 | SearchResult |
 `-------------*/
-  ELLE_ATTRIBUTE(uint32_t, peer_id);
-  typedef QFuture<std::vector<uint32_t>> FutureSearchResult;
-  ELLE_ATTRIBUTE(FutureSearchResult, search_future);
-  ELLE_ATTRIBUTE(QFutureWatcher<std::vector<uint32_t>>, search_watcher);
+  typedef std::unordered_map<uint32_t, SearchResultWidget*> Results;
+  ELLE_ATTRIBUTE(Results, results);
+  typedef std::unordered_set<uint32_t> Recipients;
+  ELLE_ATTRIBUTE(Recipients, recipients);
   ELLE_ATTRIBUTE(QPixmap, magnifier);
   ELLE_ATTRIBUTE(QMovie*, loading_icon);
-  ELLE_ATTRIBUTE(QVector<uint32_t>, results);
 
 protected:
   void
@@ -153,7 +187,7 @@ protected:
 | Layout |
 `-------*/
 private:
-  std::unordered_map<uint32_t, UserModel> _user_models;
+  std::unordered_map<uint32_t, std::unique_ptr<UserModel>> _user_models;
   typedef QHash<QUrl, FileItem*> Files;
   ELLE_ATTRIBUTE_R(Files, files);
 
@@ -183,5 +217,7 @@ public:
   void
   print(std::ostream& stream) const override;
 };
+
+# include <fist-gui-qt/SendPanel.hxx>
 
 #endif

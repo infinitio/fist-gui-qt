@@ -143,6 +143,7 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/TransactionFooter.hh",
       "src/fist-gui-qt/TransactionModel.cc",
       "src/fist-gui-qt/TransactionModel.hh",
+      "src/fist-gui-qt/TransactionModel.hxx",
       "src/fist-gui-qt/TransactionPanel.cc",
       "src/fist-gui-qt/TransactionPanel.hh",
       "src/fist-gui-qt/TransactionWidget.cc",
@@ -151,6 +152,7 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/TransactionWindow.hh",
       "src/fist-gui-qt/UserModel.cc",
       "src/fist-gui-qt/UserModel.hh",
+      "src/fist-gui-qt/UserModel.hxx",
       "src/fist-gui-qt/UserWidget.cc",
       "src/fist-gui-qt/UserWidget.hh",
       "src/fist-gui-qt/globals.hh",
@@ -170,6 +172,21 @@ def configure(cxx_toolkit = None,
 
       "src/fist-gui-qt/onboarding/Onboarder.hh",
       "src/fist-gui-qt/onboarding/Onboarder.cc",
+
+      "src/fist-gui-qt/TwoStateIconButton.hh",
+      "src/fist-gui-qt/TwoStateIconButton.cc",
+
+      "src/fist-gui-qt/State.hh",
+      "src/fist-gui-qt/State.cc",
+
+
+
+
+
+
+      # ###########
+      # "src/fist-gui-qt/Exp/ExpandingArea.hh",
+      # "src/fist-gui-qt/Exp/ExpandingArea.cc",
     )
 
   application = drake.cxx.Executable(
@@ -178,8 +195,49 @@ def configure(cxx_toolkit = None,
     cxx_toolkit,
     cxx_config)
 
+  with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
+    sources = drake.nodes(
+#      "resources/fist-gui-qt/resources.qrc",
+
+      "src/fist-gui-qt/RoundShadowWidget.cc",
+      "src/fist-gui-qt/RoundShadowWidget.hh",
+      "src/fist-gui-qt/IconButton.cc",
+      "src/fist-gui-qt/IconButton.hh",
+      "src/fist-gui-qt/Panel.cc",
+      "src/fist-gui-qt/Panel.hh",
+      "src/fist-gui-qt/SmoothLayout.cc",
+      "src/fist-gui-qt/SmoothLayout.hh",
+      "src/fist-gui-qt/Footer.cc",
+      "src/fist-gui-qt/Footer.hh",
+
+      "src/fist-gui-qt/SmoothScrollBar.cc",
+      "src/fist-gui-qt/SmoothScrollBar.hh",
+
+      "src/fist-gui-qt/TextListItem.cc",
+      "src/fist-gui-qt/TextListItem.hh",
+      "src/fist-gui-qt/ListItem.cc",
+      "src/fist-gui-qt/ListItem.hh",
+      "src/fist-gui-qt/ListWidget.cc",
+      "src/fist-gui-qt/ListWidget.hh",
+
+      "src/fist-gui-qt/HorizontalSeparator.cc",
+      "src/fist-gui-qt/HorizontalSeparator.hh",
+
+      "src/fist-gui-qt/Exp/main.cc",
+      "src/fist-gui-qt/Exp/ExpandingArea.hh",
+      "src/fist-gui-qt/Exp/ExpandingArea.cc",
+    )
+
+  exp = drake.cxx.Executable(
+    'bin/Exp',
+    sources + libraries,
+    cxx_toolkit,
+    cxx_config)
+
+
   build = drake.Rule('build')
   build << application
+  build << exp
 
   check = drake.Rule('check')
 

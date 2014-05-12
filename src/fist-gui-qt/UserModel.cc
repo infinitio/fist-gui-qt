@@ -12,13 +12,15 @@
 ELLE_LOG_COMPONENT("infinit.FIST.UserModel");
 
 UserModel::UserModel(gap_State* state,
-                     uint32_t id):
-  _state(state),
-  _id(id),
-  _fullname((const char *) nullptr),
-  _avatar(),
-  _default_avatar(true),
-  _new_avatar(true)
+                     uint32_t id)
+  : _state(state)
+  , _id(id)
+  , _fullname()
+  , _handle()
+  , _avatar()
+  , _transactions()
+  , _default_avatar(true)
+  , _new_avatar(true)
 {
   ELLE_TRACE_SCOPE("%s: create user model", *this);
 }
@@ -53,11 +55,27 @@ UserModel::handle() const
   return this->_handle;
 }
 
-uint32_t
-UserModel::id() const
+UserModel::Transactions const&
+UserModel::transactions() const
 {
-  return this->_id;
+  ELLE_TRACE_SCOPE("%s: get transactions", *this);
+
+  if (this->_transactions.empty())
+  {
+    uint32_t* trs = gap_transactions(this->_state);
+
+    for (uint32_t v = 0; trs[v] != gap_null(); v += 1)
+      if (this->id() == gap_transaction_sender_id(this->_state, trs[v]) ||
+          this->id() == gap_transaction_recipient_id(this->_state, trs[v]))
+        this->_transactions.emplace(new TransactionModel(this->_state, trs[v]));
+
+    gap_transactions_free(trs);
+    ELLE_DEBUG("fetched 'transactions': %s", this->_transactions);
+  }
+
+  return this->_transactions;
 }
+
 
 bool
 UserModel::new_avatar() const
@@ -98,6 +116,7 @@ UserModel::avatar() const
       {
         this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
       }
+      emit avatar_updated();
       this->_default_avatar = false;
     }
     else if(this->_avatar.isNull())

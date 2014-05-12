@@ -7,10 +7,13 @@
 #include <QWidget>
 
 #include <fist-gui-qt/SmoothLayout.hh>
+#include <elle/log.hh>
 
 /*-------------.
 | Construction |
 `-------------*/
+
+ELLE_LOG_COMPONENT("fooo");
 
 SmoothLayout::SmoothLayout(QWidget* owner):
   Super(owner),
@@ -19,7 +22,8 @@ SmoothLayout::SmoothLayout(QWidget* owner):
   _maximum_height(0),
   _maximum_width(0),
   _height_animation(new QPropertyAnimation(this, "heightHint")),
-  _width_animation(new QPropertyAnimation(this, "widthHint"))
+  _width_animation(new QPropertyAnimation(this, "widthHint")),
+  _vlayout(new QVBoxLayout(this))
 {
   this->_height_animation->setDuration(1);
   // this->_height_animation->setEasingCurve(QEasingCurve::InOutQuad);
@@ -37,13 +41,58 @@ SmoothLayout::childEvent(QChildEvent* event)
   Super::childEvent(event);
   if (event->added() || event->removed())
     if (dynamic_cast<QWidget*>(event->child()))
+    {
+      auto* widget = static_cast<QWidget*>(event->child());
+      if (event->added())
+      {
+        ELLE_WARN("install");
+        widget->installEventFilter(this);
+      }
+      else if (event->removed())
+      {
+        ELLE_WARN("remove");
+        widget->removeEventFilter(this);
+      }
+      // this->_vlayout->addWidget(widget);
       this->_layout();
+    }
+}
+
+// Filter anchor events to detect changes like visibility changed,
+// position changed, modal window spawned...
+bool
+SmoothLayout::eventFilter(QObject *obj, QEvent *event)
+{
+  if (!dynamic_cast<QWidget*>(obj))
+    return Super::eventFilter(obj, event);
+
+//  auto action = [&] { std::cerr << "event " << event->type() << std::endl; this->_layout(); this->updateGeometry(); };
+  auto action = [&] { this->_layout(); this->update(); this->repaint(); }; //std::cerr << "event " << event->type() << std::endl; this->_layout(); this->updateGeometry(); };
+  if (event->type() == QEvent::Hide)
+    action();
+  else if (event->type() == QEvent::Show)
+    action();
+  else if (event->type() == QEvent::GraphicsSceneResize)
+    action();
+  else if (event->type() == QEvent::Resize)
+    action();
+  else if (event->type() == QEvent::LayoutRequest)
+    action();
+  else if (event->type() == QEvent::Move)
+    action();
+  else if (event->type() == QEvent::Paint);
+  else if (event->type() == QEvent::Leave);
+  else if (event->type() == QEvent::Enter);
+  // else
+  //   std::cerr << "nop: " << event->type() << std::endl;
+
+  return Super::eventFilter(obj, event);
 }
 
 void
 SmoothLayout::resizeEvent(QResizeEvent* event)
 {
-  // std::cerr << "resize " << event->size() << std::endl;
+  std::cerr << "resize " << event->size() << std::endl;
   auto widgets = this->_child_widgets();
   QSize size(event->size());
   // Compute total children height hint and number of growing children.
@@ -107,6 +156,8 @@ QSize
 SmoothLayout::sizeHint() const
 {
   return QSize(this->_width_hint, this->_height_hint);
+  // res.
+  //return QSize(, this->_height_hint);
 }
 
 QWidgetList
@@ -134,7 +185,10 @@ SmoothLayout::_layout()
     if (widget->isHidden()) continue;
     QSize hint(widget->sizeHint());
     if (hint.height() > 0)
+    {
+      // ELLE_LOG("%s: height: %s", widget, hint.height());
       height += hint.height();
+    }
     width = std::max(width, hint.width());
   }
 
@@ -151,8 +205,8 @@ SmoothLayout::_layout()
       this->_width_animation->start();
     }
   }
-
-  this->setHeightHint(height);
+  // ELLE_LOG("update height: %s", height)
+    this->setHeightHint(height);
   this->setWidthHint(width);
 }
 
@@ -161,12 +215,17 @@ SmoothLayout::setHeightHint(int value)
 {
   if (value != this->_height_hint)
   {
+    // ELLE_LOG("yeap");
     if (this->_maximum_height > 0)
       this->_height_hint = std::min(value, this->_maximum_height);
     else
       this->_height_hint = value;
     Q_EMIT onHeightHintChanged();
     updateGeometry();
+  }
+  else
+  {
+    // ELLE_ERR("nop");
   }
 }
 
@@ -206,6 +265,39 @@ SmoothLayout::setMaximumWidth(int value)
   }
 }
 
+void
+SmoothLayout::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_F5)
+  {
+    std::cerr << "repaint" << std::endl;
+    this->repaint(0, 0, 10, 10);
+    this->repaint();
+  }
+  else if (event->key() == Qt::Key_F4)
+  {
+    std::cerr << "update" << std::endl;
+    this->update();
+  }
+  else if (event->key() == Qt::Key_F3)
+  {
+    std::cerr << "updage geo" << std::endl;
+    this->updateGeometry();
+  }
+  else if (event->key() == Qt::Key_F2)
+  {
+    std::cerr << "layout" << std::endl;
+    this->resize(0, 0);
+    this->_layout();
+  }
+  else if (event->key() == Qt::Key_F1)
+  {
+    std::cerr << "resize" << std::endl;
+    this->adjustSize();
+  }
+
+  Super::keyPressEvent(event);
+}
 /*----------.
 | Printable |
 `----------*/

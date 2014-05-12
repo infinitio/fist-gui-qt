@@ -35,7 +35,7 @@ namespace
   {
     TextStyle(QFont const& font,
               QColor const& color = QColor(0x25, 0x25, 0x25),
-              Qt::Alignment const& aligment = Qt::AlignLeft):
+              Qt::Alignment const& aligment = Qt::AlignLeft | Qt::AlignVCenter):
       _font(font),
       _color(color),
       _alignement(aligment)

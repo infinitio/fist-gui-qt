@@ -5,6 +5,7 @@
 #include <fist-gui-qt/TextListItem.hh>
 
 #include <elle/log.hh>
+#include <elle/assert.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.TransactionPanel");
 
@@ -76,9 +77,9 @@ TransactionPanel::add_transaction(gap_State* state,
   }
 
   if (this->_transactions.find(tid) == this->_transactions.end())
-    this->_transactions.emplace(tid, TransactionModel(state, tid));
+    this->_transactions[tid].reset(new TransactionModel(state, tid));
 
-  auto const& transaction = this->_transactions.at(tid);
+  auto const& transaction = *this->_transactions.at(tid);
   emit new_transaction(tid);
 
   if (!transaction.is_sender())
@@ -93,7 +94,7 @@ TransactionPanel::add_transaction(gap_State* state,
           : elle::sprintf("%s files", transaction.files().size())
       ).c_str());
   }
-  auto widget = new TransactionWidget(this->_transactions.at(tid));
+  auto widget = new TransactionWidget(transaction);
 
   connect(widget, SIGNAL(transaction_accepted(uint32_t)),
           this, SLOT(_on_transaction_accepted(uint32_t)));
@@ -123,21 +124,13 @@ TransactionPanel::avatar_available(uint32_t uid)
 {
   ELLE_TRACE_SCOPE("%s: avatar available for user %s", *this, uid);
   // XXX: Ugly, but no better way for the moment.
-  bool update_list = false;
   for (auto& tr: this->_transactions)
   {
-    if (tr.second.peer_id() == uid)
+    if (tr.second->peer_id() == uid)
     {
-      update_list = true;
-      ELLE_DEBUG("update %s's avatar", tr.second.peer_fullname().toStdString());
-      tr.second.avatar_available();
+      ELLE_DEBUG("update %s's avatar", tr.second->peer_fullname().toStdString());
+      tr.second->avatar_available();
     }
-  }
-
-  if (update_list)
-  {
-    ELLE_TRACE("%s: update transaction list", *this);
-    this->_list->reload();
   }
 }
 
@@ -203,7 +196,8 @@ TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 {
   ELLE_TRACE_SCOPE("%s: update transaction %s", *this, id);
 
-  auto const& transaction = this->_transactions.at(id);
+  ELLE_ASSERT(this->_transactions.at(id) != nullptr);
+  auto const& transaction = *this->_transactions.at(id);
 
   switch (transaction.status())
   {

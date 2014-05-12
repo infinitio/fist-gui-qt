@@ -42,6 +42,9 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
   _progress_timer(nullptr),
   _mtime_updater(new QTimer(this))
 {
+  connect(&this->_transaction, SIGNAL(avatar_updated()),
+          this, SLOT(_on_avatar_updated()));
+
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
   this->_peer_status->setPixmap(QPixmap(":/icons/status.png"));
@@ -190,18 +193,18 @@ TransactionWidget::trigger()
 }
 
 void
+TransactionWidget::_on_avatar_updated()
+{
+  this->_peer_avatar->setPicture(this->_transaction.avatar());
+}
+
+void
 TransactionWidget::_update()
 {
   ELLE_TRACE_SCOPE("%s: update", *this);
   this->_info_area->show();
   this->_cancel_button->hide();
   this->_accept_reject_area->hide();
-
-  if (this->_transaction.new_avatar())
-  {
-    ELLE_DEBUG("new avatar");
-    this->_peer_avatar->setPicture(this->_transaction.avatar());
-  }
 
   ELLE_DEBUG("peer is %sconnected",
              this->_transaction.peer_connection_status() ? "" : "dis");
@@ -366,7 +369,6 @@ TransactionWidget::update_status()
     {
       stream << "StatusUpdater";
     }
-
   };
 
   static std::map<gap_TransactionStatus, StatusUpdater> tooltips{

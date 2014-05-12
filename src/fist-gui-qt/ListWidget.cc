@@ -136,7 +136,7 @@ ListWidget::_layout()
     this->_width_hint = std::max(this->_width_hint, widget->sizeHint().width());
 
   int rows = 0;
-  int fixed_height = -1;
+  int fixed_height = this->maxRows() == 0 ? 0 : -1;
   for (auto widget: this->_widgets)
   {
     int widget_height = widget->sizeHint().height();

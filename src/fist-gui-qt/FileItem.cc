@@ -77,18 +77,15 @@ FileItem::FileItem(QUrl const& path):
     this->_icon->setPixmap(icon_provider.icon(this->_file).pixmap(18));
 
   this->_layout->addWidget(this->_icon);
-  this->_layout->addItem(new QSpacerItem(4, 0,
-                                  QSizePolicy::Minimum, QSizePolicy::Minimum));
+  this->_layout->addSpacing(4);
   this->_layout->addWidget(this->_name);
-  this->_layout->addItem(new QSpacerItem(0, 0,
-                                  QSizePolicy::Expanding, QSizePolicy::Minimum));
+  this->_layout->addStretch();
   this->_layout->addWidget(this->_size);
-  this->_layout->addItem(new QSpacerItem(4, 0,
-                                  QSizePolicy::Minimum, QSizePolicy::Minimum));
+  this->_layout->addSpacing(4);
   this->_layout->addWidget(this->_remove);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  this->setFixedHeight(42);
+  this->setFixedHeight(36);
   this->adjustSize();
 }
 

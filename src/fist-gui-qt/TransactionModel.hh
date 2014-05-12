@@ -1,5 +1,5 @@
-#ifndef TRANSACTIONMODEL_HH
-# define TRANSACTIONMODEL_HH
+#ifndef FIST_GUI_QT_TRANSACTIONMODEL_HH
+# define FIST_GUI_QT_TRANSACTIONMODEL_HH
 
 # include <boost/logic/tribool.hpp>
 
@@ -14,6 +14,7 @@
 # include <surface/gap/gap.hh>
 
 class TransactionModel:
+  public QObject,
   public elle::Printable
 {
 public:
@@ -60,7 +61,7 @@ public:
   new_avatar() const;
 
   void
-  avatar_available();
+  avatar_available() const;
 
 private:
   gap_State* _state;
@@ -79,12 +80,31 @@ private:
   mutable bool _default_avatar;
   mutable bool _new_avatar;
 
+  /*-------------.
+  | Orderability |
+  `-------------*/
+public:
+  bool
+  operator ==(TransactionModel const& t) const;
+
+  bool
+  operator <(TransactionModel const& t) const;
+
+signals:
+  void
+  avatar_updated() const;
+
+private:
   /*----------.
   | Printable |
   `----------*/
   void
   print(std::ostream& stream) const override;
+
+private:
+  Q_OBJECT;
 };
 
+# include <fist-gui-qt/TransactionModel.hxx>
 
 #endif

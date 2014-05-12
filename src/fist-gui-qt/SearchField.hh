@@ -72,6 +72,9 @@ Q_SIGNALS:
   void
   search_ready(QString const& text);
 
+  void
+  search_changed(QString const& text);
+
 private slots:
   void
   delay_expired();

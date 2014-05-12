@@ -9,7 +9,7 @@
 ELLE_LOG_COMPONENT("infinit.FIST.SearchField");
 
 static int const margin = 7;
-static QSize const icon_size(16, 16);
+static QSize const icon_size(14, 14);
 
 SearchField::Field::Field(QWidget* parent)
   : QLineEdit(parent)
@@ -37,7 +37,7 @@ SearchField::SearchField(QWidget* owner):
   connect(this->_search_field, SIGNAL(textChanged(QString const&)),
           this, SLOT(text_changed(QString const&)));
 
-  this->setContentsMargins(margin, 0, margin, 0);
+  this->setContentsMargins(16, 0, 0, 0);
   auto* layout = new QHBoxLayout(this);
 
   // Icon.
@@ -45,6 +45,8 @@ SearchField::SearchField(QWidget* owner):
     this->_icon->hide();
     this->_icon->setFixedSize(icon_size);
     layout->addWidget(this->_icon);
+  }
+  {
   }
   // Search field.
   {
@@ -135,6 +137,8 @@ SearchField::keyPressEvent(QKeyEvent* event)
 void
 SearchField::text_changed(QString const& text)
 {
+  emit search_changed(text);
+
   if (text.isEmpty())
     emit search_ready(this->_search_field->text());
   else

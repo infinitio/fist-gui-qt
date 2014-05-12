@@ -139,9 +139,9 @@ TransactionModel::new_avatar() const
 }
 
 void
-TransactionModel::avatar_available()
+TransactionModel::avatar_available() const
 {
-  this->_new_avatar = true;
+  this->avatar();
 }
 
 QPixmap const&
@@ -170,6 +170,7 @@ TransactionModel::avatar() const
         this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
       }
       this->_default_avatar = false;
+      emit avatar_updated();
     }
     else if(this->_avatar.isNull())
     {
@@ -180,6 +181,18 @@ TransactionModel::avatar() const
 
   this->_new_avatar = false;
   return this->_avatar;
+}
+
+bool
+TransactionModel::operator ==(TransactionModel const& t) const
+{
+  return this->id() == t.id();
+}
+
+bool
+TransactionModel::operator <(TransactionModel const& t) const
+{
+  return this->id() < t.id();
 }
 
 void

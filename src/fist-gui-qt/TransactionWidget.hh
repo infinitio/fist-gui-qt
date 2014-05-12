@@ -79,6 +79,9 @@ public slots:
   void update_status();
   void update_mtime();
 
+private slots:
+  void _on_avatar_updated();
+
 private:
   ELLE_ATTRIBUTE_R(TransactionModel const&, transaction);
   ELLE_ATTRIBUTE_R(AvatarWidget*, peer_avatar);

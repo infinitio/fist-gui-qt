@@ -16,6 +16,7 @@
 # include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/RoundShadowWidget.hh>
+# include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class InfinitDock:
@@ -27,6 +28,7 @@ class InfinitDock:
 private:
   class Prologue;
   std::unique_ptr<Prologue> _prologue;
+  ELLE_ATTRIBUTE(fist::State, state);
 
 /*------.
 | Types |
@@ -165,7 +167,6 @@ private:
   QAction* _send_files;
   QAction* _report_a_problem;
   QAction* _quit;
-  ELLE_ATTRIBUTE_X(gap_State*, state);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
 
   /*----------.

@@ -70,7 +70,7 @@ public:
                   gap_TransactionStatus status);
 
 private:
-  std::unordered_map<uint32_t, TransactionModel> _transactions;
+  std::unordered_map<uint32_t, std::unique_ptr<TransactionModel>> _transactions;
 
 private:
   Q_OBJECT;

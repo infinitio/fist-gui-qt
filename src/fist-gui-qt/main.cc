@@ -1,11 +1,8 @@
+#include <iostream>
+
 #include <stdexcept>
 
-#include <QApplication>
-
-#include <elle/log.hh>
-
 #include <fist-gui-qt/Fist.hh>
-#include <fist-gui-qt/LoginWindow.hh>
 
 int
 main(int argc, char** argv)

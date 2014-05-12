@@ -1,6 +1,11 @@
 #ifndef FIST_GUI_QT_FWD_HH
 # define FIST_GUI_QT_FWD_HH
 
+// State.
+class State;
+class UserModel;
+class TransactionModel;
+
 // Windows.
 class InfinitDock;
 class LoadingDialog;

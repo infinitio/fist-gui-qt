@@ -44,7 +44,7 @@ namespace fist
     Onboarder::receive_file(QString const& file)
     {
       this->_transactions[gap_onboarding_receive_transaction(
-          this->_dock->state(), file.toStdString().c_str(), 6)] = nullptr;
+          this->_dock->_state.state(), file.toStdString().c_str(), 6)] = nullptr;
     }
 
     void

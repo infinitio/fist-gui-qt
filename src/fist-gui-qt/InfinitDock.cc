@@ -63,8 +63,9 @@ class InfinitDock::Prologue
 // the graphical part is fully load, and then, initialize it.
 InfinitDock::InfinitDock(gap_State* state)
   : _prologue(new Prologue(state))
+  , _state(state)
   , _transaction_panel(nullptr)
-  , _send_panel(new SendPanel(state))
+  , _send_panel(new SendPanel(this->_state))
   , _menu(new QMenu(this))
   , _logo(":/icons/menu-bar-fire@2x.png")
   , _systray(new QSystemTrayIcon(this))
@@ -72,7 +73,6 @@ InfinitDock::InfinitDock(gap_State* state)
   , _send_files(new QAction(tr("&Send files..."), this))
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
   , _quit(new QAction(tr("&Quit"), this))
-  , _state(state)
 #ifndef FIST_PRODUCTION_BUILD
   , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
 #endif
@@ -156,9 +156,9 @@ InfinitDock::InfinitDock(gap_State* state)
   this->_menu->addAction(_quit);
 
   // Register gap callback.
-  gap_connection_callback(_state, InfinitDock::connection_status_cb);
-  gap_user_status_callback(_state, InfinitDock::user_status_cb);
-  gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
+  gap_connection_callback(_state.state(), InfinitDock::connection_status_cb);
+  gap_user_status_callback(_state.state(), InfinitDock::user_status_cb);
+  gap_avatar_available_callback(_state.state(), InfinitDock::avatar_available_cb);
 
   this->_show_transactions_view();
 
@@ -340,8 +340,8 @@ InfinitDock::report_a_problem()
       auto std_text = text.toStdString();
       ELLE_DEBUG("user message as std::string: %s", std_text);
       gap_send_user_report(
-        this->_state,
-        gap_self_email(this->_state),
+        this->_state.state(),
+        gap_self_email(this->_state.state()),
         std_text.c_str(),
         logfile.c_str(),
         elle::sprintf("%s on %s",
@@ -659,7 +659,7 @@ void
 InfinitDock::_update()
 {
   ELLE_DUMP("%s: poll", *this);
-  auto res = gap_poll(_state);
+  auto res = gap_poll(_state.state());
 
   if (!res)
     ELLE_ERR("poll failed: %s", res);

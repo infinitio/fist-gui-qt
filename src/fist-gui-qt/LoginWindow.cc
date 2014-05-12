@@ -165,7 +165,8 @@ LoginWindow::~LoginWindow()
 void
 LoginWindow::_login_attempt()
 {
-  elle::SafeFinally unlock_login([&] { this->_enable(); });
+  elle::SafeFinally unlock_login([&] {
+      this->_enable(); this->_password_field->setFocus(); });
 
   auto status = this->_login_future.result();
   if (status == gap_ok)
