@@ -72,7 +72,7 @@ Q_SIGNALS:
 | Panel |
 `------*/
 public Q_SLOTS:
-  TransactionPanel&
+  MainPanel&
   transactionPanel();
 
   void
@@ -121,7 +121,7 @@ private:
 private:
   void _switch_view(Panel* target);
 
-  ELLE_ATTRIBUTE(TransactionPanel*, transaction_panel);
+  ELLE_ATTRIBUTE(MainPanel*, transaction_panel);
 //  RoundShadowWidget* _panel;
 
 private Q_SLOTS:
@@ -131,8 +131,13 @@ private Q_SLOTS:
                    QSystemTrayIcon::MessageIcon icon);
 
 private:
-  SendPanel* _send_panel;
+  fist::sendview::Panel* _send_panel;
 
+  Panel* _next_panel;
+
+private slots:
+  void
+  _branle();
 /*-----.
 | Menu |
 `-----*/

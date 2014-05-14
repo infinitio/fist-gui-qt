@@ -14,12 +14,13 @@
 # include <fist-gui-qt/TransactionFooter.hh>
 # include <fist-gui-qt/TransactionWidget.hh>
 # include <fist-gui-qt/Panel.hh>
+# include <fist-gui-qt/gui/Tabs.hh>
 
-class TransactionPanel:
+class MainPanel:
   public Panel
 {
 public:
-  TransactionPanel(gap_State* state, QWidget* parent = nullptr);
+  MainPanel(gap_State* state, QWidget* parent = nullptr);
   static void transaction_cb(uint32_t id, gap_TransactionStatus status);
 
 public Q_SLOTS:
@@ -58,7 +59,9 @@ signals:
   new_transaction_shown(TransactionWidget* widget);
 
 private:
-  ListWidget* _list;
+  Tabber* _tabs;
+  ListWidget* _transaction_list;
+//  ListWidget* _link_list;
   gap_State* _state;
 
 public:

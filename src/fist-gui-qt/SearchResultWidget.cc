@@ -24,14 +24,24 @@ SearchResultWidget::SearchResultWidget(UserModel const& model,
             this, SLOT(_on_avatar_updated()));
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
-  this->_layout->setContentsMargins(13, 0, 20, 0);
+  this->_layout->setSpacing(8);
+  this->_layout->setContentsMargins(10, 4, 10, 4);
   this->_layout->addWidget(this->_avatar);
   {
+    auto* vlayout = new QVBoxLayout;
+    vlayout->setSpacing(0);
+    vlayout->setContentsMargins(0, 0, 0, 0);
     auto fullname = new QLabel(this->_model.fullname());
     view::send::user::fullname::style(*fullname);
-    this->_layout->addWidget(fullname);
+    vlayout->addWidget(fullname);
+    if (this->_model.handle().size() > 0)
+    {
+      auto handle = new QLabel(this->_model.handle());
+      view::send::user::handle::style(*handle);
+      vlayout->addWidget(handle);
+    }
+    this->_layout->addLayout(vlayout, 1);
   }
-  this->_layout->addStretch();
   this->_layout->addWidget(this->_selector);
 
   this->setToolTip(
@@ -49,13 +59,14 @@ QSize
 SearchResultWidget::sizeHint() const
 {
   auto size = this->_layout->minimumSize();
-  return QSize(this->widthHint(), size.height());
+  return QSize(Super::sizeHint().width(), size.height());
 }
 
 void
 SearchResultWidget::trigger()
 {
   ELLE_TRACE_SCOPE("%s: clicked", *this);
+  this->_selector->click();
 }
 
 void

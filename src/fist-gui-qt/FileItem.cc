@@ -5,7 +5,7 @@
 
 #include <fist-gui-qt/FileItem.hh>
 #include <fist-gui-qt/globals.hh>
-
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.FileItem");
 
@@ -21,23 +21,6 @@ namespace
     }
   };
 }
-
-static
-QString
-readable_size(qint64 size)
-{
-  int i = 0;
-  std::vector<QString> units = {
-    "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
-
-  while (size > 1024)
-  {
-    size /= 1024.f;
-    i++;
-  }
-
-  return QString("%1").arg(size) + " " + units[i];
-};
 
 FileItem::FileItem(QUrl const& path):
   ListItem(nullptr, view::send::file::background, false),
@@ -57,7 +40,7 @@ FileItem::FileItem(QUrl const& path):
   this->_layout->setAlignment(Qt::AlignVCenter);
   ELLE_TRACE_SCOPE("%s: construction with path %s", *this, path);
 
-  this->setContentsMargins(6, 0, 6, 0);
+  this->setContentsMargins(6, 0, 13, 0);
 
   // Name.
   {
@@ -87,6 +70,8 @@ FileItem::FileItem(QUrl const& path):
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   this->setFixedHeight(36);
   this->adjustSize();
+
+//  this->setStyleSheet("background-color:blue;");
 }
 
 void

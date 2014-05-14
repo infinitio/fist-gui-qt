@@ -42,9 +42,10 @@ protected:
   virtual
   void
   childEvent(QChildEvent* event) override;
-private:
+protected:
   void
   _layout();
+private:
   QWidgetList
   _child_widgets(bool visible_only = false) const;
 
@@ -86,14 +87,12 @@ Q_SIGNALS:
   void onWidthHintChanged();
   void onMaximumHeightChanged();
   void onMaximumWidthChanged();
+  void
+  resized();
 
 private:
   QPropertyAnimation* _height_animation;
   QPropertyAnimation* _width_animation;
-  QVBoxLayout* _vlayout;
-
-
-
 
 void
 keyPressEvent(QKeyEvent* event) override;

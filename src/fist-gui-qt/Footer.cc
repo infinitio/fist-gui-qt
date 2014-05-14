@@ -3,13 +3,11 @@
 #include <fist-gui-qt/Footer.hh>
 
 Footer::Footer(QWidget* parent):
-  QWidget(parent),
+  Super(parent),
   _layout(new QHBoxLayout(this))
 {
   this->_layout->setContentsMargins(10, 10, 10, 5);
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  this->setFixedSize(320, 32);
+  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 }
 
 void

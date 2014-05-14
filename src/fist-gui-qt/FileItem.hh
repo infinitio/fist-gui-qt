@@ -15,9 +15,9 @@
 class FileItem:
   public ListItem
 {
+  typedef ListItem Super;
 public:
   FileItem(QUrl const& path);
-
   virtual ~FileItem() = default;
 
   virtual

@@ -20,7 +20,7 @@
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
-#include <fist-gui-qt/SendPanel.hh>
+#include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/Settings.hh>
@@ -65,7 +65,8 @@ InfinitDock::InfinitDock(gap_State* state)
   : _prologue(new Prologue(state))
   , _state(state)
   , _transaction_panel(nullptr)
-  , _send_panel(new SendPanel(this->_state))
+  , _send_panel(new fist::sendview::Panel(this->_state))
+  , _next_panel(nullptr)
   , _menu(new QMenu(this))
   , _logo(":/icons/menu-bar-fire@2x.png")
   , _systray(new QSystemTrayIcon(this))
@@ -94,7 +95,7 @@ InfinitDock::InfinitDock(gap_State* state)
   this->connect(this->_systray, SIGNAL(messageClicked()),
                 this, SLOT(_systray_message_clicked()));
 
-  this->_transaction_panel = new TransactionPanel(state);
+  this->_transaction_panel = new MainPanel(state);
 
   this->_register_panel(this->_transaction_panel);
   this->_register_panel(this->_send_panel);
@@ -259,7 +260,7 @@ InfinitDock::_register_panel(Panel* panel)
           this, SLOT(setBackground(QColor const&)));
 }
 
-TransactionPanel&
+MainPanel&
 InfinitDock::transactionPanel()
 {
   return *this->_transaction_panel;
@@ -398,7 +399,7 @@ InfinitDock::pick_files()
   if (selected.size())
   {
     for (auto const& file: selected)
-      this->_send_panel->add_file(QUrl::fromLocalFile(file));
+      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
     this->_switch_view(this->_send_panel);
     this->show();
   }
@@ -409,9 +410,8 @@ InfinitDock::enterEvent(QEvent* event)
 {
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
-
-  if (this->centralWidget() == this->_send_panel)
-    this->setFocus();
+  // if (this->centralWidget() == this->_send_panel)
+  //   this->setFocus();
 }
 
 void
@@ -474,8 +474,8 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
     }
   }
 
-  if (this->centralWidget() != nullptr)
-    static_cast<QObject*>(this->centralWidget())->event(event);
+  // if (this->centralWidget() != nullptr)
+  //   static_cast<QObject*>(this->centralWidget())->event(event);
 
 }
 
@@ -553,16 +553,38 @@ InfinitDock::_switch_view(Panel* panel)
     return;
   }
 
+  this->_next_panel = panel;
   if (this->centralWidget() != nullptr)
   {
     ELLE_DEBUG("hide %s", *this->centralWidget());
-    static_cast<Panel*>(this->centralWidget())->on_hide();
+    Panel* current_panel = static_cast<Panel*>(this->centralWidget());
+    current_panel->on_hide();
+    // connect(current_panel, SIGNAL(resized()), this, SLOT(_branle()));
+    // current_panel->setHeightHint(32);
+
+    ELLE_LOG("--- %s", *current_panel);
+  }
+  // else
+  // {
+    this->_branle();
+//  }
+}
+
+void
+InfinitDock::_branle()
+{
+  Panel* current_panel = static_cast<Panel*>(this->centralWidget());
+  if (current_panel != nullptr)
+  {
+    disconnect(current_panel, SIGNAL(resized()), this, SLOT(_branle()));
     this->centralWidget()->setParent(0);
   }
 
-  this->setCentralWidget(panel);
-  panel->on_show();
+  ELLE_LOG("+++ %s", *this->_next_panel);
+  this->setCentralWidget(this->_next_panel);
+  this->_next_panel->on_show();
 
+  this->_next_panel = nullptr;
   // XXX: Dirty, but Qt is in trouble to calculate the size of hidden widget.
   // So every time a new panel is shown, make sure that the size matches the
   // content.

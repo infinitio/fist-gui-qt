@@ -11,18 +11,20 @@ namespace fist
     public IconButton
   {
     typedef IconButton Super;
+  public:
     enum class State
     {
       released,
-        released_hover,
-        pressed,
-        pressed_hover,
-        };
+      released_hover,
+      pressed,
+      pressed_hover,
+    };
 
   public:
     TwoStateIconButton(QPixmap const& released,
                        QPixmap const& pressed,
-                       bool already_pressed = false);
+                       bool already_pressed = false,
+                       int width = 20);
 
   public:
     void
@@ -50,6 +52,10 @@ namespace fist
   private:
     Q_OBJECT;
   };
+
+  std::ostream&
+  operator <<(std::ostream& out,
+              TwoStateIconButton::State const& s);
 }
 
 #endif

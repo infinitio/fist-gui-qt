@@ -11,6 +11,7 @@
 
 # include <fist-gui-qt/SmoothScrollBar.hh>
 # include <fist-gui-qt/ListItem.hh>
+#include <fist-gui-qt/globals.hh>
 
 class ListWidget:
   public QWidget,
@@ -20,11 +21,24 @@ public:
   class Separator
   {
   public:
-    Separator(QVector<QColor> const& colors):
-      _colors(colors)
+    Separator(QVector<QColor> const& colors,
+              int left_margin = 0,
+              int right_margin = 0)
+      : _colors(colors)
+      , _left_margin(left_margin)
+      , _right_margin(right_margin)
     {}
+
+    int
+    height() const
+    {
+      return this->_colors.size();
+    }
+
   private:
-    QVector<QColor> _colors;
+    ELLE_ATTRIBUTE(QVector<QColor>, colors);
+    ELLE_ATTRIBUTE(int, left_margin);
+    ELLE_ATTRIBUTE(int, right_margin);
   friend ListWidget;
   };
 
@@ -50,8 +64,7 @@ public:
 `-------------*/
 public:
  ListWidget(QWidget* parent = nullptr,
-            Separator const& separator = Separator({QColor(0xE3, 0xE3, 0xE3),
-                                                   Qt::white}));
+            Separator const& separator = Separator(list::separator::colors));
 
 /*--------.
 | Widgets |
@@ -63,6 +76,14 @@ public:
   void
   remove_widget(ListItem* widget, bool all = true);
 
+
+private:
+// Filter anchor events to detect changes like visibility changed,
+// position changed, modal window spawned...
+  bool
+  eventFilter(QObject *obj, QEvent *event) override;
+
+public:
   void
   move_widget(ListItem* widget, Position position = Bottom);
 
@@ -72,6 +93,7 @@ public:
   void
   clearWidgets();
 
+public slots:
   void
   setFocus();
 
@@ -131,6 +153,8 @@ protected:
 
   void
   keyPressEvent(QKeyEvent* event) override;
+  void
+  _select_element(size_t index);
   size_t _keyboard_index;
   QWidget* _mate;
 

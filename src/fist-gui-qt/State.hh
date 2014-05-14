@@ -47,7 +47,6 @@ namespace fist
     Users
     swaggers(QString const& filter);
 
-
     // Launch a search (long operation).
     // Directly returns the swaggers matching the search.
     // When the operation is finished, the watcher will signal it (and is

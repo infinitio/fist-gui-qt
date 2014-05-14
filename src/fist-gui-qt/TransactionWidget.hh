@@ -19,9 +19,12 @@
 class TransactionWidget:
   public ListItem
 {
+  typedef ListItem Super;
+
 public:
   TransactionWidget(TransactionModel const& model);
-  Q_OBJECT;
+  virtual
+  ~TransactionWidget() = default;
 
 /*-----------.
 | Properties |
@@ -98,11 +101,16 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);
   QTimer* _mtime_updater;
 
+private:
 /*----------.
 | Printable |
 `----------*/
   void
   print(std::ostream& stream) const override;
+
+private:
+  Q_OBJECT;
+
 };
 
 #endif

@@ -37,13 +37,14 @@ public:
   _update();
 
 public:
+  virtual
   int
   widthHint() const;
 
   QSize
   sizeHint() const override;
 
-private:
+public:
   virtual
   void
   trigger() = 0;

@@ -22,13 +22,14 @@ SmoothLayout::SmoothLayout(QWidget* owner):
   _maximum_height(0),
   _maximum_width(0),
   _height_animation(new QPropertyAnimation(this, "heightHint")),
-  _width_animation(new QPropertyAnimation(this, "widthHint")),
-  _vlayout(new QVBoxLayout(this))
+  _width_animation(new QPropertyAnimation(this, "widthHint"))
 {
-  this->_height_animation->setDuration(1);
+  this->_height_animation->setDuration(100);
+  connect(this->_height_animation, SIGNAL(finished()),
+          this, SIGNAL(resized()));
   // this->_height_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
-  this->_width_animation->setDuration(120);
+  this->_width_animation->setDuration(0);
 }
 
 /*-------.
@@ -46,6 +47,7 @@ SmoothLayout::childEvent(QChildEvent* event)
       if (event->added())
       {
         ELLE_WARN("install");
+
         widget->installEventFilter(this);
       }
       else if (event->removed())
@@ -53,7 +55,6 @@ SmoothLayout::childEvent(QChildEvent* event)
         ELLE_WARN("remove");
         widget->removeEventFilter(this);
       }
-      // this->_vlayout->addWidget(widget);
       this->_layout();
     }
 }
@@ -67,7 +68,7 @@ SmoothLayout::eventFilter(QObject *obj, QEvent *event)
     return Super::eventFilter(obj, event);
 
 //  auto action = [&] { std::cerr << "event " << event->type() << std::endl; this->_layout(); this->updateGeometry(); };
-  auto action = [&] { this->_layout(); this->update(); this->repaint(); }; //std::cerr << "event " << event->type() << std::endl; this->_layout(); this->updateGeometry(); };
+  auto action = [&] { this->_layout(); this->update(); this->updateGeometry(); }; //std::cerr << "event " << event->type() << std::endl; this->_layout(); this->updateGeometry(); };
   if (event->type() == QEvent::Hide)
     action();
   else if (event->type() == QEvent::Show)
@@ -176,6 +177,7 @@ SmoothLayout::_child_widgets(bool visible_only) const
 void
 SmoothLayout::_layout()
 {
+  ELLE_LOG("??????");
   auto widgets = this->_child_widgets();
 
   int height = 0;
@@ -192,12 +194,14 @@ SmoothLayout::_layout()
     width = std::max(width, hint.width());
   }
 
-  if (this->isVisible())
+  if (this->isVisible() || true)
   {
     if (height != this->_height_hint)
     {
+      this->_height_animation->stop();
       this->_height_animation->setEndValue(height);
       this->_height_animation->start();
+      ELLE_LOG("..........................");
     }
     if (width != this->_width_hint)
     {
@@ -205,9 +209,12 @@ SmoothLayout::_layout()
       this->_width_animation->start();
     }
   }
-  // ELLE_LOG("update height: %s", height)
+  else
+  {
+    // ELLE_LOG("update height: %s", height)
     this->setHeightHint(height);
-  this->setWidthHint(width);
+    this->setWidthHint(width);
+  }
 }
 
 void

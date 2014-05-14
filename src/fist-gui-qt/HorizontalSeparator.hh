@@ -4,11 +4,14 @@
 # include <QFrame>
 # include <QWidget>
 
+# include <elle/attribute.hh>
+
 class HorizontalSeparator:
   public QFrame
 {
 public:
-  HorizontalSeparator(QWidget* parent = nullptr);
+  HorizontalSeparator(QWidget* parent = nullptr,
+                      int margin = 0);
 
 public:
   QSize
@@ -17,6 +20,8 @@ public:
 protected:
   void
   paintEvent(QPaintEvent*) override;
+
+  ELLE_ATTRIBUTE_RW(int, margin);
 };
 
 #endif

@@ -7,23 +7,27 @@
 #include <elle/log.hh>
 #include <elle/assert.hh>
 
-ELLE_LOG_COMPONENT("infinit.FIST.TransactionPanel");
+ELLE_LOG_COMPONENT("infinit.FIST.MainPanel");
 
 #define MAX_TRANSAS 15
 
-static TransactionPanel* g_panel = nullptr;
+static MainPanel* g_panel = nullptr;
 static gap_State* g_state = nullptr;
 
-TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
+MainPanel::MainPanel(gap_State* state, QWidget* parent):
   Panel(new TransactionFooter, parent),
-  _list(new ListWidget(this)),
+  _tabs(new Tabber(this)),
+  _transaction_list(new ListWidget(this)),
+  // _link_list(new ListWidget(this)),
   _state(state)
 {
   this->footer()->setParent(this);
 
+
+
   // Register gap callback.
   g_panel = this;
-  gap_transaction_callback(state, TransactionPanel::transaction_cb);
+  gap_transaction_callback(state, MainPanel::transaction_cb);
 
   //TODO: kill this abomination with a gap_transactions already sorted.
   uint32_t* trs = gap_transactions(state);
@@ -53,7 +57,7 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
 
   if (transactions_list.empty())
   {
-    this->_list->add_widget(new TextListItem("You haven't sent or received any files yet", 70, this));
+    this->_transaction_list->add_widget(new TextListItem("You haven't sent or received any files yet", 70, this));
     return;
   }
 
@@ -62,18 +66,25 @@ TransactionPanel::TransactionPanel(gap_State* state, QWidget* parent):
        iter != transactions_list.end() && i < MAX_TRANSAS;
        ++i, ++iter)
   {
+
     this->add_transaction(state, *iter, true);
   }
+
+  this->_tabs->add_tab("Transactions", this->_transaction_list);
+  this->_tabs->add_tab("Links");
+
+
+  this->_layout();
 }
 
 TransactionWidget*
-TransactionPanel::add_transaction(gap_State* state,
+MainPanel::add_transaction(gap_State* state,
                                   uint32_t tid,
                                   bool init)
 {
   if (this->_transactions.size() == 0)
   {
-    this->_list->clearWidgets();
+    this->_transaction_list->clearWidgets();
   }
 
   if (this->_transactions.find(tid) == this->_transactions.end())
@@ -103,7 +114,7 @@ TransactionPanel::add_transaction(gap_State* state,
   connect(widget, SIGNAL(transaction_canceled(uint32_t)),
           this, SLOT(_on_transaction_canceled(uint32_t)));
 
-  this->_list->add_widget(widget,
+  this->_transaction_list->add_widget(widget,
                           init ?
                             ListWidget::Position::Bottom :
                             ListWidget::Position::Top);
@@ -114,13 +125,13 @@ TransactionPanel::add_transaction(gap_State* state,
 }
 
 void
-TransactionPanel::setFocus()
+MainPanel::setFocus()
 {
-  this->_list->setFocus();
+  // this->_transaction_list->setFocus();
 }
 
 void
-TransactionPanel::avatar_available(uint32_t uid)
+MainPanel::avatar_available(uint32_t uid)
 {
   ELLE_TRACE_SCOPE("%s: avatar available for user %s", *this, uid);
   // XXX: Ugly, but no better way for the moment.
@@ -135,45 +146,45 @@ TransactionPanel::avatar_available(uint32_t uid)
 }
 
 void
-TransactionPanel::user_status_changed(uint32_t uid,
+MainPanel::user_status_changed(uint32_t uid,
                                       gap_UserStatus status)
 {
   ELLE_TRACE_SCOPE("%s: user %s status changed to %s", *this, uid, status);
 
   // XXX: Do per user update.
-  this->_list->reload();
+  this->_transaction_list->reload();
 }
 
 void
-TransactionPanel::_on_transaction_accepted(uint32_t tid)
+MainPanel::_on_transaction_accepted(uint32_t tid)
 {
   ELLE_TRACE_SCOPE("%s: accept transaction %s", *this, tid);
   gap_accept_transaction(this->_state, tid);
 }
 
 void
-TransactionPanel::_on_transaction_rejected(uint32_t tid)
+MainPanel::_on_transaction_rejected(uint32_t tid)
 {
   ELLE_TRACE_SCOPE("%s: reject transaction %s", *this, tid);
   gap_reject_transaction(this->_state, tid);
 }
 
 void
-TransactionPanel::_on_transaction_canceled(uint32_t tid)
+MainPanel::_on_transaction_canceled(uint32_t tid)
 {
   ELLE_TRACE_SCOPE("%s: cancel transaction %s", *this, tid);
   gap_cancel_transaction(this->_state, tid);
 }
 
 void
-TransactionPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
+MainPanel::transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
   ELLE_TRACE_SCOPE("transaction %s updated with status %s", id, status);
   g_panel->_transaction_cb(id, status);
 }
 
 void
-TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
+MainPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
 {
   if (gap_transaction_status(this->_state, id) <
       gap_transaction_waiting_accept)
@@ -192,7 +203,7 @@ TransactionPanel::_transaction_cb(uint32_t id, gap_TransactionStatus status)
 }
 
 void
-TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
+MainPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 {
   ELLE_TRACE_SCOPE("%s: update transaction %s", *this, id);
 
@@ -275,7 +286,7 @@ TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
       break;
   }
 
-  for (auto widget: this->_list->widgets())
+  for (auto widget: this->_transaction_list->widgets())
     widget->_update();
 }
 
@@ -283,13 +294,13 @@ TransactionPanel::updateTransaction(gap_State* /* state */, uint32_t id)
 | Footer |
 `-------*/
 TransactionFooter*
-TransactionPanel::footer()
+MainPanel::footer()
 {
   return static_cast<TransactionFooter*>(this->_footer);
 }
 
 void
-TransactionPanel::print(std::ostream& stream) const
+MainPanel::print(std::ostream& stream) const
 {
-  stream << "TransactionPanel";
+  stream << "MainPanel";
 }

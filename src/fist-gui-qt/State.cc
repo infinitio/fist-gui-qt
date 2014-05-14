@@ -50,7 +50,8 @@ namespace fist
     State::Users res;
     for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
     {
-      ELLE_ASSERT_CONTAINS(this->_users, swaggers[i]);
+      if (this->_users.find(swaggers[i]) == this->_users.end())
+        this->_users[swaggers[i]].reset(new UserModel(this->_state, swaggers[i]));
       auto const& user = this->_users.at(swaggers[i]);
       res.append(user.get());
     }
@@ -68,7 +69,8 @@ namespace fist
     State::Users res;
     for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
     {
-      ELLE_ASSERT_CONTAINS(this->_users, swaggers[i]);
+      if (this->_users.find(swaggers[i]) == this->_users.end())
+        this->_users[swaggers[i]].reset(new UserModel(this->_state, swaggers[i]));
       auto const& user = this->_users.at(swaggers[i]);
       if (user->fullname().contains(filter) ||
           user->handle().contains(filter))

@@ -73,4 +73,21 @@ operator << (std::ostream& out, QNetworkReply const& r)
   return out << "Request(" << r.url() << ")";
 }
 
+inline
+QString
+readable_size(qint64 size)
+{
+  int i = 0;
+  std::vector<QString> units = {
+    "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+
+  while (size > 1024)
+  {
+    size /= 1024.f;
+    i++;
+  }
+
+  return QString("%1").arg(size) + " " + units[i];
+};
+
 #endif

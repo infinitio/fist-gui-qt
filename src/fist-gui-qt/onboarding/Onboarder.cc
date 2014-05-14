@@ -5,15 +5,15 @@
 #include <surface/gap/gap.hh>
 
 #include <fist-gui-qt/AvatarWidget.hh>
-#include <fist-gui-qt/SendFooter.hh>
-#include <fist-gui-qt/SendPanel.hh>
-#include <fist-gui-qt/gui/Tooltip.hh>
+#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/SendView/Files.hh>
+#include <fist-gui-qt/SendView/Footer.hh>
+#include <fist-gui-qt/SendView/Panel.hh>
+#include <fist-gui-qt/SendView/Users.hh>
 #include <fist-gui-qt/TransactionFooter.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
-#include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
-#include <fist-gui-qt/AddFileWidget.hh>
-#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/gui/Tooltip.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.onboarding.Onboarder");
@@ -154,7 +154,7 @@ namespace fist
     Onboarder::_choose_peer()
     {
       this->_set_tooltip(
-        this->_dock->_send_panel->search(),
+        this->_dock->_send_panel->users(),
         "Search for a friend using\n"
         "his fullname or nickname.",
         Qt::AlignLeft);
@@ -164,7 +164,7 @@ namespace fist
     Onboarder::_on_peer_chosen()
     {
       auto* send_panel = this->_dock->_send_panel;
-      if (send_panel->files().isEmpty())
+      if (send_panel->file_adder()->files().isEmpty())
       {
         this->_set_tooltip(
           send_panel->file_adder(),
@@ -207,12 +207,12 @@ namespace fist
         Qt::AlignLeft,
         1500);
 
-      if (send_panel->peer_valid())
+      //if (send_panel->peer_valid())
       {
         connect(this->_tooltip.get(), SIGNAL(hidden()),
                 this, SLOT(_on_transaction_ready()));
       }
-      else
+      // else
       {
         connect(this->_tooltip.get(), SIGNAL(hidden()),
                 this, SLOT(_choose_peer()));

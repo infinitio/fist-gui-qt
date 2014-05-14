@@ -27,6 +27,7 @@ ListWidget::ListWidget(QWidget* parent,
   _wheel_event(false),
   _keyboard_index(0)
 {
+  this->setContentsMargins(0, 0, 0, 0);
   ELLE_DEBUG_SCOPE("%s: creation", *this);
   this->_scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
@@ -51,6 +52,8 @@ ListWidget::add_widget(ListItem* widget, Position position)
   else
     ELLE_ERR("%s: unknown widget position %s", *this, position);
 
+  ++this->_keyboard_index;
+  this->_keyboard_index %= this->_widgets.size();
   widget->setParent(this);
   widget->show();
   this->_scroll->raise();
@@ -62,17 +65,51 @@ ListWidget::remove_widget(ListItem* widget, bool all)
 {
   ELLE_DEBUG_SCOPE("%s: remove widget%s %s", *this, all ? "s" : "", *widget);
   if (all)
-    this->_widgets.removeAll(widget);
+  {
+    auto removed = this->_widgets.removeAll(widget);
+    this->_keyboard_index -= removed;
+    this->_keyboard_index %= this->_widgets.size();
+  }
   else
   {
     auto index = this->_widgets.indexOf(widget);
     if (index != -1)
       this->_widgets.removeAt(index);
+    --this->_keyboard_index;
+    this->_keyboard_index %= this->_widgets.size();
   }
   widget->setParent(nullptr);
   delete widget;
   widget = nullptr;
   this->_layout();
+}
+
+bool
+ListWidget::eventFilter(QObject *obj, QEvent *event)
+{
+  if (!dynamic_cast<QWidget*>(obj))
+    return Super::eventFilter(obj, event);
+
+  auto action = [&] { this->_layout(); };
+  if (event->type() == QEvent::Hide)
+    action();
+  else if (event->type() == QEvent::Show)
+    action();
+  else if (event->type() == QEvent::GraphicsSceneResize)
+    action();
+  else if (event->type() == QEvent::Resize)
+    action();
+  else if (event->type() == QEvent::LayoutRequest)
+    action();
+  else if (event->type() == QEvent::Move)
+    action();
+  else if (event->type() == QEvent::Paint);
+  else if (event->type() == QEvent::Leave);
+  else if (event->type() == QEvent::Enter);
+  // else
+  //   std::cerr << "nop: " << event->type() << std::endl;
+
+  return Super::eventFilter(obj, event);
 }
 
 void
@@ -130,39 +167,56 @@ ListWidget::minimumSizeHint() const
 void
 ListWidget::_layout()
 {
+  ELLE_TRACE_SCOPE("%s: layout request", *this);
   int height = 0;
   this->_width_hint = 0;
   for (auto widget: this->_widgets)
     this->_width_hint = std::max(this->_width_hint, widget->sizeHint().width());
-
+  ELLE_DEBUG("width hint: %s", this->_width_hint);
   int rows = 0;
   int fixed_height = this->maxRows() == 0 ? 0 : -1;
   for (auto widget: this->_widgets)
   {
-    int widget_height = widget->sizeHint().height();
-    QRect geometry(0, height - this->_offset, this->width(), widget_height);
-    widget->setGeometry(geometry);
-    widget_height = widget->size().height();
-    height += widget_height + this->_separator._colors.size();
-    if (fixed_height == -1 && ++rows == this->maxRows())
+    if (widget->isHidden())
+      continue;
+
+    ELLE_DEBUG("widget: %s", *widget)
     {
-      fixed_height = height;
+      int widget_height = widget->sizeHint().height();
+      ELLE_DEBUG("height hint: %s", widget_height);
+      QRect geometry(0, height - this->_offset, this->width(), widget_height);
+      widget->setGeometry(geometry);
+      widget_height = widget->size().height();
+      ELLE_DEBUG("new height: %s", widget_height);
+      height += widget_height + this->_separator.height();
+      if (fixed_height == -1 && ++rows == this->maxRows())
+      {
+        fixed_height = height;
+        ELLE_DEBUG("fixed height: %s", fixed_height);
+      }
+      ELLE_DEBUG("list height: %s", height);
     }
   }
+  ELLE_DEBUG("calculated height: %s", height);
 
   this->_width_hint += this->_scroll->sizeHint().width();
 
   int real_height = ((fixed_height != -1) ? fixed_height : height);
+  ELLE_DEBUG("real height: %s", real_height);
 
   // Remove the bottom separator.
   if (!this->_widgets.empty())
   {
-    real_height -= this->_separator._colors.size();
-    height -= this->_separator._colors.size();
+    real_height -= this->_separator.height();
+    height -= this->_separator.height();
   }
+
+  ELLE_DEBUG("real height less last separator: %s", real_height);
 
   this->_height_hint = real_height;
   this->updateGeometry();
+
+  ELLE_DEBUG("height updated: %s", this->height());
 
   this->_scroll->setMinimum(0);
   this->_scroll->setMaximum(height);
@@ -173,7 +227,7 @@ ListWidget::_layout()
   else
     this->_scroll->hide();
 
-  this->update();
+  this->repaint();
 }
 
 int
@@ -218,53 +272,50 @@ ListWidget::wheelEvent(QWheelEvent* event)
 }
 
 void
+ListWidget::_select_element(size_t index)
+{
+  size_t old_index = this->_keyboard_index;
+
+  if (old_index > 0)
+  {
+    ListItem* old = this->_widgets[old_index];
+    old->setStyleSheet("background-color:white;");
+  }
+
+  index %= this->_widgets.size();
+  ListItem* item = this->_widgets[index];
+  item->setStyleSheet("background-color:pink;");
+}
+
+void
 ListWidget::keyPressEvent(QKeyEvent*)
 {
   return;
 
   // Problematic with the transactions list ATM.
-#if 0
-  size_t old_index = _keyboard_index;
+  size_t index = _keyboard_index;
 
   if (event->key() == Qt::Key_Down && _keyboard_index > 0)
-    _keyboard_index -= 1;
+    index -= 1;
   else if (event->key() == Qt::Key_Up && _keyboard_index < _widgets.size())
-    _keyboard_index += 1;
+    index += 1;
   else if (event->key() == Qt::Key_Return)
-    _widgets[_widgets.size() - _keyboard_index]->trigger();
-
-  std::cout << _widgets.size() << " " << _keyboard_index << std::endl;
-
-  if (_keyboard_index == 0)
-  {
-
-    //_mate->setFocus();
-  }
-  else
-  {
-    if (old_index > 0)
-    {
-      ListItem* old = _widgets[_widgets.size() - old_index];
-      old->setStyleSheet("background-color:white;");
-    }
-
-    ListItem* item = _widgets[_widgets.size() - _keyboard_index];
-    item->setStyleSheet("background-color:pink;");
-  }
-#endif
+    _widgets[index]->trigger();
+  index %= this->_widgets.size();
+  this->_select_element(index);
 }
 
 void
 ListWidget::setFocus()
 {
+  return;
+
   QWidget::setFocus();
 
   if (_widgets.size() != 0)
   {
-#if 0
     ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
     item->setStyleSheet("background-color:pink;");
-#endif
   }
 }
 
@@ -300,6 +351,8 @@ ListWidget::paintEvent(QPaintEvent* e)
   QPainter painter(this);
   int height = -this->_offset;
 
+  auto left_margin = this->_separator._left_margin;
+  auto right_margin = this->_separator._right_margin;
   for (auto widget: this->_widgets)
   {
     height += widget->size().height();
@@ -307,7 +360,8 @@ ListWidget::paintEvent(QPaintEvent* e)
     {
       painter.setPen(color);
       painter.setBrush(color);
-      painter.drawRect(0, height, this->width(), 0);
+      painter.drawRect(
+        left_margin, height, this->width() - left_margin - right_margin, 0);
       height += 1;
     }
   }

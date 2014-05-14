@@ -11,10 +11,13 @@
 class SearchResultWidget:
   public ListItem
 {
+  typedef ListItem Super;
 public:
   SearchResultWidget(UserModel const& model,
                      bool preselected = false,
                      QWidget* parent = nullptr);
+  virtual
+  ~SearchResultWidget() = default;
 
   virtual
   QSize

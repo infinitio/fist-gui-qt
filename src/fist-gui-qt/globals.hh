@@ -1,9 +1,10 @@
 #ifndef GLOBALS_HH
 # define GLOBALS_HH
 
-# include <QFont>
 # include <QColor>
+# include <QFont>
 # include <QLabel>
+# include <QVector>
 
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
@@ -71,6 +72,16 @@ namespace
 namespace regexp
 {
   static QString email = "[a-z0-9\\._%+-]+@[a-z0-9\\.-]+\\.[a-z]{2,12}";
+}
+
+namespace list
+{
+  namespace separator
+  {
+    static
+    QVector<QColor> const
+    colors({QColor(0xE3, 0xE3, 0xE3), Qt::white});
+  }
 }
 
 namespace view
@@ -269,11 +280,30 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), Qt::AlignVCenter);
+      style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
       QString const
-      text("Search for a friend...");
+      text("Search or select a user...");
+    }
+
+    namespace message
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+
+      static
+      QString const
+      text("Optional message...");
+
+      namespace remaining_characters
+      {
+        static
+        TextStyle const
+        style(QFont("Arial", 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
+
+      }
     }
 
     namespace user

@@ -7,7 +7,6 @@ ListItem::ListItem(QWidget* parent,
   _background(background_color),
   _clickable(clickable)
 {
-  this->setFixedWidth(320);
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QPalette palette = this->palette();
@@ -45,7 +44,7 @@ ListItem::enterEvent(QEvent*)
 
   QPalette palette = this->palette();
   {
-    palette.setColor(QPalette::Window, QColor(0xF5, 0xFE, 0xFF));
+    palette.setColor(QPalette::Window, QColor(0xB5, 0xDE, 0xFF)); //QColor(0xF5, 0xFE, 0xFF));
   }
   this->setPalette(palette);
 }
