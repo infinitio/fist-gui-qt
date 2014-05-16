@@ -113,7 +113,10 @@ namespace fist
 
     Tooltip::~Tooltip()
     {
-      this->over();
+      ELLE_LOG("LLLLLLLLL");
+      // ELLE_TRACE("uninstall event filter on anchored widget: %s", this->_widget)
+      //   if (this->_widget != nullptr)
+      //     this->_widget->removeEventFilter(this);
     }
 
     bool
@@ -361,7 +364,6 @@ namespace fist
       ELLE_TRACE("uninstall event filter on anchored widget: %s", this->_widget)
         if (this->_widget != nullptr)
           this->_widget->removeEventFilter(this);
-
       this->hide();
       emit hidden();
     }

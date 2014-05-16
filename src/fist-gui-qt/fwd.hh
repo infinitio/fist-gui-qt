@@ -1,11 +1,6 @@
 #ifndef FIST_GUI_QT_FWD_HH
 # define FIST_GUI_QT_FWD_HH
 
-// State.
-class State;
-class UserModel;
-class TransactionModel;
-
 // Windows.
 class InfinitDock;
 class LoadingDialog;
@@ -31,12 +26,23 @@ class HorizontalSeparator;
 
 namespace fist
 {
+  class State;
+
+  namespace model
+  {
+    class User;
+    class Transaction;
+    // class Link;
+  }
+
   namespace sendview
   {
     class Panel;
     class Footer;
     class Files;
+    class Users;
   }
+
   namespace onboarding
   {
     class Onboarder;

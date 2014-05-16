@@ -73,7 +73,7 @@ namespace fist
       connect(&this->_state, SIGNAL(results_ready()),
               this, SLOT(_set_users()));
       {
-        this->_users->setMaxRows(4);
+        this->_users->setMaxRows(3);
       }
       {
         this->set_icon(this->_magnifier);
@@ -84,7 +84,6 @@ namespace fist
       auto* vlayout = new QVBoxLayout(this);
       vlayout->setAlignment(Qt::AlignVCenter);
       vlayout->setContentsMargins(0, 0, 0, 0);
-      vlayout->setSpacing(0);
       {
         auto* layout = new QHBoxLayout;
         layout->setContentsMargins(16, 0, 0, 5);
@@ -155,7 +154,14 @@ namespace fist
     Users::_select_first_user()
     {
       if (!this->_results.empty())
-        this->_results.begin()->second->trigger();
+      {
+        // XXX: This suxx so much because results is an unordered_map so we are
+        // not supposed to make any assumption on the order of the elements.
+        // But, it works so while the swagg is not returned, keep that solution.
+        auto it = this->_results.begin();
+        std::advance(it, this->_results.size() - 1);
+        it->second->trigger();
+      }
     }
 
     void
@@ -172,7 +178,7 @@ namespace fist
     Users::set_users(fist::State::Users const& users, bool local)
     {
       ELLE_TRACE_SCOPE("%s: set users", *this);
-      for (UserModel* model: users)
+      for (model::User* model: users)
       {
         ELLE_DEBUG("-- %s", model->id());
         if (this->_results.find(model->id()) == this->_results.end())
@@ -187,19 +193,24 @@ namespace fist
                   SIGNAL(unselected(uint32_t)),
                   this,
                   SLOT(_remove_peer(uint32_t)));
-          this->_users->add_widget(widget, ListWidget::Position::Top);
+          this->_users->add_widget(widget, ListWidget::Position::Bottom);
           this->_results[model->id()] = widget;
         }
       }
 
-      if (this->_users->widgets().isEmpty() &&
-          !local &&
-          !email_checker.exactMatch(this->text()))
+      if (this->_users->widgets().isEmpty() && !local)
       {
-        this->_users->add_widget(
-          new TextListItem("<b>No result</b><br />Send to an email address instead",
-                           60, this),
-          ListWidget::Position::Top);
+        if (!email_checker.exactMatch(this->text()))
+        {
+          this->_users->add_widget(
+            new TextListItem("<b>No result</b><br />Send to an email address instead",
+                             60, this),
+            ListWidget::Position::Top);
+        }
+        else
+        {
+          emit peer_found();
+        }
       }
 
       if (!this->_users->widgets().isEmpty())
@@ -216,7 +227,7 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: add peer: %s", *this, uid);
       this->_recipients.insert(uid);
-      // emit peer_found();
+      emit peer_found();
     }
 
     void

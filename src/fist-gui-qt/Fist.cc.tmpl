@@ -28,6 +28,7 @@
 #include <fist-gui-qt/Updater.hh>
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/Settings.hh>
+#include <fist-gui-qt/State.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
@@ -111,15 +112,9 @@ gap_state()
 #endif
 }
 
-void
-Fist::GapDeleter::operator() (gap_State* state) const
-{
-  gap_free(state);
-}
-
 Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
-  _state(gap_state()),
+  _state(new fist::State(gap_state())),
   _lock(nullptr),
   _filelock(
     QString::fromStdString(
@@ -131,7 +126,7 @@ Fist::Fist(int argc, char** argv):
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
   g_fist = this;
-  gap_kicked_out_callback(this->_state.get(), Fist::_kicked_out_callback);
+  gap_kicked_out_callback(this->_state->state(), Fist::_kicked_out_callback);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
   if (!this->_set_lock())
@@ -210,7 +205,7 @@ Fist::operator ()()
     "http://download.infinit.io/windows/${architecture}/update.xml");
 
   this->_updater.reset(new Updater(QString::fromStdString(update_url), this));
-  this->_login_window.reset(new LoginWindow(this->_state.get()));
+  this->_login_window.reset(new LoginWindow(*this->_state));
 
   connect(this->_updater.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
@@ -280,7 +275,7 @@ Fist::_set_lock()
   // Local socket to check if an server (on an other instance) is running.
   ELLE_DEBUG("create local socket to look for running instance")
     this->_other_instance.reset(new QLocalSocket(this));
-  // Violent but if you receive something, it's a succide signal.
+  // Violent but if you receive something, it's a suicide signal.
   connect(this->_other_instance.get(), SIGNAL(readyRead()),
           this, SLOT(_kicked_by_another_instance()));
   ELLE_DEBUG("try connecting to %s", lock_name)
@@ -318,7 +313,7 @@ Fist::_set_lock()
     auto email = fist::settings()["Login"].get("email", "unknown").toString();
 
     gap_send_user_report(
-      this->_state.get(),
+      this->_state->state(),
       email.toStdString().c_str(),
       "CrashReport",
       previous_log.c_str(),
@@ -347,7 +342,7 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
-  this->_dock.reset(new InfinitDock(this->_state.get()));
+  this->_dock.reset(new InfinitDock(*this->_state));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
   this->_dock->hide();
@@ -363,7 +358,7 @@ Fist::_new_local_socket_connection()
     this->_login_window->setFocus();
   auto socket = this->_lock->nextPendingConnection();
   std::string death{"kill your self"};
-  ELLE_DEBUG("send succide order")
+  ELLE_DEBUG("send suicide order")
     socket->write(death.c_str(), death.size());
 }
 
@@ -376,11 +371,28 @@ Fist::_kicked_out_callback()
 void
 Fist::kicked_out()
 {
-  this->_dock.reset();
-  this->_state.reset(gap_state());
+  ELLE_TRACE_SCOPE("%s: kicked out", *this);
+  ELLE_DEBUG("clear gui")
+  {
+    this->_login_window.reset();
+    this->_dock.reset();
+  }
+  ELLE_DEBUG("clear state")
+  {
+    this->_state.reset();
+  }
 
-  this->_login_window->show();
-  this->_login_window->set_message("You have been disconnected", "");
+  ELLE_DEBUG("reset set")
+  {
+    this->_state.reset(new fist::State(gap_state()));
+  }
+
+  ELLE_DEBUG("reset gui")
+  {
+    this->_login_window.reset(new LoginWindow(*this->_state));
+    this->_login_window->show();
+    this->_login_window->set_message("You have been disconnected", "");
+  }
 }
 
 void

@@ -1,81 +1,88 @@
 #ifndef FIST_GUI_QT_GUI_TAB_HH
 # define FIST_GUI_QT_GUI_TAB_HH
 
+# include <QColor>
+# include <QFont>
 # include <QObject>
 # include <QPushButton>
 # include <QVector>
-# include <QColor>
 
 # include <elle/attribute.hh>
 
-class Tabber;
-
-class Tab:
-  public QWidget
+namespace fist
 {
-  typedef QWidget Super;
+  namespace gui
+  {
 
-public:
-  Tab(Tabber& tabber,
-      QString const& name,
-      QVector<QWidget*> const& widgets);
+    class TabWidget;
 
-  virtual
-  ~Tab() = default;
+    class Tab:
+      public QWidget
+    {
+      typedef QWidget Super;
 
-private:
-  void
-  enterEvent(QEvent* event) override;
+    public:
+      Tab(TabWidget& tabber,
+          QString const& name,
+          QVector<QWidget*> const& widgets);
 
-  void
-  leaveEvent(QEvent* event) override;
+      virtual
+      ~Tab() = default;
 
-  void
-  paintEvent(QPaintEvent* event) override;
+    private:
+      void
+      enterEvent(QEvent* event) override;
 
-  void
-  mouseReleaseEvent(QMouseEvent* event) override;
+      void
+      leaveEvent(QEvent* event) override;
 
-  QSize
-  sizeHint() const override;
+      void
+      paintEvent(QPaintEvent* event) override;
 
-  QSize
-  minimumSizeHint() const override;
+      void
+      mouseReleaseEvent(QMouseEvent* event) override;
 
-private:
-  void
-  _hover();
+      QSize
+      sizeHint() const override;
 
-  void
-  _active();
+      QSize
+      minimumSizeHint() const override;
 
-  void
-  _inactive();
+    private:
+      void
+      _hover();
 
+      void
+      _active();
 
-private slots:
-  void
-    _notify_tabber();
-
-public slots:
-  void
-    enable();
-
-  void
-    disable();
-
-private:
-  ELLE_ATTRIBUTE(Tabber&, tabber);
-  ELLE_ATTRIBUTE_R(QString, name)
-  ELLE_ATTRIBUTE(QVector<QWidget*>, widgets);
-  ELLE_ATTRIBUTE_Rw(QColor, color);
-private:
-  Q_OBJECT;
-
-private:
-  friend Tabber;
-};
+      void
+      _inactive();
 
 
+    private slots:
+      void
+      _notify_tabber();
+
+    public slots:
+      void
+      enable();
+
+      void
+      disable();
+
+    private:
+      ELLE_ATTRIBUTE(TabWidget&, tabber);
+      ELLE_ATTRIBUTE_R(QString, name)
+      ELLE_ATTRIBUTE(QVector<QWidget*>, widgets);
+      ELLE_ATTRIBUTE_Rw(QFont, font);
+      ELLE_ATTRIBUTE_Rw(QColor, color);
+    private:
+      Q_OBJECT;
+
+    private:
+      friend TabWidget;
+    };
+  }
+}
 
 #endif

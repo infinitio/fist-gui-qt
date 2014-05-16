@@ -9,7 +9,7 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.UserWidget");
 
-UserWidget::UserWidget(UserModel const& model,
+UserWidget::UserWidget(fist::model::User const& model,
                        QWidget* parent):
   ListItem(parent),
   _model(model),

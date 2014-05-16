@@ -116,6 +116,9 @@ namespace fist
       void
       search_changed(QString const& text);
 
+      void
+      peer_found();
+
     private slots:
       void
       delay_expired();
@@ -135,11 +138,11 @@ namespace fist
        void
        set_users(fist::State::Users const& users, bool local);
 
-void
-_add_peer(uint32_t);
+      void
+      _add_peer(uint32_t);
 
-void
-_remove_peer(uint32_t);
+      void
+      _remove_peer(uint32_t);
 
     private:
       QTimer _search_delay;

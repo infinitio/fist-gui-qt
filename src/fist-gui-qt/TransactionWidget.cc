@@ -1,5 +1,6 @@
 #include <map>
 
+#include <QEvent>
 #include <QSpacerItem>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -8,7 +9,6 @@
 #include <elle/log.hh>
 
 #include <surface/gap/gap.hh>
-
 
 #include <fist-gui-qt/AvatarWidget.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
@@ -26,12 +26,13 @@ QVector<gap_TransactionStatus> g_finals =
   gap_transaction_cloud_buffered,
 };
 
-TransactionWidget::TransactionWidget(TransactionModel const& model):
+TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
   ListItem(nullptr, view::background, false),
   _transaction(model),
   _peer_avatar(new AvatarWidget(this->_transaction.avatar())),
   _peer_status(new QLabel),
   _layout(nullptr),
+  _filename(new QLabel(this)),
   _accept_button(new IconButton(QPixmap(":/buttons/accept.png"))),
   _reject_button(new IconButton(QPixmap(":/buttons/reject.png"))),
   _accept_reject_area(new QWidget),
@@ -44,6 +45,8 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
 {
   connect(&this->_transaction, SIGNAL(avatar_updated()),
           this, SLOT(_on_avatar_updated()));
+  connect(&this->_transaction, SIGNAL(status_updated()),
+          this, SLOT(apply_update()));
 
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
@@ -86,14 +89,17 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
     user_and_status->addStretch(0);
     texts->addSpacing(4);
 
-    auto filename = this->_transaction.files().size() == 1 ?
-      new QLabel(this->_transaction.files().first()) :
-      new QLabel(QString("%1 files").arg(this->_transaction.files().size()));
     {
-      filename->setToolTip(this->_transaction.tooltip());
-      view::transaction::files::style(*filename);
-      filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-      texts->addWidget(filename);
+      this->_filename->setText(
+        this->_transaction.files().size() == 1 ?
+        this->_transaction.files().first() :
+        QString("%1 files").arg(this->_transaction.files().size()));
+
+      this->_filename->installEventFilter(this);
+      this->_filename->setToolTip(this->_transaction.tooltip());
+      view::transaction::files::style(*this->_filename);
+      this->_filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+      texts->addWidget(this->_filename);
     }
     texts->addStretch();
   }
@@ -126,8 +132,6 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
     layout->addWidget(this->_accept_reject_area);
   }
 
-  this->_update();
-
   setSizePolicy(QSizePolicy::Minimum,
                 QSizePolicy::Minimum);
   adjustSize();
@@ -138,11 +142,36 @@ TransactionWidget::TransactionWidget(TransactionModel const& model):
           SIGNAL(onProgressChanged(float)));
 #endif
 
-  connect(this->_mtime_updater, SIGNAL(timeout()),
-          this, SLOT(update_mtime()));
-  this->_mtime_updater->setSingleShot(true);
-  this->_mtime_updater->start(1000);
+  this->apply_update();
   this->update();
+}
+
+bool
+TransactionWidget::eventFilter(QObject *obj, QEvent *event)
+{
+  if (!dynamic_cast<QWidget*>(obj))
+    return Super::eventFilter(obj, event);
+
+  if (obj == this->_filename)
+  {
+    if (!this->_transaction.is_sender() && this->_transaction.status() == gap_transaction_finished)
+    {
+      if (event->type() == QEvent::Enter)
+      {
+        view::transaction::files::hover_style(*this->_filename);
+        this->update();
+      }
+      else if (event->type() == QEvent::Leave)
+      {
+        view::transaction::files::style(*this->_filename);
+        this->update();
+      }
+      else if (event->type() == QEvent::MouseButtonPress)
+        emit open_file(this->_transaction.id());
+    }
+  }
+
+  return Super::eventFilter(obj, event);
 }
 
 /*-----------.
@@ -170,7 +199,7 @@ QSize
 TransactionWidget::sizeHint() const
 {
   auto size = this->_layout->minimumSize();
-  return QSize(this->widthHint(), size.height());
+  return QSize(Super::sizeHint().width(), size.height());
 }
 
 QSize
@@ -199,7 +228,7 @@ TransactionWidget::_on_avatar_updated()
 }
 
 void
-TransactionWidget::_update()
+TransactionWidget::apply_update()
 {
   ELLE_TRACE_SCOPE("%s: update", *this);
   this->_info_area->show();
@@ -272,7 +301,7 @@ TransactionWidget::_update()
     this->_peer_avatar->setTransactionCount(0);
   }
 
-  this->update_status();
+  this->_on_status_updated();
 }
 
 void
@@ -305,31 +334,11 @@ TransactionWidget::cancel()
   emit transaction_canceled(this->_transaction.id());
 }
 
-typedef std::pair<QString, uint32_t> Time;
-static
-Time
-QDateTime_to_friendly_duration(QDateTime const& time)
-{
-  auto secs = time.secsTo(QDateTime::currentDateTimeUtc());
-  std::vector<std::pair<int, QString>> printers{
-    {31556926, "year"}, {2419200, "month"}, {604800, "week"}, {86400, "day"}, {3600, "hour"}, {60, "min"}, {1, "sec"}};
-
-  for (auto const& duration_pair: printers)
-    if (secs > duration_pair.first)
-      return Time(QString::fromStdString(
-                    elle::sprintf("%s %s%s ago",
-                                  secs / duration_pair.first,
-                                  duration_pair.second,
-                                  ((secs / duration_pair.first) > 1) ? "s" : "")),
-                  duration_pair.first);
-  return Time("...", 1);
-}
-
 /*-------.
 | Status |
 `-------*/
 void
-TransactionWidget::update_status()
+TransactionWidget::_on_status_updated()
 {
   struct StatusUpdater:
     public elle::Printable
@@ -423,13 +432,23 @@ TransactionWidget::update_status()
     this->_peer_fullname->setText(this->_transaction.peer_fullname());
 }
 
+static
+int
+seconds_since_midnight(QDateTime const& date)
+{
+  auto time = date.time();
+  return time.hour() * 3600 + time.minute() * 60 + time.second();
+}
 void
 TransactionWidget::update_mtime()
 {
   ELLE_DUMP_SCOPE("mtime updated");
-  auto res = QDateTime_to_friendly_duration(this->_transaction.mtime());
-  this->_mtime->setText(res.first);
-  this->_mtime_updater->start(res.second);
+  auto current = QDateTime::currentDateTime();
+  auto transaction_mtime = this->_transaction.mtime().toLocalTime();
+  QString format(transaction_mtime.secsTo(current) < seconds_since_midnight(current)
+                 ? "h:mA"
+                 : "MMM d");
+  this->_mtime->setText(transaction_mtime.toString(format));
 }
 
 void

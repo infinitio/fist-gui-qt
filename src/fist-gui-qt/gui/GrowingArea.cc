@@ -33,8 +33,6 @@ namespace fist
       this->_body->installEventFilter(this);
       this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
       this->minimumHeightHint(0);
-
-      ELLE_LOG(">>>>>>>>>>> %s", this->size());
     }
 
     bool
@@ -59,7 +57,7 @@ namespace fist
       else if (event->type() == QEvent::Resize)
       {
         ELLE_DEBUG("element resized");
-        // action();
+        action();
       }
       else if (event->type() == QEvent::LayoutRequest)
       {

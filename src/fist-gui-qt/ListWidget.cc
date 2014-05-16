@@ -51,9 +51,6 @@ ListWidget::add_widget(ListItem* widget, Position position)
     this->_widgets.push_front(widget);
   else
     ELLE_ERR("%s: unknown widget position %s", *this, position);
-
-  ++this->_keyboard_index;
-  this->_keyboard_index %= this->_widgets.size();
   widget->setParent(this);
   widget->show();
   this->_scroll->raise();
@@ -67,16 +64,12 @@ ListWidget::remove_widget(ListItem* widget, bool all)
   if (all)
   {
     auto removed = this->_widgets.removeAll(widget);
-    this->_keyboard_index -= removed;
-    this->_keyboard_index %= this->_widgets.size();
   }
   else
   {
     auto index = this->_widgets.indexOf(widget);
     if (index != -1)
       this->_widgets.removeAt(index);
-    --this->_keyboard_index;
-    this->_keyboard_index %= this->_widgets.size();
   }
   widget->setParent(nullptr);
   delete widget;
@@ -288,7 +281,7 @@ ListWidget::_select_element(size_t index)
 }
 
 void
-ListWidget::keyPressEvent(QKeyEvent*)
+ListWidget::keyPressEvent(QKeyEvent* event)
 {
   return;
 

@@ -5,19 +5,38 @@
 
 #include <fist-gui-qt/Panel.hh>
 
-// ELLE_LOG_COMPONENT("infinit.FIST.Panel");
+ELLE_LOG_COMPONENT("infinit.FIST.Panel");
 
 Panel::Panel(Footer* footer,
-             QWidget* owner):
-  SmoothLayout(owner),
-  _footer(footer)
+             QWidget* owner)
+  : Super(owner)
+  , _body(new SmoothLayout(nullptr, 100))
+  , _footer(footer)
 {
+  ELLE_DEBUG("bite")
+    this->_body->setParent(this);
+  ELLE_DEBUG("boite")
+    this->_footer->setParent(this);
+  ELLE_DEBUG("lul");
+
   this->setHeightHint(this->_footer->size().height());
 
   this->setMaximumHeight(400);
   this->setFixedWidth(320);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+}
+
+void
+Panel::childEvent(QChildEvent* event)
+{
+  if (event->child() != this->_footer && event->child() != this->_body)
+  {
+    if (event->added())
+    {
+      event->child()->setParent(this->_body);
+    }
+  }
 }
 
 // /*-------.

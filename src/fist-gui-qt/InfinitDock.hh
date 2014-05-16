@@ -28,7 +28,7 @@ class InfinitDock:
 private:
   class Prologue;
   std::unique_ptr<Prologue> _prologue;
-  ELLE_ATTRIBUTE(fist::State, state);
+  ELLE_ATTRIBUTE(fist::State&, state);
 
 /*------.
 | Types |
@@ -40,7 +40,7 @@ public:
 | Construction |
 `-------------*/
 public:
-  InfinitDock(gap_State* state);
+  InfinitDock(fist::State& state);
 
 /*------------.
 | Destruction |
@@ -56,9 +56,6 @@ public:
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
   static void avatar_available_cb(uint32_t id);
-
-public slots:
-  void _update();
 
 public slots:
   void _systray_activated(QSystemTrayIcon::ActivationReason reason);
@@ -114,6 +111,11 @@ private:
   void
   hideEvent(QHideEvent* event) override;
 
+  QSize
+  sizeHint() const override
+  {
+    return QSize(326, Super::sizeHint().height());
+  }
 private:
   void
   focusOutEvent(QFocusEvent* event) override;
@@ -164,6 +166,12 @@ protected:
 
   void
   focusInEvent(QFocusEvent* event) override;
+
+  void
+  moveEvent(QMoveEvent* event) override
+  {
+    this->_position_panel();
+  }
 
 private:
   QPixmap _logo;

@@ -27,9 +27,9 @@ class LoginWindow:
   typedef RoundShadowWidget Super;
 
 private:
-  gap_State* _state;
+  ELLE_ATTRIBUTE(fist::State&, state);
 public:
-  LoginWindow(gap_State* state);
+  LoginWindow(fist::State& state);
   ~LoginWindow();
 
   void keyPressEvent(QKeyEvent* event);

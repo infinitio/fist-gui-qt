@@ -6,13 +6,14 @@
 TextListItem::TextListItem(QString const& string,
                            int height,
                            QWidget* parent)
-  : ListItem(parent, Qt::transparent, false)
+  : Super(parent, Qt::transparent, false)
   , _layout(new QHBoxLayout(this))
   , _height(height)
 {
+  this->_layout->setContentsMargins(42, 0, 32, 0);
   QLabel* text = new QLabel(string);
   view::transaction::no_notification::style(*text);
-  this->_layout->addWidget(text, 0, Qt::AlignCenter);
+  this->_layout->addWidget(text, 1);
 }
 
 /*-------.
@@ -22,7 +23,7 @@ TextListItem::TextListItem(QString const& string,
 QSize
 TextListItem::sizeHint() const
 {
-  return QSize(this->widthHint(), this->_height);
+  return QSize(Super::sizeHint().width(), this->_height);
 }
 
 QSize

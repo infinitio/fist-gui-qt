@@ -28,7 +28,8 @@ namespace fist
       , _foo(new QWidget(this))
       , _attach(new IconButton(QPixmap(":/icons/files.png")))
       , _text(new QLabel(view::send::file_adder::text))
-      , _expanser(new fist::TwoStateIconButton(QPixmap(":/buttons/hide@2x.png"), QPixmap(":/buttons/show@2x.png"), true, 10))
+      , _expanser(new fist::TwoStateIconButton(QPixmap(":/buttons/show@2x.png"), QPixmap(":/buttons/hide@2x.png"), true, 10))
+      , _add_file(new IconButton(QPixmap(":/icons/files.png")))
       , _files()
       , _separator(new HorizontalSeparator(this))
       , _list(new ListWidget(this))
@@ -79,19 +80,21 @@ namespace fist
         layout->setSpacing(9);
         layout->addWidget(this->_text, 1);
         layout->addWidget(this->_expanser);
+        layout->addWidget(this->_add_file);
         adder->adjustSize();
         adder->setFixedHeight(adder->size().height());
         vlayout->addWidget(adder);
 
         //vlayout->addLayout(layout);
-
       }
 
       vlayout->addWidget(this->_separator);
       vlayout->addWidget(this->_growing_area);
       this->adjustSize();
+
       this->_attach->installEventFilter(this);
       this->_text->installEventFilter(this);
+
       this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
       this->setAcceptDrops(true);
 
@@ -102,6 +105,9 @@ namespace fist
 
       connect(this, SIGNAL(file_added()), SLOT(_update_message()));
       connect(this, SIGNAL(file_removed()), SLOT(_update_message()));
+
+      connect(this->_growing_area, SIGNAL(shrinking()), this->_separator, SLOT(hide()));
+      connect(this->_growing_area, SIGNAL(expanding()), this->_separator, SLOT(show()));
 
       this->_expanser->hide();
       this->_separator->hide();
@@ -215,7 +221,9 @@ namespace fist
       }
       else
       {
-        this->_expanser->hide();
+        if (this->_growing_area->state() == gui::GrowingArea::State::shrinking ||
+            this->_growing_area->state() == gui::GrowingArea::State::shrinked)
+          this->_expanser->hide();
       }
       this->repaint();
     }

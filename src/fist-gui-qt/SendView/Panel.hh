@@ -22,7 +22,7 @@
 # include <fist-gui-qt/Panel.hh>
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
-# include <fist-gui-qt/gui/Tabs.hh>
+# include <fist-gui-qt/gui/TabWidget.hh>
 
 namespace fist
 {
@@ -103,7 +103,7 @@ namespace fist
 
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
-      ELLE_ATTRIBUTE_R(Tabber*, tabs);
+      ELLE_ATTRIBUTE_R(gui::TabWidget*, tabs);
       ELLE_ATTRIBUTE_R(Users*, users);
       ELLE_ATTRIBUTE_R(Message*, message);
       ELLE_ATTRIBUTE_R(Files*, file_adder);
@@ -117,7 +117,7 @@ namespace fist
     | Layout |
     `-------*/
     private:
-      std::unordered_map<uint32_t, std::unique_ptr<UserModel>> _user_models;
+      std::unordered_map<uint32_t, std::unique_ptr<model::User>> _user_models;
 
       void
       on_show() override;

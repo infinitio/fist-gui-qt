@@ -61,8 +61,8 @@ class InfinitDock::Prologue
 
 // Creating the transaction panel is a long operation. So we just wait until all
 // the graphical part is fully load, and then, initialize it.
-InfinitDock::InfinitDock(gap_State* state)
-  : _prologue(new Prologue(state))
+InfinitDock::InfinitDock(fist::State& state)
+  : _prologue(new Prologue(state.state()))
   , _state(state)
   , _transaction_panel(nullptr)
   , _send_panel(new fist::sendview::Panel(this->_state))
@@ -95,7 +95,8 @@ InfinitDock::InfinitDock(gap_State* state)
   this->connect(this->_systray, SIGNAL(messageClicked()),
                 this, SLOT(_systray_message_clicked()));
 
-  this->_transaction_panel = new MainPanel(state);
+  this->_transaction_panel = new MainPanel(this->_state,
+                                           this);
 
   this->_register_panel(this->_transaction_panel);
   this->_register_panel(this->_send_panel);
@@ -104,6 +105,9 @@ InfinitDock::InfinitDock(gap_State* state)
           SLOT(_position_panel()));
 
   {
+    connect(this->_transaction_panel,
+            SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
+            this, SLOT(_systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
     connect(this->_transaction_panel->footer()->send(),
             SIGNAL(released()),
             this,
@@ -162,13 +166,6 @@ InfinitDock::InfinitDock(gap_State* state)
   gap_avatar_available_callback(_state.state(), InfinitDock::avatar_available_cb);
 
   this->_show_transactions_view();
-
-  ELLE_DEBUG("start the update loop")
-  {
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
-    timer->start(1000);
-  }
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_report_a_problem, SIGNAL(triggered()),
@@ -375,15 +372,13 @@ InfinitDock::_position_panel()
 
   static int margin = 5;
 
-  this->move(
-    qBound(screen.left() + margin,
-           x,
-           screen.right() - margin - this->width()),
-    qBound(screen.top() + margin,
-           y,
-           screen.bottom() - margin - this->height()));
-
-  ELLE_DUMP("%s: new position: (%s, %s)", *this, this->x(), this->y());
+  int new_x = qBound(screen.left() + margin, x, screen.right() - margin - this->width());
+  int new_y = qBound(screen.top() + margin, y, screen.bottom() - margin - this->height());
+  if (this->x() != new_x || this->y() != new_y)
+  {
+    this->move(new_x, new_y);
+    ELLE_DUMP("%s: new position: (%s, %s)", *this, this->x(), this->y());
+  }
 }
 
 
@@ -471,6 +466,10 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
     else if (event->key() == Qt::Key_S)
     {
       this->_show_send_view();
+    }
+    else
+    {
+      static_cast<QObject*>(this->centralWidget())->event(event);
     }
   }
 
@@ -675,16 +674,6 @@ InfinitDock::_on_onboarded_sending_completed()
   // checking the previously stored one.
   fist::settings()["onboarding"].set(
     onboarded_sending_complete, QString(INFINIT_VERSION));
-}
-
-void
-InfinitDock::_update()
-{
-  ELLE_DUMP("%s: poll", *this);
-  auto res = gap_poll(_state.state());
-
-  if (!res)
-    ELLE_ERR("poll failed: %s", res);
 }
 
 void

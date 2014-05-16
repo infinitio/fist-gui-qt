@@ -5,13 +5,13 @@
 
 # include <fist-gui-qt/AvatarIcon.hh>
 # include <fist-gui-qt/ListItem.hh>
-# include <fist-gui-qt/UserModel.hh>
+# include <fist-gui-qt/model/User.hh>
 
 class UserWidget:
   public ListItem
 {
 public:
-  UserWidget(UserModel const& model,
+  UserWidget(fist::model::User const& model,
              QWidget* parent = nullptr);
 
   virtual
@@ -32,7 +32,7 @@ public:
 | Attributes |
 `-----------*/
 private:
-  UserModel const& _model;
+  fist::model::User const& _model;
   AvatarIcon* _avatar;
 
 /*-------.

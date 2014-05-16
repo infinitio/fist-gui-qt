@@ -45,24 +45,23 @@ namespace fist
     Panel::Panel(fist::State& state)
       : Super(new Footer)
       , _state(state)
-      , _tabs(new Tabber(this))
+      , _tabs(new fist::gui::TabWidget(this))
       , _users(new Users(_state, this))
       , _message(new Message(this))
       , _file_adder(new Files(this))
     {
-      this->_tabs->add_tab("SEND TO USER", {_users, _message, _file_adder});
-      this->_tabs->add_tab("GET A LINK", {_message, _file_adder});
+      this->_tabs->add_tab("SEND TO USER", { this->_users, this->_message, this->_file_adder, this->_message->top_separator(), });
+      this->_tabs->add_tab("GET A LINK", { this->_message, this->_file_adder, });
 
       this->footer()->setParent(this);
-      // this->_file_list->setStyleSheet("color:green;");
-
-      // connect(this->_search, SIGNAL(return_pressed()),
-      //         this, SLOT(_pick_user()));
 
       connect(this->_file_adder, SIGNAL(clicked()),
               this, SIGNAL(choose_files()));
 
       connect(this->_file_adder->attach(), SIGNAL(released()),
+              this, SIGNAL(choose_files()));
+
+      connect(this->_file_adder->add_file(), SIGNAL(released()),
               this, SIGNAL(choose_files()));
 
       connect(this->_file_adder, SIGNAL(file_dropped(QUrl const&)),
@@ -86,15 +85,6 @@ namespace fist
       connect(this, SIGNAL(canceled()),
               this, SIGNAL(switch_signal()));
 
-      // connect(this->_file_adder->expanser(), SIGNAL(pressed()),
-      //         this, SLOT(_shrink_files()));
-
-      // connect(this->_file_adder->expanser(), SIGNAL(released()),
-      //         this, SLOT(_expand_files()));
-
-      //XXX: Could be factored.
-      // this->_users_part_separator->hide();
-
       this->setAcceptDrops(true);
     }
 
@@ -102,15 +92,14 @@ namespace fist
     Panel::_pick_user()
     {
       ELLE_TRACE_SCOPE("%s: pick user", *this);
-      if (this->_users->recipients().empty())
-      {
-        // auto uid = this->_results.last();
-        // this->_set_peer(uid);
-      }
-      else
+      if (!this->_users->recipients().empty())
       {
         // ELLE_DEBUG("try to send to %s", this->_peer_id);
         this->_send();
+      }
+      else
+      {
+        this->_users->search_field()->setFocus();
       }
     }
 
@@ -122,6 +111,7 @@ namespace fist
       if (!this->_users->peer_valid())
       {
         ELLE_DEBUG("peer is not set");
+        this->_users->search_field()->setFocus();
         return;
       }
 

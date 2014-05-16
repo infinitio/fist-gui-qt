@@ -9,6 +9,7 @@
 class TextListItem:
   public ListItem
 {
+  typedef ListItem Super;
 public:
   TextListItem(QString const& text,
                int height = 40,

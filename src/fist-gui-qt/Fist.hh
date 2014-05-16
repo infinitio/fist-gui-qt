@@ -13,7 +13,6 @@
 # include <elle/attribute.hh>
 
 # include <surface/gap/fwd.hh>
-
 # include <fist-gui-qt/fwd.hh>
 
 class Fist:
@@ -96,14 +95,7 @@ private slots:
 
 private:
   ELLE_ATTRIBUTE(std::unique_ptr<Prologue>, prologue);
-  // Handle gap destruction automatically.
-  struct GapDeleter
-  {
-    void
-    operator () (gap_State* state) const;
-  };
-  typedef std::unique_ptr<gap_State, GapDeleter> StatePtr;
-  ELLE_ATTRIBUTE(StatePtr, state);
+  ELLE_ATTRIBUTE(std::unique_ptr<fist::State>, state);
   // The local server can be used as a 'only one instance running' lock.
   // They are 3 ways usually used:
   // - QLocalServer.

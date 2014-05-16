@@ -5,7 +5,7 @@
 
 # include <fist-gui-qt/AvatarIcon.hh>
 # include <fist-gui-qt/ListItem.hh>
-# include <fist-gui-qt/UserModel.hh>
+# include <fist-gui-qt/model/User.hh>
 # include <fist-gui-qt/TwoStateIconButton.hh>
 
 class SearchResultWidget:
@@ -13,7 +13,7 @@ class SearchResultWidget:
 {
   typedef ListItem Super;
 public:
-  SearchResultWidget(UserModel const& model,
+  SearchResultWidget(fist::model::User const& model,
                      bool preselected = false,
                      QWidget* parent = nullptr);
   virtual
@@ -50,7 +50,7 @@ _unselected();
 | Attributes |
 `-----------*/
 private:
-  UserModel const& _model;
+  fist::model::User const& _model;
   AvatarIcon* _avatar;
   ELLE_ATTRIBUTE_R(fist::TwoStateIconButton*, selector);
 

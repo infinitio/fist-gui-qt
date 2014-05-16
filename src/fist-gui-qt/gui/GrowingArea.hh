@@ -55,7 +55,7 @@ namespace fist
       ELLE_ATTRIBUTE_R(QWidget*, body);
       ELLE_ATTRIBUTE_Rw(int, minimumHeightHint);
       ELLE_ATTRIBUTE(QPropertyAnimation*, height_animator);
-      ELLE_ATTRIBUTE(State, state);
+      ELLE_ATTRIBUTE_R(State, state);
 
     public:
       QSize

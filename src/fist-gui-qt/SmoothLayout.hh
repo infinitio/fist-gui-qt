@@ -3,6 +3,7 @@
 
 # include <QWidget>
 # include <QPropertyAnimation>
+# include <QList>
 # include <QVBoxLayout>
 
 # include <elle/Printable.hh>
@@ -24,7 +25,8 @@ public:
 | Construction |
 `-------------*/
 public:
-  SmoothLayout(QWidget* owner = nullptr);
+  SmoothLayout(QWidget* owner = nullptr,
+               int height_animation_duration = 0);
 
 /*-------.
 | Layout |
@@ -46,7 +48,7 @@ protected:
   void
   _layout();
 private:
-  QWidgetList
+  QList<QWidget*>
   _child_widgets(bool visible_only = false) const;
 
   // Filter anchor events to detect changes like visibility changed,

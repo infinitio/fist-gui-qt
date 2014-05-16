@@ -7,6 +7,8 @@
 
 # include <elle/attribute.hh>
 
+# include <fist-gui-qt/HorizontalSeparator.hh>
+
 namespace fist
 {
   namespace sendview
@@ -19,6 +21,7 @@ namespace fist
       Message(QWidget* parent,
                 int maximum_characters = 100);
 
+      ELLE_ATTRIBUTE_R(HorizontalSeparator*, top_separator);
       ELLE_ATTRIBUTE_R(QLabel, icon);
       ELLE_ATTRIBUTE_R(QLineEdit*, message);
       ELLE_ATTRIBUTE(int, maximum_characters);
@@ -32,9 +35,10 @@ namespace fist
       QString
       text() const;
 
-public slots:
-void
-clear();
+    public slots:
+      void
+      clear();
+
     private:
       QSize
       sizeHint() const override;

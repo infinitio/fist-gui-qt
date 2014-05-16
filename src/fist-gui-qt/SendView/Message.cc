@@ -11,6 +11,7 @@
     Message::Message(QWidget* parent,
                      int maximum_characters)
       : Super(parent)
+      , _top_separator(new HorizontalSeparator(this))
       , _icon()
       , _message(new QLineEdit(this))
       , _maximum_characters(maximum_characters)
@@ -36,7 +37,7 @@
       QVBoxLayout* vlayout = new QVBoxLayout(this);
       vlayout->setSpacing(0);
       vlayout->setContentsMargins(0, 0, 0, 0);
-      vlayout->addWidget(new HorizontalSeparator(this));
+      vlayout->addWidget(this->_top_separator);
       QHBoxLayout* layout = new QHBoxLayout;
       layout->setContentsMargins(14, 0, 12, 0);
       layout->addWidget(&this->_icon);

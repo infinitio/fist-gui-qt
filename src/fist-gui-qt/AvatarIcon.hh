@@ -1,5 +1,5 @@
-#ifndef AVATARICON_HH
-# define AVATARICON_HH
+#ifndef FIST_GUI_QT_AVATARICON_HH
+# define FIST_GUI_QT_AVATARICON_HH
 
 # include <fist-gui-qt/AvatarWidget.hh>
 
@@ -12,6 +12,8 @@ class AvatarIcon:
 public:
   AvatarIcon(QPixmap const& pixmap,
              QSize const& size = QSize(35, 35));
+  virtual
+  ~AvatarIcon() = default;
 
   void
   set_avatar(QPixmap const& pixmap);

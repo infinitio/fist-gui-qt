@@ -15,9 +15,9 @@
 
 # include <elle/attribute.hh>
 
-# include <fist-gui-qt/UserModel.hh>
-# include <fist-gui-qt/TransactionModel.hh>
-// # include <fist-gui-qt/LinkModel.hh>
+# include <fist-gui-qt/model/Link.hh>
+# include <fist-gui-qt/model/User.hh>
+# include <fist-gui-qt/model/Transaction.hh>
 
 # include <surface/gap/gap.hh>
 
@@ -31,13 +31,36 @@ namespace fist
   {
   public:
     State(gap_State* state);
+    virtual
+    ~State() = default;
+    // Handle gap destruction automatically.
+    struct GapDeleter
+    {
+      void
+      operator () (gap_State* state) const;
+    };
+    typedef std::unique_ptr<gap_State, GapDeleter> StatePtr;
+    ELLE_ATTRIBUTE(StatePtr, state);
 
-    ELLE_ATTRIBUTE_R(gap_State*, state);
+  public:
+    gap_State*
+    state() const
+    {
+      return this->_state.get();
+    }
 
+  private slots:
+    void
+    _poll();
+  public slots:
+    void
+    on_logged_in();
+
+  public:
     /*------.
-      | Users |
-      `------*/
-    typedef QVector<UserModel*> Users;
+    | Users |
+    `------*/
+    typedef QVector<model::User*> Users;
 
     // Return every swaggers.
     Users
@@ -61,13 +84,25 @@ namespace fist
     Users
     results();
 
-    typedef std::unordered_map<uint32_t, std::unique_ptr<UserModel>> UserModels;
+    typedef std::unordered_map<uint32_t, std::unique_ptr<model::User>> UserModels;
     ELLE_ATTRIBUTE_R(UserModels, users);
     typedef QFuture<std::vector<uint32_t>> FutureSearchResult;
     typedef QFutureWatcher<std::vector<uint32_t>> SearchResultWatcher;
     ELLE_ATTRIBUTE(FutureSearchResult, search_future);
     ELLE_ATTRIBUTE_X(SearchResultWatcher, search_watcher);
     ELLE_ATTRIBUTE(std::vector<uint32_t>, last_results);
+
+    static
+    void
+    avatar_available_callback(uint32_t id);
+    void
+    on_avatar_available_callback(uint32_t);
+
+    static
+    void
+    user_status_callback(uint32_t id, gap_UserStatus status);
+    void
+    on_user_status_callback(uint32_t, gap_UserStatus status);
 
   signals:
     void
@@ -91,17 +126,64 @@ namespace fist
     | Transactions |
     `-------------*/
     typedef boost::multi_index::multi_index_container<
-      TransactionModel,
+      model::Transaction,
       boost::multi_index::indexed_by<
         boost::multi_index::ordered_unique<
-          boost::multi_index::const_mem_fun<TransactionModel, uint32_t, &TransactionModel::id>
+          boost::multi_index::const_mem_fun<model::Model, uint32_t, &model::Model::id>
           >,
         boost::multi_index::ordered_non_unique<
-          boost::multi_index::const_mem_fun<TransactionModel, QDateTime const&, &TransactionModel::mtime>
+          boost::multi_index::const_mem_fun<model::Transaction, QDateTime const&, &model::Transaction::mtime>
           >
         >
-      > TransactionModels;
-    ELLE_ATTRIBUTE_R(TransactionModels, transactions);
+      > Transactions;
+    ELLE_ATTRIBUTE_R(Transactions, transactions);
+
+    // Some method are static in order to provide a prototype matching  callback
+    // the the C api.
+    // A global instance of state is accessible in order to allow the bouncing
+    // static function to operate on the instance of State.
+    static
+    void
+    transaction_callback(uint32_t id,
+                         gap_TransactionStatus status);
+    void
+    on_transaction_callback(uint32_t,
+                            gap_TransactionStatus);
+
+    model::Transaction const&
+    transaction(uint32_t id);
+
+  public slots:
+    void
+    on_transaction_accepted(uint32_t id);
+    void
+    on_transaction_rejected(uint32_t id);
+    void
+    on_transaction_canceled(uint32_t id);
+    void
+    open_file(uint32_t id);
+  signals:
+    void
+    new_transaction(uint32_t id);
+    void
+    transaction_updated(uint32_t id);
+
+  private:
+    /*------.
+    | Links |
+    `------*/
+    typedef boost::multi_index::multi_index_container<
+      model::Link,
+      boost::multi_index::indexed_by<
+        boost::multi_index::ordered_unique<
+          boost::multi_index::const_mem_fun<model::Model, uint32_t, &model::Model::id>
+          >,
+        boost::multi_index::ordered_non_unique<
+          boost::multi_index::const_mem_fun<model::Link, QDateTime const&, &model::Link::mtime>
+          >
+        >
+      > Links;
+    ELLE_ATTRIBUTE_R(Links, links);
 
   private:
     Q_OBJECT;

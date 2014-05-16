@@ -15,7 +15,8 @@
 
 ELLE_LOG_COMPONENT("fooo");
 
-SmoothLayout::SmoothLayout(QWidget* owner):
+SmoothLayout::SmoothLayout(QWidget* owner,
+                           int height_animation_duration):
   Super(owner),
   _height_hint(0),
   _width_hint(0),
@@ -24,7 +25,7 @@ SmoothLayout::SmoothLayout(QWidget* owner):
   _height_animation(new QPropertyAnimation(this, "heightHint")),
   _width_animation(new QPropertyAnimation(this, "widthHint"))
 {
-  this->_height_animation->setDuration(100);
+  this->_height_animation->setDuration(height_animation_duration);
   connect(this->_height_animation, SIGNAL(finished()),
           this, SIGNAL(resized()));
   // this->_height_animation->setEasingCurve(QEasingCurve::InOutQuad);
@@ -93,8 +94,8 @@ SmoothLayout::eventFilter(QObject *obj, QEvent *event)
 void
 SmoothLayout::resizeEvent(QResizeEvent* event)
 {
-  std::cerr << "resize " << event->size() << std::endl;
   auto widgets = this->_child_widgets();
+
   QSize size(event->size());
   // Compute total children height hint and number of growing children.
   int total_height = 0;
@@ -161,10 +162,10 @@ SmoothLayout::sizeHint() const
   //return QSize(, this->_height_hint);
 }
 
-QWidgetList
+QList<QWidget*>
 SmoothLayout::_child_widgets(bool visible_only) const
 {
-  QWidgetList widgets;
+  QList<QWidget*> widgets;
   for (QObject* child: this->children())
     if (QWidget* widget = dynamic_cast<QWidget*>(child))
     {
@@ -177,7 +178,6 @@ SmoothLayout::_child_widgets(bool visible_only) const
 void
 SmoothLayout::_layout()
 {
-  ELLE_LOG("??????");
   auto widgets = this->_child_widgets();
 
   int height = 0;
@@ -194,14 +194,13 @@ SmoothLayout::_layout()
     width = std::max(width, hint.width());
   }
 
-  if (this->isVisible() || true)
+  if (this->isVisible())
   {
     if (height != this->_height_hint)
     {
       this->_height_animation->stop();
       this->_height_animation->setEndValue(height);
       this->_height_animation->start();
-      ELLE_LOG("..........................");
     }
     if (width != this->_width_hint)
     {

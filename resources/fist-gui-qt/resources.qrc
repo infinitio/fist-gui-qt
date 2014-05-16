@@ -117,6 +117,10 @@
 
     <file>../buttons/show@2x.png</file>
     <file>../buttons/hide@2x.png</file>
+    <file>../buttons/clipboard@2x.png</file>
+    <file>../buttons/clipboard.png</file>
+    <file>../buttons/share@2x.png</file>
+    <file>../buttons/share.png</file>
 
     <!-- bgs -->
     <file>../bgs/header-top-gray@2x.png</file>

@@ -29,11 +29,11 @@ namespace fist
       , _tooltip(nullptr)
     {
       ELLE_TRACE_SCOPE("%s: creation", *this);
-      connect(&this->_dock->transactionPanel(), SIGNAL(new_transaction(uint32_t)),
+      connect(this->_dock->transactionPanel().transactions(), SIGNAL(new_transaction(uint32_t)),
               this, SLOT(_on_new_transaction(uint32_t)));
-      connect(&this->_dock->transactionPanel(), SIGNAL(new_transaction(uint32_t)),
+      connect(this->_dock->transactionPanel().transactions(), SIGNAL(new_transaction(uint32_t)),
               this, SLOT(_on_new_transaction(uint32_t)));
-      connect(&this->_dock->transactionPanel(), SIGNAL(new_transaction_shown(TransactionWidget*)),
+      connect(this->_dock->transactionPanel().transactions(), SIGNAL(new_transaction_shown(TransactionWidget*)),
               this, SLOT(_on_transaction_widget_shown(TransactionWidget*)));
     }
 
@@ -60,6 +60,7 @@ namespace fist
       auto const& model = widget->transaction();
       if (this->_transactions.find(model.id()) == this->_transactions.end())
         return;
+
       this->_transactions[model.id()] = widget;
       connect(widget, SIGNAL(transaction_accepted(uint32_t)),
               this, SLOT(_on_transaction_accepted(uint32_t)));
@@ -140,9 +141,9 @@ namespace fist
                  this, SLOT(_on_send_panel_visible()));
 
       this->_choose_peer();
-      connect(widget, SIGNAL(peer_found()),
+      connect(widget->users(), SIGNAL(peer_found()),
               this, SLOT(_on_peer_chosen()));
-      connect(widget, SIGNAL(file_added()),
+      connect(widget->file_adder(), SIGNAL(file_added()),
               this, SLOT(_on_file_added_before_peer()));
       connect(widget, SIGNAL(sent()),
               this, SLOT(_send_onboarding_done()));
@@ -154,7 +155,7 @@ namespace fist
     Onboarder::_choose_peer()
     {
       this->_set_tooltip(
-        this->_dock->_send_panel->users(),
+        this->_dock->_send_panel->users()->search_field(),
         "Search for a friend using\n"
         "his fullname or nickname.",
         Qt::AlignLeft);
@@ -180,11 +181,11 @@ namespace fist
         this->_on_file_added_before_peer();
       }
 
-      disconnect(send_panel, SIGNAL(peer_found()),
+      disconnect(send_panel->users(), SIGNAL(peer_found()),
                  this, SLOT(_on_peer_chosen()));
-      disconnect(send_panel, SIGNAL(file_added()),
+      disconnect(send_panel->file_adder(), SIGNAL(file_added()),
                  this, SLOT(_on_file_added_before_peer()));
-      connect(send_panel, SIGNAL(file_added()),
+      connect(send_panel->file_adder(), SIGNAL(file_added()),
               this, SLOT(_on_transaction_ready()));
     }
 

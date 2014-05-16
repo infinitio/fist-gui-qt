@@ -9,19 +9,6 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.FileItem");
 
-namespace
-{
-  struct Separator:
-    public QFrame
-  {
-    Separator()
-    {
-      this->setFrameShape(QFrame::VLine);
-      this->setFrameShadow(QFrame::Sunken);
-    }
-  };
-}
-
 FileItem::FileItem(QUrl const& path):
   ListItem(nullptr, view::send::file::background, false),
   _layout(new QHBoxLayout(this)),

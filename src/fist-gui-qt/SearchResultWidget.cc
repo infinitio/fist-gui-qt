@@ -10,7 +10,7 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.SearchResult");
 
-SearchResultWidget::SearchResultWidget(UserModel const& model,
+SearchResultWidget::SearchResultWidget(fist::model::User const& model,
                                        bool preselected,
                                        QWidget* parent):
   ListItem(parent, Qt::white),
@@ -20,8 +20,7 @@ SearchResultWidget::SearchResultWidget(UserModel const& model,
     QPixmap(":/buttons/user-unselected@2x.png"), QPixmap(":/buttons/user-selected@2x"), preselected)),
   _layout(new QHBoxLayout(this))
 {
-  connect(&this->_model, SIGNAL(avatar_updated()),
-            this, SLOT(_on_avatar_updated()));
+  connect(&this->_model, SIGNAL(avatar_updated()), this, SLOT(_on_avatar_updated()));
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
   this->_layout->setSpacing(8);
@@ -85,6 +84,7 @@ void
 SearchResultWidget::_on_avatar_updated()
 {
   this->_avatar->set_avatar(this->_model.avatar());
+  this->update();
 }
 
 void

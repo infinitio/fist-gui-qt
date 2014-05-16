@@ -1,0 +1,82 @@
+#include <QVBoxLayout>
+
+#include <fist-gui-qt/Footer.hh>
+#include <fist-gui-qt/MainView/Links.hh>
+#include <fist-gui-qt/MainView/LinkWidget.hh>
+#include <fist-gui-qt/TextListItem.hh>
+
+#include <elle/assert.hh>
+#include <elle/log.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.Transactions");
+
+namespace fist
+{
+  namespace mainview
+  {
+    Links::Links(fist::State& state,
+                 QWidget* parent)
+      :  QWidget(parent)
+      , _state(state)
+      , _link_list(new ListWidget(this))
+      , _widgets()
+    {
+      this->_link_list->setMaxRows(4);
+      auto* layout = new QVBoxLayout(this);
+      layout->setContentsMargins(0, 0, 0, 0);
+      layout->setMargin(0);
+      layout->addWidget(this->_link_list);
+
+      if (this->_state.links().get<0>().empty())
+      {
+        this->_link_list->add_widget(new TextListItem("You have no lin yet", 70, this));
+        return;
+      }
+
+      for (model::Link const& model: this->_state.links().get<0>())
+      {
+        this->add_link(model);
+      }
+
+      // connect(&this->_state, SIGNAL(new_transaction(id)),
+      //         this, SLOT(add_transaction(uint32_t)));
+      // connect(&this->_state, SIGNAL(transaction_updated(uint32_t)),
+      //         this, SLOT(_on_transaction_updated(uint32_t)));
+    }
+
+    void
+    Links::add_link(uint32_t id)
+    {
+      ELLE_ASSERT_CONTAINS(this->_state.links().get<0>(), id);
+      this->add_link(*this->_state.links().get<0>().find(id));
+    }
+
+    void
+    Links::add_link(model::Link const& model)
+    {
+      if (this->_widgets.empty())
+      {
+        this->_link_list->clearWidgets();
+      }
+
+      if (this->_widgets.find(model.id()) != this->_widgets.end())
+      {
+        ELLE_WARN("%s: link %s already present", *this, model);
+      }
+
+      auto widget = new LinkWidget(model);
+
+      this->_link_list->add_widget(widget,
+                                   ListWidget::Position::Top);
+      this->_widgets[model.id()] = widget;
+      this->update();
+      this->updateGeometry();
+    }
+
+    void
+    Links::print(std::ostream& stream) const
+    {
+      stream << "Links";
+    }
+  }
+}
