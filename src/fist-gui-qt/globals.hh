@@ -1,9 +1,10 @@
-#ifndef GLOBALS_HH
-# define GLOBALS_HH
+#ifndef FIST_GUI_QT_GLOBALS_HH
+# define FIST_GUI_QT_GLOBALS_HH
 
-# include <QFont>
 # include <QColor>
+# include <QFont>
 # include <QLabel>
+# include <QVector>
 
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
@@ -35,12 +36,12 @@ namespace
   {
     TextStyle(QFont const& font,
               QColor const& color = QColor(0x25, 0x25, 0x25),
-              Qt::Alignment const& aligment = Qt::AlignLeft):
+              Qt::Alignment const& aligment = Qt::AlignLeft | Qt::AlignVCenter):
       _font(font),
       _color(color),
       _alignement(aligment)
     {
-      this->_font.setStyleStrategy(QFont::PreferAntialias);
+      this->_font.setStyleStrategy(QFont::PreferQuality);
     }
 
     void
@@ -71,6 +72,16 @@ namespace
 namespace regexp
 {
   static QString email = "[a-z0-9\\._%+-]+@[a-z0-9\\.-]+\\.[a-z]{2,12}";
+}
+
+namespace list
+{
+  namespace separator
+  {
+    static
+    QVector<QColor> const
+    colors({QColor(0xE3, 0xE3, 0xE3), Qt::white});
+  }
 }
 
 namespace view
