@@ -193,6 +193,12 @@ namespace fist
         emit canceled();
       else if (event->key() == Qt::Key_Return)
         this->_pick_user();
+      else if (event->key() == Qt::Key_Right)
+        this->_tabs->activate_next();
+      else if (event->key() == Qt::Key_Left)
+        this->_tabs->activate_previous();
+      else if (event->key() == Qt::Key_F)
+        this->_file_adder->add_file()->click();
     }
 
   /*------------.
@@ -205,6 +211,7 @@ namespace fist
       emit set_background_color(Qt::white);
       emit shown();
       this->update();
+      this->_tabs->activate_first();
       this->_users->clear_search();
       this->_users->setFocus();
     }

@@ -64,14 +64,15 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
   auto layout = new QHBoxLayout(this);
   // XXX: should but 13, 13, 13, 13 but avatar widget size is strange.
   layout->setContentsMargins(8, 8, 13, 8);
+  layout->setSpacing(5);
   this->_layout = layout;
   layout->addWidget(this->_peer_avatar, 0, Qt::AlignLeft);
 
   {
     auto texts = new QVBoxLayout;
-    texts->setContentsMargins(5, 0, 5, 0);
+    texts->setContentsMargins(5, 0, 0, 0);
 
-    layout->addLayout(texts);
+    layout->addLayout(texts, 1);
 
     texts->addStretch();
     auto user_and_status = new QHBoxLayout;
@@ -98,19 +99,23 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
       this->_filename->installEventFilter(this);
       this->_filename->setToolTip(this->_transaction.tooltip());
       view::transaction::files::style(*this->_filename);
-      this->_filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+      this->_filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
       texts->addWidget(this->_filename);
     }
     texts->addStretch();
   }
-  layout->addStretch();
+
   {
     auto time_and_info = new QVBoxLayout;
+    time_and_info->setContentsMargins(0, 0, 0, 0);
+    time_and_info->setSpacing(4);
     this->_info_area->setLayout(time_and_info);
+    time_and_info->addStretch();
     view::transaction::date::style(*this->_mtime);
     time_and_info->addWidget(this->_mtime, 0, Qt::AlignCenter | Qt::AlignRight);
     auto status_and_cancel = new QHBoxLayout;
     time_and_info->addLayout(status_and_cancel);
+    time_and_info->addStretch();
     {
       status_and_cancel->addStretch();
       status_and_cancel->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);

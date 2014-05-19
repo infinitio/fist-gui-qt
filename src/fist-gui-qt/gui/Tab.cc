@@ -109,15 +109,14 @@ namespace fist
     void
     Tab::_notify_tabber()
     {
-      this->_tabber.active_tab(*this);
+      this->_tabber.activate_tab(*this);
     }
 
     void
     Tab::enable()
     {
       for (QWidget* widget: this->_widgets)
-//        if (widget->isHidden())
-          widget->show();
+        widget->show();
       this->_active();
       this->update();
     }
@@ -126,8 +125,7 @@ namespace fist
     Tab::disable()
     {
       for (QWidget* widget: this->_widgets)
-//        if (widget->isVisible())
-          widget->hide();
+        widget->hide();
       this->_inactive();
       this->update();
     }

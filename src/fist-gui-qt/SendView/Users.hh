@@ -98,7 +98,10 @@ namespace fist
       peer_valid() const;
 
     protected:
-      void keyPressEvent(QKeyEvent* event);
+      void
+      keyPressEvent(QKeyEvent* event) override;
+      void
+      showEvent(QShowEvent* event) override;
 
     Q_SIGNALS:
       void

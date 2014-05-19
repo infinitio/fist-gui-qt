@@ -33,6 +33,10 @@ private:
   ELLE_ATTRIBUTE_R(fist::mainview::Transactions*, transactions);
   ELLE_ATTRIBUTE_R(fist::mainview::Links*, links);
 
+private:
+  void
+  keyPressEvent(QKeyEvent* event) override;
+
 public:
   TransactionFooter*
   footer();

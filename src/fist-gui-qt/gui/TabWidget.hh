@@ -23,6 +23,7 @@ namespace fist
       public QWidget
     {
       typedef QWidget Super;
+    private:
     public:
       TabWidget(QWidget* parent = nullptr);
 
@@ -38,7 +39,23 @@ namespace fist
 
       // Make the tab active (Make every widgets visible).
       void
-      active_tab(Tab& tab);
+      activate_tab(Tab& tab);
+
+      // Make the first tab active.
+      void
+      activate_first();
+
+      // Get the index of the current tab.
+      int
+      _active_tab_index() const;
+
+      // Activate next tab.
+      void
+      activate_next();
+
+      // Activate next tab.
+      void
+      activate_previous();
 
       bool
       is_active_tab(Tab& tab) const;
@@ -52,9 +69,11 @@ namespace fist
       QSize
       sizeHint() const override;
 
+    private:
       ELLE_ATTRIBUTE(QHBoxLayout*, layout);
       typedef std::vector<std::unique_ptr<Tab>> Tabs;
       ELLE_ATTRIBUTE_R(Tabs, tabs);
+      ELLE_ATTRIBUTE(int, index);
       ELLE_ATTRIBUTE(Tab*, active_tab);
     };
   }

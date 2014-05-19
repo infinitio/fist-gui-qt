@@ -455,27 +455,23 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
 
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
+  else
+    return;
 
   if (this->centralWidget() == this->_transaction_panel)
   {
     if (event->key() == Qt::Key_Escape)
     {
       ELLE_DEBUG("escape pressed");
-      this->toggle_dock();
+      this->toggle_dock(); return;
     }
     else if (event->key() == Qt::Key_S)
     {
-      this->_show_send_view();
-    }
-    else
-    {
-      static_cast<QObject*>(this->centralWidget())->event(event);
+      this->_show_send_view(); return;
     }
   }
 
-  // if (this->centralWidget() != nullptr)
-  //   static_cast<QObject*>(this->centralWidget())->event(event);
-
+  QCoreApplication::sendEvent(this->centralWidget(), event);
 }
 
 void

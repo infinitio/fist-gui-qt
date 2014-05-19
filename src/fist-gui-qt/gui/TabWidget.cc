@@ -1,8 +1,13 @@
+#include <QEvent>
+#include <QKeyEvent>
 #include <QHBoxLayout>
 
 #include <elle/finally.hh>
+#include <elle/log.hh>
 
 #include <fist-gui-qt/gui/TabWidget.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.gui.TabWidget");
 
 namespace fist
 {
@@ -23,6 +28,7 @@ namespace fist
     TabWidget::add_tab(QString const& name,
                        QVector<QWidget*> const& widgets)
     {
+      ELLE_TRACE_SCOPE("%s: add tab %s", *this, name);
       this->_tabs.emplace_back(new Tab(*this, name, widgets));
       this->_layout->addWidget(this->_tabs.back().get());
 
@@ -31,13 +37,14 @@ namespace fist
         this->_tabs.back()->disable();
       }
 
-      this->active_tab(*this->_tabs.begin()->get());
+      this->activate_tab(*this->_tabs.begin()->get());
     }
 
     void
     TabWidget::add_tab(QString const& name,
                        QWidget* widget)
     {
+      ELLE_TRACE_SCOPE("%s: add tab %s", *this, name);
       QVector<QWidget*> widgets;
       widgets.push_back(widget);
       this->add_tab(name, widgets);
@@ -50,8 +57,9 @@ namespace fist
     }
 
     void
-    TabWidget::active_tab(Tab& tab)
+    TabWidget::activate_tab(Tab& tab)
     {
+      ELLE_TRACE_SCOPE("%s: activate tab %s", *this, tab);
       elle::SafeFinally update([&] { tab.enable(); this->update(); });
       if (this->is_active_tab(tab))
       {
@@ -67,6 +75,51 @@ namespace fist
       }
 
       this->_active_tab = &tab;
+    }
+
+    int
+    TabWidget::_active_tab_index() const
+    {
+      // XXX: Dirty.
+      int i = 0;
+      for (auto const& tab: this->_tabs)
+      {
+        if (this->is_active_tab(*tab))
+          break;
+        ++i;
+      }
+
+      return i;
+    }
+    void
+    TabWidget::activate_next()
+    {
+      ELLE_TRACE_SCOPE("%s: activate next tab", *this);
+      if (this->_tabs.empty())
+        return;
+
+      int current_tab = this->_active_tab_index();
+      this->activate_tab(*this->_tabs[++current_tab % this->_tabs.size()]);
+    }
+
+    void
+    TabWidget::activate_previous()
+    {
+      ELLE_TRACE_SCOPE("%s: activate previous tab", *this);
+      if (this->_tabs.empty())
+        return;
+      int current_tab = this->_active_tab_index();
+      this->activate_tab(*this->_tabs[--current_tab % this->_tabs.size()]);
+    }
+
+    void
+    TabWidget::activate_first()
+    {
+      ELLE_TRACE_SCOPE("%s: activate first tab", *this);
+      if (this->_tabs.empty())
+        return;
+
+      this->activate_tab(**this->_tabs.begin());
     }
 
     void

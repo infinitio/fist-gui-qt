@@ -30,6 +30,19 @@ MainPanel::MainPanel(fist::State& state,
   this->footer()->setParent(this);
 }
 
+void
+MainPanel::keyPressEvent(QKeyEvent* event)
+{
+  if (event->key() == Qt::Key_Right)
+  {
+    this->_tabs->activate_next();
+  }
+  if (event->key() == Qt::Key_Left)
+  {
+    this->_tabs->activate_previous();
+  }
+}
+
 /*-------.
 | Footer |
 `-------*/

@@ -39,8 +39,17 @@ namespace fist
           emit up_pressed();
         else if (event->key() == Qt::Key_Down)
           emit down_pressed();
+        else if (event->key() == Qt::Key_Escape)
+        {
+          static_cast<QWidget*>(this->parent())->setFocus(Qt::OtherFocusReason); return;
+        }
+        else if (this->text().isEmpty() && (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right))
+        {
+          this->parent()->event(event); return;
+        }
         else
           QLineEdit::keyPressEvent(event);
+
       event->accept();
     }
 
@@ -278,11 +287,24 @@ namespace fist
     Users::keyPressEvent(QKeyEvent* event)
     {
       if (event->key() == Qt::Key_Up)
-        emit up_pressed();
+      {
+        emit up_pressed(); return;
+      }
       else if (event->key() == Qt::Key_Down)
-        emit down_pressed();
+      {
+        emit down_pressed(); return;
+      }
       else if (event->key() == Qt::Key_Return && !event->isAccepted())
-        emit return_pressed();
+      {
+        emit return_pressed(); return;
+      }
+      Super::keyPressEvent(event);
+    }
+
+    void
+    Users::showEvent(QShowEvent* event)
+    {
+      this->_search_field->setFocus();
     }
 
     void
@@ -317,7 +339,8 @@ namespace fist
     void
     Users::focusInEvent(QFocusEvent* event)
     {
-      this->_search_field->setFocus();
+      if (event->reason() != Qt::OtherFocusReason)
+        this->_search_field->setFocus();
     }
 
     QSize
