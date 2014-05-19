@@ -7,12 +7,16 @@
 #include <QWidget>
 
 #include <fist-gui-qt/SmoothLayout.hh>
+#include <elle/log.hh>
 
 /*-------------.
 | Construction |
 `-------------*/
 
-SmoothLayout::SmoothLayout(QWidget* owner):
+ELLE_LOG_COMPONENT("infinit.FIST.SmoothLayout");
+
+SmoothLayout::SmoothLayout(QWidget* owner,
+                           int height_animation_duration):
   Super(owner),
   _height_hint(0),
   _width_hint(0),
@@ -21,10 +25,11 @@ SmoothLayout::SmoothLayout(QWidget* owner):
   _height_animation(new QPropertyAnimation(this, "heightHint")),
   _width_animation(new QPropertyAnimation(this, "widthHint"))
 {
-  this->_height_animation->setDuration(1);
-  // this->_height_animation->setEasingCurve(QEasingCurve::InOutQuad);
+  this->_height_animation->setDuration(height_animation_duration);
+  connect(this->_height_animation, SIGNAL(finished()),
+          this, SIGNAL(resized()));
 
-  this->_width_animation->setDuration(120);
+  this->_width_animation->setDuration(0);
 }
 
 /*-------.
@@ -37,14 +42,53 @@ SmoothLayout::childEvent(QChildEvent* event)
   Super::childEvent(event);
   if (event->added() || event->removed())
     if (dynamic_cast<QWidget*>(event->child()))
+    {
+      auto* widget = static_cast<QWidget*>(event->child());
+      if (event->added())
+      {
+        ELLE_DEBUG("install event filter to new widget: %s", *widget)
+          widget->installEventFilter(this);
+      }
+      else if (event->removed())
+      {
+        ELLE_DEBUG("remove event filter from deleted widget: %s", *widget)
+          widget->removeEventFilter(this);
+      }
       this->_layout();
+    }
+}
+
+bool
+SmoothLayout::eventFilter(QObject *obj, QEvent *event)
+{
+  if (!dynamic_cast<QWidget*>(obj))
+    return Super::eventFilter(obj, event);
+
+  auto action = [&] { this->_layout(); this->update(); this->updateGeometry(); };
+  if (event->type() == QEvent::Hide)
+    action();
+  else if (event->type() == QEvent::Show)
+    action();
+  else if (event->type() == QEvent::GraphicsSceneResize)
+    action();
+  else if (event->type() == QEvent::Resize)
+    action();
+  else if (event->type() == QEvent::LayoutRequest)
+    action();
+  else if (event->type() == QEvent::Move)
+    action();
+  else if (event->type() == QEvent::Paint);
+  else if (event->type() == QEvent::Leave);
+  else if (event->type() == QEvent::Enter);
+
+  return Super::eventFilter(obj, event);
 }
 
 void
 SmoothLayout::resizeEvent(QResizeEvent* event)
 {
-  // std::cerr << "resize " << event->size() << std::endl;
   auto widgets = this->_child_widgets();
+
   QSize size(event->size());
   // Compute total children height hint and number of growing children.
   int total_height = 0;
@@ -109,10 +153,10 @@ SmoothLayout::sizeHint() const
   return QSize(this->_width_hint, this->_height_hint);
 }
 
-QWidgetList
+QList<QWidget*>
 SmoothLayout::_child_widgets(bool visible_only) const
 {
-  QWidgetList widgets;
+  QList<QWidget*> widgets;
   for (QObject* child: this->children())
     if (QWidget* widget = dynamic_cast<QWidget*>(child))
     {
@@ -134,7 +178,10 @@ SmoothLayout::_layout()
     if (widget->isHidden()) continue;
     QSize hint(widget->sizeHint());
     if (hint.height() > 0)
+    {
+      // ELLE_LOG("%s: height: %s", widget, hint.height());
       height += hint.height();
+    }
     width = std::max(width, hint.width());
   }
 
@@ -142,6 +189,7 @@ SmoothLayout::_layout()
   {
     if (height != this->_height_hint)
     {
+      this->_height_animation->stop();
       this->_height_animation->setEndValue(height);
       this->_height_animation->start();
     }
@@ -151,9 +199,12 @@ SmoothLayout::_layout()
       this->_width_animation->start();
     }
   }
-
-  this->setHeightHint(height);
-  this->setWidthHint(width);
+  else
+  {
+    // ELLE_LOG("update height: %s", height)
+    this->setHeightHint(height);
+    this->setWidthHint(width);
+  }
 }
 
 void
@@ -161,6 +212,7 @@ SmoothLayout::setHeightHint(int value)
 {
   if (value != this->_height_hint)
   {
+    ELLE_DEBUG("%s: new height hint: %s", *this, value);
     if (this->_maximum_height > 0)
       this->_height_hint = std::min(value, this->_maximum_height);
     else
@@ -175,6 +227,7 @@ SmoothLayout::setWidthHint(int value)
 {
   if (value != this->_width_hint)
   {
+    ELLE_DEBUG("%s: new width hint: %s", *this, value);
     if (this->_maximum_width > 0)
       this->_width_hint = std::min(value, this->_maximum_width);
     else

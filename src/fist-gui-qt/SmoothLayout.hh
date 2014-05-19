@@ -3,6 +3,8 @@
 
 # include <QWidget>
 # include <QPropertyAnimation>
+# include <QList>
+# include <QVBoxLayout>
 
 # include <elle/Printable.hh>
 
@@ -23,7 +25,8 @@ public:
 | Construction |
 `-------------*/
 public:
-  SmoothLayout(QWidget* owner = nullptr);
+  SmoothLayout(QWidget* owner = nullptr,
+               int height_animation_duration = 0);
 
 /*-------.
 | Layout |
@@ -41,11 +44,17 @@ protected:
   virtual
   void
   childEvent(QChildEvent* event) override;
-private:
+protected:
   void
   _layout();
-  QWidgetList
+private:
+  QList<QWidget*>
   _child_widgets(bool visible_only = false) const;
+
+  // Filter anchor events to detect changes like visibility changed,
+  // position changed, modal window spawned...
+  bool
+  eventFilter(QObject *obj, QEvent *event) override;
 
 public:
   Q_PROPERTY(int heightHint
@@ -74,11 +83,14 @@ public:
   void setMaximumHeight(int value);
   void setMaximumWidth(int value);
 
+
 Q_SIGNALS:
   void onHeightHintChanged();
   void onWidthHintChanged();
   void onMaximumHeightChanged();
   void onMaximumWidthChanged();
+  void
+  resized();
 
 private:
   QPropertyAnimation* _height_animation;
