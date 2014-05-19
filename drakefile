@@ -183,6 +183,9 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/model/User.hxx",
       "src/fist-gui-qt/model/Link.cc",
       "src/fist-gui-qt/model/Link.hh",
+
+      "src/fist-gui-qt/gui/GrowingArea.cc",
+      "src/fist-gui-qt/gui/GrowingArea.hh",
     )
 
   application = drake.cxx.Executable(
