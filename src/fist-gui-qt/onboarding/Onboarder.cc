@@ -5,15 +5,15 @@
 #include <surface/gap/gap.hh>
 
 #include <fist-gui-qt/AvatarWidget.hh>
-#include <fist-gui-qt/SendFooter.hh>
-#include <fist-gui-qt/SendPanel.hh>
-#include <fist-gui-qt/gui/Tooltip.hh>
+#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/SendView/Files.hh>
+#include <fist-gui-qt/SendView/Footer.hh>
+#include <fist-gui-qt/SendView/Panel.hh>
+#include <fist-gui-qt/SendView/Users.hh>
 #include <fist-gui-qt/TransactionFooter.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
-#include <fist-gui-qt/SearchField.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
-#include <fist-gui-qt/AddFileWidget.hh>
-#include <fist-gui-qt/IconButton.hh>
+#include <fist-gui-qt/gui/Tooltip.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.onboarding.Onboarder");
@@ -29,11 +29,11 @@ namespace fist
       , _tooltip(nullptr)
     {
       ELLE_TRACE_SCOPE("%s: creation", *this);
-      connect(&this->_dock->transactionPanel(), SIGNAL(new_transaction(uint32_t)),
+      connect(this->_dock->transactionPanel().transactions(), SIGNAL(new_transaction(uint32_t)),
               this, SLOT(_on_new_transaction(uint32_t)));
-      connect(&this->_dock->transactionPanel(), SIGNAL(new_transaction(uint32_t)),
+      connect(this->_dock->transactionPanel().transactions(), SIGNAL(new_transaction(uint32_t)),
               this, SLOT(_on_new_transaction(uint32_t)));
-      connect(&this->_dock->transactionPanel(), SIGNAL(new_transaction_shown(TransactionWidget*)),
+      connect(this->_dock->transactionPanel().transactions(), SIGNAL(new_transaction_shown(TransactionWidget*)),
               this, SLOT(_on_transaction_widget_shown(TransactionWidget*)));
     }
 
@@ -44,7 +44,7 @@ namespace fist
     Onboarder::receive_file(QString const& file)
     {
       this->_transactions[gap_onboarding_receive_transaction(
-          this->_dock->state(), file.toStdString().c_str(), 6)] = nullptr;
+          this->_dock->_state.state(), file.toStdString().c_str(), 6)] = nullptr;
     }
 
     void
@@ -60,6 +60,7 @@ namespace fist
       auto const& model = widget->transaction();
       if (this->_transactions.find(model.id()) == this->_transactions.end())
         return;
+
       this->_transactions[model.id()] = widget;
       connect(widget, SIGNAL(transaction_accepted(uint32_t)),
               this, SLOT(_on_transaction_accepted(uint32_t)));
@@ -140,9 +141,9 @@ namespace fist
                  this, SLOT(_on_send_panel_visible()));
 
       this->_choose_peer();
-      connect(widget, SIGNAL(peer_found()),
+      connect(widget->users(), SIGNAL(peer_found()),
               this, SLOT(_on_peer_chosen()));
-      connect(widget, SIGNAL(file_added()),
+      connect(widget->file_adder(), SIGNAL(file_added()),
               this, SLOT(_on_file_added_before_peer()));
       connect(widget, SIGNAL(sent()),
               this, SLOT(_send_onboarding_done()));
@@ -154,7 +155,7 @@ namespace fist
     Onboarder::_choose_peer()
     {
       this->_set_tooltip(
-        this->_dock->_send_panel->search(),
+        this->_dock->_send_panel->users()->search_field(),
         "Search for a friend using\n"
         "his fullname or nickname.",
         Qt::AlignLeft);
@@ -164,7 +165,7 @@ namespace fist
     Onboarder::_on_peer_chosen()
     {
       auto* send_panel = this->_dock->_send_panel;
-      if (send_panel->files().isEmpty())
+      if (send_panel->file_adder()->files().isEmpty())
       {
         this->_set_tooltip(
           send_panel->file_adder(),
@@ -180,11 +181,11 @@ namespace fist
         this->_on_file_added_before_peer();
       }
 
-      disconnect(send_panel, SIGNAL(peer_found()),
+      disconnect(send_panel->users(), SIGNAL(peer_found()),
                  this, SLOT(_on_peer_chosen()));
-      disconnect(send_panel, SIGNAL(file_added()),
+      disconnect(send_panel->file_adder(), SIGNAL(file_added()),
                  this, SLOT(_on_file_added_before_peer()));
-      connect(send_panel, SIGNAL(file_added()),
+      connect(send_panel->file_adder(), SIGNAL(file_added()),
               this, SLOT(_on_transaction_ready()));
     }
 
@@ -207,12 +208,12 @@ namespace fist
         Qt::AlignLeft,
         1500);
 
-      if (send_panel->peer_valid())
+      //if (send_panel->peer_valid())
       {
         connect(this->_tooltip.get(), SIGNAL(hidden()),
                 this, SLOT(_on_transaction_ready()));
       }
-      else
+      // else
       {
         connect(this->_tooltip.get(), SIGNAL(hidden()),
                 this, SLOT(_choose_peer()));

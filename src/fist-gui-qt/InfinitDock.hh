@@ -16,6 +16,7 @@
 # include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/RoundShadowWidget.hh>
+# include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class InfinitDock:
@@ -27,6 +28,7 @@ class InfinitDock:
 private:
   class Prologue;
   std::unique_ptr<Prologue> _prologue;
+  ELLE_ATTRIBUTE(fist::State&, state);
 
 /*------.
 | Types |
@@ -38,7 +40,7 @@ public:
 | Construction |
 `-------------*/
 public:
-  InfinitDock(gap_State* state);
+  InfinitDock(fist::State& state);
 
 /*------------.
 | Destruction |
@@ -56,9 +58,6 @@ public:
   static void avatar_available_cb(uint32_t id);
 
 public slots:
-  void _update();
-
-public slots:
   void _systray_activated(QSystemTrayIcon::ActivationReason reason);
 
 Q_SIGNALS:
@@ -70,7 +69,7 @@ Q_SIGNALS:
 | Panel |
 `------*/
 public Q_SLOTS:
-  TransactionPanel&
+  MainPanel&
   transactionPanel();
 
   void
@@ -112,6 +111,11 @@ private:
   void
   hideEvent(QHideEvent* event) override;
 
+  QSize
+  sizeHint() const override
+  {
+    return QSize(326, Super::sizeHint().height());
+  }
 private:
   void
   focusOutEvent(QFocusEvent* event) override;
@@ -119,7 +123,7 @@ private:
 private:
   void _switch_view(Panel* target);
 
-  ELLE_ATTRIBUTE(TransactionPanel*, transaction_panel);
+  ELLE_ATTRIBUTE(MainPanel*, transaction_panel);
 //  RoundShadowWidget* _panel;
 
 private Q_SLOTS:
@@ -129,8 +133,13 @@ private Q_SLOTS:
                    QSystemTrayIcon::MessageIcon icon);
 
 private:
-  SendPanel* _send_panel;
+  fist::sendview::Panel* _send_panel;
 
+  Panel* _next_panel;
+
+private slots:
+  void
+  _activate_new_panel();
 /*-----.
 | Menu |
 `-----*/
@@ -158,6 +167,12 @@ protected:
   void
   focusInEvent(QFocusEvent* event) override;
 
+  void
+  moveEvent(QMoveEvent* event) override
+  {
+    this->_position_panel();
+  }
+
 private:
   QPixmap _logo;
   QSystemTrayIcon* _systray;
@@ -165,7 +180,6 @@ private:
   QAction* _send_files;
   QAction* _report_a_problem;
   QAction* _quit;
-  ELLE_ATTRIBUTE_X(gap_State*, state);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
 
   /*----------.

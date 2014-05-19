@@ -63,7 +63,7 @@ ListWidget::remove_widget(ListItem* widget, bool all)
   ELLE_DEBUG_SCOPE("%s: remove widget%s %s", *this, all ? "s" : "", *widget);
   if (all)
   {
-    auto removed = this->_widgets.removeAll(widget);
+    this->_widgets.removeAll(widget);
   }
   else
   {
@@ -283,6 +283,7 @@ ListWidget::keyPressEvent(QKeyEvent* event)
 {
   return;
 
+#if 0
   // Problematic with the transactions list ATM.
   size_t index = _keyboard_index;
 
@@ -294,6 +295,7 @@ ListWidget::keyPressEvent(QKeyEvent* event)
     _widgets[index]->trigger();
   index %= this->_widgets.size();
   this->_select_element(index);
+#endif
 }
 
 void

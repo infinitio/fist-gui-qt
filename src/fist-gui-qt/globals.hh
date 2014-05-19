@@ -195,13 +195,45 @@ namespace view
     }
   }
 
+  namespace links
+  {
+    namespace no_links
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
+    }
+
+    namespace file
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9.5), QColor(0x25, 0x25, 0x25));
+    }
+
+    namespace status
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 8.5), QColor(0xA8, 0xA8, 0xA8));
+    }
+
+    namespace counter
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
+
+    }
+  }
+
   namespace transaction
   {
     namespace no_notification
     {
       static
       TextStyle const
-      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
     }
 
     static
@@ -220,13 +252,17 @@ namespace view
       static
       TextStyle const
       style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
+
+      static
+      TextStyle const
+      hover_style(QFont("Arial", 9), QColor(0x3D, 0x91, 0xD4));
     }
 
     namespace date
     {
       static
       TextStyle const
-      style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont("Arial", 8), QColor(0xA8, 0xA8, 0xA8));
     }
   }
 
@@ -280,11 +316,30 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), Qt::AlignVCenter);
+      style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
       QString const
-      text("Search for a friend...");
+      text("Search or select a user...");
+    }
+
+    namespace message
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+
+      static
+      QString const
+      text("Optional message...");
+
+      namespace remaining_characters
+      {
+        static
+        TextStyle const
+        style(QFont("Arial", 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
+
+      }
     }
 
     namespace user

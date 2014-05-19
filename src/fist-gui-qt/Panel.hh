@@ -1,13 +1,16 @@
 #ifndef FIST_PANEL_HH
 # define FIST_PANEL_HH
 
+# include <QVBoxLayout>
 # include <QSystemTrayIcon>
+
+# include <elle/Printable.hh>
 
 # include <fist-gui-qt/SmoothLayout.hh>
 # include <fist-gui-qt/Footer.hh>
 
-class Panel:
-  public SmoothLayout
+class Panel
+  : public SmoothLayout
 {
   typedef SmoothLayout Super;
 
@@ -16,7 +19,11 @@ public:
         QWidget* owner = nullptr);
 
 protected:
+  SmoothLayout* _body;
   Footer* _footer;
+
+  void
+  childEvent(QChildEvent*) override;
 
 public:
   virtual

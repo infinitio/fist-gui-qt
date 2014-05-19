@@ -13,15 +13,18 @@
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>
-# include <fist-gui-qt/TransactionModel.hh>
+# include <fist-gui-qt/model/Transaction.hh>
 # include <fist-gui-qt/IconButton.hh>
 
 class TransactionWidget:
   public ListItem
 {
+  typedef ListItem Super;
+
 public:
-  TransactionWidget(TransactionModel const& model);
-  Q_OBJECT;
+  TransactionWidget(fist::model::Transaction const& model);
+  virtual
+  ~TransactionWidget() = default;
 
 /*-----------.
 | Properties |
@@ -67,24 +70,31 @@ public:
   void
   trigger();
 
-public:
+  bool
+  eventFilter(QObject *obj, QEvent *event) override;
+
+public slots:
   void
-  _update() override;
+  apply_update();
 
 public slots:
   void accept();
   void reject();
   void cancel();
   void update_progress();
-  void update_status();
   void update_mtime();
 
+private slots:
+  void _on_avatar_updated();
+  void _on_status_updated();
+
 private:
-  ELLE_ATTRIBUTE_R(TransactionModel const&, transaction);
+  ELLE_ATTRIBUTE_R(fist::model::Transaction const&, transaction);
   ELLE_ATTRIBUTE_R(AvatarWidget*, peer_avatar);
   ELLE_ATTRIBUTE_R(QLabel*, peer_fullname);
   QLabel* _peer_status;
   QLayout* _layout;
+  ELLE_ATTRIBUTE_R(QLabel*, filename);
   ELLE_ATTRIBUTE_R(IconButton*, accept_button);
   ELLE_ATTRIBUTE_R(IconButton*, reject_button);
   QWidget* _accept_reject_area;
@@ -95,11 +105,20 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);
   QTimer* _mtime_updater;
 
+signals:
+  void
+  open_file(uint32_t);
+
+private:
 /*----------.
 | Printable |
 `----------*/
   void
   print(std::ostream& stream) const override;
+
+private:
+  Q_OBJECT;
+
 };
 
 #endif

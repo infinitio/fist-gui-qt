@@ -20,7 +20,7 @@
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
-#include <fist-gui-qt/SendPanel.hh>
+#include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/Settings.hh>
@@ -61,10 +61,12 @@ class InfinitDock::Prologue
 
 // Creating the transaction panel is a long operation. So we just wait until all
 // the graphical part is fully load, and then, initialize it.
-InfinitDock::InfinitDock(gap_State* state)
-  : _prologue(new Prologue(state))
+InfinitDock::InfinitDock(fist::State& state)
+  : _prologue(new Prologue(state.state()))
+  , _state(state)
   , _transaction_panel(nullptr)
-  , _send_panel(new SendPanel(state))
+  , _send_panel(new fist::sendview::Panel(this->_state))
+  , _next_panel(nullptr)
   , _menu(new QMenu(this))
   , _logo(":/icons/menu-bar-fire@2x.png")
   , _systray(new QSystemTrayIcon(this))
@@ -72,7 +74,6 @@ InfinitDock::InfinitDock(gap_State* state)
   , _send_files(new QAction(tr("&Send files..."), this))
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
   , _quit(new QAction(tr("&Quit"), this))
-  , _state(state)
 #ifndef FIST_PRODUCTION_BUILD
   , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
 #endif
@@ -94,7 +95,8 @@ InfinitDock::InfinitDock(gap_State* state)
   this->connect(this->_systray, SIGNAL(messageClicked()),
                 this, SLOT(_systray_message_clicked()));
 
-  this->_transaction_panel = new TransactionPanel(state);
+  this->_transaction_panel = new MainPanel(this->_state,
+                                           this);
 
   this->_register_panel(this->_transaction_panel);
   this->_register_panel(this->_send_panel);
@@ -103,6 +105,9 @@ InfinitDock::InfinitDock(gap_State* state)
           SLOT(_position_panel()));
 
   {
+    connect(this->_transaction_panel,
+            SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
+            this, SLOT(_systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
     connect(this->_transaction_panel->footer()->send(),
             SIGNAL(released()),
             this,
@@ -156,18 +161,11 @@ InfinitDock::InfinitDock(gap_State* state)
   this->_menu->addAction(_quit);
 
   // Register gap callback.
-  gap_connection_callback(_state, InfinitDock::connection_status_cb);
-  gap_user_status_callback(_state, InfinitDock::user_status_cb);
-  gap_avatar_available_callback(_state, InfinitDock::avatar_available_cb);
+  gap_connection_callback(_state.state(), InfinitDock::connection_status_cb);
+  gap_user_status_callback(_state.state(), InfinitDock::user_status_cb);
+  gap_avatar_available_callback(_state.state(), InfinitDock::avatar_available_cb);
 
   this->_show_transactions_view();
-
-  ELLE_DEBUG("start the update loop")
-  {
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(_update()));
-    timer->start(1000);
-  }
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_report_a_problem, SIGNAL(triggered()),
@@ -257,9 +255,10 @@ InfinitDock::_register_panel(Panel* panel)
 
   connect(panel, SIGNAL(set_background_color(QColor const&)),
           this, SLOT(setBackground(QColor const&)));
+  panel->hide();
 }
 
-TransactionPanel&
+MainPanel&
 InfinitDock::transactionPanel()
 {
   return *this->_transaction_panel;
@@ -340,8 +339,8 @@ InfinitDock::report_a_problem()
       auto std_text = text.toStdString();
       ELLE_DEBUG("user message as std::string: %s", std_text);
       gap_send_user_report(
-        this->_state,
-        gap_self_email(this->_state),
+        this->_state.state(),
+        gap_self_email(this->_state.state()),
         std_text.c_str(),
         logfile.c_str(),
         elle::sprintf("%s on %s",
@@ -374,15 +373,13 @@ InfinitDock::_position_panel()
 
   static int margin = 5;
 
-  this->move(
-    qBound(screen.left() + margin,
-           x,
-           screen.right() - margin - this->width()),
-    qBound(screen.top() + margin,
-           y,
-           screen.bottom() - margin - this->height()));
-
-  ELLE_DUMP("%s: new position: (%s, %s)", *this, this->x(), this->y());
+  int new_x = qBound(screen.left() + margin, x, screen.right() - margin - this->width());
+  int new_y = qBound(screen.top() + margin, y, screen.bottom() - margin - this->height());
+  if (this->x() != new_x || this->y() != new_y)
+  {
+    this->move(new_x, new_y);
+    ELLE_DUMP("%s: new position: (%s, %s)", *this, this->x(), this->y());
+  }
 }
 
 
@@ -398,7 +395,7 @@ InfinitDock::pick_files()
   if (selected.size())
   {
     for (auto const& file: selected)
-      this->_send_panel->add_file(QUrl::fromLocalFile(file));
+      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
     this->_switch_view(this->_send_panel);
     this->show();
   }
@@ -409,9 +406,8 @@ InfinitDock::enterEvent(QEvent* event)
 {
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
-
-  if (this->centralWidget() == this->_send_panel)
-    this->setFocus();
+  // if (this->centralWidget() == this->_send_panel)
+  //   this->setFocus();
 }
 
 void
@@ -460,23 +456,23 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
 
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
+  else
+    return;
 
   if (this->centralWidget() == this->_transaction_panel)
   {
     if (event->key() == Qt::Key_Escape)
     {
       ELLE_DEBUG("escape pressed");
-      this->toggle_dock();
+      this->toggle_dock(); return;
     }
     else if (event->key() == Qt::Key_S)
     {
-      this->_show_send_view();
+      this->_show_send_view(); return;
     }
   }
 
-  if (this->centralWidget() != nullptr)
-    static_cast<QObject*>(this->centralWidget())->event(event);
-
+  QCoreApplication::sendEvent(this->centralWidget(), event);
 }
 
 void
@@ -553,16 +549,32 @@ InfinitDock::_switch_view(Panel* panel)
     return;
   }
 
+  this->_next_panel = panel;
   if (this->centralWidget() != nullptr)
   {
     ELLE_DEBUG("hide %s", *this->centralWidget());
-    static_cast<Panel*>(this->centralWidget())->on_hide();
+    Panel* current_panel = static_cast<Panel*>(this->centralWidget());
+    current_panel->on_hide();
+    current_panel->hide();
+  }
+
+  this->_activate_new_panel();
+}
+
+void
+InfinitDock::_activate_new_panel()
+{
+  Panel* current_panel = static_cast<Panel*>(this->centralWidget());
+  if (current_panel != nullptr)
+  {
     this->centralWidget()->setParent(0);
   }
 
-  this->setCentralWidget(panel);
-  panel->on_show();
+  this->setCentralWidget(this->_next_panel);
+  this->_next_panel->show();
+  this->_next_panel->on_show();
 
+  this->_next_panel = nullptr;
   // XXX: Dirty, but Qt is in trouble to calculate the size of hidden widget.
   // So every time a new panel is shown, make sure that the size matches the
   // content.
@@ -653,16 +665,6 @@ InfinitDock::_on_onboarded_sending_completed()
   // checking the previously stored one.
   fist::settings()["onboarding"].set(
     onboarded_sending_complete, QString(INFINIT_VERSION));
-}
-
-void
-InfinitDock::_update()
-{
-  ELLE_DUMP("%s: poll", *this);
-  auto res = gap_poll(_state);
-
-  if (!res)
-    ELLE_ERR("poll failed: %s", res);
 }
 
 void

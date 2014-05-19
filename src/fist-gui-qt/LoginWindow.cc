@@ -25,7 +25,7 @@ ELLE_LOG_COMPONENT("infinit.FIST.LoginWindow");
 static QRegExp email_checker(regexp::email,
                              Qt::CaseInsensitive);
 
-LoginWindow::LoginWindow(gap_State* state):
+LoginWindow::LoginWindow(fist::State& state):
   RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
   _email_field(new QLineEdit),
@@ -153,8 +153,11 @@ LoginWindow::LoginWindow(gap_State* state):
 
   connect(&this->_login_watcher, SIGNAL(finished()),
           this, SLOT(_login_attempt()));
-
+  connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   this->update();
+
+  this->setTabOrder(this->_email_field, this->_password_field);
+  this->setTabOrder(this->_password_field, this->_email_field);
 }
 
 LoginWindow::~LoginWindow()
@@ -165,7 +168,8 @@ LoginWindow::~LoginWindow()
 void
 LoginWindow::_login_attempt()
 {
-  elle::SafeFinally unlock_login([&] { this->_enable(); });
+  elle::SafeFinally unlock_login([&] {
+      this->_enable(); this->_password_field->setFocus(); });
 
   auto status = this->_login_future.result();
   if (status == gap_ok)
@@ -256,11 +260,12 @@ LoginWindow::_login()
 
   this->_login_future = QtConcurrent::run(
     [=] {
+      // Will explode if the state is destroyed.
       char* hash = gap_hash_password(
-        _state, email.toStdString().c_str(), pw.toStdString().c_str());
+        this->_state.state(), email.toStdString().c_str(), pw.toStdString().c_str());
 
       elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
-      return gap_login(_state, email.toStdString().c_str(), hash);
+      return gap_login(this->_state.state(), email.toStdString().c_str(), hash);
     });
 
   this->_message_field->setMovie(this->_loading_icon);

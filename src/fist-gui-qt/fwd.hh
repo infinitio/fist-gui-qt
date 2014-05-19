@@ -8,7 +8,6 @@ class LoginWindow;
 class Updater;
 
 // Dock Elements.
-class AddFileWidget;
 class AvatarWidget;
 class FileItem;
 class IconButton;
@@ -19,15 +18,31 @@ class TextListItem;
 class Panel;
 class RoundShadowWidget;
 class SearchField;
-class SendPanel;
 class TransactionList;
-class TransactionPanel;
+class MainPanel;
 class TransactionWidget;
 class SearchResultWidget;
 class HorizontalSeparator;
-class SendFooter;
+
 namespace fist
 {
+  class State;
+
+  namespace model
+  {
+    class User;
+    class Transaction;
+    // class Link;
+  }
+
+  namespace sendview
+  {
+    class Panel;
+    class Footer;
+    class Files;
+    class Users;
+  }
+
   namespace onboarding
   {
     class Onboarder;

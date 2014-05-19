@@ -89,8 +89,6 @@ def configure(cxx_toolkit = None,
   with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
     sources = drake.nodes(
       "resources/fist-gui-qt/resources.qrc",
-      "src/fist-gui-qt/AddFileWidget.cc",
-      "src/fist-gui-qt/AddFileWidget.hh",
       "src/fist-gui-qt/AvatarIcon.cc",
       "src/fist-gui-qt/AvatarIcon.hh",
       "src/fist-gui-qt/AvatarWidget.cc",
@@ -125,10 +123,6 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/SearchField.hh",
       "src/fist-gui-qt/SearchResultWidget.cc",
       "src/fist-gui-qt/SearchResultWidget.hh",
-      "src/fist-gui-qt/SendFooter.cc",
-      "src/fist-gui-qt/SendFooter.hh",
-      "src/fist-gui-qt/SendPanel.cc",
-      "src/fist-gui-qt/SendPanel.hh",
       "src/fist-gui-qt/ShapeButton.cc",
       "src/fist-gui-qt/ShapeButton.hh",
       "src/fist-gui-qt/SmoothLayout.cc",
@@ -141,16 +135,12 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/gui/Tooltip.hh",
       "src/fist-gui-qt/TransactionFooter.cc",
       "src/fist-gui-qt/TransactionFooter.hh",
-      "src/fist-gui-qt/TransactionModel.cc",
-      "src/fist-gui-qt/TransactionModel.hh",
       "src/fist-gui-qt/TransactionPanel.cc",
       "src/fist-gui-qt/TransactionPanel.hh",
       "src/fist-gui-qt/TransactionWidget.cc",
       "src/fist-gui-qt/TransactionWidget.hh",
       "src/fist-gui-qt/TransactionWindow.cc",
       "src/fist-gui-qt/TransactionWindow.hh",
-      "src/fist-gui-qt/UserModel.cc",
-      "src/fist-gui-qt/UserModel.hh",
       "src/fist-gui-qt/UserWidget.cc",
       "src/fist-gui-qt/UserWidget.hh",
       "src/fist-gui-qt/globals.hh",
@@ -194,6 +184,27 @@ def configure(cxx_toolkit = None,
 
       "src/fist-gui-qt/State.hh",
       "src/fist-gui-qt/State.cc",
+
+      "src/fist-gui-qt/TwoStateIconButton.hh",
+      "src/fist-gui-qt/TwoStateIconButton.cc",
+
+      "src/fist-gui-qt/SendView/Panel.hh",
+      "src/fist-gui-qt/SendView/Panel.cc",
+      "src/fist-gui-qt/SendView/Footer.cc",
+      "src/fist-gui-qt/SendView/Footer.hh",
+      "src/fist-gui-qt/SendView/Files.cc",
+      "src/fist-gui-qt/SendView/Files.hh",
+      "src/fist-gui-qt/SendView/Users.cc",
+      "src/fist-gui-qt/SendView/Users.hh",
+      "src/fist-gui-qt/SendView/Message.cc",
+      "src/fist-gui-qt/SendView/Message.hh",
+
+      "src/fist-gui-qt/MainView/Transactions.cc",
+      "src/fist-gui-qt/MainView/Transactions.hh",
+      "src/fist-gui-qt/MainView/Links.hh",
+      "src/fist-gui-qt/MainView/Links.cc",
+      "src/fist-gui-qt/MainView/LinkWidget.cc",
+      "src/fist-gui-qt/MainView/LinkWidget.hh",
     )
 
   application = drake.cxx.Executable(
@@ -201,6 +212,7 @@ def configure(cxx_toolkit = None,
     sources + libraries,
     cxx_toolkit,
     cxx_config)
+
 
   build = drake.Rule('build')
   build << application
