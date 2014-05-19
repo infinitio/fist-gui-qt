@@ -53,6 +53,7 @@ public:
   leaveEvent(QEvent*) override;
 
 private slots:
+  virtual
   void
   _clicked();
 

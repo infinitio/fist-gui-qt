@@ -69,6 +69,7 @@ IconButton::set_pixmap(QPixmap const& pixmap)
   this->_draw_shape(this->_icon);
   this->_draw_shape(this->_shadow, Qt::black);
   this->_refresh();
+  this->update();
 }
 
 void
