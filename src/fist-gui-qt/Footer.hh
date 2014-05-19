@@ -1,5 +1,5 @@
-#ifndef FOOTER_HH
-# define FOOTER_HH
+#ifndef FIST_GUI_QT_FOOTER_HH
+# define FIST_GUI_QT_FOOTER_HH
 
 # include <QWidget>
 # include <QHBoxLayout>
@@ -7,6 +7,7 @@
 class Footer:
   public QWidget
 {
+  typedef QWidget Super;
 public:
   Footer(QWidget* parent = nullptr);
   virtual ~Footer() = default;
@@ -27,6 +28,5 @@ public:
 protected:
   QHBoxLayout* _layout;
 };
-
 
 #endif
