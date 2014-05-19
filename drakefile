@@ -191,6 +191,9 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/gui/TabWidget.hh",
       "src/fist-gui-qt/gui/Tab.cc",
       "src/fist-gui-qt/gui/Tab.hh",
+
+      "src/fist-gui-qt/State.hh",
+      "src/fist-gui-qt/State.cc",
     )
 
   application = drake.cxx.Executable(
