@@ -5,39 +5,9 @@
 
 #include <fist-gui-qt/FileItem.hh>
 #include <fist-gui-qt/globals.hh>
-
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.FileItem");
-
-namespace
-{
-  struct Separator:
-    public QFrame
-  {
-    Separator()
-    {
-      this->setFrameShape(QFrame::VLine);
-      this->setFrameShadow(QFrame::Sunken);
-    }
-  };
-}
-
-static
-QString
-readable_size(qint64 size)
-{
-  int i = 0;
-  std::vector<QString> units = {
-    "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
-
-  while (size > 1024)
-  {
-    size /= 1024.f;
-    i++;
-  }
-
-  return QString("%1").arg(size) + " " + units[i];
-};
 
 FileItem::FileItem(QUrl const& path):
   ListItem(nullptr, view::send::file::background, false),
@@ -57,7 +27,7 @@ FileItem::FileItem(QUrl const& path):
   this->_layout->setAlignment(Qt::AlignVCenter);
   ELLE_TRACE_SCOPE("%s: construction with path %s", *this, path);
 
-  this->setContentsMargins(6, 0, 6, 0);
+  this->setContentsMargins(6, 0, 13, 0);
 
   // Name.
   {
@@ -77,14 +47,11 @@ FileItem::FileItem(QUrl const& path):
     this->_icon->setPixmap(icon_provider.icon(this->_file).pixmap(18));
 
   this->_layout->addWidget(this->_icon);
-  this->_layout->addItem(new QSpacerItem(4, 0,
-                                  QSizePolicy::Minimum, QSizePolicy::Minimum));
+  this->_layout->addSpacing(4);
   this->_layout->addWidget(this->_name);
-  this->_layout->addItem(new QSpacerItem(0, 0,
-                                  QSizePolicy::Expanding, QSizePolicy::Minimum));
+  this->_layout->addStretch();
   this->_layout->addWidget(this->_size);
-  this->_layout->addItem(new QSpacerItem(4, 0,
-                                  QSizePolicy::Minimum, QSizePolicy::Minimum));
+  this->_layout->addSpacing(4);
   this->_layout->addWidget(this->_remove);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
