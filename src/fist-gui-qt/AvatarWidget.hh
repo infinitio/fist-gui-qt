@@ -1,5 +1,5 @@
-#ifndef AVATARWIDGET_HH
-# define AVATARWIDGET_HH
+#ifndef FIST_GUI_QT_AVATARWIDGET_HH
+# define FIST_GUI_QT_AVATARWIDGET_HH
 
 # include <map>
 
@@ -17,29 +17,31 @@ extern std::map<uint32_t, QPixmap> g_avatars;
 class AvatarWidget:
   public QWidget
 {
-  public:
-    AvatarWidget();
-    AvatarWidget(QString const& picture);
-    AvatarWidget(QPixmap const& avatar);
+public:
+  AvatarWidget();
+  AvatarWidget(QString const& picture);
+  AvatarWidget(QPixmap const& avatar);
+  virtual
+  ~AvatarWidget() = default;
 
-  public:
-    Q_OBJECT;
-    Q_PROPERTY(QPixmap picture
-               READ picture
-               WRITE setPicture
-               NOTIFY onPictureChanged);
+public:
+  Q_OBJECT;
+  Q_PROPERTY(QPixmap picture
+             READ picture
+             WRITE setPicture
+             NOTIFY onPictureChanged);
 
-  public:
-    QPixmap picture();
-    void setPicture(QPixmap const& value);
-  Q_SIGNALS:
-    void onPictureChanged();
-  private:
-    QPixmap _picture;
+public:
+  QPixmap picture();
+  void setPicture(QPixmap const& value);
+Q_SIGNALS:
+  void onPictureChanged();
+private:
+  QPixmap _picture;
 
-/*-------------.
-| Transactions |
-`-------------*/
+  /*-------------.
+  | Transactions |
+  `-------------*/
 
 public:
   static
@@ -77,9 +79,9 @@ private:
   Q_PROPERTY_R(float, smooth_progress, smooth_progress);
   ELLE_ATTRIBUTE(QPropertyAnimation*, progress_animation);
 
-/*--------.
-| Drawing |
-`--------*/
+  /*--------.
+  | Drawing |
+  `--------*/
 
 protected:
   virtual
