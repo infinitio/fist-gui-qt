@@ -170,6 +170,19 @@ def configure(cxx_toolkit = None,
 
       "src/fist-gui-qt/onboarding/Onboarder.hh",
       "src/fist-gui-qt/onboarding/Onboarder.cc",
+
+      # Models.
+      "src/fist-gui-qt/model/Model.cc",
+      "src/fist-gui-qt/model/Model.hh",
+      "src/fist-gui-qt/model/Model.hxx",
+      "src/fist-gui-qt/model/Transaction.cc",
+      "src/fist-gui-qt/model/Transaction.hh",
+      "src/fist-gui-qt/model/Transaction.hxx",
+      "src/fist-gui-qt/model/User.cc",
+      "src/fist-gui-qt/model/User.hh",
+      "src/fist-gui-qt/model/User.hxx",
+      "src/fist-gui-qt/model/Link.cc",
+      "src/fist-gui-qt/model/Link.hh",
     )
 
   application = drake.cxx.Executable(
