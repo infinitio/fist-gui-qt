@@ -75,6 +75,7 @@ namespace fist
       }
       gap_transactions_free(trs);
     }
+    this->_compute_active_transactions();
 
     ELLE_TRACE("load fake links")
     {
@@ -121,11 +122,11 @@ namespace fist
   void
   State::on_user_status_callback(uint32_t id, gap_UserStatus status)
   {
-    ELLE_TRACE_SCOPE("%s: avatar available for id %s", *this, id);
+    ELLE_TRACE_SCOPE("%s: peer %s status updated to %s", *this, id, status);
     if (this->_users.find(id) == this->_users.end())
       this->_users[id].reset(new model::User(*this, id));
     this->_users[id]->avatar_updated();
-    for (model::Transaction const& model: this->_transactions.get<1>())
+    for (model::Transaction const& model: this->_transactions.get<0>())
     {
       if (model.peer_id() == id)
         model.peer_status_updated();
@@ -240,12 +241,22 @@ namespace fist
   void
   State::on_transaction_callback(uint32_t id, gap_TransactionStatus status)
   {
+    ELLE_TRACE_SCOPE("%s: transaction notification (%s) with status %s",
+                     *this, id, status);
     ELLE_ASSERT(id != gap_null());
-    auto it = this->_transactions.get<0>().find(id);
-    if (it == this->_transactions.get<0>().end())
+    if (!gap_is_link_transaction(this->state(), id))
     {
-      this->_transactions.emplace(*this, id);
-      emit new_transaction(id);
+      auto it = this->_transactions.get<0>().find(id);
+      if (it == this->_transactions.get<0>().end())
+      {
+        this->_transactions.emplace(*this, id);
+        emit new_transaction(id);
+      }
+
+      this->_transactions.get<0>().find(id)->status_updated();
+      emit transaction_updated(id);
+
+      this->_compute_active_transactions();
     }
 
     this->_transactions.get<0>().find(id)->status_updated();
@@ -264,6 +275,30 @@ namespace fist
     }
 
     return *this->_transactions.get<0>().find(id);
+  }
+
+  // XXX: Use a per transaction boolean which says if it's activ or not.
+  void
+  State::_compute_active_transactions()
+  {
+    unsigned int count = 0;
+    for (auto const& transaction: this->_transactions.get<0>())
+    {
+      if (!gap_transaction_is_final(this->state(), transaction.id()) &&
+          gap_transaction_concern_device(this->state(), transaction.id()))
+        ++count;
+    }
+    this->active_transactions(count);
+  }
+
+  void
+  State::active_transactions(unsigned int count)
+  {
+    if (this->_active_transactions != count)
+    {
+      this->_active_transactions = count;
+      emit active_transactions_changed(this->_active_transactions);
+    }
   }
 
   void
