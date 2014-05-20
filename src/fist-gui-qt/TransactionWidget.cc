@@ -48,6 +48,8 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
           this, SLOT(_on_avatar_updated()));
   connect(&this->_transaction, SIGNAL(status_updated()),
           this, SLOT(apply_update()));
+  connect(&this->_transaction, SIGNAL(peer_status_updated()),
+          this, SLOT(apply_update()));
 
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
