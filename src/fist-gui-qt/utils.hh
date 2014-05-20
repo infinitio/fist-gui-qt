@@ -1,8 +1,9 @@
-#ifndef UTILS_HH
-# define UTILS_HH
+#ifndef FIST_GUI_QT_UTILS_HH
+# define FIST_GUI_QT_UTILS_HH
 
-# include <QUrl>
+# include <QDateTime>
 # include <QNetworkReply>
+# include <QUrl>
 
 # define Q_PROPERTY_R(Type, Name, Read)                 \
   public:                                               \
@@ -89,5 +90,25 @@ readable_size(qint64 size)
 
   return QString("%1").arg(size) + " " + units[i];
 };
+
+static
+int
+seconds_since_midnight(QDateTime const& date)
+{
+  auto time = date.time();
+  return time.hour() * 3600 + time.minute() * 60 + time.second();
+}
+
+inline
+QString
+pretty_date(QDateTime const& date)
+{
+  auto current = QDateTime::currentDateTime();
+  auto local_date = date.toLocalTime();
+  QString format(local_date.secsTo(current) < seconds_since_midnight(current)
+                 ? "h:mA"
+                 : "MMM d");
+  return local_date.toString(format);
+}
 
 #endif

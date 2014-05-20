@@ -14,6 +14,7 @@
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/TransactionWindow.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 
@@ -437,23 +438,12 @@ TransactionWidget::_on_status_updated()
     this->_peer_fullname->setText(this->_transaction.peer_fullname());
 }
 
-static
-int
-seconds_since_midnight(QDateTime const& date)
-{
-  auto time = date.time();
-  return time.hour() * 3600 + time.minute() * 60 + time.second();
-}
 void
 TransactionWidget::update_mtime()
 {
   ELLE_DUMP_SCOPE("mtime updated");
-  auto current = QDateTime::currentDateTime();
   auto transaction_mtime = this->_transaction.mtime().toLocalTime();
-  QString format(transaction_mtime.secsTo(current) < seconds_since_midnight(current)
-                 ? "h:mA"
-                 : "MMM d");
-  this->_mtime->setText(transaction_mtime.toString(format));
+  this->_mtime->setText(pretty_date(transaction_mtime));
 }
 
 void
