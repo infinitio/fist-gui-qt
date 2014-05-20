@@ -12,7 +12,6 @@
 ELLE_LOG_COMPONENT("infinit.FIST.SendView.Users");
 
 static int const margin = 7;
-static QSize const icon_size(14, 14);
 
 namespace
 {
@@ -65,7 +64,7 @@ namespace fist
                  QWidget* owner)
       :  QWidget(owner)
       , _state(state)
-      , _magnifier(":/icons/search@2x.png")
+      , _magnifier(":/icons/search.png")
       , _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this))
       , _icon(new QLabel(this))
       , _search_field(new SearchField(this))
@@ -93,12 +92,13 @@ namespace fist
       auto* vlayout = new QVBoxLayout(this);
       vlayout->setAlignment(Qt::AlignVCenter);
       vlayout->setContentsMargins(0, 0, 0, 0);
+      vlayout->setSpacing(0);
       {
         auto* layout = new QHBoxLayout;
-        layout->setContentsMargins(16, 0, 0, 5);
+        layout->setSpacing(8);
+        layout->setContentsMargins(18, 4, 5, 4);
         // Icon.
         {
-          this->_icon->setFixedSize(icon_size);
           layout->addWidget(this->_icon);
         }
         // Search field.
@@ -113,7 +113,7 @@ namespace fist
                   this, SLOT(text_changed(QString const&)));
           connect(this->_search_field, SIGNAL(returnPressed()),
                   this, SLOT(_select_first_user()));
-          layout->addWidget(this->_search_field);
+          layout->addWidget(this->_search_field, 1);
         }
         vlayout->addLayout(layout);
       }
@@ -250,16 +250,13 @@ namespace fist
     Users::set_icon(QPixmap const& pixmap)
     {
       this->_icon->show();
-      this->_icon->setPixmap(pixmap.scaled(icon_size,
-                                           Qt::KeepAspectRatioByExpanding,
-                                           Qt::SmoothTransformation));
+      this->_icon->setPixmap(pixmap);
       this->update();
     }
 
     void
     Users::set_icon(QMovie& movie)
     {
-      movie.setScaledSize(icon_size);
       this->_icon->show();
       this->_icon->setMovie(&movie);
       this->_icon->movie()->start();

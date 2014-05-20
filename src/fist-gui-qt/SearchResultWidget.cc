@@ -23,7 +23,7 @@ SearchResultWidget::SearchResultWidget(fist::model::User const& model,
   connect(&this->_model, SIGNAL(avatar_updated()), this, SLOT(_on_avatar_updated()));
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
-  this->_layout->setSpacing(8);
+  this->_layout->setSpacing(4);
   this->_layout->setContentsMargins(10, 4, 10, 4);
   this->_layout->addWidget(this->_avatar);
   {

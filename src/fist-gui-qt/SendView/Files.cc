@@ -75,9 +75,9 @@ namespace fist
         auto* layout = new QHBoxLayout(adder);
         layout->setAlignment(Qt::AlignVCenter);
         layout->setSpacing(6);
-        layout->setContentsMargins(16, 16, 16, 16);
+        layout->setContentsMargins(16, 13, 13, 13);
         layout->addWidget(this->_attach);
-        layout->setSpacing(9);
+        layout->setSpacing(16);
         layout->addWidget(this->_text, 1);
         layout->addWidget(this->_expanser);
         layout->addWidget(this->_add_file);

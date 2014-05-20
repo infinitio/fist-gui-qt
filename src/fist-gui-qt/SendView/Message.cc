@@ -39,9 +39,10 @@
       vlayout->setContentsMargins(0, 0, 0, 0);
       vlayout->addWidget(this->_top_separator);
       QHBoxLayout* layout = new QHBoxLayout;
-      layout->setContentsMargins(14, 0, 12, 0);
+      layout->setSpacing(0);
+      layout->setContentsMargins(16, 0, 13, 0);
       layout->addWidget(&this->_icon);
-      layout->addSpacing(4);
+      layout->addSpacing(10);
       layout->addWidget(this->_message, 1);
       layout->addSpacing(2);
       layout->addWidget(&this->_remaining_characters, 0, Qt::AlignHCenter);

@@ -111,7 +111,7 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
   {
     auto time_and_info = new QVBoxLayout;
     time_and_info->setContentsMargins(0, 0, 0, 0);
-    time_and_info->setSpacing(4);
+    time_and_info->setSpacing(10);
     this->_info_area->setLayout(time_and_info);
     time_and_info->addStretch();
     view::transaction::date::style(*this->_mtime);
