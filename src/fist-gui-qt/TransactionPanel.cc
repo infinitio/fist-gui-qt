@@ -29,8 +29,12 @@ MainPanel::MainPanel(fist::State& state,
     SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
     this, SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
 
-  this->_tabs->add_tab("TRANSFERS", {this->_transactions});
-  this->_tabs->add_tab("LINKS", {this->_links});
+  auto* transfer_tab = this->_tabs->add_tab("TRANSFERS", {this->_transactions});
+  connect(&this->_state, SIGNAL(active_transactions_changed(unsigned int)),
+          transfer_tab, SLOT(on_notification_count_changed(unsigned int)));
+  auto* link_tab = this->_tabs->add_tab("LINKS", {this->_links});
+  connect(&this->_state, SIGNAL(active_links_changed(unsigned int)),
+          link_tab, SLOT(on_notification_count_changed(unsigned int)));
   this->footer()->setParent(this);
 }
 
