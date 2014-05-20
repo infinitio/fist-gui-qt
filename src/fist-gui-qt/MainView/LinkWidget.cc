@@ -12,6 +12,7 @@
 
 #include <fist-gui-qt/MainView/LinkWidget.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.MainView.LinkWidget");
 
@@ -25,11 +26,14 @@ namespace fist
       , _model(model)
       , _layout(new QHBoxLayout(this))
       , _picture()
-      , _status("branle chiche")
-      , _download_counter("32")
+      , _status()
+      , _click_counter()
       , _go_to_website(new IconButton(QPixmap(":/buttons/share.png")))
       , _copy_link(new IconButton(QPixmap(":/buttons/clipboard.png")))
     {
+      connect(&this->_model, SIGNAL(status_updated()),
+              this, SLOT(_on_status_updated()));
+
       this->_layout->setContentsMargins(12, 12, 12, 12);
       this->_layout->setSpacing(10);
       {
@@ -64,12 +68,12 @@ namespace fist
         vlayout->setSpacing(0);
         vlayout->addStretch();
         {
-          view::links::counter::style(this->_download_counter);
-          this->_download_counter.setStyleSheet(
+          view::links::counter::style(this->_click_counter);
+          this->_click_counter.setStyleSheet(
             "border: 3px solid rgb(204,204,204); border-radius: 8px; background-color: rgb(204,204,204);");
         }
 
-        vlayout->addWidget(&this->_download_counter);
+        vlayout->addWidget(&this->_click_counter);
         vlayout->addWidget(this->_go_to_website);
         this->_go_to_website->setToolTip("Open the link");
         vlayout->addSpacing(5);
@@ -85,19 +89,30 @@ namespace fist
               this, SLOT(_copy_link_to_clipboard()));
 
       this->leaveEvent(nullptr);
-      this->_on_progress_updated();
+      this->_on_status_updated();
     }
 
     void
     LinkWidget::_on_progress_updated()
     {
-      this->_on_status_updated(QString("Uploading... (%1%)").arg(this->_model.progress() * 100));
+      this->_update(
+        QString("Uploading... (%1%)").arg(this->_model.progress() * 100));
     }
 
     void
-    LinkWidget::_on_status_updated(QString const& status)
+    LinkWidget::_on_status_updated()
+    {
+      if (this->_model.is_finished())
+        this->_update(pretty_date(this->_model.mtime()));
+      else
+        this->_on_progress_updated();
+    }
+
+    void
+    LinkWidget::_update(QString const& status)
     {
       this->_status.setText(status);
+      this->_click_counter.setText(QString("%1").arg(this->_model.click_count()));
     }
 
     void
@@ -105,7 +120,7 @@ namespace fist
     {
       this->_go_to_website->show();
       this->_copy_link->show();
-      this->_download_counter.hide();
+      this->_click_counter.hide();
     }
 
     void
@@ -113,7 +128,7 @@ namespace fist
     {
       this->_go_to_website->hide();
       this->_copy_link->hide();
-      this->_download_counter.show();
+      this->_click_counter.show();
     }
 
     void

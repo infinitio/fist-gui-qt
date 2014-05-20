@@ -42,10 +42,13 @@ namespace fist
 
     private slots:
       void
-      _on_status_updated(QString const& status);
+      _update(QString const& status);
 
       void
       _on_progress_updated();
+
+      void
+      _on_status_updated();
 
       void
       _copy_link_to_clipboard();
@@ -61,7 +64,7 @@ namespace fist
       ELLE_ATTRIBUTE(QHBoxLayout*, layout);
       ELLE_ATTRIBUTE(QLabel, picture);
       ELLE_ATTRIBUTE(QLabel, status);
-      ELLE_ATTRIBUTE(QLabel, download_counter);
+      ELLE_ATTRIBUTE(QLabel, click_counter);
       ELLE_ATTRIBUTE(IconButton*, go_to_website);
       ELLE_ATTRIBUTE(IconButton*, copy_link);
 
