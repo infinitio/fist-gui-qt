@@ -191,6 +191,22 @@ namespace fist
         >
       > Links;
     ELLE_ATTRIBUTE_R(Links, links);
+    ELLE_ATTRIBUTE_Rw(unsigned int, active_links);
+
+  public:
+    model::Link const&
+    link(uint32_t id);
+
+  signals:
+    void
+    new_link(uint32_t id);
+    void
+    link_updated(uint32_t id);
+    void
+    active_links_changed(unsigned int);
+  private:
+    void
+    _compute_active_links();
 
   private:
     Q_OBJECT;

@@ -20,6 +20,10 @@ MainPanel::MainPanel(fist::State& state,
           this->_transactions, SLOT(add_transaction(uint32_t)));
   connect(&this->_state, SIGNAL(transaction_updated(uint32_t)),
           this->_transactions, SLOT(on_transaction_updated(uint32_t)));
+  connect(&this->_state, SIGNAL(new_link(uint32_t)),
+          this->_links, SLOT(add_link(uint32_t)));
+  connect(&this->_state, SIGNAL(link_updated(uint32_t)),
+          this->_links, SLOT(on_link_updated(uint32_t)));
   connect(
     this->_transactions,
     SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),

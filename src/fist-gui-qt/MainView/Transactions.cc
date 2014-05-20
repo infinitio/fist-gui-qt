@@ -1,3 +1,4 @@
+#include <Qt>
 #include <QVBoxLayout>
 
 #include <fist-gui-qt/Footer.hh>
@@ -19,7 +20,7 @@ namespace fist
                                QWidget* parent)
       :  QWidget(parent)
       , _state(state)
-      , _transaction_list(new ListWidget(this))
+      , _transaction_list(new ListWidget(this, ListWidget::Separator(list::separator::colors), view::background))
       , _widgets()
     {
       this->_transaction_list->setMaxRows(4);

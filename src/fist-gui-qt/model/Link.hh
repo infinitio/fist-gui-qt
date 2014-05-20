@@ -9,6 +9,8 @@
 # include <elle/attribute.hh>
 # include <elle/Printable.hh>
 
+# include <surface/gap/gap.hh>
+
 # include <fist-gui-qt/model/Model.hh>
 # include <fist-gui-qt/fwd.hh>
 
@@ -27,11 +29,41 @@ namespace fist
       ~Link() = default;
 
     private:
-      ELLE_ATTRIBUTE_R(QUrl, url);
-      ELLE_ATTRIBUTE_R(QString, name);
-      ELLE_ATTRIBUTE_R(QDateTime, mtime);
-      ELLE_ATTRIBUTE_R(uint32_t, download_count);
-      ELLE_ATTRIBUTE_R(float, progress);
+      ELLE_ATTRIBUTE_P(surface::gap::LinkTransaction, link, mutable);
+      ELLE_ATTRIBUTE_P(QDateTime, mtime, mutable);
+
+    public:
+      void
+      update();
+
+    public:
+      QUrl
+      url() const;
+
+      QString
+      name() const;
+
+      QDateTime const&
+      mtime() const;
+
+      uint32_t
+      click_count() const;
+
+      float
+      progress() const;
+
+      gap_TransactionStatus
+      status() const;
+
+      bool
+      is_finished() const;
+
+    signals:
+      void
+      status_updated() const;
+
+      void
+      click_count_updated() const;
 
     private:
       /*----------.
@@ -39,6 +71,10 @@ namespace fist
       `----------*/
       void
       print(std::ostream& stream) const override;
+
+    private:
+      // Make State friend in order to allow it to send signals.
+      friend fist::State;
 
     private:
       Q_OBJECT;

@@ -77,12 +77,12 @@ namespace fist
     }
     this->_compute_active_transactions();
 
-    ELLE_TRACE("load fake links")
+    ELLE_TRACE("load links")
     {
-      for (uint32_t i = 0; i < 14; ++i)
+      auto const& links = gap_link_transactions(this->state());
+      for (auto const& link: links)
       {
-        this->_links.emplace(*this, i);
-        ELLE_DEBUG("link: %s", *this->_links.get<0>().find(i));
+        this->_links.emplace(*this, link.id);
       }
     }
   }
@@ -258,9 +258,29 @@ namespace fist
 
       this->_compute_active_transactions();
     }
+    else
+    {
+      auto it = this->_links.get<0>().find(id);
+      if (it == this->_links.get<0>().end())
+      {
+        this->_links.emplace(*this, id);
+        emit new_link(id);
+      }
 
-    this->_transactions.get<0>().find(id)->status_updated();
-    emit transaction_updated(id);
+      struct UpdateLink
+      {
+        void
+        operator()(model::Link& model)
+        {
+          model.update();
+        }
+      };
+
+      this->_links.modify(this->_links.get<0>().find(id), UpdateLink());
+      emit link_updated(id);
+
+      this->_compute_active_links();
+    }
   }
 
   model::Transaction const&
@@ -327,5 +347,41 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     QDesktopServices::openUrl(QUrl(QString(gap_get_output_dir(this->state()))));
+  }
+
+  void
+  State::_compute_active_links()
+  {
+    unsigned int count = 0;
+    for (auto const& link: this->_links.get<0>())
+    {
+      if (!link.is_finished())
+        ++count;
+    }
+    this->active_links(count);
+  }
+
+  void
+  State::active_links(unsigned int count)
+  {
+    if (this->_active_links != count)
+    {
+      this->_active_links = count;
+      emit active_links_changed(this->_active_links);
+    }
+  }
+
+  model::Link const&
+  State::link(uint32_t id)
+  {
+    ELLE_ASSERT(id != gap_null());
+    auto it = this->_links.get<0>().find(id);
+    if (it == this->_links.get<0>().end())
+    {
+      this->_links.emplace(*this, id);
+      emit new_link(id);
+    }
+
+    return *this->_links.get<0>().find(id);
   }
 }

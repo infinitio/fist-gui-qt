@@ -26,11 +26,15 @@ namespace fist
       Links(fist::State& state,
             QWidget* parent);
 
+    public slots:
       void
       add_link(uint32_t id);
 
       void
       add_link(model::Link const& model);
+
+      void
+      on_link_updated(uint32_t id);
 
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
