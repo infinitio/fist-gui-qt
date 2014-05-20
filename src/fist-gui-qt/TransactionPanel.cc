@@ -43,6 +43,12 @@ MainPanel::keyPressEvent(QKeyEvent* event)
   }
 }
 
+void
+MainPanel::_on_show()
+{
+  this->_tabs->show();
+}
+
 /*-------.
 | Footer |
 `-------*/

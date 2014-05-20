@@ -25,12 +25,19 @@ protected:
   void
   childEvent(QChildEvent*) override;
 
-public:
+private:
   virtual
+  void
+  _on_show() {};
+
+  virtual
+  void
+  _on_hide() {};
+
+public:
   void
   on_show();
 
-  virtual
   void
   on_hide();
 

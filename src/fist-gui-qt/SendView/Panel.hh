@@ -120,10 +120,10 @@ namespace fist
       std::unordered_map<uint32_t, std::unique_ptr<model::User>> _user_models;
 
       void
-      on_show() override;
+      _on_show() override;
 
       void
-      on_hide() override;
+      _on_hide() override;
 
       void
       focusInEvent(QFocusEvent* event) override;

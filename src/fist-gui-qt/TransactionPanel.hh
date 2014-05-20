@@ -27,6 +27,10 @@ public:
   MainPanel(fist::State& state,
             QWidget* parent = nullptr);
 
+public:
+  void
+  _on_show() override;
+
 private:
   fist::State& _state;
   fist::gui::TabWidget* _tabs;

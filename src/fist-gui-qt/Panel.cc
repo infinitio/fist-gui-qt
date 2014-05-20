@@ -4,6 +4,7 @@
 #include <elle/log.hh>
 
 #include <fist-gui-qt/Panel.hh>
+#include <fist-gui-qt/globals.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Panel");
 
@@ -51,11 +52,17 @@ Panel::minimumSizeHint() const
 
 void
 Panel::on_show()
-{}
+{
+  emit set_background_color(Qt::white);
+  this->_on_show();
+}
 
 void
 Panel::on_hide()
-{}
+{
+  emit set_background_color(view::background);
+  this->_on_hide();
+}
 
 Footer*
 Panel::footer()

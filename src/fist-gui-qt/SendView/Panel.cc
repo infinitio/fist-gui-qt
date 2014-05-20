@@ -205,11 +205,9 @@ namespace fist
   | Show & Hide |
   `------------*/
     void
-    Panel::on_show()
+    Panel::_on_show()
     {
       ELLE_TRACE_SCOPE("%s: show", *this);
-      emit set_background_color(Qt::white);
-      emit shown();
       this->update();
       this->_tabs->activate_first();
       this->_users->clear_search();
@@ -217,11 +215,9 @@ namespace fist
     }
 
     void
-    Panel::on_hide()
+    Panel::_on_hide()
     {
       ELLE_TRACE_SCOPE("%s: hide", *this);
-      emit set_background_color(view::background);
-
       this->_users->clear();
       this->_file_adder->clear();
       this->_message->clear();
