@@ -15,11 +15,10 @@ ELLE_LOG_COMPONENT("infinit.FIST.RoundShadowWidget");
 
 RoundShadowWidget::RoundShadowWidget(int radius,
                                      int shadow,
-                                     Qt::WindowFlags flags):
-  QMainWindow(nullptr, flags),
-  _radius(radius),
-  _shadow(shadow),
-  _background(view::background)
+                                     Qt::WindowFlags flags)
+  : QMainWindow(nullptr, flags)
+  , _radius(radius)
+  , _shadow(shadow)
 {
   ELLE_DEBUG_SCOPE("%s: construction", *this);
   this->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -29,6 +28,8 @@ RoundShadowWidget::RoundShadowWidget(int radius,
                            this->_shadow, margin);
   this->setMinimumSize(QSize(0, 0));
   this->setFocusPolicy(Qt::StrongFocus);
+
+  this->setBackground(view::background);
 }
 
 /*-------------------.
@@ -64,13 +65,18 @@ RoundShadowWidget::setShadow(int value)
 QColor const&
 RoundShadowWidget::background()
 {
-  return this->_background;
+  auto const& palette = this->palette();
+  return palette.color(QPalette::Window);
 }
 
 void
 RoundShadowWidget::setBackground(QColor const& value)
 {
-  this->_background = value;
+  {
+    auto palette = this->palette();
+    palette.setColor(QPalette::Window, value);
+    this->setPalette(palette);
+  }
   Q_EMIT this->onBackgroundChanged();
   this->update();
 }
@@ -162,7 +168,8 @@ RoundShadowWidget::paintEvent(QPaintEvent*)
                        this->height() - (shadow + radius) * 2,
                        180);
   }
-  painter.setBrush(this->_background);
+
+  painter.setBrush(this->background());
   painter.drawRoundedRect(shadow,
                           shadow,
                           this->width() - shadow * 2,

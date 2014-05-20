@@ -63,8 +63,6 @@ private:
   _radius;
   int
   _shadow;
-  QColor
-  _background;
 
 /*---------.
 | Geometry |
