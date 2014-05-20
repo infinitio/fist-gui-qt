@@ -16,7 +16,8 @@ static int const items = 5;
 `-------------*/
 
 ListWidget::ListWidget(QWidget* parent,
-                       Separator const& separator):
+                       Separator const& separator,
+                       boost::optional<QColor> background_color):
   Super(parent),
   _offset(0),
   _separator(separator),
@@ -32,6 +33,15 @@ ListWidget::ListWidget(QWidget* parent,
   this->_scroll->hide();
   connect(_scroll, SIGNAL(valueChanged(int)), SLOT(setOffset(int)));
   this->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+
+  if (background_color)
+  {
+    QPalette palette = this->palette();
+    {
+      palette.setColor(QPalette::Window, background_color.get());
+    }
+    this->setPalette(palette);
+  }
 }
 
 /*--------.
@@ -52,6 +62,11 @@ ListWidget::add_widget(ListItem* widget, Position position)
   else
     ELLE_ERR("%s: unknown widget position %s", *this, position);
   widget->setParent(this);
+  {
+    QPalette palette = widget->palette();
+    palette.setColor(QPalette::Window, this->palette().color(QPalette::Window));
+    widget->setPalette(palette);
+  }
   widget->show();
   this->_scroll->raise();
   this->_layout();
@@ -341,6 +356,7 @@ ListWidget::reload()
 void
 ListWidget::paintEvent(QPaintEvent* e)
 {
+  Super::paintEvent(e);
   QPainter painter(this);
   int height = -this->_offset;
 

@@ -1,5 +1,7 @@
-#ifndef LISTWIDGET_HH
-# define LISTWIDGET_HH
+#ifndef FIST_GUI_QT_LISTWIDGET_HH
+# define FIST_GUI_QT_LISTWIDGET_HH
+
+# include <boost/optional.hpp>
 
 # include <QSet>
 # include <QWidget>
@@ -11,7 +13,7 @@
 
 # include <fist-gui-qt/SmoothScrollBar.hh>
 # include <fist-gui-qt/ListItem.hh>
-#include <fist-gui-qt/globals.hh>
+# include <fist-gui-qt/globals.hh>
 
 class ListWidget:
   public QWidget,
@@ -64,7 +66,8 @@ public:
 `-------------*/
 public:
  ListWidget(QWidget* parent = nullptr,
-            Separator const& separator = Separator(list::separator::colors));
+            Separator const& separator = Separator(list::separator::colors),
+            boost::optional<QColor> background_color = {});
 
 /*--------.
 | Widgets |
