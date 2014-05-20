@@ -49,12 +49,9 @@ namespace fist
       , _users(new Users(_state, this))
       , _message(new Message(this))
       , _file_adder(new Files(this))
+      , _transaction_tab(_tabs->add_tab("SEND TO USER", { this->_users, this->_message, this->_file_adder, this->_message->top_separator(), }))
+      , _link_tab(_tabs->add_tab("GET A LINK", { this->_message, this->_file_adder, }))
     {
-      this->_tabs->add_tab("SEND TO USER", { this->_users, this->_message, this->_file_adder, this->_message->top_separator(), });
-      this->_tabs->add_tab("GET A LINK", { this->_message, this->_file_adder, });
-
-      this->footer()->setParent(this);
-
       connect(this->_file_adder, SIGNAL(clicked()),
               this, SIGNAL(choose_files()));
 
@@ -92,9 +89,9 @@ namespace fist
     Panel::_pick_user()
     {
       ELLE_TRACE_SCOPE("%s: pick user", *this);
+      ELLE_LOG("%s", *this->_link_tab);
       if (!this->_users->recipients().empty())
       {
-        // ELLE_DEBUG("try to send to %s", this->_peer_id);
         this->_send();
       }
       else
@@ -103,22 +100,54 @@ namespace fist
       }
     }
 
+    bool
+    Panel::_check_files()
+    {
+      if (this->_file_adder->files().empty())
+      {
+        ELLE_DEBUG("file list is empty");
+        this->_file_adder->pulse();
+      }
+
+      return !this->_file_adder->files().empty();
+    }
+
+    void
+    Panel::_generate_link()
+    {
+      std::vector<std::string> files;
+      for (int i = 0; i < this->_file_adder->files().size(); ++i)
+      {
+        files.push_back(
+          QDir::toNativeSeparators(this->_file_adder->files().keys().at(i).toLocalFile()).toStdString());
+      }
+
+      std::string message = this->_message->text().toStdString();
+      ELLE_DEBUG("message: %s", message);
+      ELLE_TRACE("generate link")
+        gap_create_link_transaction(this->_state.state(), files, message.c_str());
+      ELLE_DEBUG("done!");
+      emit sent();
+    }
+
     void
     Panel::_send()
     {
+
+      if (!this->_check_files())
+        return;
+
+      if (this->_tabs->is_active_tab(*this->_link_tab))
+      {
+        this->_generate_link(); return;
+      }
+
       ELLE_TRACE_SCOPE("%s: send", *this);
 
       if (!this->_users->peer_valid())
       {
         ELLE_DEBUG("peer is not set");
         this->_users->search_field()->setFocus();
-        return;
-      }
-
-      if (this->_file_adder->files().empty())
-      {
-        ELLE_DEBUG("file list is empty");
-        this->_file_adder->pulse();
         return;
       }
 

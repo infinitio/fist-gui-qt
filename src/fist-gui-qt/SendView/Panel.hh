@@ -65,6 +65,13 @@ namespace fist
       file_added();
 
     private slots:
+
+      bool
+      _check_files();
+
+      void
+      _generate_link();
+
       void
       _send();
 
@@ -107,6 +114,8 @@ namespace fist
       ELLE_ATTRIBUTE_R(Users*, users);
       ELLE_ATTRIBUTE_R(Message*, message);
       ELLE_ATTRIBUTE_R(Files*, file_adder);
+      ELLE_ATTRIBUTE(gui::Tab*, transaction_tab);
+      ELLE_ATTRIBUTE(gui::Tab*, link_tab);
 
 
     protected:
