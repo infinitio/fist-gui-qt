@@ -20,11 +20,12 @@ namespace fist
       , _active_tab(nullptr)
     {
       this->setContentsMargins(0, 0, 0, 0);
+      this->_layout->setContentsMargins(0, 0, 0, 0);
       this->_layout->setSpacing(0);
       this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Ignored);
     }
 
-    void
+    Tab*
     TabWidget::add_tab(QString const& name,
                        QVector<QWidget*> const& widgets)
     {
@@ -38,16 +39,18 @@ namespace fist
       }
 
       this->activate_tab(*this->_tabs.begin()->get());
+
+      return this->_tabs.back().get();
     }
 
-    void
+    Tab*
     TabWidget::add_tab(QString const& name,
                        QWidget* widget)
     {
       ELLE_TRACE_SCOPE("%s: add tab %s", *this, name);
       QVector<QWidget*> widgets;
       widgets.push_back(widget);
-      this->add_tab(name, widgets);
+      return this->add_tab(name, widgets);
     }
 
     bool
@@ -126,6 +129,14 @@ namespace fist
     TabWidget::remove_tab(QString const& name)
     {
       elle::unreachable();
+    }
+
+    void
+    TabWidget::showEvent(QShowEvent* event)
+    {
+      Super::showEvent(event);
+      if (this->_active_tab != nullptr)
+        this->activate_tab(*this->_active_tab);
     }
 
     QSize

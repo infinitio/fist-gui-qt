@@ -1,9 +1,10 @@
 #include <iostream>
 
-# include <QPainter>
+#include <QPainter>
 #include "Tab.hh"
 
-# include <fist-gui-qt/gui/TabWidget.hh>
+#include <fist-gui-qt/gui/TabWidget.hh>
+#include <fist-gui-qt/globals.hh>
 
 namespace fist
 {
@@ -14,13 +15,21 @@ namespace fist
              QVector<QWidget*> const& widgets)
       : Super(&tabber)
       , _tabber(tabber)
-      , _name(name)
+      , _name(new QLabel(name, this))
+      , _notification_count(0)
+      , _counter(new QLabel(QString("%1").arg(this->_notification_count), this))
       , _widgets(widgets)
-      , _font("Arial", 9)
       , _color(0x33, 0x33, 0x33)
     {
-      this->_font.setCapitalization(QFont::AllUppercase);
+      auto* layout = new QHBoxLayout(this);
+      layout->addStretch();
+      layout->addWidget(this->_name);
+      view::tab::counter::style(*this->_counter);
+      layout->addWidget(this->_counter);
+      layout->addStretch();
       this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+      this->on_notification_count_changed(0);
     }
 
     void
@@ -57,6 +66,21 @@ namespace fist
                    36);
     }
 
+    void
+    Tab::on_notification_count_changed(unsigned int count)
+    {
+      this->_notification_count = count;
+      if (this->_notification_count == 0)
+      {
+        this->_counter->hide();
+      }
+      else
+      {
+        this->_counter->setText(QString("%1").arg(this->_notification_count));
+        this->_counter->show();
+      }
+      this->update();
+    }
     QSize
     Tab::minimumSizeHint() const
     {
@@ -67,13 +91,10 @@ namespace fist
     Tab::paintEvent(QPaintEvent* event)
     {
       int line_height = 2;
+      Super::paintEvent(event);
       QPainter painter(this);
-      painter.setFont(this->_font);
       painter.setPen(this->_color);
       painter.setBrush(this->_color);
-      painter.drawText(
-        QRect(0, 0, this->width(), this->height() - line_height),
-       Qt::AlignCenter, this->name());
       painter.drawRect(0, this->height() - line_height, this->width(), line_height);
     }
 
@@ -81,29 +102,33 @@ namespace fist
     Tab::color(QColor const& color)
     {
       this->_color = color;
-      QPalette palette = this->palette();
+      // XXX: A bit violent.
+      for (auto* component: std::vector<QWidget*>{this, this->_name, this->_counter})
       {
-        palette.setColor(QPalette::WindowText, this->_color);
+        QPalette palette = component->palette();
+        {
+          palette.setColor(QPalette::WindowText, this->_color);
+        }
+        component->setPalette(palette);
       }
-      this->setPalette(palette);
     }
 
     void
     Tab::_hover()
     {
-      this->color(QColor(0x2B, 0xCE, 0xCD));
+      this->color(view::tab::hover_style.color());
     }
 
     void
     Tab::_active()
     {
-      this->color(QColor(0x2B, 0xBE, 0xBD));
+      this->color(view::tab::selected_style.color());
     }
 
     void
     Tab::_inactive()
     {
-      this->color(QColor(0x51, 0x51, 0x51));
+      this->color(view::tab::style.color());
     }
 
     void

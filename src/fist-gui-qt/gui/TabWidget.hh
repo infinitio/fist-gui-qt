@@ -23,17 +23,16 @@ namespace fist
       public QWidget
     {
       typedef QWidget Super;
-    private:
     public:
       TabWidget(QWidget* parent = nullptr);
 
       // Add a tab associated with a list a widgets.
-      void
+      Tab*
       add_tab(QString const& name,
               QVector<QWidget*> const& widgets = {});
 
       // Add a tab associated with one widget.
-      void
+      Tab*
       add_tab(QString const& name,
               QWidget* widgets);
 
@@ -65,6 +64,9 @@ namespace fist
       // XXX: Not implemented yet.
       void
       remove_tab(QString const& name);
+
+      void
+      showEvent(QShowEvent* event) override;
 
       QSize
       sizeHint() const override;

@@ -6,11 +6,13 @@
 # include <QLabel>
 # include <QVector>
 
+# include <elle/attribute.hh>
+
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
 
 // XXX: Rework the structure.
-// A good structure could be, but it's really verbose.
+// A good structure could be (but it's really verbose).
 // view
 // - login
 //   - email
@@ -63,9 +65,9 @@ namespace
     }
 
   private:
-    QFont _font;
-    QColor _color;
-    Qt::Alignment _alignement;
+    ELLE_ATTRIBUTE_R(QFont, font);
+    ELLE_ATTRIBUTE_R(QColor, color);
+    ELLE_ATTRIBUTE_R(Qt::Alignment, alignement);
   };
 }
 
@@ -89,6 +91,28 @@ namespace view
   static
   QColor const
   background(0xF8, 0xF8, 0xF8);
+
+  namespace tab
+  {
+    namespace counter
+    {
+      static
+      TextStyle const
+      style(QFont("Arial", 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignTop);
+    }
+
+    static
+    TextStyle const
+    style(QFont("Arial", 11), QColor(0x51, 0x51, 0x51));
+
+    static
+    TextStyle const
+    hover_style(QFont("Arial", 11), QColor(0x2B, 0xCE, 0xCD));
+
+    static
+    TextStyle const
+    selected_style(QFont("Arial", 11), QColor(0x2B, 0xBE, 0xBD));
+  }
 
   namespace tooltip
   {

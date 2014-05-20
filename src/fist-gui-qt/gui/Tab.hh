@@ -3,6 +3,7 @@
 
 # include <QColor>
 # include <QFont>
+# include <QLabel>
 # include <QObject>
 # include <QPushButton>
 # include <QVector>
@@ -58,7 +59,6 @@ namespace fist
       void
       _inactive();
 
-
     private slots:
       void
       _notify_tabber();
@@ -70,11 +70,16 @@ namespace fist
       void
       disable();
 
+    public slots:
+      void
+      on_notification_count_changed(unsigned int count);
+
     private:
       ELLE_ATTRIBUTE(TabWidget&, tabber);
-      ELLE_ATTRIBUTE_R(QString, name)
+      ELLE_ATTRIBUTE_R(QLabel*, name)
+      ELLE_ATTRIBUTE_R(unsigned int, notification_count);
+      ELLE_ATTRIBUTE(QLabel*, counter)
       ELLE_ATTRIBUTE(QVector<QWidget*>, widgets);
-      ELLE_ATTRIBUTE_Rw(QFont, font);
       ELLE_ATTRIBUTE_Rw(QColor, color);
     private:
       Q_OBJECT;
