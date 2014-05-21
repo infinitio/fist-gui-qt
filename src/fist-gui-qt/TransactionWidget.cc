@@ -41,8 +41,7 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
   _mtime(new QLabel),
   _status(new QLabel),
   _info_area(new QWidget),
-  _progress_timer(nullptr),
-  _mtime_updater(new QTimer(this))
+  _progress_timer(nullptr)
 {
   connect(&this->_transaction, SIGNAL(avatar_updated()),
           this, SLOT(_on_avatar_updated()));
@@ -238,7 +237,7 @@ TransactionWidget::_on_avatar_updated()
 void
 TransactionWidget::apply_update()
 {
-  ELLE_TRACE_SCOPE("%s: update", *this);
+  ELLE_TRACE_SCOPE("%s: update: %s", *this, this->_transaction.status());
   this->_info_area->show();
   this->_cancel_button->hide();
   this->_accept_reject_area->hide();
@@ -249,6 +248,7 @@ TransactionWidget::apply_update()
     this->_peer_status->show();
   else
     this->_peer_status->hide();
+
 
   if (this->_transaction.status() == gap_transaction_waiting_accept &&
       !this->_transaction.is_sender())

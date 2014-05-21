@@ -17,6 +17,7 @@ namespace fist
                              uint32_t id)
       : Model(state, id)
       , _is_sender(boost::logic::indeterminate)
+      , _status(gap_transaction_status(this->_state.state(), this->id()))
       , _peer_fullname((char const*) nullptr)
       , _peer_id(0)
       , _files()
@@ -120,7 +121,13 @@ namespace fist
     gap_TransactionStatus
     Transaction::status() const
     {
-      return gap_transaction_status(this->_state.state(), this->id());
+      return this->_status;
+    }
+
+    void
+    Transaction::status(gap_TransactionStatus status)
+    {
+      this->_status = status;
     }
 
     QDateTime const&
@@ -169,39 +176,39 @@ namespace fist
           }
           this->_default_avatar = false;
         }
-          else if(this->_avatar.isNull())
-          {
+        else if(this->_avatar.isNull())
+        {
           ELLE_DEBUG("%s: avatar not available yet", *this);
           this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
         }
-        }
+      }
 
-        this->_new_avatar = false;
-        return this->_avatar;
-        }
+      this->_new_avatar = false;
+      return this->_avatar;
+    }
 
-          bool
-            Transaction::operator ==(Transaction const& t) const
-          {
-          return this->id() == t.id();
-        }
+    bool
+    Transaction::operator ==(Transaction const& t) const
+    {
+      return this->id() == t.id();
+    }
 
-          bool
-            Transaction::operator <(Transaction const& t) const
-          {
-          return this->id() < t.id();
-        }
+    bool
+    Transaction::operator <(Transaction const& t) const
+    {
+      return this->id() < t.id();
+    }
 
-          void
-                                   Transaction::print(std::ostream& stream) const
-          {
-          stream << "Transaction(" << this->id() << ")";
-          if (!boost::logic::indeterminate(this->_is_sender))
-          {
-          stream << " "
-                 << (this->is_sender() ? "to" : "from")
-                 << " " << this->peer_fullname();
-        }
-        }
-        }
-        }
+    void
+    Transaction::print(std::ostream& stream) const
+    {
+      stream << "Transaction(" << this->id() << ")";
+      if (!boost::logic::indeterminate(this->_is_sender))
+      {
+        stream << " "
+               << (this->is_sender() ? "to" : "from")
+               << " " << this->peer_fullname();
+      }
+    }
+  }
+}

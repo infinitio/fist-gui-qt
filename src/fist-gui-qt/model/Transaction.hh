@@ -49,9 +49,6 @@ namespace fist
       QString
       tooltip() const;
 
-      gap_TransactionStatus
-      status() const;
-
       QDateTime const&
       mtime() const;
 
@@ -69,6 +66,7 @@ namespace fist
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
       ELLE_ATTRIBUTE_P(boost::logic::tribool, is_sender, mutable);
+      ELLE_ATTRIBUTE_rw(gap_TransactionStatus, status);
       ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
       ELLE_ATTRIBUTE_P(uint32_t, peer_id, mutable);
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);

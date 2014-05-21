@@ -103,7 +103,6 @@ private:
   ELLE_ATTRIBUTE_R(QLabel*, status);
   QWidget* _info_area;
   ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);
-  QTimer* _mtime_updater;
 
 signals:
   void

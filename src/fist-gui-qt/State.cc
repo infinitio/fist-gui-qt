@@ -253,6 +253,23 @@ namespace fist
         emit new_transaction(id);
       }
 
+      struct UpdateStatus
+      {
+        UpdateStatus(gap_TransactionStatus status):
+          _status(status)
+        {}
+
+        void
+        operator()(model::Transaction& model)
+        {
+          model.status(this->_status);
+        }
+
+        ELLE_ATTRIBUTE(gap_TransactionStatus, status);
+      };
+
+      this->_transactions.modify(
+        this->_transactions.get<0>().find(id), UpdateStatus(status));
       this->_transactions.get<0>().find(id)->status_updated();
       emit transaction_updated(id);
 
