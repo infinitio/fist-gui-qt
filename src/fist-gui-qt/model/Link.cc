@@ -15,8 +15,9 @@ namespace fist
     Link::Link(fist::State& state,
                uint32_t id)
       : Super(state, id)
-      , _link(gap_link_transaction_by_id(this->_state.state(), id))
-    {}
+      , _link(gap_link_transaction_by_id(this->_state.state(), this->id()))
+    {
+    }
 
     void
     Link::update()
@@ -58,7 +59,7 @@ namespace fist
     float
     Link::progress() const
     {
-      return this->is_finished() ? 1.0f : 0.5f;
+      return this->is_finished() ? 1.0f : gap_transaction_progress(this->_state.state(), this->id());
     }
 
     gap_TransactionStatus
@@ -70,7 +71,7 @@ namespace fist
     bool
     Link::is_finished() const
     {
-      return this->status() != gap_transaction_transferring;
+      return this->status() == gap_transaction_finished;
     }
 
     void

@@ -30,6 +30,10 @@ namespace fist
       , _click_counter()
       , _go_to_website(new IconButton(QPixmap(":/buttons/share.png")))
       , _copy_link(new IconButton(QPixmap(":/buttons/clipboard.png")))
+      , _progress_timer(nullptr)
+      , _update_progress_interval(1000)
+      , _smooth_progress(0.0f)
+      , _progress_animation(new QPropertyAnimation(this, "smooth_progress"))
     {
       connect(&this->_model, SIGNAL(status_updated()),
               this, SLOT(_on_status_updated()));
@@ -88,15 +92,15 @@ namespace fist
       connect(this->_copy_link, SIGNAL(clicked()),
               this, SLOT(_copy_link_to_clipboard()));
 
+      {
+        this->_progress_animation->setDuration(this->_update_progress_interval);
+        this->_progress_animation->setEasingCurve(QEasingCurve::Linear);
+        this->_progress_animation->setEndValue(0.0f);
+
+      }
+
       this->leaveEvent(nullptr);
       this->_on_status_updated();
-    }
-
-    void
-    LinkWidget::_on_progress_updated()
-    {
-      this->_update(
-        QString("Uploading... (%1%)").arg(this->_model.progress() * 100));
     }
 
     void
@@ -105,14 +109,61 @@ namespace fist
       if (this->_model.is_finished())
         this->_update(pretty_date(this->_model.mtime()));
       else
-        this->_on_progress_updated();
+      {
+        this->_update(
+          QString("Uploading... (%1%)").arg(this->_model.progress() * 100));
+      }
     }
 
     void
     LinkWidget::_update(QString const& status)
     {
       this->_status.setText(status);
-      this->_click_counter.setText(QString("%1").arg(this->_model.click_count()));
+      if (this->_model.click_count() > 0)
+      {
+        this->_click_counter.setText(QString("%1").arg(
+          this->_model.click_count()));
+        this->_click_counter.show();
+      }
+      else
+        this->_click_counter.hide();
+
+      if (!this->_model.is_finished() && this->_progress_timer == nullptr)
+      {
+        this->_progress_timer.reset(new QTimer);
+        this->_progress_timer->setInterval(this->_update_progress_interval);
+        connect(this->_progress_timer.get(), SIGNAL(timeout()),
+                this, SLOT(_progress_updated()));
+        this->_progress_timer->start(this->_update_progress_interval);
+      }
+      else if (this->_model.is_finished() && this->_progress_timer != nullptr)
+      {
+        this->_progress_timer.reset();
+      }
+    }
+
+    void
+    LinkWidget::_progress_updated()
+    {
+      auto old_progress = this->_progress_animation->endValue();
+      ELLE_WARN("boite");
+      auto new_progress = this->_model.progress();
+      this->_update(
+        QString("Uploading... (%1%)").arg(new_progress * 100));
+      ELLE_DEBUG_SCOPE("update progress from %s to %s",
+                       old_progress, new_progress);
+      this->_progress_animation->stop();
+      this->_progress_animation->setStartValue(old_progress);
+      this->_progress_animation->setEndValue(new_progress);
+      this->_progress_animation->start();
+      this->update();
+    }
+
+    void
+    LinkWidget::smooth_progress(float progress)
+    {
+      this->_smooth_progress = progress;
+      this->repaint();
     }
 
     void
@@ -128,20 +179,24 @@ namespace fist
     {
       this->_go_to_website->hide();
       this->_copy_link->hide();
-      this->_click_counter.show();
+      if (this->_model.click_count() > 0)
+        this->_click_counter.show();
     }
 
     void
     LinkWidget::paintEvent(QPaintEvent* event)
     {
       Super::paintEvent(event);
-      int line_height = 2;
-
-      QPainter painter(this);
-      static QColor color(0x50, 0xD3, 0xED);
-      painter.setPen(color);
-      painter.setBrush(color);
-      painter.drawRect(0, this->height() - line_height, this->width() * this->_model.progress(), line_height);
+      if (!this->_model.is_finished())
+      {
+        static int line_height = 2;
+        QPainter painter(this);
+        static QColor color(0x50, 0xD3, 0xED);
+        painter.setPen(color);
+        painter.setBrush(color);
+        painter.drawRect(0, this->height() - line_height,
+                         this->width() * this->_smooth_progress, line_height);
+      }
     }
 
     void

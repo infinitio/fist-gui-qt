@@ -3,11 +3,14 @@
 
 # include <QHBoxLayout>
 # include <QLabel>
+# include <QPropertyAnimation>
+# include <QTimer>
 
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/model/Link.hh>
 # include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/gui/Tooltip.hh>
+# include <fist-gui-qt/utils.hh>
 
 namespace fist
 {
@@ -45,7 +48,7 @@ namespace fist
       _update(QString const& status);
 
       void
-      _on_progress_updated();
+      _progress_updated();
 
       void
       _on_status_updated();
@@ -67,6 +70,16 @@ namespace fist
       ELLE_ATTRIBUTE(QLabel, click_counter);
       ELLE_ATTRIBUTE(IconButton*, go_to_website);
       ELLE_ATTRIBUTE(IconButton*, copy_link);
+      ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);
+      ELLE_ATTRIBUTE(int, update_progress_interval);
+
+    public:
+      Q_PROPERTY(float smooth_progress
+                 READ smooth_progress
+                 WRITE smooth_progress);
+    private:
+      ELLE_ATTRIBUTE_Rw(float, smooth_progress);
+      ELLE_ATTRIBUTE(QPropertyAnimation*, progress_animation);
 
     private:
       Q_OBJECT;
