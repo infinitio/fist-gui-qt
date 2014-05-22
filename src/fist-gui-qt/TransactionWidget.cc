@@ -120,9 +120,9 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
     time_and_info->addStretch();
     {
       status_and_cancel->addStretch();
-      status_and_cancel->addWidget(this->_status, 0, Qt::AlignCenter | Qt::AlignRight);
+      status_and_cancel->addWidget(this->_status, 0, Qt::AlignVCenter | Qt::AlignRight);
       status_and_cancel->addSpacing(3);
-      status_and_cancel->addWidget(this->_cancel_button, 0, Qt::AlignCenter | Qt::AlignRight);
+      status_and_cancel->addWidget(this->_cancel_button, 0, Qt::AlignVCenter | Qt::AlignRight);
     }
     layout->addWidget(this->_info_area);
   }
@@ -130,9 +130,11 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
     auto infos = new QVBoxLayout;
     this->_accept_reject_area->setLayout(infos);
 
-    infos->addWidget(this->_accept_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-    infos->addWidget(this->_reject_button, 0, Qt::AlignCenter | Qt::AlignLeft);
-
+    infos->addStretch();
+    infos->addWidget(this->_accept_button, 0, Qt::AlignVCenter | Qt::AlignLeft);
+    infos->addSpacing(2);
+    infos->addWidget(this->_reject_button, 0, Qt::AlignVCenter | Qt::AlignLeft);
+    infos->addStretch();
     this->_accept_button->setToolTip("Accept");
     this->_reject_button->setToolTip("Reject");
 
