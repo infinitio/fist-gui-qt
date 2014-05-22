@@ -27,6 +27,7 @@ namespace fist
       , _model(model)
       , _layout(new QHBoxLayout(this))
       , _picture()
+      , _name(this->_model.name())
       , _status()
       , _click_counter()
       , _go_to_website(new IconButton(QPixmap(":/buttons/share.png")))
@@ -51,10 +52,9 @@ namespace fist
         vlayout->setContentsMargins(0, 0, 0, 0);
         vlayout->setSpacing(5);
         {
-          auto* name = new QLabel(this->_model.name(), this);
-          name->setToolTip(this->_model.name());
-          view::links::file::style(*name);
-          vlayout->addWidget(name);
+          this->_name.setToolTip(this->_model.name());
+          view::links::file::style(this->_name);
+          vlayout->addWidget(&this->_name);
         }
         {
           view::links::status::style(this->_status);
@@ -93,7 +93,6 @@ namespace fist
         this->_progress_animation->setDuration(this->_update_progress_interval);
         this->_progress_animation->setEasingCurve(QEasingCurve::Linear);
         this->_progress_animation->setEndValue(0.0f);
-
       }
 
       this->leaveEvent(nullptr);
@@ -153,9 +152,9 @@ namespace fist
     LinkWidget::_set_smooth_progress(float progress)
     {
       this->_smooth_progress = progress;
-      auto style = view::links::status::style;
-      style.color().darker(50 + 50 * this->_smooth_progress);
-      style(this->_status);
+      auto style = view::links::file::style;
+      style.color().darker(25 + 75 * this->_smooth_progress);
+      style(this->_name);
       this->repaint();
     }
 

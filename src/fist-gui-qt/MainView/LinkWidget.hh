@@ -66,6 +66,7 @@ namespace fist
       ELLE_ATTRIBUTE(fist::model::Link const&, model);
       ELLE_ATTRIBUTE(QHBoxLayout*, layout);
       ELLE_ATTRIBUTE(QLabel, picture);
+      ELLE_ATTRIBUTE(QLabel, name);
       ELLE_ATTRIBUTE(QLabel, status);
       ELLE_ATTRIBUTE(QLabel, click_counter);
       ELLE_ATTRIBUTE(IconButton*, go_to_website);

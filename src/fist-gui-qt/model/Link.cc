@@ -34,7 +34,9 @@ namespace fist
     QUrl
     Link::url() const
     {
-      return QUrl(QString::fromStdString(this->_link.link));
+      if (this->_link.link)
+        return QUrl(QString::fromStdString(this->_link.link.get()));
+      return QUrl();
     }
 
     QString
