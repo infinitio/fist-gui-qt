@@ -190,8 +190,17 @@ SmoothLayout::_layout()
     if (height != this->_height_hint)
     {
       this->_height_animation->stop();
-      this->_height_animation->setEndValue(height);
-      this->_height_animation->start();
+
+      if (this->_height_animation->duration() == 0)
+      {
+        this->setHeightHint(height);
+        emit resized();
+      }
+      else
+      {
+        this->_height_animation->setEndValue(height);
+        this->_height_animation->start();
+      }
     }
     if (width != this->_width_hint)
     {
