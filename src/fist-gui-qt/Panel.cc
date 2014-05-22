@@ -14,11 +14,9 @@ Panel::Panel(Footer* footer,
   , _body(new SmoothLayout(nullptr, 100))
   , _footer(footer)
 {
-  ELLE_DEBUG("bite")
-    this->_body->setParent(this);
-  ELLE_DEBUG("boite")
-    this->_footer->setParent(this);
-  ELLE_DEBUG("lul");
+  // Set parent afterward (to prevent childEvent with body and footer null).
+  this->_body->setParent(this);
+  this->_footer->setParent(this);
 
   this->setHeightHint(this->_footer->size().height());
 
