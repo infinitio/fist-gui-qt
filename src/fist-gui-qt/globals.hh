@@ -98,20 +98,20 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignTop);
+      style(QFont("Arial", 8.5), QColor(0xFF, 0xFF, 0xFF), Qt::AlignTop);
     }
 
     static
     TextStyle const
-    style(QFont("Arial", 11), QColor(0x51, 0x51, 0x51));
+    style(QFont("Arial", 10), QColor(0x51, 0x51, 0x51));
 
     static
     TextStyle const
-    hover_style(QFont("Arial", 11), QColor(0x2B, 0xCE, 0xCD));
+    hover_style(QFont("Arial", 10), QColor(0x2B, 0xCE, 0xCD));
 
     static
     TextStyle const
-    selected_style(QFont("Arial", 11), QColor(0x2B, 0xBE, 0xBD));
+    selected_style(QFont("Arial", 10), QColor(0x2B, 0xBE, 0xBD));
   }
 
   namespace tooltip

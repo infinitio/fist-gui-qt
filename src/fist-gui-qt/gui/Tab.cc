@@ -21,7 +21,9 @@ namespace fist
       , _widgets(widgets)
       , _color(0x33, 0x33, 0x33)
     {
+      this->setContentsMargins(0, 6, 0, 6);
       auto* layout = new QHBoxLayout(this);
+      layout->setContentsMargins(0, 0, 0, 0);
       layout->addStretch();
       layout->addWidget(this->_name);
       view::tab::counter::style(*this->_counter);
