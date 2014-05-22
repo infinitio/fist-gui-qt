@@ -95,10 +95,9 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: update transaction %s", *this, id);
 
       auto const& transaction = this->_state.transaction(id);
-
       if (this->_widgets.find(id) == this->_widgets.end())
       {
-        ELLE_WARN("%s: received an update for an non displayed transaction: %s",
+        ELLE_WARN("%s: update for an non displayed transaction: %s",
                   *this, id);
         this->add_transaction(id);
       }

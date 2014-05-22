@@ -80,10 +80,9 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: update link %s", *this, id);
 
       auto const& link = this->_state.link(id);
-
       if (this->_widgets.find(id) == this->_widgets.end())
       {
-        ELLE_WARN("%s: received an update for an non displayed link: %s",
+        ELLE_WARN("%s: update for an non displayed link: %s",
                   *this, id);
         this->add_link(id);
       }
