@@ -3,6 +3,8 @@
   <qresource>
 
     <!-- icons -->
+    <file>../icons/add-file.png</file>
+    <file>../icons/add-file@2x.png</file>
     <file>../icons/accept.png</file>
     <file>../icons/accept@2x.png</file>
     <file>../icons/add-cancel-hover.png</file>
