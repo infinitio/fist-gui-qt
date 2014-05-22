@@ -165,5 +165,27 @@
     <!-- fonts -->
     <file>../fonts/LucidaGrande.ttc</file>
 
+    <!-- File icons -->
+    <file>../mimetypes/archive.png</file>
+    <file>../mimetypes/archive@2x.png</file>
+    <file>../mimetypes/cat.png</file>
+    <file>../mimetypes/cat@2x.png</file>
+    <file>../mimetypes/document.png</file>
+    <file>../mimetypes/document@2x.png</file>
+    <file>../mimetypes/folder.png</file>
+    <file>../mimetypes/folder@2x.png</file>
+    <file>../mimetypes/illustrator.png</file>
+    <file>../mimetypes/illustrator@2x.png</file>
+    <file>../mimetypes/music.png</file>
+    <file>../mimetypes/music@2x.png</file>
+    <file>../mimetypes/photoshop.png</file>
+    <file>../mimetypes/photoshop@2x.png</file>
+    <file>../mimetypes/picture.png</file>
+    <file>../mimetypes/picture@2x.png</file>
+    <file>../mimetypes/powerpoint.png</file>
+    <file>../mimetypes/powerpoint@2x.png</file>
+    <file>../mimetypes/video.png</file>
+    <file>../mimetypes/video@2x.png</file>
+
   </qresource>
 </RCC>
