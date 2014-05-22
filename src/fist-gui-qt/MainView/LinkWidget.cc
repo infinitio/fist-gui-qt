@@ -71,7 +71,7 @@ namespace fist
         {
           view::links::counter::style(this->_click_counter);
           this->_click_counter.setStyleSheet(
-            "border: 3px solid rgb(204,204,204); border-radius: 8px; background-color: rgb(204,204,204);");
+            "border: 5px solid rgb(204,204,204); border-radius: 8px; background-color: rgb(204,204,204);");
         }
 
         vlayout->addWidget(&this->_click_counter);
@@ -116,14 +116,8 @@ namespace fist
     LinkWidget::_update(QString const& status)
     {
       this->_status.setText(status);
-      if (this->_model.click_count() > 0)
-      {
-        this->_click_counter.setText(QString("%1").arg(
-          this->_model.click_count()));
-        this->_click_counter.show();
-      }
-      else
-        this->_click_counter.hide();
+      this->_click_counter.setText(
+        QString("%1").arg(this->_model.click_count()));
 
       if (!this->_model.is_finished() && this->_progress_timer == nullptr)
       {
@@ -143,7 +137,6 @@ namespace fist
     LinkWidget::_progress_updated()
     {
       auto old_progress = this->_progress_animation->endValue();
-      ELLE_WARN("boite");
       auto new_progress = this->_model.progress();
       this->_update(
         QString("Uploading... (%1%)").arg(new_progress * 100));
@@ -157,9 +150,12 @@ namespace fist
     }
 
     void
-    LinkWidget::smooth_progress(float progress)
+    LinkWidget::_set_smooth_progress(float progress)
     {
       this->_smooth_progress = progress;
+      auto style = view::links::status::style;
+      style.color().darker(50 + 50 * this->_smooth_progress);
+      style(this->_status);
       this->repaint();
     }
 
@@ -176,8 +172,7 @@ namespace fist
     {
       this->_go_to_website->hide();
       this->_copy_link->hide();
-      if (this->_model.click_count() > 0)
-        this->_click_counter.show();
+      this->_click_counter.show();
     }
 
     void

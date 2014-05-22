@@ -76,9 +76,12 @@ namespace fist
     public:
       Q_PROPERTY(float smooth_progress
                  READ smooth_progress
-                 WRITE smooth_progress);
+                 WRITE _set_smooth_progress);
     private:
-      ELLE_ATTRIBUTE_Rw(float, smooth_progress);
+      ELLE_ATTRIBUTE_R(float, smooth_progress);
+    private:
+      void
+      _set_smooth_progress(float);
       ELLE_ATTRIBUTE(QPropertyAnimation*, progress_animation);
 
     private:
