@@ -11,6 +11,7 @@
 #include <elle/log.hh>
 
 #include <fist-gui-qt/MainView/LinkWidget.hh>
+#include <fist-gui-qt/gui/IconProvider.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/utils.hh>
 
@@ -41,11 +42,7 @@ namespace fist
       this->_layout->setContentsMargins(12, 12, 12, 12);
       this->_layout->setSpacing(10);
       {
-        QFileIconProvider icon_provider;
-        if (QFileInfo(this->_model.name()).isDir())
-          this->_picture.setPixmap(icon_provider.icon(QFileIconProvider::Folder).pixmap(42));
-        else
-          this->_picture.setPixmap(icon_provider.icon(this->_model.name()).pixmap(42));
+        this->_picture.setPixmap(gui::icon_provider().icon(this->_model.name()).scaled(42, 42));
         this->_layout->addWidget(&this->_picture);
       }
       {
