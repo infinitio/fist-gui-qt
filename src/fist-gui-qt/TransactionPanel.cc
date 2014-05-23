@@ -6,8 +6,6 @@
 
 #include <elle/assert.hh>
 
-#define MAX_TRANSAS 15
-
 MainPanel::MainPanel(fist::State& state,
                      QWidget* parent)
   : Panel(new TransactionFooter, parent)
