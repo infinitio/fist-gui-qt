@@ -42,7 +42,7 @@
       layout->setSpacing(0);
       layout->setContentsMargins(16, 0, 13, 0);
       layout->addWidget(&this->_icon);
-      layout->addSpacing(10);
+      layout->addSpacing(9);
       layout->addWidget(this->_message, 1);
       layout->addSpacing(2);
       layout->addWidget(&this->_remaining_characters, 0, Qt::AlignHCenter);

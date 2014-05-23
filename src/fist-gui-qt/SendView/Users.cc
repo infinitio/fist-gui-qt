@@ -95,7 +95,7 @@ namespace fist
       vlayout->setSpacing(0);
       {
         auto* layout = new QHBoxLayout;
-        layout->setSpacing(8);
+        layout->setSpacing(12 - margin);
         layout->setContentsMargins(18, 4, 5, 4);
         // Icon.
         {
