@@ -28,11 +28,11 @@ namespace fist
       ~Transaction() = default;
       Transaction(Transaction const&) = default;
 
-      bool
-      is_sender() const;
+      model::User const&
+      peer() const;
 
-      uint32_t
-      peer_id() const;
+      bool
+      is_final() const;
 
       QString const&
       peer_fullname() const;
@@ -65,10 +65,10 @@ namespace fist
     private:
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
-      ELLE_ATTRIBUTE_P(boost::logic::tribool, is_sender, mutable);
+      ELLE_ATTRIBUTE_RP(boost::logic::tribool, is_sender, mutable);
       ELLE_ATTRIBUTE_rw(gap_TransactionStatus, status);
       ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
-      ELLE_ATTRIBUTE_P(uint32_t, peer_id, mutable);
+      ELLE_ATTRIBUTE_RP(uint32_t, peer_id, mutable);
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);
       ELLE_ATTRIBUTE_P(QString, tooltip, mutable);
       ELLE_ATTRIBUTE_P(QDateTime, mtime, mutable);

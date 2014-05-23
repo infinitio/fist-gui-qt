@@ -1,4 +1,5 @@
 #include <fist-gui-qt/model/Transaction.hh>
+#include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/State.hh>
 
@@ -16,10 +17,15 @@ namespace fist
     Transaction::Transaction(fist::State& state,
                              uint32_t id)
       : Model(state, id)
-      , _is_sender(boost::logic::indeterminate)
+      , _is_sender(
+        gap_self_id(this->_state.state()) ==
+        gap_transaction_sender_id(this->_state.state(), this->id()))
       , _status(gap_transaction_status(this->_state.state(), this->id()))
       , _peer_fullname((char const*) nullptr)
-      , _peer_id(0)
+      , _peer_id(
+        this->_is_sender
+        ? gap_transaction_recipient_id(this->_state.state(), this->id())
+        : gap_transaction_sender_id(this->_state.state(), this->id()))
       , _files()
       , _avatar()
       , _default_avatar(true)
@@ -28,47 +34,32 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: create transaction model", *this);
     }
 
-    bool
-    Transaction::is_sender() const
+    model::User const&
+    Transaction::peer() const
     {
-      if (boost::logic::indeterminate(this->_is_sender))
-      {
-        this->_is_sender = (gap_self_id(this->_state.state()) ==
-                            gap_transaction_sender_id(this->_state.state(), this->id()));
-        ELLE_DEBUG("%s: fetched 'is_sender': %s", *this, this->_is_sender);
-      }
-
-      return (this->_is_sender == true);
+      return this->_state.user(this->peer_id());
     }
 
-    uint32_t
-    Transaction::peer_id() const
+    bool
+    Transaction::is_final() const
     {
-      if (this->_peer_id == 0)
-      {
-        this->_peer_id = this->is_sender()
-          ? gap_transaction_recipient_id(this->_state.state(), this->id())
-          : gap_transaction_sender_id(this->_state.state(), this->id());
-        ELLE_DEBUG("%s: fetched 'peer_id': %s", *this, this->_peer_id);
-      }
+      static QVector<gap_TransactionStatus> final_states =
+        {
+          gap_transaction_finished,
+          gap_transaction_failed,
+          gap_transaction_canceled,
+          gap_transaction_rejected,
+          gap_transaction_cloud_buffered,
+        };
 
-      return this->_peer_id;
+      return gap_transaction_is_final(this->_state.state(), this->id()) ||
+        final_states.contains(this->status());
     }
 
     QString const&
     Transaction::peer_fullname() const
     {
-      if (this->_peer_fullname.isNull() || this->_peer_fullname.isEmpty())
-      {
-        this->_peer_fullname =
-          QString::fromUtf8(
-            this->is_sender()
-            ? gap_transaction_recipient_fullname(this->_state.state(), this->id())
-            : gap_transaction_sender_fullname(this->_state.state(), this->id())).trimmed();
-        ELLE_DEBUG("%s: fetched 'peer_fullname': %s", *this, this->_peer_fullname);
-      }
-
-      return this->_peer_fullname;
+      return this->peer().fullname();
     }
 
     gap_UserStatus
