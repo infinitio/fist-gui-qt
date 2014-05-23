@@ -18,15 +18,6 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 
-QVector<gap_TransactionStatus> g_finals =
-{
-  gap_transaction_finished,
-  gap_transaction_failed,
-  gap_transaction_canceled,
-  gap_transaction_rejected,
-  gap_transaction_cloud_buffered,
-};
-
 TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
   ListItem(nullptr, view::background, false),
   _transaction(model),
@@ -131,9 +122,9 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
     this->_accept_reject_area->setLayout(infos);
 
     infos->addStretch();
-    infos->addWidget(this->_accept_button, 0, Qt::AlignVCenter | Qt::AlignLeft);
+    infos->addWidget(this->_accept_button, 0, Qt::AlignCenter);
     infos->addSpacing(2);
-    infos->addWidget(this->_reject_button, 0, Qt::AlignVCenter | Qt::AlignLeft);
+    infos->addWidget(this->_reject_button, 0, Qt::AlignCenter);
     infos->addStretch();
     this->_accept_button->setToolTip("Accept");
     this->_reject_button->setToolTip("Reject");
@@ -234,6 +225,7 @@ void
 TransactionWidget::_on_avatar_updated()
 {
   this->_peer_avatar->setPicture(this->_transaction.avatar());
+  this->repaint();
 }
 
 void
@@ -270,7 +262,7 @@ TransactionWidget::apply_update()
 
   if (this->_accept_reject_area->isHidden())
   {
-    if (!g_finals.contains(this->_transaction.status()))
+    if (!this->_transaction.is_final())
     {
       this->_cancel_button->show();
     }
@@ -302,11 +294,12 @@ TransactionWidget::apply_update()
   else if (this->_transaction.status() != gap_transaction_transferring &&
            this->_progress_timer != nullptr)
   {
+    ELLE_TRACE("destroy progress timer");
     setProgress(0);
     this->_progress_timer.reset();
   }
 
-  if (g_finals.contains(this->_transaction.status()))
+  if (this->_transaction.is_final())
   {
     this->_peer_avatar->setTransactionCount(0);
   }

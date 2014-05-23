@@ -71,7 +71,7 @@ namespace
 
   private:
     ELLE_ATTRIBUTE_RX(QFont, font);
-    ELLE_ATTRIBUTE_RX(QColor, color);
+    ELLE_ATTRIBUTE_RW(QColor, color);
     ELLE_ATTRIBUTE_R(Qt::Alignment, alignement);
   };
 }

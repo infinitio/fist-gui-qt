@@ -118,7 +118,16 @@ namespace fist
       this->_click_counter.setText(
         QString("%1").arg(this->_model.click_count()));
 
-      if (!this->_model.is_finished() && this->_progress_timer == nullptr)
+      if (this->_model.status() == gap_transaction_failed)
+      {
+          view::links::file::failed_style(this->_name);
+      }
+      else if (this->_model.status() == gap_transaction_finished)
+      {
+          view::links::file::style(this->_name);
+      }
+      if ((this->_model.status() == gap_transaction_transferring) &&
+          (this->_progress_timer == nullptr))
       {
         this->_progress_timer.reset(new QTimer);
         this->_progress_timer->setInterval(this->_update_progress_interval);
@@ -130,6 +139,8 @@ namespace fist
       {
         this->_progress_timer.reset();
       }
+
+      this->repaint();
     }
 
     void
@@ -153,7 +164,7 @@ namespace fist
     {
       this->_smooth_progress = progress;
       auto style = view::links::file::style;
-      style.color().darker(25 + 75 * this->_smooth_progress);
+      style.color(style.color().darker(20 + 50 * this->_smooth_progress));
       style(this->_name);
       this->repaint();
     }
