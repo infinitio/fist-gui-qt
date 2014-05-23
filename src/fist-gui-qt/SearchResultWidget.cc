@@ -17,7 +17,11 @@ SearchResultWidget::SearchResultWidget(fist::model::User const& model,
   _model(model),
   _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
   _selector(new fist::TwoStateIconButton(
-    QPixmap(":/buttons/user-unselected@2x.png"), QPixmap(":/buttons/user-selected@2x"), preselected)),
+    QPixmap(":/buttons/user-unselected@2x.png"),
+    QPixmap(":/buttons/user-selected@2x"),
+    QPixmap(":/buttons/user-unselected-hover@2x.png"),
+    QPixmap(":/buttons/user-selected@2x.png"),
+    preselected)),
   _layout(new QHBoxLayout(this))
 {
   connect(&this->_model, SIGNAL(avatar_updated()), this, SLOT(_on_avatar_updated()));
@@ -60,6 +64,20 @@ SearchResultWidget::sizeHint() const
   auto size = this->_layout->minimumSize();
   return QSize(Super::sizeHint().width(), size.height());
 }
+
+void
+SearchResultWidget::enterEvent(QEvent* event)
+{
+  // Super::enterEvent(event);
+  QCoreApplication::sendEvent(this->_selector, event);
+}
+void
+SearchResultWidget::leaveEvent(QEvent* event)
+{
+  // Super::leaveEvent(event);
+  QCoreApplication::sendEvent(this->_selector, event);
+}
+
 
 void
 SearchResultWidget::trigger()

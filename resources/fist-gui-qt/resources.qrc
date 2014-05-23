@@ -116,6 +116,7 @@
     <file>../buttons/send-files-simple.png</file>
     <file>../buttons/user-selected@2x.png</file>
     <file>../buttons/user-unselected@2x.png</file>
+    <file>../buttons/user-unselected-hover@2x.png</file>
 
     <file>../buttons/show@2x.png</file>
     <file>../buttons/hide@2x.png</file>

@@ -19,9 +19,14 @@ public:
   virtual
   ~SearchResultWidget() = default;
 
-  virtual
   QSize
-  sizeHint() const;
+  sizeHint() const override;
+
+  void
+  enterEvent(QEvent*) override;
+
+  void
+  leaveEvent(QEvent*) override;
 
 Q_SIGNALS:
   void
@@ -41,11 +46,11 @@ private slots:
   void
   _on_avatar_updated();
 
-void
-_selected();
+  void
+  _selected();
 
-void
-_unselected();
+  void
+  _unselected();
 /*-----------.
 | Attributes |
 `-----------*/

@@ -23,6 +23,8 @@ namespace fist
   public:
     TwoStateIconButton(QPixmap const& released,
                        QPixmap const& pressed,
+                       QPixmap const& released_hover,
+                       QPixmap const& pressed_hover,
                        bool already_pressed = false,
                        int width = 20);
 
@@ -48,6 +50,9 @@ namespace fist
     ELLE_ATTRIBUTE_R(State, state);
     ELLE_ATTRIBUTE(QPixmap, released_pixmap);
     ELLE_ATTRIBUTE(QPixmap, pressed_pixmap);
+    // XXX: Do something better.
+    ELLE_ATTRIBUTE(QPixmap, released_hover_pixmap);
+    ELLE_ATTRIBUTE(QPixmap, pressed_hover_pixmap);
 
   private:
     Q_OBJECT;

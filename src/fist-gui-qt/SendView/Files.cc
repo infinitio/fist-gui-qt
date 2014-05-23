@@ -28,7 +28,10 @@ namespace fist
       , _foo(new QWidget(this))
       , _attach(new IconButton(QPixmap(":/icons/files.png")))
       , _text(new QLabel(view::send::file_adder::text))
-      , _expanser(new fist::TwoStateIconButton(QPixmap(":/buttons/show@2x.png"), QPixmap(":/buttons/hide@2x.png"), true, 10))
+      , _expanser(new fist::TwoStateIconButton(QPixmap(":/buttons/show@2x.png"),
+                                               QPixmap(":/buttons/hide@2x.png"),
+                                               QPixmap(":/buttons/show@2x.png"),
+                                               QPixmap(":/buttons/hide@2x.png"), true, 10))
       , _add_file(new IconButton(QPixmap(":/icons/add-file.png")))
       , _files()
       , _separator(new HorizontalSeparator(this))
