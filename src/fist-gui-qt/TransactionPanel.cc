@@ -30,10 +30,11 @@ MainPanel::MainPanel(fist::State& state,
   auto* transfer_tab = this->_tabs->add_tab("TRANSFERS", {this->_transactions});
   connect(&this->_state, SIGNAL(active_transactions_changed(unsigned int)),
           transfer_tab, SLOT(on_notification_count_changed(unsigned int)));
+  transfer_tab->on_notification_count_changed(this->_state.active_transactions());
   auto* link_tab = this->_tabs->add_tab("LINKS", {this->_links});
   connect(&this->_state, SIGNAL(active_links_changed(unsigned int)),
           link_tab, SLOT(on_notification_count_changed(unsigned int)));
-  this->footer()->setParent(this);
+  link_tab->on_notification_count_changed(this->_state.active_links());
 }
 
 void
