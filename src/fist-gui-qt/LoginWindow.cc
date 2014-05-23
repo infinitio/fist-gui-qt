@@ -155,9 +155,6 @@ LoginWindow::LoginWindow(fist::State& state):
           this, SLOT(_login_attempt()));
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   this->update();
-
-  this->setTabOrder(this->_email_field, this->_password_field);
-  this->setTabOrder(this->_password_field, this->_email_field);
 }
 
 LoginWindow::~LoginWindow()
