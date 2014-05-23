@@ -84,6 +84,9 @@ namespace fist
     Users
     results();
 
+    model::User&
+    user(uint32_t user_id);
+
     typedef std::unordered_map<uint32_t, std::unique_ptr<model::User>> UserModels;
     ELLE_ATTRIBUTE_R(UserModels, users);
     typedef QFuture<std::vector<uint32_t>> FutureSearchResult;
@@ -113,15 +116,6 @@ namespace fist
     _on_results_ready();
 
   public:
-    // static
-    // void
-    // user_status_cb(uint32_t id,
-    //                gap_UserStatus const status);
-
-    // static
-    // void
-    // avatar_available_cb(uint32_t id);
-
     /*-------------.
     | Transactions |
     `-------------*/

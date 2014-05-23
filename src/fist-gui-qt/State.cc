@@ -33,12 +33,12 @@ namespace fist
   {
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
-    ELLE_DEBUG("attach avatar callback")
-      gap_avatar_available_callback(this->state(), State::avatar_available_callback);
-    ELLE_DEBUG("transaction update callback")
+    ELLE_DEBUG("transaction updated callback")
       gap_transaction_callback(this->state(), State::transaction_callback);
-    ELLE_DEBUG("user status update callback")
+    ELLE_DEBUG("user status updated callback")
       gap_user_status_callback(this->state(), State::user_status_callback);
+    ELLE_DEBUG("avatar updated callback")
+      gap_avatar_available_callback(this->state(), State::avatar_available_callback);
 
     connect(&this->_search_watcher, SIGNAL(finished()),
             this, SLOT(_on_results_ready()));
@@ -74,8 +74,8 @@ namespace fist
         ELLE_DEBUG("transaction: %s", *this->_transactions.get<0>().find(trs[i]));
       }
       gap_transactions_free(trs);
+      this->_compute_active_transactions();
     }
-    this->_compute_active_transactions();
 
     ELLE_TRACE("load links")
     {
@@ -84,6 +84,7 @@ namespace fist
       {
         this->_links.emplace(*this, link.id);
       }
+      this->_compute_active_links();
     }
   }
 
@@ -111,6 +112,11 @@ namespace fist
       this->_users[id].reset(new model::User(*this, id));
     ELLE_DEBUG("update %s avatar", *this->_users[id])
       this->_users[id]->avatar_updated();
+    for (model::Transaction const& model: this->_transactions.get<0>())
+    {
+      if (model.peer_id() == id)
+        model.avatar_updated();
+    }
   }
 
   void
@@ -163,8 +169,8 @@ namespace fist
       if (this->_users.find(swaggers[i]) == this->_users.end())
         this->_users[swaggers[i]].reset(new model::User(*this, swaggers[i]));
       auto const& user = this->_users.at(swaggers[i]);
-      if (user->fullname().contains(filter) ||
-          user->handle().contains(filter))
+      if (user->fullname().toLower().contains(filter.toLower()) ||
+          user->handle().toLower().contains(filter.toLower()))
         res.append(user.get());
     }
     gap_swaggers_free(swaggers);
@@ -197,6 +203,14 @@ namespace fist
     this->_search_future.cancel();
     this->_search_future = FutureSearchResult();
     this->_search_watcher.setFuture(this->_search_future);
+  }
+
+  model::User&
+  State::user(uint32_t user_id)
+  {
+    if (this->_users.find(user_id) == this->_users.end())
+      this->_users[user_id].reset(new model::User(*this, user_id));
+    return *this->_users[user_id];
   }
 
   State::Users
@@ -286,20 +300,16 @@ namespace fist
 
       struct UpdateLink
       {
-        UpdateLink(gap_TransactionStatus status):
-          _status(status)
-        {}
+        UpdateLink() = default;
 
         void
         operator()(model::Link& model)
         {
           model.update();
         }
-
-        ELLE_ATTRIBUTE(gap_TransactionStatus, status);
       };
 
-      this->_links.modify(this->_links.get<0>().find(id), UpdateLink(status));
+      this->_links.modify(this->_links.get<0>().find(id), UpdateLink());
       emit link_updated(id);
 
       this->_compute_active_links();
@@ -327,7 +337,7 @@ namespace fist
     unsigned int count = 0;
     for (auto const& transaction: this->_transactions.get<0>())
     {
-      if (!gap_transaction_is_final(this->state(), transaction.id()) &&
+      if (!transaction.is_final() &&
           gap_transaction_concern_device(this->state(), transaction.id()))
         ++count;
     }
