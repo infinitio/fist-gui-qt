@@ -118,18 +118,21 @@ namespace fist
     void
     Tab::_hover()
     {
+      view::tab::hover_style(*this->_name);
       this->color(view::tab::hover_style.color());
     }
 
     void
     Tab::_active()
     {
+      view::tab::selected_style(*this->_name);
       this->color(view::tab::selected_style.color());
     }
 
     void
     Tab::_inactive()
     {
+      view::tab::style(*this->_name);
       this->color(view::tab::style.color());
     }
 

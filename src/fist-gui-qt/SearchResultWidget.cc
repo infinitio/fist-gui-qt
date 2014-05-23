@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
