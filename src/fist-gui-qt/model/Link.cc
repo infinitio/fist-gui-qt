@@ -1,4 +1,5 @@
 #include <QString>
+#include <QVector>
 #include <QStringList>
 
 #include <elle/log.hh>
@@ -61,7 +62,14 @@ namespace fist
     float
     Link::progress() const
     {
-      return this->is_finished() ? 1.0f : gap_transaction_progress(this->_state.state(), this->id());
+      if (this->status() == gap_transaction_transferring)
+      {
+        return gap_transaction_progress(this->_state.state(), this->id());
+      }
+      else if (this->is_finished())
+        return 1.0f;
+      else
+        return 0.0f;
     }
 
     gap_TransactionStatus
@@ -73,7 +81,15 @@ namespace fist
     bool
     Link::is_finished() const
     {
-      return this->status() == gap_transaction_finished;
+      static QVector<gap_TransactionStatus> final_states =
+        {
+          gap_transaction_finished,
+          gap_transaction_failed,
+          gap_transaction_canceled,
+        };
+
+      return gap_transaction_is_final(this->_state.state(), this->id()) ||
+        final_states.contains(this->status());
     }
 
     void
