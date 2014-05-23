@@ -26,6 +26,10 @@ MainPanel::MainPanel(fist::State& state,
     this->_transactions,
     SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
     this, SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
+  connect(
+    this->_links,
+    SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
+    this, SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
 
   auto* transfer_tab = this->_tabs->add_tab("TRANSFERS", {this->_transactions});
   connect(&this->_state, SIGNAL(active_transactions_changed(unsigned int)),

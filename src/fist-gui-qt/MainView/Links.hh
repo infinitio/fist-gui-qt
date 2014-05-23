@@ -36,6 +36,12 @@ namespace fist
       void
       on_link_updated(uint32_t id);
 
+    signals:
+      void
+      systray_message(QString const& title,
+                      QString const& body,
+                      QSystemTrayIcon::MessageIcon = QSystemTrayIcon::Information);
+
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
       ELLE_ATTRIBUTE(ListWidget*, link_list);

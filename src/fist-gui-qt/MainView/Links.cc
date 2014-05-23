@@ -1,3 +1,5 @@
+#include <QApplication>
+#include <QClipboard>
 #include <QVBoxLayout>
 
 #include <fist-gui-qt/Footer.hh>
@@ -50,6 +52,11 @@ namespace fist
     {
       ELLE_ASSERT_CONTAINS(this->_state.links().get<0>(), id);
       this->add_link(*this->_state.links().get<0>().find(id));
+
+      emit systray_message("Link ready!",
+                           "Link has been copied to your clipboard");
+      QClipboard *clipboard = QApplication::clipboard();
+      clipboard->setText(this->_state.links().get<0>().find(id)->url().toString());
     }
 
     void
