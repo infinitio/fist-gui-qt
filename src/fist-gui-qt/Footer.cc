@@ -6,7 +6,8 @@ Footer::Footer(QWidget* parent):
   Super(parent),
   _layout(new QHBoxLayout(this))
 {
-  this->_layout->setContentsMargins(10, 10, 10, 5);
+  this->setContentsMargins(0, 0, 0, 0);
+  this->_layout->setContentsMargins(12, 10, 12, 5);
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 }
 
