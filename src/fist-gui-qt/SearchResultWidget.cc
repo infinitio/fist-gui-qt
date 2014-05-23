@@ -42,10 +42,12 @@ SearchResultWidget::SearchResultWidget(fist::model::User const& model,
   }
   this->_layout->addWidget(this->_selector);
 
+#ifndef FIST_PRODUCTION_BUILD
   this->setToolTip(
     QString::fromStdString(
     elle::sprintf("id: %s\nfullname: %s\nhandle: %s",
                     this->_model.id(), this->_model.fullname(), this->_model.handle())));
+#endif
 
 connect(this->_selector, SIGNAL(pressed()), this, SLOT(_selected()));
 connect(this->_selector, SIGNAL(released()), this, SLOT(_unselected()));
