@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <QPainter>
 
 #include <fist-gui-qt/AvatarWidget.hh>
@@ -9,22 +7,21 @@
 `-------------*/
 
 // Diameter of the avatar
-static int const picture_size = 45;
-static int const shadow_width = 2;
-static int const border_width = 2;
+static int const picture_size = 50;
+static int const shadow_width = 0;
+static int const border_width = 0;
 static int const progress_size = 4;
-static int const progress_offset = 2;
+static int const progress_offset = 0;
 static int const badge_size = 16;
-static int const badge_border_size = 2;
+static int const badge_border_size = 0;
 static int const total_size = 2 * progress_size + 2 * progress_offset + picture_size;
 
 static int const progress_hue = 200;
 static int const progress_saturation = 175;
 static int const progress_value = 250;
+
 static QColor const progress_color(
   QColor::fromHsv(progress_hue, progress_saturation, progress_value));
-
-std::map<uint32_t, QPixmap> g_avatars;
 
 AvatarWidget::AvatarWidget()
   : _picture(total_size, total_size)
@@ -71,8 +68,8 @@ AvatarWidget::setPicture(QPixmap const& avatar)
   {
     this->_picture.fill(Qt::transparent);
     QPainter painter(&this->_picture);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
     painter.translate(QPointF(total_size / 2., total_size / 2.));
     // Shadow
     {
@@ -100,8 +97,8 @@ AvatarWidget::setPicture(QPixmap const& avatar)
       {
         mask.fill(Qt::transparent);
         QPainter painter(&mask);
-        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         QPointF center(picture_size / 2., picture_size / 2.);
         QRadialGradient gradient(center, picture_size / 2.,
                                  center, picture_size / 2. - 1);
@@ -115,13 +112,12 @@ AvatarWidget::setPicture(QPixmap const& avatar)
       {
         picture.fill(Qt::transparent);
         QPainter painter(&picture);
-        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         painter.setBrush(Qt::NoBrush);
         painter.setPen(Qt::NoPen);
-        painter.drawPixmap(QRect(QPoint(0, 0), picture.size()),
-                           avatar,
-                           QRect(QPoint(0, 0), avatar.size()));
+        auto v = avatar.scaled(picture.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        painter.drawPixmap(QPoint(0, 0), v);
         painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
         painter.drawPixmap(QPoint(0, 0), mask);
       }
@@ -182,8 +178,9 @@ void
 AvatarWidget::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.setRenderHints(QPainter::Antialiasing |
-                         QPainter::SmoothPixmapTransform);
+  painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+
   painter.translate(QPointF(total_size / 2., total_size / 2.));
   QRectF progress_region(
     center_rect(picture_size + 2 * progress_offset + progress_size));

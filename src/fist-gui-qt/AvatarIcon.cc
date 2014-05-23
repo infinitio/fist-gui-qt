@@ -25,16 +25,18 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
   {
     _mask.fill(Qt::transparent);
     QPainter painter(&this->_mask);
-    painter.setRenderHints(QPainter::HighQualityAntialiasing |
-                           QPainter::SmoothPixmapTransform);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
     painter.drawEllipse(this->_geometry);
   }
 
   QPainter painter(&this->_pixmap);
+  painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
   painter.translate(this->_border, this->_border);
-  painter.drawPixmap(this->_geometry, pixmap);
+  painter.drawPixmap(QPoint(0, 0),
+                     pixmap.scaled(this->_geometry.size(),
+                                   Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
   painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
   painter.drawPixmap(this->_geometry, this->_mask);
 }
@@ -43,7 +45,6 @@ void
 AvatarIcon::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-  painter.setRenderHints(QPainter::HighQualityAntialiasing |
-                         QPainter::SmoothPixmapTransform);
+  painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
   painter.drawPixmap(_geometry, this->_pixmap);
 }
