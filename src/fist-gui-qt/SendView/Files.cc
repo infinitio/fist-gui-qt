@@ -153,7 +153,7 @@ namespace fist
         this->_text->setText("Add files");
       else
       {
-        int size = 0;
+        qint64 size = 0;
         for (auto const& file: this->_files.keys())
         {
           if (file.isLocalFile())
