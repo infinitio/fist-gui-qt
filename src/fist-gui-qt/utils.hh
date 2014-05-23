@@ -4,6 +4,8 @@
 # include <QDateTime>
 # include <QNetworkReply>
 # include <QUrl>
+# include <QRect>
+# include <QPoint>
 
 # define Q_PROPERTY_R(Type, Name, Read)                 \
   public:                                               \
