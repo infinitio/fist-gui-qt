@@ -36,23 +36,11 @@ RoundShadowWidget::RoundShadowWidget(int radius,
 | Display properties |
 `-------------------*/
 
-int
-RoundShadowWidget::radius()
-{
-  return this->_radius;
-}
-
 void
 RoundShadowWidget::setRadius(int value)
 {
   this->_radius = value;
   Q_EMIT this->onRadiusChanged();
-}
-
-int
-RoundShadowWidget::shadow()
-{
-  return this->_shadow;
 }
 
 void

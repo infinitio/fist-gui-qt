@@ -5,6 +5,7 @@
 # include <QWidget>
 
 # include <elle/Printable.hh>
+# include <elle/attribute.hh>
 
 class RoundShadowWidget:
   public QMainWindow,
@@ -36,12 +37,8 @@ public:
              WRITE setBackground
              NOTIFY onBackgroundChanged);
 public:
-  int
-  radius();
   void
   setRadius(int value);
-  int
-  shadow();
   void
   setShadow(int value);
   QColor const&
@@ -59,10 +56,8 @@ Q_SIGNALS:
   void
   onBackgroundChanged();
 private:
-  int
-  _radius;
-  int
-  _shadow;
+  ELLE_ATTRIBUTE_R(int, radius);
+  ELLE_ATTRIBUTE_R(int, shadow);
 
 /*---------.
 | Geometry |
