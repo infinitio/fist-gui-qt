@@ -124,6 +124,8 @@
     <file>../buttons/clipboard.png</file>
     <file>../buttons/share@2x.png</file>
     <file>../buttons/share.png</file>
+    <file>../buttons/upload@2x.png</file>
+    <file>../buttons/upload.png</file>
 
     <!-- bgs -->
     <file>../bgs/header-top-gray@2x.png</file>

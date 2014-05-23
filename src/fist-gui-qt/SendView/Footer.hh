@@ -25,9 +25,18 @@ namespace fist
       virtual
       ~Footer() = default;
 
+    public slots:
+      void
+      peer_transaction_mode();
+      void
+      link_mode();
+
     private:
       ELLE_ATTRIBUTE_R(IconButton*, back);
       ELLE_ATTRIBUTE_R(IconButton*, send);
+
+    private:
+      Q_OBJECT;
     };
 
   }

@@ -82,6 +82,12 @@ namespace fist
       connect(this, SIGNAL(canceled()),
               this, SIGNAL(switch_signal()));
 
+      connect(this->_transaction_tab, SIGNAL(activated()),
+              this->footer(), SLOT(peer_transaction_mode()));
+
+      connect(this->_link_tab, SIGNAL(activated()),
+              this->footer(), SLOT(link_mode()));
+
       this->setAcceptDrops(true);
     }
 
