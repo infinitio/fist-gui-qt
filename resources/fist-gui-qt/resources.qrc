@@ -162,9 +162,6 @@
     <file>../images/logo-complete.png</file>
     <file>../images/logo.png</file>
 
-    <!-- fonts -->
-    <file>../fonts/LucidaGrande.ttc</file>
-
     <!-- File icons -->
     <file>../mimetypes/archive.png</file>
     <file>../mimetypes/archive@2x.png</file>
@@ -186,6 +183,11 @@
     <file>../mimetypes/powerpoint@2x.png</file>
     <file>../mimetypes/video.png</file>
     <file>../mimetypes/video@2x.png</file>
+
+    <!-- Fonts -->
+    <file>../fonts/LucidaGrande.ttc</file>
+    <file>../fonts/Montserrat-Bold.ttf</file>
+    <file>../fonts/Montserrat-Regular.ttf</file>
 
   </qresource>
 </RCC>

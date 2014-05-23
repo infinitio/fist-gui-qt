@@ -8,6 +8,11 @@
 
 # include <elle/attribute.hh>
 
+static QString Arial("Arial");
+static QString Lucida("LucidaGrande");
+static QString Montserrat("Montserrat");
+static QString Font(Arial);
+
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
 
@@ -43,7 +48,7 @@ namespace
       _color(color),
       _alignement(aligment)
     {
-      this->_font.setStyleStrategy(QFont::PreferQuality);
+      this->_font.setStyleStrategy(QFont::PreferAntialias);
     }
 
     void
@@ -98,27 +103,27 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 8.5), QColor(0xFF, 0xFF, 0xFF), Qt::AlignTop);
+      style(QFont(Montserrat, 7), QColor(0xFF, 0xFF, 0xFF), Qt::AlignTop);
     }
 
     static
     TextStyle const
-    style(QFont("Arial", 10), QColor(0x51, 0x51, 0x51));
+    style(QFont(Montserrat, 9), QColor(0x51, 0x51, 0x51));
 
     static
     TextStyle const
-    hover_style(QFont("Arial", 10), QColor(0x2B, 0xCE, 0xCD));
+    hover_style(QFont(Montserrat, 9), QColor(0x2B, 0xCE, 0xCD));
 
     static
     TextStyle const
-    selected_style(QFont("Arial", 10), QColor(0x2B, 0xBE, 0xBD));
+    selected_style(QFont(Montserrat, 9), QColor(0x2B, 0xBE, 0xBD));
   }
 
   namespace tooltip
   {
     static
     TextStyle const
-    style(QFont("Arial", 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
+    style(QFont(Font, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
   }
 
   namespace login
@@ -135,7 +140,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 11), QColor(0x33, 0x33, 0x33));
+      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
 
       static
       QString const
@@ -150,7 +155,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 11), QColor(0x33, 0x33, 0x33));
+      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
 
       static
       QString const
@@ -165,14 +170,14 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 11), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
+      style(QFont(Font, 11), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
     }
 
     namespace links
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0x3D, 0x91, 0xD4));
+      style(QFont(Font, 9), QColor(0x3D, 0x91, 0xD4));
 
       static
       Qt::TextInteractionFlags const
@@ -204,14 +209,14 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 8.5), QColor(0x88, 0x88, 0x88));
+      style(QFont(Font, 8.5), QColor(0x88, 0x88, 0x88));
     }
 
     namespace footer
     {
       static
       TextStyle const
-      style(QFont("Arial", 11, QFont::Bold), Qt::white);
+      style(QFont(Font, 11, QFont::Bold), Qt::white);
 
       static
       QString const
@@ -225,28 +230,32 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     namespace file
     {
       static
       TextStyle const
-      style(QFont("Arial", 9.5), QColor(0x25, 0x25, 0x25));
+      style(QFont(Font, 9.5), QColor(0x25, 0x25, 0x25));
+
+      static
+      TextStyle const
+      failed_style(QFont(Font, 9.5), QColor(0xD3, 0x15, 0x15));
     }
 
     namespace status
     {
       static
       TextStyle const
-      style(QFont("Arial", 8.5), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont(Font, 8.5), QColor(0xA8, 0xA8, 0xA8));
     }
 
     namespace counter
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
+      style(QFont(Font, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
 
     }
   }
@@ -257,7 +266,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     static
@@ -268,25 +277,25 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 10), QColor(0x25, 0x25, 0x25));
+      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25));
     }
 
     namespace files
     {
       static
       TextStyle const
-      style(QFont("Arial", 9.5), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont(Font, 9.5), QColor(0xA8, 0xA8, 0xA8));
 
       static
       TextStyle const
-      hover_style(QFont("Arial", 9), QColor(0x3D, 0x91, 0xD4));
+      hover_style(QFont(Font, 9), QColor(0x3D, 0x91, 0xD4));
     }
 
     namespace date
     {
       static
       TextStyle const
-      style(QFont("Arial", 8), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont(Font, 8), QColor(0xA8, 0xA8, 0xA8));
     }
   }
 
@@ -298,14 +307,14 @@ namespace view
       {
         static
         TextStyle const
-        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       namespace size
       {
         static
         TextStyle const
-        style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       static
@@ -317,11 +326,11 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+      style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
 
       static
       TextStyle const
-      hover_style(QFont("Arial", 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
+      hover_style(QFont(Font, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
 
       static
       QColor const
@@ -340,7 +349,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+      style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
       QString const
@@ -351,7 +360,7 @@ namespace view
     {
       static
       TextStyle const
-      style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+      style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
       QString const
@@ -361,7 +370,7 @@ namespace view
       {
         static
         TextStyle const
-        style(QFont("Arial", 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
+        style(QFont(Font, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
 
       }
     }
@@ -372,14 +381,14 @@ namespace view
       {
         static
         TextStyle const
-        style(QFont("Arial", 9), QColor(0x25, 0x25, 0x25));
+        style(QFont(Font, 9), QColor(0x25, 0x25, 0x25));
       }
 
       namespace handle
       {
         static
         TextStyle const
-        style(QFont("Arial", 8), QColor(0xC4, 0xC4, 0xC4));
+        style(QFont(Font, 8), QColor(0xC4, 0xC4, 0xC4));
       }
     }
 

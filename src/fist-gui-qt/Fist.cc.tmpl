@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <QDesktopWidget>
+#include <QFontDatabase>
 #include <QFont>
 #include <QIcon>
 #include <QLocalSocket>
@@ -142,9 +143,16 @@ Fist::~Fist()
 void
 Fist::_initialize_application()
 {
+  QFontDatabase database;
+  auto luc = database.addApplicationFont(":/fonts/LucidaGrande.ttc");
+  auto mont = database.addApplicationFont(":/fonts/Montserrat-Regular.ttf");
+  if (luc == -1 || mont == -1)
+    ELLE_WARN("%s: impossible to install fonts", *this);
+
   QFont arial("Arial", 11);
   arial.setStyleStrategy(QFont::PreferAntialias);
   this->_application->setFont(arial);
+
   this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   this->_application->setQuitOnLastWindowClosed(false);
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
