@@ -8,6 +8,7 @@
 #include <QNetworkRequest>
 #include <QPixmap>
 #include <QPushButton>
+#include <QRegExp>
 #include <QTextStream>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -16,6 +17,7 @@
 #include <elle/log.hh>
 #include <elle/finally.hh>
 #include <elle/assert.hh>
+#include <elle/Version.hh>
 
 #include <common/common.hh>
 
@@ -245,11 +247,28 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     emit update_error("unable to read the update file",
                       "unable to read the update file");
   }
-  else if (updater_info["version"].toStdString() == INFINIT_VERSION)
+  else if (!updater_info["version"].isEmpty())
   {
-    emit no_update_available();
-    ELLE_LOG("no update available");
-    return;
+    static elle::Version current_version(
+      INFINIT_VERSION_MAJOR, INFINIT_VERSION_MINOR, INFINIT_VERSION_SUBMINOR);
+    ELLE_TRACE("current version: %s", current_version);
+
+    QRegExp version("(\\d+)\\.(\\d+)\\.(\\d+)");
+    version.indexIn(updater_info["version"]);
+
+    elle::Version update_version(
+      version.cap(1).toInt(), version.cap(2).toInt(), version.cap(3).toInt());
+    ELLE_TRACE("update version: %s", update_version);
+    if (update_version <= current_version)
+    {
+      emit no_update_available();
+      ELLE_LOG("no update available");
+      return;
+    }
+    else
+    {
+      ELLE_LOG("current version is older than remote");
+    }
   }
 
   if (updater_info.contains("url"))
@@ -262,7 +281,7 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
                       "update file unavailable"); return;
   }
 
-  ELLE_TRACE("an updater is available at %s", this->_updater_url);
+  ELLE_TRACE("an update is available at %s", this->_updater_url);
 
 #ifdef INFINIT_WINDOWS
   auto mandatory = true;
