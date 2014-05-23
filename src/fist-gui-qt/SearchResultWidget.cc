@@ -38,12 +38,6 @@ SearchResultWidget::SearchResultWidget(fist::model::User const& model,
     auto fullname = new QLabel(this->_model.fullname());
     view::send::user::fullname::style(*fullname);
     vlayout->addWidget(fullname);
-    if (this->_model.handle().size() > 0)
-    {
-      auto handle = new QLabel(this->_model.handle());
-      view::send::user::handle::style(*handle);
-      vlayout->addWidget(handle);
-    }
     this->_layout->addLayout(vlayout, 1);
   }
   this->_layout->addWidget(this->_selector);
