@@ -74,6 +74,10 @@ namespace fist
       void
       on_notification_count_changed(unsigned int count);
 
+    signals:
+      void
+      activated();
+
     private:
       ELLE_ATTRIBUTE(TabWidget&, tabber);
       ELLE_ATTRIBUTE_R(QLabel*, name)

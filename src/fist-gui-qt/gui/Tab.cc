@@ -21,7 +21,7 @@ namespace fist
       , _widgets(widgets)
       , _color(0x33, 0x33, 0x33)
     {
-      this->setContentsMargins(0, 6, 0, 6);
+      this->setContentsMargins(0, 5, 0, 7);
       auto* layout = new QHBoxLayout(this);
       layout->setContentsMargins(0, 0, 0, 0);
       layout->addStretch();
@@ -146,6 +146,7 @@ namespace fist
         widget->show();
       this->_active();
       this->update();
+      emit activated();
     }
 
     void

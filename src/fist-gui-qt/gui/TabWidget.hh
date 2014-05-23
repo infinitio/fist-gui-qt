@@ -36,7 +36,7 @@ namespace fist
       add_tab(QString const& name,
               QWidget* widgets);
 
-      // Make the tab active (Make every widgets visible).
+      // Make the tab active (makes every widgets visible).
       void
       activate_tab(Tab& tab);
 
