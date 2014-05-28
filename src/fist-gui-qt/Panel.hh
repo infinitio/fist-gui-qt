@@ -51,6 +51,8 @@ Q_SIGNALS:
   void
   set_background_color(QColor const& color);
 
+  void
+  shown();
 public:
   QSize
   minimumSizeHint() const override;

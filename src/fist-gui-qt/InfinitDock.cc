@@ -665,6 +665,8 @@ InfinitDock::_on_onboarded_sending_completed()
   // checking the previously stored one.
   fist::settings()["onboarding"].set(
     onboarded_sending_complete, QString(INFINIT_VERSION));
+
+  this->_onboarder.reset();
 }
 
 void

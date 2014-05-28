@@ -52,6 +52,7 @@ void
 Panel::on_show()
 {
   emit set_background_color(Qt::white);
+  emit shown();
   this->_on_show();
 }
 

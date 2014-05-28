@@ -208,7 +208,7 @@ namespace fist
         Qt::AlignLeft,
         1500);
 
-      //if (send_panel->peer_valid())
+      if (send_panel->users()->peer_valid())
       {
         connect(this->_tooltip.get(), SIGNAL(hidden()),
                 this, SLOT(_on_transaction_ready()));

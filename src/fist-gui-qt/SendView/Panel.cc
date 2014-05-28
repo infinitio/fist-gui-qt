@@ -218,6 +218,7 @@ namespace fist
     Panel::_on_show()
     {
       ELLE_TRACE_SCOPE("%s: show", *this);
+      emit shown();
       this->update();
       this->_tabs->activate_first();
       this->_users->clear_search();
