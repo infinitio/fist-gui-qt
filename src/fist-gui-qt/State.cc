@@ -47,13 +47,6 @@ namespace fist
   void
   State::on_logged_in()
   {
-    ELLE_DEBUG("start the update loop")
-    {
-      QTimer *timer = new QTimer(this);
-      connect(timer, SIGNAL(timeout()), this, SLOT(_poll()));
-      timer->start(1000);
-    }
-
     ELLE_TRACE("load swaggers")
     {
       uint32_t* swaggers = gap_swaggers(this->state());
@@ -85,6 +78,13 @@ namespace fist
         this->_links.emplace(*this, link.id);
       }
       this->_compute_active_links();
+    }
+
+    ELLE_DEBUG("start the update loop")
+    {
+      QTimer *timer = new QTimer(this);
+      connect(timer, SIGNAL(timeout()), this, SLOT(_poll()));
+      timer->start(1000);
     }
   }
 
