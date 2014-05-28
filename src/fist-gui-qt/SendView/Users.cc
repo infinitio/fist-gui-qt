@@ -202,8 +202,8 @@ namespace fist
                   SIGNAL(unselected(uint32_t)),
                   this,
                   SLOT(_remove_peer(uint32_t)));
-          this->_users->add_widget(widget,
-                                   local ? ListWidget::Position::Top : ListWidget::Position::Bottom);
+          this->_users->add_widget(widget, ListWidget::Position::Bottom);
+          // local ? ListWidget::Position::Top : ListWidget::Position::Bottom);
           this->_results[model->id()] = widget;
         }
       }
