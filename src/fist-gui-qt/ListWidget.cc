@@ -183,7 +183,7 @@ ListWidget::_layout()
   int fixed_height = this->maxRows() == 0 ? 0 : -1;
   for (auto widget: this->_widgets)
   {
-    if (widget->isHidden())
+    if (widget == nullptr || widget->isHidden())
       continue;
 
     ELLE_DEBUG("widget: %s", *widget)
