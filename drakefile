@@ -47,6 +47,9 @@ def configure(cxx_toolkit = None,
   if boost is None:
     boost = drake.cxx.boost.Boost(cxx_toolkit = cxx_toolkit)
     cxx_config += boost.config()
+    cxx_config += boost.config_system()
+    cxx_config += boost.config_filesystem()
+    cxx_config += boost.config_locale()
 
   if fist_production_build:
     cxx_config.define('FIST_PRODUCTION_BUILD')

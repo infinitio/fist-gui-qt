@@ -1,5 +1,11 @@
 #include <unistd.h> //Crapy crap.
 
+#ifdef INFINIT_WINDOWS
+# include <boost/filesystem/path.hpp>
+# include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+# include <locale>
+#endif
+
 #include <memory>
 
 #include <QDesktopWidget>
@@ -156,7 +162,13 @@ Fist::_initialize_application()
   this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   this->_application->setQuitOnLastWindowClosed(false);
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+#ifdef INFINIT_WINDOWS
+  boost::filesystem::path::imbue(
+    std::locale(
+      std::locale(),
+      new boost::filesystem::detail::utf8_codecvt_facet()));
+#endif
 }
 
 void
