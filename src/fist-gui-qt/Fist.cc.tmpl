@@ -68,6 +68,7 @@ class Fist::Prologue
   Prologue()
   {
 #ifdef FIST_PRODUCTION_BUILD
+    elle::os::setenv("INFINIT_CRASH_DEST", "crash@infinit.io", true);
 
     if (!elle::os::inenv("ELLE_LOG_LEVEL"))
     {
@@ -77,9 +78,13 @@ class Fist::Prologue
           "*trophonius*:TRACE,"
           "*meta*:TRACE,"
           "*gap*:TRACE,"
+          "surface.gap.TransferMachine:DEBUG,"
           "*frete*:TRACE,"
           "*station*:DEBUG,"
-          "*FIST*:DEBUG,"
+          "reactor.fsm.*:TRACE,"
+          "*FIST*:TRACE,"
+          "*FIST.State*:DEBUG,"
+          "infinit.surface.gap.Rounds:DEBUG,"
           "elle.CrashReporter:DEBUG",
         true);
     }
