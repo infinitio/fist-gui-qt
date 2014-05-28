@@ -615,7 +615,7 @@ InfinitDock::_start_onboarded_reception()
     elle::os::getenv(
       "FIST_ONBOARDING_FILE",
       (QCoreApplication::applicationDirPath() +
-       QDir::separator() + "XXX").toStdString()));
+       QDir::separator() + "Infinit - Episode 2.mp4").toStdString()));
   this->_onboarder->receive_file(file);
   connect(this->_onboarder.get(), SIGNAL(reception_completed()),
           this, SLOT(_on_onboarded_reception_completed()));
