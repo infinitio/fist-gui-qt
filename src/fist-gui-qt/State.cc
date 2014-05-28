@@ -181,12 +181,17 @@ namespace fist
   State::Users
   State::search(QString const& filter)
   {
-    this->_search_future.cancel();
-    this->_search_future = QtConcurrent::run(
-      [&,filter] {
-        std::string text = filter.toStdString();
-        if (filter.count('@') == 1 && email_checker.exactMatch(filter))
-          return std::vector<uint32_t>{gap_user_by_email(this->state(), text.c_str())};
+    ELLE_DEBUG("search %s", filter);
+    ELLE_DEBUG("cancel future")
+      this->cancel_search();
+    ELLE_DEBUG("make concurent run")
+      this->_search_future = QtConcurrent::run(
+        [&,filter] {
+          std::string text = filter.toStdString();
+          if (filter.count('@') == 1 && email_checker.exactMatch(filter))
+          {
+            return std::vector<uint32_t>{gap_user_by_email(this->state(), text.c_str())};
+          }
         else
           return gap_users_search(this->state(), text.c_str());
       });
@@ -200,9 +205,12 @@ namespace fist
   void
   State::cancel_search()
   {
-    this->_search_future.cancel();
-    this->_search_future = FutureSearchResult();
-    this->_search_watcher.setFuture(this->_search_future);
+    ELLE_DEBUG("cancel search")
+      this->_search_future.cancel();
+    ELLE_DEBUG("reset future")
+      this->_search_future = FutureSearchResult();
+    ELLE_DEBUG("restore watcher")
+      this->_search_watcher.setFuture(this->_search_future);
   }
 
   model::User&
