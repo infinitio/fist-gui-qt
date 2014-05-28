@@ -27,8 +27,8 @@ FileItem::FileItem(QUrl const& path):
   this->_layout->setAlignment(Qt::AlignVCenter);
   ELLE_TRACE_SCOPE("%s: construction with path %s", *this, path);
 
-  this->setContentsMargins(6, 0, 13, 0);
-
+  this->setContentsMargins(14, 0, 14, 0);
+  this->_layout->setContentsMargins(0, 0, 0, 0);
   // Name.
   {
     view::send::file::name::style(*this->_name);
@@ -47,14 +47,14 @@ FileItem::FileItem(QUrl const& path):
     this->_icon->setPixmap(icon_provider.icon(this->_file).pixmap(18));
 
   this->_layout->addWidget(this->_icon);
-  this->_layout->addSpacing(4);
+  this->_layout->addSpacing(10);
   this->_layout->addWidget(this->_name);
   this->_layout->addStretch();
   this->_layout->addWidget(this->_size);
   this->_layout->addSpacing(4);
   this->_layout->addWidget(this->_remove);
 
-  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
   this->setFixedHeight(42);
   this->adjustSize();
 }
