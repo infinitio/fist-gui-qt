@@ -99,24 +99,41 @@ namespace view
 
   namespace tab
   {
+    static
+    TextStyle const
+    style(QFont(Montserrat, 9.5), QColor(0x8B, 0x8B, 0x83));
+
+    static
+    QColor
+    bar_color(0xE6, 0xE6, 0xE6);
+
+    static
+    TextStyle const
+    hover_style(QFont(Montserrat, 9.5), QColor(0x51, 0x51, 0x49));
+
+    static
+    QColor
+    bar_hover_color(0xD5, 0xD5, 0xD5);
+
+    static
+    TextStyle const
+    selected_style(QFont(Montserrat, 9.5), QColor(0x2B, 0xBE, 0xBD));
+
     namespace counter
     {
       static
       TextStyle const
-      style(QFont(Montserrat, 7), QColor(0xFF, 0xFF, 0xFF), Qt::AlignTop);
+      style(QFont(Montserrat, 7), tab::style.color(), Qt::AlignTop);
+
+      static
+      TextStyle const
+      hover_style(QFont(Montserrat, 7), tab::hover_style.color(), Qt::AlignTop);
+
+      static
+      TextStyle const
+      selected_style(QFont(Montserrat, 7), tab::selected_style.color(), Qt::AlignTop);
     }
 
-    static
-    TextStyle const
-    style(QFont(Montserrat, 9), QColor(0x51, 0x51, 0x51));
-
-    static
-    TextStyle const
-    hover_style(QFont(Montserrat, 9), QColor(0x2B, 0xCE, 0xCD));
-
-    static
-    TextStyle const
-    selected_style(QFont(Montserrat, 9), QColor(0x2B, 0xBE, 0xBD));
   }
 
   namespace tooltip

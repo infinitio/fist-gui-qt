@@ -104,28 +104,26 @@ namespace fist
     Tab::color(QColor const& color)
     {
       this->_color = color;
-      // XXX: A bit violent.
-      for (auto* component: std::vector<QWidget*>{this, this->_name, this->_counter})
-      {
-        QPalette palette = component->palette();
-        {
-          palette.setColor(QPalette::WindowText, this->_color);
-        }
-        component->setPalette(palette);
-      }
+      this->repaint();
     }
 
     void
     Tab::_hover()
     {
+      if (this->_tabber.is_active_tab(*this))
+        return;
+
       view::tab::hover_style(*this->_name);
-      this->color(view::tab::hover_style.color());
+      view::tab::counter::hover_style(*this->_counter);
+      this->color(view::tab::bar_hover_color);
+
     }
 
     void
     Tab::_active()
     {
       view::tab::selected_style(*this->_name);
+      view::tab::counter::selected_style(*this->_counter);
       this->color(view::tab::selected_style.color());
     }
 
@@ -133,7 +131,8 @@ namespace fist
     Tab::_inactive()
     {
       view::tab::style(*this->_name);
-      this->color(view::tab::style.color());
+      view::tab::counter::style(*this->_counter);
+      this->color(view::tab::bar_color);
     }
 
     void
