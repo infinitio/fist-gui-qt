@@ -273,7 +273,7 @@ namespace fist
       if (it != this->_files.end())
       {
         this->_list->remove_widget(it.value());
-        this->_files.remove(path);
+        this->_files.erase(it);
         emit file_removed();
       }
       else
