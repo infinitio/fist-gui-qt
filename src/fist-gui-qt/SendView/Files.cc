@@ -39,6 +39,7 @@ namespace fist
       , _growing_area(new fist::gui::GrowingArea(_list, this))
       , _pulse_animation(new QPropertyAnimation(this, "pulseColor"))
     {
+      this->_growing_area->expand();
       {
         this->_pulse_animation->setStartValue(view::send::file_adder::pulse);
         this->_pulse_animation->setEndValue(view::send::file_adder::background);
@@ -114,6 +115,7 @@ namespace fist
 
       this->_expanser->hide();
       this->_separator->hide();
+      this->repaint();
     };
 
     QSize
@@ -137,7 +139,7 @@ namespace fist
         {
           this->_attach->set_pixmap(QPixmap(":/icons/files-hover.png"));
         }
-        else if (event->type() == QEvent::Leave || event->type() == QEvent::DragLeave)
+        else if (event->type() == QEvent::Leave || event->type() == QEvent::DragLeave || event->type() == QEvent::WindowBlocked)
         {
           this->_attach->set_pixmap(QPixmap(":/icons/files.png"));
         }
@@ -177,6 +179,7 @@ namespace fist
       this->_update_message();
       this->_expanser->hide();
       this->_separator->hide();
+      this->repaint();
     }
 
     void
