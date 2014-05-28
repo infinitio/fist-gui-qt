@@ -157,7 +157,7 @@ namespace fist
         }
         else if (event->type() == QEvent::WindowBlocked)
         {
-          ELLE_DEBUG("widget blocked by an modal window")
+          ELLE_DEBUG("widget blocked by a modal window")
           {
             ++this->_blocked_by_a_modal_window;
             this->hide();
