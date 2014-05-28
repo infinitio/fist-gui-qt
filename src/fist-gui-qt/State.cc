@@ -379,7 +379,7 @@ namespace fist
   State::open_file(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());
-    QDesktopServices::openUrl(QUrl(QString(gap_get_output_dir(this->state()))));
+    QDesktopServices::openUrl(QUrl::fromLocalFile((QString(gap_get_output_dir(this->state())))));
   }
 
   void
