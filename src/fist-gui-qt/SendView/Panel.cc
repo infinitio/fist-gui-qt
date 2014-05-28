@@ -157,37 +157,20 @@ namespace fist
         return;
       }
 
-      char** filenames;
-      if ((filenames = (char**)malloc((this->_file_adder->files().size() + 1) * sizeof(char*)))
-          == nullptr)
-      {
-        ELLE_ERR("unable to allocate file list");
-      }
-
-      for (int i = 0; i < this->_file_adder->files().size(); i++)
-      {
-        auto filepath =
-          QDir::toNativeSeparators(this->_file_adder->files().keys().at(i).toLocalFile()).toStdString();
-
-        ELLE_DEBUG("file to add: %s", filepath);
-
-        if ((filenames[i] = (char*)malloc((filepath.size() + 1))) == nullptr)
-        {
-          ELLE_ERR("unable to allocate file name");
-        }
-
-        strcpy(filenames[i], filepath.c_str());
-      }
-
-      filenames[this->_file_adder->files().size()] = nullptr;
-
       std::string message = this->_message->text().toStdString();
+      std::vector<std::string> files;
+      for (int i = 0; i < this->_file_adder->files().size(); ++i)
+      {
+        files.push_back(
+          QDir::toNativeSeparators(this->_file_adder->files().keys().at(i).toLocalFile()).toStdString());
+      }
+
       for (auto const& recipient: this->_users->recipients())
       {
         if (recipient != gap_null())
         {
           gap_send_files(
-            this->_state.state(), recipient, filenames, message.c_str());
+            this->_state.state(), recipient, files, message);
         }
       }
       if (email_checker.exactMatch(this->_users->text()))
@@ -195,16 +178,8 @@ namespace fist
         QString recipient = this->_users->text();
         ELLE_TRACE_SCOPE("send files to %s", this->_users->text());
         gap_send_files_by_email(
-          this->_state.state(), recipient.toStdString().c_str(), filenames, message.c_str());
+          this->_state.state(), recipient.toStdString(), files, message);
       }
-
-      auto** cpy = filenames;
-      while (*cpy != nullptr)
-      {
-        ::free((void*) *cpy);
-        ++cpy;
-      }
-      ::free((void*) filenames);
 
       emit sent();
     }
