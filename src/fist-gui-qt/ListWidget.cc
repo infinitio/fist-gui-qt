@@ -168,9 +168,6 @@ ListWidget::_layout()
   ELLE_TRACE_SCOPE("%s: layout request", *this);
   int height = 0;
   this->_width_hint = 0;
-  for (auto widget: this->_widgets)
-    this->_width_hint = std::max(this->_width_hint, widget->sizeHint().width());
-  ELLE_DEBUG("width hint: %s", this->_width_hint);
   int rows = 0;
   int fixed_height = this->maxRows() == 0 ? 0 : -1;
   for (auto widget: this->_widgets)
@@ -178,6 +175,7 @@ ListWidget::_layout()
     if (widget == nullptr || widget->isHidden())
       continue;
 
+    this->_width_hint = std::max(this->_width_hint, widget->sizeHint().width());
     ELLE_DEBUG("widget: %s", *widget)
     {
       int widget_height = widget->sizeHint().height();
