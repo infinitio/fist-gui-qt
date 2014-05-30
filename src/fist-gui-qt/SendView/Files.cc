@@ -258,9 +258,9 @@ namespace fist
       if (this->_files.contains(path))
         return;
 
-      this->_files.insert(path, new FileItem(path));
+      auto it = this->_files.insert(path, std::make_shared<FileItem>(path));
       emit file_added();
-      connect(this->_files[path], SIGNAL(remove(QUrl const&)),
+      connect(it->get(), SIGNAL(remove(QUrl const&)),
               this, SLOT(remove_file(QUrl const&)));
       this->_separator->show();
       this->_list->add_widget(this->_files[path]);

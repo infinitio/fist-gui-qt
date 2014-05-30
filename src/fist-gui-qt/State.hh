@@ -1,6 +1,8 @@
 #ifndef FIST_GUI_QT_STATE_HH
 # define FIST_GUI_QT_STATE_HH
 
+# include <vector>
+
 # include <QDateTime>
 # include <QFuture>
 # include <QFutureWatcher>
@@ -60,7 +62,8 @@ namespace fist
     /*------.
     | Users |
     `------*/
-    typedef QVector<model::User*> Users;
+    // typedef std::vector<model::User const&> Users;
+    typedef std::vector<uint32_t> Users;
 
     // Return every swaggers.
     Users
@@ -84,16 +87,17 @@ namespace fist
     Users
     results();
 
-    model::User&
+    model::User const&
     user(uint32_t user_id);
 
     typedef std::unordered_map<uint32_t, std::unique_ptr<model::User>> UserModels;
     ELLE_ATTRIBUTE_R(UserModels, users);
-    typedef QFuture<std::vector<uint32_t>> FutureSearchResult;
-    typedef QFutureWatcher<std::vector<uint32_t>> SearchResultWatcher;
+    typedef std::vector<uint32_t> Results;
+    typedef QFuture<Results> FutureSearchResult;
+    typedef QFutureWatcher<Results> SearchResultWatcher;
     ELLE_ATTRIBUTE(FutureSearchResult, search_future);
     ELLE_ATTRIBUTE_X(SearchResultWatcher, search_watcher);
-    ELLE_ATTRIBUTE(std::vector<uint32_t>, last_results);
+    ELLE_ATTRIBUTE(Results, last_results);
 
     static
     void

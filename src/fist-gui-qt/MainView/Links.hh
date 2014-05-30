@@ -1,6 +1,7 @@
 #ifndef FIST_GUI_QT_MAINVIEW_LINKS_HH
 # define FIST_GUI_QT_MAINVIEW_LINKS_HH
 
+# include <memory>
 # include <unordered_map>
 
 # include <QSystemTrayIcon>
@@ -45,7 +46,7 @@ namespace fist
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
       ELLE_ATTRIBUTE(ListWidget*, link_list);
-      typedef std::unordered_map<uint32_t, LinkWidget*> Widgets;
+      typedef std::unordered_map<uint32_t, std::shared_ptr<LinkWidget>> Widgets;
       ELLE_ATTRIBUTE(Widgets, widgets);
     private:
       Q_OBJECT;

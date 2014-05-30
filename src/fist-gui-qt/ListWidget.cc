@@ -49,7 +49,7 @@ ListWidget::ListWidget(QWidget* parent,
 `--------*/
 
 void
-ListWidget::add_widget(ListItem* widget, Position position)
+ListWidget::add_widget(ItemPtr widget, Position position)
 {
   ELLE_DEBUG_SCOPE("%s: add widget %s on %s",
                    *this,
@@ -73,7 +73,7 @@ ListWidget::add_widget(ListItem* widget, Position position)
 }
 
 void
-ListWidget::remove_widget(ListItem* widget, bool all)
+ListWidget::remove_widget(ItemPtr widget, bool all)
 {
   ELLE_DEBUG_SCOPE("%s: remove widget%s %s", *this, all ? "s" : "", *widget);
   if (all)
@@ -86,9 +86,6 @@ ListWidget::remove_widget(ListItem* widget, bool all)
     if (index != -1)
       this->_widgets.removeAt(index);
   }
-  widget->setParent(nullptr);
-  delete widget;
-  widget = nullptr;
   this->_layout();
 }
 
@@ -119,7 +116,7 @@ ListWidget::eventFilter(QObject *obj, QEvent *event)
 }
 
 void
-ListWidget::move_widget(ListItem* widget, Position position)
+ListWidget::move_widget(ItemPtr widget, Position position)
 {
   ELLE_DEBUG_SCOPE("%s: move widget %s to position %s",
                      *this, widget, position);
@@ -135,7 +132,7 @@ ListWidget::move_widget(ListItem* widget, Position position)
   }
 }
 
-QList<ListItem*> const&
+QList<ListWidget::ItemPtr> const&
 ListWidget::widgets() const
 {
   return this->_widgets;
@@ -144,11 +141,6 @@ ListWidget::widgets() const
 void
 ListWidget::clearWidgets()
 {
-  for (auto& widget: this->_widgets)
-  {
-    delete widget;
-    widget = nullptr;
-  }
   this->_widgets.clear();
   this->_layout();
 }
@@ -284,12 +276,12 @@ ListWidget::_select_element(size_t index)
 
   if (old_index > 0)
   {
-    ListItem* old = this->_widgets[old_index];
+    auto old = this->_widgets[old_index];
     old->setStyleSheet("background-color:white;");
   }
 
   index %= this->_widgets.size();
-  ListItem* item = this->_widgets[index];
+  auto item = this->_widgets[index];
   item->setStyleSheet("background-color:pink;");
 }
 
@@ -322,7 +314,7 @@ ListWidget::setFocus()
 
   if (_widgets.size() != 0)
   {
-    ListItem* item = _widgets[_widgets.size() - ++_keyboard_index];
+    auto item = _widgets[_widgets.size() - ++_keyboard_index];
     item->setStyleSheet("background-color:pink;");
   }
 }

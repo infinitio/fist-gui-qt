@@ -32,7 +32,8 @@ namespace fist
 
       if (this->_state.links().get<0>().empty())
       {
-        this->_link_list->add_widget(new TextListItem("You have no link yet", 70, this));
+        this->_link_list->add_widget(
+          std::make_shared<TextListItem>("You have no link yet", 70, this));
         return;
       }
 
@@ -72,7 +73,7 @@ namespace fist
         ELLE_WARN("%s: link %s already present", *this, model);
       }
 
-      auto widget = new LinkWidget(model);
+      auto widget = std::make_shared<LinkWidget>(model);
 
       this->_link_list->add_widget(widget,
                                    ListWidget::Position::Top);

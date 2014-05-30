@@ -2,6 +2,7 @@
 # define FIST_GUI_QT_SEND_VIEW_USERS_HH
 
 # include <unordered_set>
+# include <memory>
 
 # include <QLineEdit>
 # include <QKeyEvent>
@@ -65,7 +66,7 @@ namespace fist
       // Search field.
       ELLE_ATTRIBUTE_X(SearchField*, search_field);
       // Resutls.
-      typedef std::unordered_map<uint32_t, SearchResultWidget*> Results;
+      typedef std::unordered_map<uint32_t, std::shared_ptr<SearchResultWidget>> Results;
       ELLE_ATTRIBUTE(Results, results);
       typedef std::unordered_set<uint32_t> Recipients;
       ELLE_ATTRIBUTE_R(Recipients, recipients);

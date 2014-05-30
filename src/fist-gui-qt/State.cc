@@ -1,3 +1,5 @@
+# include <vector>
+
 # include <QDesktopServices>
 # include <QtConcurrentRun>
 # include <QTimer>
@@ -6,6 +8,7 @@
 
 # include <elle/log.hh>
 
+# include <fist-gui-qt/model/User.hh>
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/globals.hh>
 
@@ -52,7 +55,7 @@ namespace fist
       uint32_t* swaggers = gap_swaggers(this->state());
       for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
       {
-        this->_users[swaggers[i]].reset(new model::User(*this, swaggers[i]));
+        this->user(swaggers[i]);
         ELLE_DEBUG("user: %s", *this->_users[swaggers[i]]);
       }
       gap_swaggers_free(swaggers);
@@ -129,9 +132,7 @@ namespace fist
   State::on_user_status_callback(uint32_t id, gap_UserStatus status)
   {
     ELLE_TRACE_SCOPE("%s: peer %s status updated to %s", *this, id, status);
-    if (this->_users.find(id) == this->_users.end())
-      this->_users[id].reset(new model::User(*this, id));
-    this->_users[id]->avatar_updated();
+    this->user(id).avatar_updated();
     for (model::Transaction const& model: this->_transactions.get<0>())
     {
       if (model.peer_id() == id)
@@ -146,12 +147,7 @@ namespace fist
 
     State::Users res;
     for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
-    {
-      if (this->_users.find(swaggers[i]) == this->_users.end())
-        this->_users[swaggers[i]].reset(new model::User(*this, swaggers[i]));
-      auto const& user = this->_users.at(swaggers[i]);
-      res.append(user.get());
-    }
+      res.push_back(this->user(swaggers[i]).id());
     gap_swaggers_free(swaggers);
 
     return res;
@@ -166,12 +162,10 @@ namespace fist
     State::Users res;
     for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
     {
-      if (this->_users.find(swaggers[i]) == this->_users.end())
-        this->_users[swaggers[i]].reset(new model::User(*this, swaggers[i]));
-      auto const& user = this->_users.at(swaggers[i]);
-      if (user->fullname().toLower().contains(filter.toLower()) ||
-          user->handle().toLower().contains(filter.toLower()))
-        res.append(user.get());
+      auto const& user = this->user(swaggers[i]);
+      if (user.fullname().toLower().contains(filter.toLower()) ||
+          user.handle().toLower().contains(filter.toLower()))
+        res.push_back(user.id());
     }
     gap_swaggers_free(swaggers);
 
@@ -213,7 +207,7 @@ namespace fist
       this->_search_watcher.setFuture(this->_search_future);
   }
 
-  model::User&
+  model::User const&
   State::user(uint32_t user_id)
   {
     if (this->_users.find(user_id) == this->_users.end())
@@ -229,8 +223,7 @@ namespace fist
     {
       if (id != gap_null())
       {
-        this->_users[id].reset(new model::User(*this, id));
-        res.append(this->_users[id].get());
+        res.push_back(this->user(id).id());
       }
     }
     return res;
@@ -247,6 +240,7 @@ namespace fist
     }
     else
     {
+      this->_last_results.clear();
       ELLE_DEBUG("future empty");
     }
     emit results_ready();

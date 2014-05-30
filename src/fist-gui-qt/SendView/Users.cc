@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <QPainter>
 #include <QHBoxLayout>
 
@@ -5,6 +7,7 @@
 #include <elle/finally.hh>
 
 #include <fist-gui-qt/SendView/Users.hh>
+#include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/SearchResultWidget.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
@@ -177,7 +180,6 @@ namespace fist
     Users::_set_users()
     {
       ELLE_TRACE_SCOPE("got result from future");
-
       elle::SafeFinally restore_magnifier(
         [&] { this->set_icon(this->_magnifier); });
       this->set_users(this->_state.results(), false);
@@ -187,24 +189,25 @@ namespace fist
     Users::set_users(fist::State::Users const& users, bool local)
     {
       ELLE_TRACE_SCOPE("%s: set users", *this);
-      for (model::User* model: users)
+      for (auto id: users)
       {
-        ELLE_DEBUG("-- %s", model->id());
-        if (this->_results.find(model->id()) == this->_results.end())
+        auto const& model = this->_state.user(id);
+        ELLE_DEBUG("-- %s", model);
+        if (this->_results.find(model.id()) == this->_results.end())
         {
-          bool picked = this->_recipients.find(model->id()) != this->_recipients.end();
-          auto widget = new SearchResultWidget(*model, picked, this);
-          connect(widget,
+          bool picked = this->_recipients.find(model.id()) != this->_recipients.end();
+          auto widget = std::make_shared<SearchResultWidget>(model, picked, this);
+          connect(widget.get(),
                   SIGNAL(selected(uint32_t)),
                   this,
                   SLOT(_add_peer(uint32_t)));
-          connect(widget,
+          connect(widget.get(),
                   SIGNAL(unselected(uint32_t)),
                   this,
                   SLOT(_remove_peer(uint32_t)));
           this->_users->add_widget(widget, ListWidget::Position::Bottom);
           // local ? ListWidget::Position::Top : ListWidget::Position::Bottom);
-          this->_results[model->id()] = widget;
+          this->_results[model.id()] = widget;
         }
       }
 
@@ -213,8 +216,8 @@ namespace fist
         if (!email_checker.exactMatch(this->text()))
         {
           this->_users->add_widget(
-            new TextListItem("<b>No result</b><br />Send to an email address instead",
-                             60, this),
+            std::make_shared<TextListItem>(
+              "<b>No result</b><br />Send to an email address instead", 60, this),
             ListWidget::Position::Top);
         }
         else

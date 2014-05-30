@@ -1,6 +1,8 @@
 #ifndef ADDFILEITEM_HH
 # define ADDFILEITEM_HH
 
+# include <memory>
+
 # include <QColor>
 # include <QHash>
 # include <QLabel>
@@ -113,7 +115,7 @@ namespace fist
       ELLE_ATTRIBUTE_R(QLabel*, text);
       ELLE_ATTRIBUTE_R(fist::TwoStateIconButton*, expanser);
       ELLE_ATTRIBUTE_R(IconButton*, add_file);
-      typedef QHash<QUrl, FileItem*> List;
+      typedef QHash<QUrl, std::shared_ptr<ListItem>> List;
       ELLE_ATTRIBUTE_R(List, files);
       ELLE_ATTRIBUTE(HorizontalSeparator*, separator);
       ELLE_ATTRIBUTE_R(ListWidget*, list);

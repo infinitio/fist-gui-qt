@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <Qt>
 #include <QVBoxLayout>
 
@@ -30,7 +32,9 @@ namespace fist
       layout->addWidget(this->_transaction_list);
       if (this->_state.transactions().get<1>().empty())
       {
-        this->_transaction_list->add_widget(new TextListItem("You haven't sent or received any files yet", 70, this));
+        this->_transaction_list->add_widget(
+          std::make_shared<TextListItem>(
+            "You haven't sent or received any files yet", 70, this));
         return;
       }
 
@@ -71,22 +75,22 @@ namespace fist
               : elle::sprintf("%s files", transaction.files().size())
                                    ).c_str());
       }
-      auto widget = new TransactionWidget(transaction);
+      auto widget = std::make_shared<TransactionWidget>(transaction);
 
-      connect(widget, SIGNAL(transaction_accepted(uint32_t)),
+      connect(widget.get(), SIGNAL(transaction_accepted(uint32_t)),
               &this->_state, SLOT(on_transaction_accepted(uint32_t)));
-      connect(widget, SIGNAL(transaction_rejected(uint32_t)),
+      connect(widget.get(), SIGNAL(transaction_rejected(uint32_t)),
               &this->_state, SLOT(on_transaction_rejected(uint32_t)));
-      connect(widget, SIGNAL(transaction_canceled(uint32_t)),
+      connect(widget.get(), SIGNAL(transaction_canceled(uint32_t)),
               &this->_state, SLOT(on_transaction_canceled(uint32_t)));
-      connect(widget, SIGNAL(open_file(uint32_t)),
+      connect(widget.get(), SIGNAL(open_file(uint32_t)),
               &this->_state, SLOT(open_file(uint32_t)));
       this->_widgets[transaction.id()] = widget;
       this->_transaction_list->add_widget(widget,
                                           ListWidget::Position::Top);
       this->update();
       this->updateGeometry();
-      emit new_transaction_shown(widget);
+      emit new_transaction_shown(widget.get());
     }
 
     void

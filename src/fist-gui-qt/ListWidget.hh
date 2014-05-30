@@ -1,6 +1,8 @@
 #ifndef FIST_GUI_QT_LISTWIDGET_HH
 # define FIST_GUI_QT_LISTWIDGET_HH
 
+# include <memory>
+
 # include <boost/optional.hpp>
 
 # include <QSet>
@@ -50,6 +52,7 @@ public:
 public:
   typedef ListWidget Self;
   typedef QWidget Super;
+  typedef std::shared_ptr<ListItem> ItemPtr;
 
 /*------.
 | Enums |
@@ -74,10 +77,10 @@ public:
 `--------*/
 public:
   void
-  add_widget(ListItem* widget, Position position = Bottom);
+  add_widget(ItemPtr widget, Position position = Bottom);
 
   void
-  remove_widget(ListItem* widget, bool all = true);
+  remove_widget(ItemPtr widget, bool all = true);
 
 
 private:
@@ -88,9 +91,9 @@ private:
 
 public:
   void
-  move_widget(ListItem* widget, Position position = Bottom);
+  move_widget(ItemPtr widget, Position position = Bottom);
 
-  QList<ListItem*> const&
+  QList<ItemPtr> const&
   widgets() const;
 
   void
@@ -139,7 +142,7 @@ private:
   int _width_hint;
   int _max_rows;
 
-  QList<ListItem*> _widgets;
+  QList<ItemPtr> _widgets;
   SmoothScrollBar* _scroll;
 
 /*-------.

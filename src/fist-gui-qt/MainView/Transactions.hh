@@ -48,7 +48,7 @@ namespace fist
                       QSystemTrayIcon::MessageIcon = QSystemTrayIcon::Information);
 
     private:
-      typedef std::unordered_map<uint32_t, TransactionWidget*> Widgets;
+      typedef std::unordered_map<uint32_t, std::shared_ptr<TransactionWidget>> Widgets;
       ELLE_ATTRIBUTE(fist::State&, state);
       ELLE_ATTRIBUTE(ListWidget*, transaction_list);
       ELLE_ATTRIBUTE(Widgets, widgets);
