@@ -45,6 +45,7 @@ namespace fist
     class Users:
       public QWidget
     {
+      typedef fist::State::Users UserList;
       typedef QWidget Super;
 
   /*-------------.
@@ -139,8 +140,8 @@ namespace fist
       void
       _set_users();
 
-       void
-       set_users(fist::State::Users const& users, bool local);
+      void
+      set_users(UserList const& users, bool local);
 
       void
       _add_peer(uint32_t);

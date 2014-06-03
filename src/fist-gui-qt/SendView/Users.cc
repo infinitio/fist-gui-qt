@@ -186,7 +186,7 @@ namespace fist
     }
 
     void
-    Users::set_users(fist::State::Users const& users, bool local)
+    Users::set_users(UserList const& users, bool local)
     {
       ELLE_TRACE_SCOPE("%s: set users", *this);
       for (auto id: users)
