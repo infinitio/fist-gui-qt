@@ -33,7 +33,7 @@ namespace fist
       if (this->_state.links().get<0>().empty())
       {
         this->_link_list->add_widget(
-          std::make_shared<TextListItem>("You have no link yet", 70, this));
+          std::make_shared<TextListItem>("You have no links yet", 70, this));
         return;
       }
 
