@@ -87,6 +87,10 @@ class Fist::Prologue
           "infinit.surface.gap.Rounds:DEBUG,"
           "elle.CrashReporter:DEBUG",
         true);
+      elle::os::setenv("ELLE_LOG_TIME", "1", true);
+      elle::os::setenv("ELLE_LOG_DISPLAY_TYPE", "1", true);
+      elle::os::setenv("ELLE_LOG_TID", "1", true);
+      elle::os::setenv("ELLE_LOG_PID", "1", true);
     }
 
     if (!elle::os::inenv("INFINIT_LOG_FILE") && !elle::os::inenv("ELLE_LOG_FILE"))
