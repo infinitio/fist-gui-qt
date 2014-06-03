@@ -7,8 +7,6 @@
 #include <fist-gui-qt/model/Link.hh>
 #include <fist-gui-qt/State.hh>
 
-ELLE_LOG_COMPONENT("infinit.FIST.model.Link");
-
 namespace fist
 {
   namespace model

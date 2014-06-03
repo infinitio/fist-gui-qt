@@ -295,7 +295,7 @@ LoginWindow::set_version()
 void
 LoginWindow::keyPressEvent(QKeyEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: key pressed (%s)", *this, event->key());
+  ELLE_DEBUG_SCOPE("%s: key pressed (%s)", *this, event->key());
 
   if (event->key() == Qt::Key_Escape)
     this->_reduce();
@@ -306,7 +306,7 @@ LoginWindow::keyPressEvent(QKeyEvent* event)
 void
 LoginWindow::focusInEvent(QFocusEvent* event)
 {
-  ELLE_TRACE_SCOPE("%s: gain focus", *this);
+  ELLE_DEBUG_SCOPE("%s: gain focus", *this);
 
   Super::focusInEvent(event);
 

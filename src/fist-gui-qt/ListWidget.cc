@@ -165,7 +165,7 @@ ListWidget::minimumSizeHint() const
 void
 ListWidget::_layout()
 {
-  ELLE_TRACE_SCOPE("%s: layout request", *this);
+  ELLE_DEBUG_SCOPE("%s: layout request", *this);
   int height = 0;
   this->_width_hint = 0;
   int rows = 0;
