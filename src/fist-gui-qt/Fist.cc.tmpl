@@ -167,13 +167,7 @@ Fist::_initialize_application()
   this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
   this->_application->setQuitOnLastWindowClosed(false);
   QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-
-#ifdef INFINIT_WINDOWS
-  boost::filesystem::path::imbue(
-    std::locale(
-      std::locale(),
-      new boost::filesystem::detail::utf8_codecvt_facet()));
-#endif
+  QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 }
 
 void
