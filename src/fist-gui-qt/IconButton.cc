@@ -64,7 +64,7 @@ IconButton::disable()
 void
 IconButton::set_pixmap(QPixmap const& pixmap)
 {
-  ELLE_TRACE_SCOPE("%s: set pixmap", *this);
+  ELLE_DEBUG_SCOPE("%s: set pixmap", *this);
   this->_original = pixmap;
   this->_draw_shape(this->_icon);
   this->_draw_shape(this->_shadow, Qt::black);

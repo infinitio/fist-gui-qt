@@ -71,7 +71,7 @@ namespace fist
     void
     GrowingArea::expand(bool force)
     {
-      ELLE_TRACE_SCOPE("%s: expand", *this);
+      ELLE_DEBUG_SCOPE("%s: expand", *this);
       auto target = this->_body->sizeHint().height(); // Super::sizeHint().height();
       if (this->_height_animator->endValue() == target)
         return;
@@ -99,7 +99,7 @@ namespace fist
     void
     GrowingArea::shrink()
     {
-      ELLE_TRACE_SCOPE("%s: shrink", *this);
+      ELLE_DEBUG_SCOPE("%s: shrink", *this);
       if (this->_state == State::shrinking || this->_state == State::shrinked)
       {
         ELLE_DEBUG("already shrink(ing,ed)");
