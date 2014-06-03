@@ -331,24 +331,26 @@ Fist::_set_lock()
     // and state is not available.
     auto email = fist::settings()["Login"].get("email", "unknown").toString();
 
-    gap_send_user_report(
-      this->_state->state(),
-      email.toStdString().c_str(),
-      "CrashReport",
-      previous_log.c_str(),
-      elle::sprintf("%s on %s",
-                    common::system::platform(),
-                    INFINIT_VERSION).c_str());
+    ELLE_LOG("%s: send crash report", *this)
+      gap_send_last_crash_logs(
+        this->_state->state(),
+        email.toStdString().c_str(),
+        previous_log.c_str(),
+        previous_log.c_str(),
+        elle::sprintf("%s on %s",
+                      common::system::platform(),
+                      INFINIT_VERSION).c_str(),
+        "");
 #else
     ELLE_WARN("Previous session crashed");
 #endif
-    ELLE_DEBUG("remove previous lock");
+    ELLE_TRACE("remove previous lock");
     {
       this->_filelock.setPermissions(QFile::WriteOwner);
       this->_filelock.remove();
     }
   }
-  ELLE_DEBUG("set new lock")
+  ELLE_TRACE("set new lock")
   {
     this->_filelock.open(QIODevice::WriteOnly);
     this->_filelock.setPermissions(QFile::ReadOwner);
