@@ -102,6 +102,19 @@ namespace fist
   }
 
   void
+  State::critical_callback(char const* str)
+  {
+    g_state->on_critical_callback(str);
+  }
+
+  void
+  State::on_critical_callback(char const* str)
+  {
+    ELLE_WARN_SCOPE("%s: critical problem %s", *this, str);
+    emit critical_failure(QString(str));
+  }
+
+  void
   State::avatar_available_callback(uint32_t id)
   {
     g_state->on_avatar_available_callback(id);

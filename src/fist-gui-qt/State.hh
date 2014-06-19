@@ -58,6 +58,14 @@ namespace fist
     void
     on_logged_in();
 
+    static
+    void
+    critical_callback(char const*);
+    void
+    on_critical_callback(char const*);
+  signals:
+    void
+    critical_failure(QString const&);
   public:
     /*------.
     | Users |
@@ -104,13 +112,11 @@ namespace fist
     avatar_available_callback(uint32_t id);
     void
     on_avatar_available_callback(uint32_t);
-
     static
     void
     user_status_callback(uint32_t id, gap_UserStatus status);
     void
     on_user_status_callback(uint32_t, gap_UserStatus status);
-
   signals:
     void
     results_ready();
