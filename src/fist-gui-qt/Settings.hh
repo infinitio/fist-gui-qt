@@ -65,7 +65,11 @@ namespace fist
       // Set the setting value.
       void
       set(QString const& key,
-          QString const& value);
+          QVariant const& value);
+
+      // Remove a setting.
+      void
+      remove(QString const& key);
 
       // Check if the setting exists.
       bool
