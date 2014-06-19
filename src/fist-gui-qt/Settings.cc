@@ -1,3 +1,5 @@
+#include <elle/assert.hh>
+
 #include <fist-gui-qt/Settings.hh>
 
 namespace fist
@@ -55,10 +57,10 @@ namespace fist
 
   void
   Settings::Group::set(QString const& key,
-                       QString const& value)
+                       QVariant const& value)
   {
     GroupProxy proxy(this->_master, this->_name);
-    proxy.settings().setValue(key, QString(value));
+    proxy.settings().setValue(key, value);
   }
 
   bool
@@ -66,6 +68,16 @@ namespace fist
   {
     GroupProxy proxy(this->_master, this->_name);
     return proxy.settings().contains(key);
+  }
+
+  void
+  Settings::Group::remove(QString const& key)
+  {
+    {
+      GroupProxy proxy(this->_master, this->_name);
+      proxy.settings().remove(key);
+    }
+    ELLE_ASSERT(!this->exists(key));
   }
 
   /*----------.
