@@ -227,12 +227,35 @@ def configure(cxx_toolkit = None,
 
   if cxx_toolkit.os == drake.os.windows:
 
+    uac_sources = drake.nodes(
+      'NSIS/UAC/src/UAC/nsisutil.h',
+      'NSIS/UAC/src/UAC/resource.h',
+      'NSIS/UAC/src/UAC/runas.cpp',
+      'NSIS/UAC/src/UAC/uac.cpp',
+      'NSIS/UAC/src/UAC/uac.h',)
+
+    uac_cxx_config = drake.cxx.Config()
+    uac_cxx_config.flag('-static-libgcc')
+    uac_cxx_config.flag('-static-libstdc++')
+    uac_cxx_config.lib('ole32')
+
+    uac_lib = drake.cxx.DynLib(
+      'lib/UAC',
+      uac_sources,
+      cxx_toolkit,
+      uac_cxx_config,
+    )
     nsis_includes = drake.nodes('NSIS/nsProcess.nsh',
                                 'NSIS/utils.nsh',
-                                'NSIS/UAC.nsh',
-                                'NSIS/UACHelper.nsh')
-    nsis_plugins = drake.nodes('NSIS/nsProcess.dll', 'NSIS/UAC.dll')
-
+                                'NSIS/UAC.nsh')
+    nsis_plugins = drake.nodes('NSIS/nsProcess.dll')
+    nsis_plugins += [uac_lib,]
+    nsis_plugins = list(map(
+        lambda x: drake.copy(x,
+                             'NSISPlugins',
+                             strip_prefix = True),
+        nsis_plugins))
+    nsis_plugins = drake.copy(nsis_plugins, 'NSISPlugins', strip_prefix = True)
     # Installer.
     installer_resources = drake.nodes(
       'resources/icons/icon.ico',
@@ -244,16 +267,16 @@ def configure(cxx_toolkit = None,
     )
 
     installer_resources_folder = drake.Node('installer_resources')
-    nsis_folder = drake.Node('NSISPlugins')
-
-    nsis_includes = drake.copy(nsis_includes, 'NSISPlugins', strip_prefix = True)
-    nsis_plugins = drake.copy(nsis_plugins, 'NSISPlugins', strip_prefix = True)
-
+    nsis_plugins_folder = drake.Node('NSISPlugins')
+    nsis_includes_folder = drake.Node('NSISIncludes')
+    nsis_includes = list(map(
+        lambda x: drake.copy(x, 'NSISIncludes', strip_prefix = True),
+        nsis_includes))
     installer_resources = list(map(
         lambda x: drake.copy(x,
                              installer_resources_folder.name().basename(),
                              strip_prefix = True),
-        installer_resources + [application] + dynamic_libraries)) + nsis_plugins + nsis_includes
+        [application] + dynamic_libraries + installer_resources)) + nsis_plugins + nsis_includes
 
     content = {
         'company': 'Infinit.io',
@@ -261,11 +284,9 @@ def configure(cxx_toolkit = None,
         'product_name': 'Infinit',
 
         # Resources.
-        'resources_folder':
-          str(drake.path_build(installer_resources_folder.name())),
+        'resources_folder': str(drake.path_build(installer_resources_folder.name())),
         'executable': str(application.name().basename()),
-        'libraries':
-          list(map(lambda lib: str(lib.name().basename()), dynamic_libraries)),
+        'libraries': list(map(lambda lib: str(lib.name().basename()), dynamic_libraries)),
         'icon': 'icon.ico',
         'background': 'installer_background.png',
         'license': 'License.txt',
@@ -273,8 +294,8 @@ def configure(cxx_toolkit = None,
         'documentation': 'Documentation.txt',
         'onboarding_file': 'Infinit - Episode 2.mp4',
 
-        'NSIS_Plugins': str(drake.path_build(nsis_folder.name())),
-        'NSIS_Includes': str(drake.path_build(nsis_folder.name())),
+        'NSIS_Plugins': str(drake.path_build(nsis_plugins_folder.name())),
+        'NSIS_Includes': str(drake.path_build(nsis_includes_folder.name())),
     }
     content.update(architecture_dictionary(cxx_toolkit))
     templating_context = drake.templating.Context(content = content)

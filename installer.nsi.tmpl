@@ -1,3 +1,16 @@
+;==============================================================================
+; Important
+;==============================================================================
+; Nsis use {variable_name} prefixed by a $ for variables which is exactly the
+; same syntax used by Mako in his templates.
+; Because Mako is ran first, {variable_name} will be interpreted and changed
+; by Mako. To declare an nsis variable, you need to use the following pattern:
+; {'{variable_name}'}.
+;
+; e.g.
+; file.nsi.tmpl : {'{foo}'}
+; file.nsi      : {foo}
+
 ;------------------------------------------------------------------------------
 ; Registry
 ;------------------------------------------------------------------------------
@@ -22,6 +35,7 @@ Var PreviousInstallDir
 !insertmacro GetParameters
 !insertmacro GetOptions
 !include x64.nsh
+!include MUI2.nsh
 !include WinVer.nsh
 
 ;; Add custom plugins folders.
@@ -31,8 +45,6 @@ Var PreviousInstallDir
 ;; Add custom plugins.
 !include UAC.nsh
 !include nsProcess.nsh
-!include "MUI.nsh"
-
 !include utils.nsh
 
 ;------------------------------------------------------------------------------
@@ -49,15 +61,6 @@ Caption "${product_name}"
 
 Icon "${resources_folder}/${icon}"
 
-; If admin / highest is passed, command line argument cannot be read.
-RequestExecutionLevel highest
-
-SetOverwrite ifdiff
-SetDateSave on
-SetDatablockOptimize on
-CRCCheck on
-SilentInstall normal
-
 InstallDir "${'${company_install}'}\${product_name}"
 InstallDirRegKey HKLM "${'${regkey}'}" ""
 
@@ -70,19 +73,44 @@ DirText "Choose the install directory"
 UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
+SetOverwrite ifdiff
+SetDateSave on
+SetDatablockOptimize on
+CRCCheck on
+SilentInstall normal
+
+; If admin / highest is passed, command line argument cannot be read.
+RequestExecutionLevel admin
+
+Function .OnInstFailed
+  libUAC::Unload
+FunctionEnd
+
+Function .OnInstSuccess
+  libUAC::Unload
+  Push "$INSTDIR\${executable}"
+  Call RunExecutable
+FunctionEnd
+
+Function .OnUnInstFailed
+  libUAC::Unload
+FunctionEnd
+
+Function .OnUnInstSuccess
+  libUAC::Unload
+FunctionEnd
+
 Function .onInit
   Call KillRunningProcess
   Call CheckArchitecture
 
   ;; Search for a previous install folder.
   ReadRegStr $INSTDIR HKLM "${'${regkey}'}" "Install_Dir"
-
-  ;; If none has been found, High execution level is requiered.
   StrCmp $INSTDIR "" 0 UAC_Elevate
   StrCpy $INSTDIR ${'${company_install}'}\${product_name}
 
 UAC_Elevate:
-  !insertmacro UAC_RunElevated
+  libUAC::RunElevated
   StrCmp 1223 $0 UAC_ElevationAborted
   StrCmp 0 $0 0 UAC_Err
   StrCmp 1 $1 0 UAC_Success
@@ -107,30 +135,22 @@ UAC_Success:
   MessageBox mb_iconstop "This installer requires admin privileges, try again."
   goto UAC_Elevate
 
-  ;; Look for autoupdate.
+  ;; Look for autoupdate argument.
   Call ParseCommandline
 
   ${'${If}'} $AutoUpdate == 1
     SetAutoClose true
     SetSilent silent
   ${'${Else}'}
-    SetSilent normal
   ${'${Endif}'}
-
-FunctionEnd
-
-Function .OnInstSuccess
-  Push "$INSTDIR\${executable}"
-  Call RunExecutable
 FunctionEnd
 
 ;------------------------------------------------------------------------------
 ; Pages
 ;------------------------------------------------------------------------------
-
 ;;; Used during upgrade to skip most pages
 Function PageSkipIfUpdate
-  ${'${If}'} $PerformUpdate == 1
+  ${'${If}'} $AutoUpdate == 1
     Abort
   ${'${EndIf}'}
 FunctionEnd
@@ -233,7 +253,6 @@ SectionEnd
 ; Create shortcuts section
 ;------------------------------------------------------------------------------
 
-
 Section "Create shortcuts"
   CreateDirectory "${'${startmenu}'}"
   SetOutPath $INSTDIR ; for working directory
@@ -282,6 +301,8 @@ Section "un.install"
   Delete "$INSTDIR\${'${uninstaller}'}"
 
   ;; Install dir.
-  RMDir "$INSTDIR"
+  ;; /r is a bad practice but if the user uninstall the app, he wants the folder
+  ;; to be emptied by the uninstaller.
+  RMDir /r "$INSTDIR"
   RMDir "${'${company_install}'}"
 SectionEnd
