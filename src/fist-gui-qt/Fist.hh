@@ -19,6 +19,7 @@ class Fist:
   public QObject,
   public elle::Printable
 {
+  typedef std::unique_ptr<fist::State> StatePtr;
 /*------------.
 | Contruction |
 `------------*/
@@ -45,6 +46,13 @@ private:
   void
   _initialize_application();
 
+  void
+  _initialize_login_window(bool kicked_out = false);
+
+  // Create a new state.
+  StatePtr
+  _new_state();
+
   bool
   _set_lock();
 /*------------------.
@@ -56,9 +64,25 @@ public slots:
   void
   about_to_quit();
 
+  // Logout the user, spawing a new state and showing the login window.
+  void
+  logout(bool kicked_out = false);
+
   // This handle the process of killing the application.
   void
   quit();
+
+private:
+  // Destroy the state, dock and login window.
+  void
+  _clear();
+
+private slots:
+  void
+  _kicked_out_reset();
+
+  void
+  _reset(bool kicked_out = false);
 
 /*-----.
 | Dock |
@@ -78,9 +102,9 @@ private:
   void
   _kicked_out_callback();
 
-public:
+private slots:
   void
-  kicked_out();
+  _kicked_out(QString const& reason = "");
 
 /*----.
 | Run |
@@ -95,7 +119,7 @@ private slots:
 
 private:
   ELLE_ATTRIBUTE(std::unique_ptr<Prologue>, prologue);
-  ELLE_ATTRIBUTE(std::unique_ptr<fist::State>, state);
+  ELLE_ATTRIBUTE(StatePtr, state);
   // The local server can be used as a 'only one instance running' lock.
   // They are 3 ways usually used:
   // - QLocalServer.

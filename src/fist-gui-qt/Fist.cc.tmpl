@@ -128,9 +128,18 @@ gap_state()
 #endif
 }
 
+Fist::StatePtr
+Fist::_new_state()
+{
+  std::unique_ptr<fist::State> state(new fist::State(gap_state()));
+  connect(state.get(), SIGNAL(critical_failure(QString const&)),
+          this, SLOT(_kicked_out()));
+  return state;
+}
+
 Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
-  _state(new fist::State(gap_state())),
+  _state(_new_state()),
   _lock(nullptr),
   _filelock(
     QString::fromStdString(
@@ -158,6 +167,7 @@ Fist::~Fist()
 void
 Fist::_initialize_application()
 {
+  ELLE_TRACE_SCOPE("%s: initialize Qt", *this);
   QFontDatabase database;
   auto luc = database.addApplicationFont(":/fonts/LucidaGrande.ttc");
   auto mont = database.addApplicationFont(":/fonts/Montserrat-Regular.ttf");
@@ -178,44 +188,50 @@ void
 Fist::about_to_quit()
 {
   ELLE_TRACE_SCOPE("%s: run cleaning operations", *this);
-  this->_dock.reset();
-  this->_state.reset();
+  this->logout();
   ELLE_DEBUG("cleaning done");
 }
 
 void
 Fist::quit()
 {
-  this->_filelock.setPermissions(QFile::WriteOwner);
-  this->_filelock.remove();
-
   ELLE_TRACE_SCOPE("%s: quit", *this);
+  ELLE_DEBUG("clear lock")
+  {
+    this->_filelock.setPermissions(QFile::WriteOwner);
+    this->_filelock.remove();
+  }
   this->_application->setQuitOnLastWindowClosed(false);
-
   ELLE_DEBUG("close updater")
     if (this->_updater != nullptr)
     {
       this->_updater->loading_dialog()->hide();
       this->_updater->loading_dialog()->close();
-    }
-
-  ELLE_DEBUG("close login window")
-    if (this->_login_window != nullptr)
-    {
-      this->_login_window->hide();
-      this->_login_window.reset();
-    }
-
-  ELLE_DEBUG("close dock")
-    if (this->_dock != nullptr)
-    {
-      this->_dock->hide();
-      this->_dock->close();
+      this->_updater.reset();
     }
 
   this->_application->setQuitOnLastWindowClosed(true);
-  this->_application->quit();
-  ELLE_DEBUG("quit");
+  ELLE_LOG("quit")
+    this->_application->quit();
+}
+
+void
+Fist::_initialize_login_window(bool prefill_fields)
+{
+  this->_login_window.reset(new LoginWindow(*this->_state, prefill_fields));
+  connect(this->_login_window.get(), SIGNAL(quit_request()),
+          this, SLOT(quit()));
+  connect(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
+          this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
+  connect(this->_updater.get(), SIGNAL(no_update_available()),
+          this->_login_window.get(), SLOT(set_version()));
+  connect(this->_login_window.get(), SIGNAL(version_rejected()),
+          this->_updater.get(), SLOT(check_for_updates()));
+  connect(this->_login_window.get(), SIGNAL(logged_in()),
+          this, SLOT(logged_in()));
+  ELLE_DEBUG("show login window");
+  this->_login_window->show();
+  this->_login_window->setFocus();
 }
 
 int
@@ -226,38 +242,13 @@ Fist::operator ()()
   auto update_url = elle::os::getenv(
     "FIST_UPDATE_FILE",
     "http://download.infinit.io/windows/${architecture}/update.xml");
-
   this->_updater.reset(new Updater(QString::fromStdString(update_url), this));
-  this->_login_window.reset(new LoginWindow(*this->_state));
-
   connect(this->_updater.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
-
-  connect(this->_login_window.get(), SIGNAL(quit_request()),
-          this, SLOT(quit()));
-
-  connect(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
-          this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
-
-  connect(this->_updater.get(), SIGNAL(no_update_available()),
-          this->_login_window.get(), SLOT(set_version()));
-
   connect(this->_updater->loading_dialog(), SIGNAL(resized()),
           this, SLOT(_reposition_dialog()));
-
-  connect(this->_login_window.get(), SIGNAL(version_rejected()),
-          this->_updater.get(), SLOT(check_for_updates()));
-
-  ELLE_DEBUG("show login window");
-
-  this->_login_window->show();
-  this->_login_window->setFocus();
-
+  this->_initialize_login_window(true);
   this->_updater->check_for_updates();
-
-  connect(this->_login_window.get(), SIGNAL(logged_in()),
-          this, SLOT(logged_in()));
-
   return this->_application->exec();
 }
 
@@ -370,6 +361,8 @@ Fist::logged_in()
   this->_dock.reset(new InfinitDock(*this->_state));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
+  connect(this->_dock.get(), SIGNAL(logout_request()),
+          this, SLOT(logout()));
   this->_dock->hide();
 }
 
@@ -390,13 +383,12 @@ Fist::_new_local_socket_connection()
 void
 Fist::_kicked_out_callback()
 {
-  g_fist->kicked_out();
+  g_fist->_kicked_out();
 }
 
 void
-Fist::kicked_out()
+Fist::_clear()
 {
-  ELLE_TRACE_SCOPE("%s: kicked out", *this);
   ELLE_DEBUG("clear gui")
   {
     this->_login_window.reset();
@@ -406,18 +398,59 @@ Fist::kicked_out()
   {
     this->_state.reset();
   }
+}
 
-  ELLE_DEBUG("reset set")
+void
+Fist::logout(bool kicked_out)
+{
+  ELLE_TRACE_SCOPE("%s: logout", *this);
+  if (this->_dock)
+  {
+    // deleteLater is used there because the initiator of the logout is a
+    // component of the dock. _clear method will destroy the dock and so destroy
+    // the component, causing a segfault.
+    if (kicked_out)
+      connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_kicked_out_reset()));
+    else
+      connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_reset()));
+    this->_dock.release()->deleteLater();
+    this->_clear();
+  }
+  else
+  {
+    this->_clear();
+    this->_reset(kicked_out);
+  }
+}
+
+void
+Fist::_kicked_out_reset()
+{
+  this->_reset(true);
+}
+
+void
+Fist::_reset(bool kicked_out)
+{
+  ELLE_DEBUG("reset state")
   {
     this->_state.reset(new fist::State(gap_state()));
   }
-
   ELLE_DEBUG("reset gui")
   {
-    this->_login_window.reset(new LoginWindow(*this->_state));
+    // If kicked out, credentials are kept to make reconnection frictionless.
+    this->_initialize_login_window(kicked_out);
     this->_login_window->show();
-    this->_login_window->set_message("You have been disconnected", "");
+    if (kicked_out)
+      this->_login_window->set_message("You have been disconnected", "");
   }
+}
+
+void
+Fist::_kicked_out(QString const& reason)
+{
+  ELLE_TRACE_SCOPE("%s: kicked out: %s", *this, reason);
+  this->logout(true);
 }
 
 void
