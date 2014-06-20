@@ -29,7 +29,8 @@ class LoginWindow:
 private:
   ELLE_ATTRIBUTE(fist::State&, state);
 public:
-  LoginWindow(fist::State& state);
+  LoginWindow(fist::State& state,
+              bool fill_email_and_password_fields = true);
   ~LoginWindow();
 
   void keyPressEvent(QKeyEvent* event);
@@ -90,6 +91,15 @@ public Q_SLOTS:
   void
   _disable();
 
+private:
+  // Save the password into user settings.
+  void
+  _save_password(QString const& email,
+                 QString const& password);
+
+  // Get the password from settings.
+  QString
+  _saved_password(QString const& email) const;
 /*----------.
 | Printable |
 `----------*/

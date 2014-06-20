@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QHBoxLayout>
+#include <QByteArray>
 #include <QPixmap>
 #include <QRegExp>
 #include <QSettings>
@@ -8,8 +9,15 @@
 #include <QVBoxLayout>
 #include <QFuture>
 #include <QtConcurrentRun>
+
+#include <elle/Buffer.hh>
 #include <elle/finally.hh>
+#include <elle/serialize/extract.hh>
+#include <elle/serialize/insert.hh>
 #include <elle/log.hh>
+
+#include <cryptography/SecretKey.hh>
+#include <cryptography/Exception.hh>
 
 #include <surface/gap/gap.hh>
 #include <version.hh>
@@ -18,14 +26,63 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/Settings.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.LoginWindow");
 
 static QRegExp email_checker(regexp::email,
                              Qt::CaseInsensitive);
+static
+infinit::cryptography::SecretKey
+secret_key(QString const& email)
+{
+  static std::string secret_key_password("S4LT%sPasswordSecretKey");
+  return infinit::cryptography::SecretKey(
+    infinit::cryptography::cipher::Algorithm::aes256,
+    elle::sprintf(secret_key_password, email.toStdString()));
+}
 
-LoginWindow::LoginWindow(fist::State& state):
+void
+LoginWindow::_save_password(QString const& email,
+                            QString const& password)
+{
+  auto encrypted_password = secret_key(email).encrypt(
+    password.toStdString());
+  std::string encrypted_password_string;
+  elle::serialize::to_string(encrypted_password_string) << encrypted_password;
+  auto eps = encrypted_password_string;
+  QByteArray ar(eps.data(), eps.length());
+  fist::settings()["Login"].set("password", ar);
+}
+
+QString
+LoginWindow::_saved_password(QString const& email) const
+{
+  auto saved_password =
+    fist::settings()["Login"].get("password", "").toByteArray();
+  if (!saved_password.isEmpty())
+  {
+    try
+    {
+      std::string str(saved_password.constData(), saved_password.size());
+      infinit::cryptography::Code code;
+      elle::serialize::from_string(str) >> code;
+      auto password_string = secret_key(email).decrypt<std::string>(code);
+      return QString::fromStdString(password_string);
+    }
+    catch (elle::Exception const& e)
+    {
+      ELLE_WARN("%s: enable to deserialize stored password: %s",
+                *this, e.what());
+      fist::settings()["Login"].remove("password");
+    }
+  }
+  return QString();
+}
+
+LoginWindow::LoginWindow(fist::State& state,
+                         bool fill_email_and_password_fields):
   RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
   _email_field(new QLineEdit),
@@ -40,7 +97,6 @@ LoginWindow::LoginWindow(fist::State& state):
   _login_future(),
   _login_watcher()
 {
-
   ELLE_TRACE_SCOPE("%s: contruction", *this);
   this->setWindowIcon(QIcon(":/images/logo.png"));
   this->resize(view::login::size);
@@ -49,26 +105,29 @@ LoginWindow::LoginWindow(fist::State& state):
     connect(this->_quit_button, SIGNAL(released()),
             this, SIGNAL(quit_request()));
   }
-  // Email field.
   {
-    this->_email_field->setPlaceholderText(view::login::email::placeholder);
-    this->_email_field->setFixedSize(view::login::email::size);
-    view::login::email::style(*this->_email_field);
-    this->_email_field->setTextMargins(12, 0, 12, 0);
-
     auto saved_email = fist::settings()["Login"].get("email", "").toString();
-    if (!saved_email.isEmpty())
-      this->_email_field->setText(saved_email);
-  }
-  // Password field.
-  {
-    this->_password_field->setPlaceholderText(view::login::password::placeholder);
-    this->_password_field->setFixedSize(view::login::password::size);
-    view::login::password::style(*this->_password_field);
-    this->_password_field->setTextMargins(12, 0, 12, 0);
-    auto saved_password = fist::settings()["Login"].get("password", "").toString();
-    if (!saved_password.isEmpty())
-      this->_password_field->setText(saved_password);
+    // Email field.
+    {
+      this->_email_field->setPlaceholderText(view::login::email::placeholder);
+      this->_email_field->setFixedSize(view::login::email::size);
+      view::login::email::style(*this->_email_field);
+      this->_email_field->setTextMargins(12, 0, 12, 0);
+
+      if (fill_email_and_password_fields && !saved_email.isEmpty())
+        this->_email_field->setText(saved_email);
+    }
+    // Password field.
+    {
+      this->_password_field->setPlaceholderText(view::login::password::placeholder);
+      this->_password_field->setFixedSize(view::login::password::size);
+      view::login::password::style(*this->_password_field);
+      this->_password_field->setTextMargins(12, 0, 12, 0);
+      if (fill_email_and_password_fields && !saved_email.isEmpty())
+      {
+        this->_password_field->setText(this->_saved_password(saved_email));
+      }
+    }
   }
   if (!this->_email_field->text().isEmpty())
     this->_password_field->setFocus();
@@ -103,7 +162,7 @@ LoginWindow::LoginWindow(fist::State& state):
       QSizePolicy::Minimum, QSizePolicy::Maximum);
     this->_reset_password_link->setOpenExternalLinks(true);
   }
-  // Version
+  // Version.
   {
     view::login::version::style(*this->_version_field);
     this->_version_field->hide();
@@ -155,6 +214,9 @@ LoginWindow::LoginWindow(fist::State& state):
           this, SLOT(_login_attempt()));
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   this->update();
+
+  if (!this->_password_field->text().isEmpty())
+    this->_login();
 }
 
 LoginWindow::~LoginWindow()
@@ -167,25 +229,26 @@ LoginWindow::_login_attempt()
 {
   elle::SafeFinally unlock_login([&] {
       this->_enable(); this->_password_field->setFocus(); });
-
   auto status = this->_login_future.result();
-  if (status == gap_ok)
+  if (status == gap_ok || status == gap_already_logged_in)
   {
     emit logged_in();
-    fist::settings()["Login"].set("email", this->_email_field->text());
+    auto email = this->_email_field->text();
+    auto password = this->_password_field->text();
+    fist::settings()["Login"].set("email", email);
+    this->_save_password(email, password);
     return;
   }
   else if (status == gap_deprecated)
   {
     emit version_rejected();
   }
-
-  static auto fill_error_field = [&] (std::string const& error_message)
+  static auto fill_error_field = [&] (std::string const& error_message,
+                                      std::string const& sub_message = "")
     {
       ELLE_WARN("%s", error_message);
-      this->set_message(error_message.c_str(), error_message.c_str());
+      this->set_message(error_message.c_str(), sub_message.c_str());
     };
-
   switch (status)
   {
 #define ERR(error_code, msg)                    \
