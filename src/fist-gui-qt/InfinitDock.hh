@@ -52,6 +52,9 @@ signals:
   void
   quit_request();
 
+  void
+  logout_request();
+
 public:
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
@@ -179,6 +182,7 @@ private:
   QMenu* _systray_menu;
   QAction* _send_files;
   QAction* _report_a_problem;
+  QAction* _logout;
   QAction* _quit;
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
 

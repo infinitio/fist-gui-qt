@@ -73,6 +73,7 @@ InfinitDock::InfinitDock(fist::State& state)
   , _systray_menu(new QMenu(this))
   , _send_files(new QAction(tr("&Send files..."), this))
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
+  , _logout(new QAction(tr("&Logout"), this))
   , _quit(new QAction(tr("&Quit"), this))
 #ifndef FIST_PRODUCTION_BUILD
   , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
@@ -158,6 +159,7 @@ InfinitDock::InfinitDock(fist::State& state)
   this->_menu->addSeparator();
   this->_menu->addAction(_report_a_problem);
   this->_menu->addSeparator();
+  this->_menu->addAction(_logout);
   this->_menu->addAction(_quit);
 
   // Register gap callback.
@@ -170,6 +172,8 @@ InfinitDock::InfinitDock(fist::State& state)
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
   this->connect(_report_a_problem, SIGNAL(triggered()),
                 this, SLOT(report_a_problem()));
+  this->connect(_logout, SIGNAL(triggered()), this, SIGNAL(logout_request()));
+  this->connect(_logout, SIGNAL(triggered()), this, SLOT(hide()));
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
 
   ELLE_DEBUG("check if onboarded reception has been done")
