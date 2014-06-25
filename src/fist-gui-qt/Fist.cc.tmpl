@@ -75,16 +75,17 @@ class Fist::Prologue
       ELLE_DEBUG("set ELLE_LOG_LEVEL");
       elle::os::setenv(
         "ELLE_LOG_LEVEL",
-          "*trophonius*:TRACE,"
+          "TRACE,"
           "*meta*:TRACE,"
-          "*gap*:TRACE,"
+          "surface.gap.*:TRACE,"
           "surface.gap.TransferMachine:DEBUG,"
-          "*frete*:TRACE,"
-          "*station*:DEBUG,"
           "reactor.fsm.*:TRACE,"
+          "frete.Frete:TRACE,"
+          "station.Station:DEBUG,"
+          "infinit.surface.gap.Rounds:DEBUG,"
+          "reactor.http.Request.bugofdoom:DUMP,"
           "*FIST*:TRACE,"
           "*FIST.State*:DEBUG,"
-          "infinit.surface.gap.Rounds:DEBUG,"
           "elle.CrashReporter:DEBUG",
         true);
       elle::os::setenv("ELLE_LOG_TIME", "1", true);
