@@ -11,6 +11,9 @@ build = None
 install = None
 check = None
 
+with open(str(drake.path_source('../elle/drake-utils.py')), 'r') as f:
+  exec(f.read(), globals(), globals())
+
 def architecture_dictionary(cxx_toolkit):
   if cxx_toolkit.architecture == drake.architecture.x86_64:
     return {"architecture": "64"}
@@ -226,6 +229,68 @@ def configure(cxx_toolkit = None,
   check = drake.Rule('check')
 
   if cxx_toolkit.os == drake.os.windows:
+    ## ------------ ##
+    ## Osslsigncode ##
+    ## ------------ ##
+    ## Osslsigncode is a tool to sign executables.
+    osslsigncode_version = drake.Version(1, 7, 1)
+    osslsigncode_basename = 'osslsigncode-%s' % osslsigncode_version
+    osslsigncode_url = \
+      'http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/%s.tar.gz' % osslsigncode_basename
+    osslsigncode_tarball = \
+      drake.node('osslsigncode/%s.tar.gz' % osslsigncode_basename)
+    osslsigncode_configure = \
+      drake.node('osslsigncode/%s/configure' % osslsigncode_basename)
+    osslsigncode_prefix = drake.path_build('osslsigncode')
+    osslsigncode_prefix_absolute = drake.path_root() / osslsigncode_prefix
+    osslsigncode = drake.node('osslsigncode/bin/osslsigncode')
+    drake.HTTPDownload(
+      osslsigncode_url,
+      osslsigncode_tarball,
+    )
+    drake.TarballExtractor(
+      osslsigncode_tarball,
+      targets = ['%s/configure' % osslsigncode_basename],
+    )
+    print(cxx_toolkit.cxx)
+    GNUBuilder(
+      cxx_toolkit,
+      configure = osslsigncode_configure,
+      configure_args = [
+        '--prefix=%s' % osslsigncode_prefix_absolute,
+        # Use our own openssl & curl.
+      ],
+      targets = [osslsigncode],
+      sources = [],
+    )
+
+    class Signer(drake.Builder):
+
+      def __init__(self, source, to):
+        """Create a signer.
+
+        source -- Node to sign.
+        to     -- Destination path.
+        """
+        self.__source = source
+        self.__target = source.clone(to.canonize())
+        drake.Builder.__init__(self, [self.__source], [self.__target])
+
+      @property
+      def command(self):
+        return [str(osslsigncode.path()),
+                '-spc', str(drake.Node('fist-gui-qt/resources/authenticode.spc').path()),
+                '-key', str(drake.Node('fist-gui-qt/resources/authenticode.key').path()),
+                '-t', 'http://timestamp.verisign.com/scripts/timstamp.dll',
+                '-in', str(self.__source.path()),
+                '-out', str(self.__target.path())]
+
+      def execute(self):
+        """Run the command given at construction time."""
+        command = self.command
+        print(command)
+        return self.cmd(' '.join(command), command)
+
 
     nsis_includes = drake.nodes('NSIS/nsProcess.nsh',
                                 'NSIS/utils.nsh',
@@ -253,7 +318,8 @@ def configure(cxx_toolkit = None,
         lambda x: drake.copy(x,
                              installer_resources_folder.name().basename(),
                              strip_prefix = True),
-        installer_resources + [application] + dynamic_libraries)) + nsis_plugins + nsis_includes
+        installer_resources + dynamic_libraries)) + nsis_plugins + nsis_includes
+    installer_resources += Signer(application, installer_resources_folder.path() / 'infinit.exe').targets()
 
     content = {
         'company': 'Infinit.io',
@@ -300,13 +366,16 @@ def configure(cxx_toolkit = None,
       },
     )
 
+    installer = Signer(drake.Node('bin/installer.exe'),
+                       drake.Node('bin/Infinit_Installer.exe').path()).targets()[0]
+
     with templating_context:
       update = drake.node('update.xml.tmpl')
 
     def install_nodes(where, f = drake.install):
       where = drake.Path(where)
       res = []
-      res.append(f(drake.Node('bin/installer.exe'), where, strip_prefix = True))
+      res.append(f(installer, where, strip_prefix = True))
       res.append(f(drake.Node('update.xml'), where))
       return res
 
