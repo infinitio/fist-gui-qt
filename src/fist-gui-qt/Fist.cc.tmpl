@@ -68,32 +68,7 @@ class Fist::Prologue
   Prologue()
   {
 #ifdef FIST_PRODUCTION_BUILD
-    elle::os::setenv("INFINIT_CRASH_DEST", "crash@infinit.io", true);
-
-    if (!elle::os::inenv("ELLE_LOG_LEVEL"))
-    {
-      ELLE_DEBUG("set ELLE_LOG_LEVEL");
-      elle::os::setenv(
-        "ELLE_LOG_LEVEL",
-          "*trophonius*:TRACE,"
-          "*meta*:TRACE,"
-          "surface.gap.*:TRACE,"
-          "surface.gap.TransferMachine:DEBUG,"
-          "reactor.fsm.*:TRACE,"
-          "frete.Frete:TRACE,"
-          "station.Station:DEBUG,"
-          "infinit.surface.gap.Rounds:DEBUG,"
-          "reactor.http.Request.bugofdoom:DUMP,"
-          "*FIST*:TRACE,"
-          "*FIST.State*:DEBUG,"
-          "elle.CrashReporter:DEBUG",
-        true);
-      elle::os::setenv("ELLE_LOG_TIME", "1", true);
-      elle::os::setenv("ELLE_LOG_DISPLAY_TYPE", "1", true);
-      elle::os::setenv("ELLE_LOG_TID", "1", true);
-      elle::os::setenv("ELLE_LOG_PID", "1", true);
-    }
-
+    elle::os::setenv("INFINIT_CRASH_DEST", "crash@infinit.io", false);
     if (!elle::os::inenv("INFINIT_LOG_FILE") && !elle::os::inenv("ELLE_LOG_FILE"))
     {
       logger.reset(
