@@ -289,9 +289,7 @@ def configure(cxx_toolkit = None,
       def execute(self):
         """Run the command given at construction time."""
         command = self.command
-        print(command)
         return self.cmd(' '.join(command), command)
-
 
     nsis_includes = drake.nodes('NSIS/nsProcess.nsh',
                                 'NSIS/utils.nsh',
@@ -320,7 +318,9 @@ def configure(cxx_toolkit = None,
                              installer_resources_folder.name().basename(),
                              strip_prefix = True),
         installer_resources + dynamic_libraries)) + nsis_plugins + nsis_includes
-    installer_resources += Signer(application, installer_resources_folder.path() / 'infinit.exe').targets()
+    signed_app = Signer(application,
+                        installer_resources_folder.name() / 'Infinit.exe').targets()[0]
+    installer_resources += [signed_app]
 
     content = {
         'company': 'Infinit.io',
@@ -330,7 +330,7 @@ def configure(cxx_toolkit = None,
         # Resources.
         'resources_folder':
           str(drake.path_build(installer_resources_folder.name())),
-        'executable': str(application.name().basename()),
+        'executable': str(signed_app.name().basename()),
         'libraries':
           list(map(lambda lib: str(lib.name().basename()), dynamic_libraries)),
         'icon': 'icon.ico',
@@ -345,30 +345,30 @@ def configure(cxx_toolkit = None,
     }
     content.update(architecture_dictionary(cxx_toolkit))
     templating_context = drake.templating.Context(content = content)
-    nsi_context = drake.nsis.Context(target = 'bin/installer.exe',
+    nsi_context = drake.nsis.Context(target = 'bin/unsigned_installer.exe',
                                      resources = installer_resources)
     with nsi_context:
       with templating_context:
         installer = drake.nodes('installer.nsi.tmpl')
-    import os
 
     def set_size(context, target):
       context['size'] = os.path.getsize(str(target.path()))
 
     content = {
-        'version': git.description(),
-      }
+      'version': git.description(),
+    }
     content.update(architecture_dictionary(cxx_toolkit))
+    installer = Signer(
+      drake.Node('bin/unsigned_installer.exe'),
+      drake.Path('bin/Infinit_Installer.exe')).targets()[0]
+
     templating_context = drake.templating.Context(
       content = content,
-      sources = [ drake.Node('bin/installer.exe'), ],
+      sources = [ installer, ],
       hooks = {
-        drake.Node('bin/installer.exe'): [ set_size, ]
+        installer: [ set_size, ]
       },
     )
-
-    installer = Signer(drake.Node('bin/installer.exe'),
-                       drake.Node('bin/Infinit_Installer.exe').path()).targets()[0]
 
     with templating_context:
       update = drake.node('update.xml.tmpl')
