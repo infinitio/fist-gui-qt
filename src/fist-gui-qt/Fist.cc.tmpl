@@ -194,15 +194,24 @@ Fist::quit()
 void
 Fist::_initialize_login_window(bool prefill_fields)
 {
+  ELLE_TRACE_SCOPE("%s: initialize login window", *this);
   this->_login_window.reset(new LoginWindow(*this->_state, prefill_fields));
+  // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
+  // If no update is available, try to auto login.
+  connect(this->_updater.get(), SIGNAL(no_update_available()),
+          this->_login_window.get(), SLOT(try_auto_login()));
+  // Forward updater error to login window.
   connect(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
           this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
+  // Display version.
   connect(this->_updater.get(), SIGNAL(no_update_available()),
           this->_login_window.get(), SLOT(set_version()));
+  // Force version checking if the current has been rejected by meta.
   connect(this->_login_window.get(), SIGNAL(version_rejected()),
           this->_updater.get(), SLOT(check_for_updates()));
+  // Notify fist when login is successful.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));
   ELLE_DEBUG("show login window");
@@ -214,17 +223,20 @@ int
 Fist::operator ()()
 {
   ELLE_TRACE_SCOPE("%s: run application", *this);
-
   auto update_url = elle::os::getenv(
     "FIST_UPDATE_FILE",
     "http://download.infinit.io/windows/${architecture}/update.xml");
   this->_updater.reset(new Updater(QString::fromStdString(update_url), this));
+  // Handle quit from updater.
   connect(this->_updater.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
+  // Automatically realign update dialog.
   connect(this->_updater->loading_dialog(), SIGNAL(resized()),
           this, SLOT(_reposition_dialog()));
-  this->_initialize_login_window(true);
-  this->_updater->check_for_updates();
+  ELLE_DEBUG("initialize login window")
+    this->_initialize_login_window(true);
+  ELLE_DEBUG("check for updates")
+    this->_updater->check_for_updates();
   return this->_application->exec();
 }
 
@@ -252,8 +264,8 @@ Fist::_set_lock()
   // but it will stay.
   // - On Windows two local servers can listen to the same pipe at the same
   // time, but any connections will go to one of the server.
-  // So if your connection is accepted, the other one will write so a lovely
-  // message to make you kill yourself.
+  // So if your connection is accepted, the other one will write in the socket
+  // a lovely message to ask you to kill yourself.
   // Otherwise, if the socket did connect to any server, that means you are
   // the only instance. So, first step is to delete the lock file (to make sure
   // to have ownership of the server name) and listen for future connection in
