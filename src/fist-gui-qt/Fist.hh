@@ -66,7 +66,8 @@ public slots:
 
   // Logout the user, spawing a new state and showing the login window.
   void
-  logout(bool kicked_out = false);
+  logout(bool kicked_out = false,
+         bool final = false);
 
   // This handle the process of killing the application.
   void

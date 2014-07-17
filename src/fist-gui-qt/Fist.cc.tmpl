@@ -164,7 +164,9 @@ void
 Fist::about_to_quit()
 {
   ELLE_TRACE_SCOPE("%s: run cleaning operations", *this);
-  this->logout();
+  auto kicked = false;
+  auto final = true;
+  this->logout(kicked, final);
   ELLE_DEBUG("cleaning done");
 }
 
@@ -389,7 +391,8 @@ Fist::_clear()
 }
 
 void
-Fist::logout(bool kicked_out)
+Fist::logout(bool kicked_out,
+             bool final)
 {
   ELLE_TRACE_SCOPE("%s: logout", *this);
   if (this->_dock)
@@ -399,7 +402,7 @@ Fist::logout(bool kicked_out)
     // the component, causing a segfault.
     if (kicked_out)
       connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_kicked_out_reset()));
-    else
+    else if (!final)
       connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_reset()));
     this->_dock.release()->deleteLater();
     this->_clear();
