@@ -214,9 +214,6 @@ LoginWindow::LoginWindow(fist::State& state,
           this, SLOT(_login_attempt()));
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   this->update();
-
-  if (!this->_password_field->text().isEmpty())
-    this->_login();
 }
 
 LoginWindow::~LoginWindow()
@@ -283,6 +280,13 @@ LoginWindow::_disable()
   this->_email_field->setDisabled(true);
   this->_password_field->setDisabled(true);
 
+}
+
+void
+LoginWindow::try_auto_login()
+{
+  if (!this->_password_field->text().isEmpty())
+    this->_login();
 }
 
 void

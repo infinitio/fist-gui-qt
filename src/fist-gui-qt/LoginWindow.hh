@@ -45,6 +45,10 @@ private slots:
   void
   _login_attempt();
 
+public slots:
+  void
+  try_auto_login();
+
 Q_SIGNALS:
   void
   logged_in();
