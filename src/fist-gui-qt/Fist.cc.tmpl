@@ -46,9 +46,9 @@ ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 // is to add a global pointer to the dock and makes it emit the signal.
 Fist* g_fist = nullptr;
 
-static std::unique_ptr<infinit::fist::log::Selector> logger;
 namespace
 {
+  static std::unique_ptr<infinit::fist::log::Selector> logger;
   static
   void
   remove_current_log()
@@ -56,7 +56,9 @@ namespace
     if (elle::os::inenv("INFINIT_LOG_FILE"))
     {
       if (logger)
+      {
         logger->remove_current_log();
+      }
     }
   }
 }
@@ -104,18 +106,9 @@ gap_state()
 #endif
 }
 
-Fist::StatePtr
-Fist::_new_state()
-{
-  std::unique_ptr<fist::State> state(new fist::State(gap_state()));
-  connect(state.get(), SIGNAL(critical_failure(QString const&)),
-          this, SLOT(_kicked_out()));
-  return state;
-}
-
 Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
-  _state(_new_state()),
+  _state(nullptr),
   _lock(nullptr),
   _filelock(
     QString::fromStdString(
@@ -127,17 +120,35 @@ Fist::Fist(int argc, char** argv):
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
   g_fist = this;
-  gap_kicked_out_callback(this->_state->state(), Fist::_kicked_out_callback);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
-  if (!this->_set_lock())
+  if (!this->_set_uniqunness_guard())
     throw elle::Exception("unable to set lock");
+  // We have to create a state here because crash report need a
+  // state to be ran.
+  this->_initialize_state();
+  this->_put_lock_file();
   this->_initialize_application();
 }
 
 Fist::~Fist()
 {
   ELLE_TRACE_SCOPE("%s: destruction", *this);
+}
+
+void
+Fist::_initialize_state()
+{
+  // Destroy previous state first.
+  this->_state.reset();
+
+  std::unique_ptr<fist::State> state(new fist::State(gap_state()));
+  connect(state.get(), SIGNAL(critical_failure(QString const&)),
+          this, SLOT(_kicked_out()));
+  gap_kicked_out_callback(state->state(),
+                          Fist::_kicked_out_callback);
+
+  this->_state = std::move(state);
 }
 
 void
@@ -197,6 +208,7 @@ void
 Fist::_initialize_login_window(bool prefill_fields)
 {
   ELLE_TRACE_SCOPE("%s: initialize login window", *this);
+  ELLE_ASSERT(this->_state != nullptr);
   this->_login_window.reset(new LoginWindow(*this->_state, prefill_fields));
   // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
@@ -243,20 +255,19 @@ Fist::operator ()()
 }
 
 bool
-Fist::_set_lock()
+Fist::_set_uniqunness_guard()
 {
-  ELLE_TRACE_SCOPE("%s: set lock", *this);
-
+  ELLE_TRACE_SCOPE("%s: set uniqueness guard", *this);
   auto locked = [this] () -> bool
     {
-      ELLE_DEBUG("another instance is running");
-      this->about_to_quit();
-      this->quit();
+      ELLE_TRACE("another instance is running");
       ELLE_DEBUG("clean current log")
+      {
+        ELLE_ASSERT(this->_state == nullptr);
         remove_current_log();
+      }
       return false;
     };
-
   // Strategy to have one instance running:
   // The first one create a socket and try to connect to a server named
   // *lock_name*. If he received no answer that means that probably no server is
@@ -301,7 +312,12 @@ Fist::_set_lock()
           this, SLOT(_new_local_socket_connection()));
   ELLE_DEBUG("listen for other instances")
     this->_lock->listen(lock_name);
+  return true;
+}
 
+void
+Fist::_put_lock_file()
+{
   // Now that we ensured that we are the only one instance running, let check if
   // our lock file is present. If it's the case, that means previous session
   // crashed (or has been ctrl - c).
@@ -340,7 +356,6 @@ Fist::_set_lock()
     this->_filelock.open(QIODevice::WriteOnly);
     this->_filelock.setPermissions(QFile::ReadOwner);
   }
-  return true;
 }
 
 void
@@ -361,9 +376,15 @@ Fist::_new_local_socket_connection()
 {
   ELLE_TRACE_SCOPE("%s: someone attempting to connect", *this);
   if (this->_dock)
+  {
+    ELLE_DEBUG("show dock");
     this->_dock->show();
+  }
   else if (this->_login_window)
+  {
+    ELLE_DEBUG("give login window the focus");
     this->_login_window->setFocus();
+  }
   auto socket = this->_lock->nextPendingConnection();
   std::string death{"kill your self"};
   ELLE_DEBUG("send suicide order")
@@ -379,6 +400,7 @@ Fist::_kicked_out_callback()
 void
 Fist::_clear()
 {
+  ELLE_TRACE_SCOPE("%s: clear everything", *this);
   ELLE_DEBUG("clear gui")
   {
     this->_login_window.reset();
@@ -394,7 +416,10 @@ void
 Fist::logout(bool kicked_out,
              bool final)
 {
-  ELLE_TRACE_SCOPE("%s: logout", *this);
+  ELLE_TRACE_SCOPE("%s: logout (%s%s)",
+                   *this,
+                   (kicked_out ? "kicked out" : "manual"),
+                   (final ? " to quit app" : ""));
   if (this->_dock)
   {
     // deleteLater is used there because the initiator of the logout is a
@@ -409,6 +434,7 @@ Fist::logout(bool kicked_out,
   }
   else
   {
+    ELLE_DEBUG("dock not created");
     this->_clear();
     this->_reset(kicked_out);
   }
@@ -423,9 +449,11 @@ Fist::_kicked_out_reset()
 void
 Fist::_reset(bool kicked_out)
 {
+  ELLE_TRACE_SCOPE("%s: reset app (%s)",
+                   *this, (kicked_out ? "kicked out" : "manual"));
   ELLE_DEBUG("reset state")
   {
-    this->_state.reset(new fist::State(gap_state()));
+    this->_initialize_state();
   }
   ELLE_DEBUG("reset gui")
   {
@@ -448,6 +476,11 @@ void
 Fist::_kicked_by_another_instance()
 {
   ELLE_TRACE_SCOPE("%s: kicked by an other instance", *this);
+  // About to quit will destroy the state.
+  this->about_to_quit();
+  // If the state is not null, the log file will be busy and
+  // we will not be able to delete it.
+  ELLE_ASSERT(this->_state == nullptr);
   remove_current_log();
   this->quit();
 }

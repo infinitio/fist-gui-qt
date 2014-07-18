@@ -43,18 +43,27 @@ private:
 | Initialization |
 `---------------*/
 private:
+
+  void
+  _initialize_state();
+
   void
   _initialize_application();
 
   void
   _initialize_login_window(bool kicked_out = false);
 
-  // Create a new state.
-  StatePtr
-  _new_state();
-
+  // Try to set a lock using QLocalServer as a guard mechanism.
+  // Return false if the lock couldn't be set.
   bool
-  _set_lock();
+  _set_uniqunness_guard();
+
+  // Write a lock file in the .infinit folder.
+  // This lock is used to detect if a previous instance of the app crashed.
+  // If a lock is already present, this function will send a crash report.
+  void
+  _put_lock_file();
+
 /*------------------.
 | Desinitialization |
 `------------------*/
