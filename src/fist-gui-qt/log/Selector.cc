@@ -37,12 +37,13 @@ namespace infinit
       bool
       Selector::remove_current_log() const
       {
+        ELLE_TRACE_SCOPE("%s: remove current log: %s", *this, this->_log_file);
         if (this->_log_file.empty())
           return true;
-
         QFile irrelevant(QString::fromStdString(this->_log_file));
         irrelevant.close();
-
+        if (!irrelevant.exists())
+          ELLE_DEBUG("irrelevant log doesn't exist");
         if (!irrelevant.remove())
         {
           ELLE_WARN("impossible to remove log (%s): %s",
