@@ -26,6 +26,7 @@ class Fist:
 public:
   Fist(int argc, char** argv);
   Fist(QApplication&& application);
+  virtual
   ~Fist();
 
 /*---------.

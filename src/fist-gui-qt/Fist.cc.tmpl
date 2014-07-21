@@ -179,6 +179,7 @@ Fist::about_to_quit()
   auto final = true;
   this->logout(kicked, final);
   ELLE_DEBUG("cleaning done");
+  ELLE_ASSERT(this->_state == nullptr);
 }
 
 void
@@ -198,7 +199,7 @@ Fist::quit()
       this->_updater->loading_dialog()->close();
       this->_updater.reset();
     }
-
+  this->about_to_quit();
   this->_application->setQuitOnLastWindowClosed(true);
   ELLE_LOG("quit")
     this->_application->quit();
@@ -426,16 +427,16 @@ Fist::logout(bool kicked_out,
     // component of the dock. _clear method will destroy the dock and so destroy
     // the component, causing a segfault.
     if (kicked_out)
-      connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_kicked_out_reset()));
+      connect(this->_dock.get(), SIGNAL(destroyed()),
+              this, SLOT(_kicked_out_reset()));
     else if (!final)
       connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_reset()));
     this->_dock.release()->deleteLater();
-    this->_clear();
   }
-  else
+  this->_clear();
+  if (kicked_out)
   {
     ELLE_DEBUG("dock not created");
-    this->_clear();
     this->_reset(kicked_out);
   }
 }
@@ -451,6 +452,7 @@ Fist::_reset(bool kicked_out)
 {
   ELLE_TRACE_SCOPE("%s: reset app (%s)",
                    *this, (kicked_out ? "kicked out" : "manual"));
+  this->_clear();
   ELLE_DEBUG("reset state")
   {
     this->_initialize_state();

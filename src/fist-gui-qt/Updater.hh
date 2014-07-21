@@ -25,6 +25,9 @@ public:
             QString("http://www.infinit.io/files/windows/update.json"),
           QObject* parent = nullptr);
 
+  virtual
+  ~Updater() = default;
+
 public Q_SLOTS:
   // Run the update.
   // Will close the application.
