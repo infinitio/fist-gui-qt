@@ -354,6 +354,13 @@ def configure(cxx_toolkit = None,
     def set_size(context, target):
       context['size'] = os.path.getsize(str(target.path()))
 
+    def set_updater_hash(context, target):
+      import hashlib
+      hasher = hashlib.sha1()
+      with open(str(target.path()), 'rb') as f:
+        hasher.update(f.read())
+      context['hash'] = hasher.hexdigest()
+
     content = {
       'version': git.description(),
     }
@@ -366,7 +373,7 @@ def configure(cxx_toolkit = None,
       content = content,
       sources = [ installer, ],
       hooks = {
-        installer: [ set_size, ]
+        installer: [ set_size, set_updater_hash ]
       },
     )
 
