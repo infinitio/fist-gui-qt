@@ -3,20 +3,6 @@
 ;------------------------------------------------------------------------------
 
 ;------------------------------------------------------------------------------
-; Kill running application if any.
-;!include nsProcess.nsh
-Function KillRunningProcess
-    Pop $0
-    ${nsProcess::FindProcess} $0 $R0
-    StrCmp $R0 0 0 end
-    ${nsProcess::CloseProcess} $0 $R0
-    StrCmp $R0 0 end 0
-    MessageBox MB_OK "Unable to kill $0"
-    end:
-      ${nsProcess::Unload}
-FunctionEnd
-
-;------------------------------------------------------------------------------
 ; Run application with dropped privileges.
 ;!include WinVer.nsh
 Function RunExecutable

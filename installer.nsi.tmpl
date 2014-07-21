@@ -70,6 +70,42 @@ DirText "Choose the install directory"
 UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
+;------------------------------------------------------------------------------
+; Kill running application if any.
+; XXX: Should be move in util and take executable as parameter.
+; XXX: Impossible to call KillRunningProcess from the uninstall section,
+;      so function has been duplicated. As ns::Process can do it, investigate
+;      to remove useless code duplication.
+;!include nsProcess.nsh
+Function KillRunningProcess
+    ${'${nsProcess::FindProcess}'} ${executable} $R0
+    StrCmp $R0 0 0 end
+
+    ${'${nsProcess::CloseProcess}'} ${executable} $R0
+    IfSilent end
+    StrCmp $R0 0 end 0      ; Success
+    StrCmp $R0 603 end 0    ; Not running
+    goto end
+
+    end:
+    ${'${nsProcess::Unload}'}
+FunctionEnd
+
+Function un.KillRunningProcess
+    ${'${nsProcess::FindProcess}'} ${executable} $R0
+    StrCmp $R0 0 0 end
+
+    ${'${nsProcess::CloseProcess}'} ${executable} $R0
+    IfSilent end
+    StrCmp $R0 0 end 0      ; Success
+    StrCmp $R0 603 end 0    ; Not running
+    goto end
+
+    end:
+    ${'${nsProcess::Unload}'}
+FunctionEnd
+;------------------------------------------------------------------------------
+
 Function .onInit
   Call KillRunningProcess
   Call CheckArchitecture
@@ -252,6 +288,7 @@ SectionEnd
 ;------------------------------------------------------------------------------
 
 Section "un.install"
+  Call un.KillRunningProcess
   ;; Registers
   DeleteRegKey HKLM "${'${uninstkey}'}"
   DeleteRegKey HKLM "${'${regkey}'}"
