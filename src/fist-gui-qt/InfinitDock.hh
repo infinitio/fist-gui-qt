@@ -55,6 +55,10 @@ signals:
   void
   logout_request();
 
+private slots:
+  void
+  _on_logout();
+
 public:
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
@@ -126,7 +130,7 @@ private:
 private:
   void _switch_view(Panel* target);
 
-  ELLE_ATTRIBUTE(MainPanel*, transaction_panel);
+  ELLE_ATTRIBUTE(std::unique_ptr<MainPanel>, transaction_panel);
 //  RoundShadowWidget* _panel;
 
 private Q_SLOTS:
@@ -136,7 +140,10 @@ private Q_SLOTS:
                    QSystemTrayIcon::MessageIcon icon);
 
 private:
-  fist::sendview::Panel* _send_panel;
+  ELLE_ATTRIBUTE(std::unique_ptr<fist::sendview::Panel>, send_panel);
+
+  fist::sendview::Panel&
+  send_panel() const;
 
   Panel* _next_panel;
 

@@ -34,7 +34,7 @@ namespace fist
   public:
     State(gap_State* state);
     virtual
-    ~State() = default;
+    ~State();
     // Handle gap destruction automatically.
     struct GapDeleter
     {
@@ -196,7 +196,7 @@ namespace fist
       > Links;
     ELLE_ATTRIBUTE_R(Links, links);
     ELLE_ATTRIBUTE_Rw(unsigned int, active_links);
-
+    ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, poll_timer);
   public:
     model::Link const&
     link(uint32_t id);

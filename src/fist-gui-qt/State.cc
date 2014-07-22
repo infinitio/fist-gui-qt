@@ -31,8 +31,17 @@ namespace fist
     gap_free(state);
   }
 
-  State::State(gap_State* state):
-    _state(state)
+  State::State(gap_State* state)
+    : _state(state)
+    , _users()
+    , _search_future()
+    , _search_watcher()
+    , _last_results()
+    , _transactions()
+    , _active_transactions()
+    , _links()
+    , _active_links()
+    , _poll_timer(new QTimer)
   {
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
@@ -45,6 +54,15 @@ namespace fist
 
     connect(&this->_search_watcher, SIGNAL(finished()),
             this, SLOT(_on_results_ready()));
+  }
+
+  State::~State()
+  {
+    ELLE_DEBUG_SCOPE("%s: destruction", *this);
+    ELLE_DEBUG("destroy poll timer")
+      this->_poll_timer.reset();
+    ELLE_DEBUG("cancel search")
+      this->cancel_search();
   }
 
   void
@@ -85,9 +103,8 @@ namespace fist
 
     ELLE_DEBUG("start the update loop")
     {
-      QTimer *timer = new QTimer(this);
-      connect(timer, SIGNAL(timeout()), this, SLOT(_poll()));
-      timer->start(1000);
+      connect(this->_poll_timer.get(), SIGNAL(timeout()), this, SLOT(_poll()));
+      this->_poll_timer->start(1000);
     }
   }
 
@@ -202,9 +219,7 @@ namespace fist
         else
           return gap_users_search(this->state(), text.c_str());
       });
-
     this->_search_watcher.setFuture(this->_search_future);
-
     return this->swaggers(filter);
   }
 
@@ -245,6 +260,7 @@ namespace fist
   void
   State::_on_results_ready()
   {
+    ELLE_TRACE_SCOPE("%s: results ready", *this);
     this->_last_results.clear();
     auto const& future = this->_search_watcher.future();
     if (future.constBegin() != future.constEnd())
@@ -253,7 +269,6 @@ namespace fist
     }
     else
     {
-      this->_last_results.clear();
       ELLE_DEBUG("future empty");
     }
     emit results_ready();

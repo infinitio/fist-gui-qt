@@ -24,7 +24,7 @@ class TransactionWidget:
 public:
   TransactionWidget(fist::model::Transaction const& model);
   virtual
-  ~TransactionWidget() = default;
+  ~TransactionWidget();
 
 /*-----------.
 | Properties |

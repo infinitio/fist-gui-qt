@@ -146,6 +146,16 @@ TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
   this->update();
 }
 
+TransactionWidget::~TransactionWidget()
+{
+  ELLE_DEBUG_SCOPE("%s: destuction", *this);
+  if (this->_progress_timer)
+  {
+    ELLE_DEBUG("destroy timer")
+      this->_progress_timer.reset();
+  }
+}
+
 bool
 TransactionWidget::eventFilter(QObject *obj, QEvent *event)
 {

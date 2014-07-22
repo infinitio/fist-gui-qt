@@ -128,26 +128,26 @@ namespace fist
         send_button, "To send a file, click here", Qt::AlignLeft);
       connect(send_button, SIGNAL(clicked()),
               this->_tooltip.get(), SLOT(hide()));
-      connect(this->_dock->_send_panel, SIGNAL(shown()),
+      connect(&this->_dock->send_panel(), SIGNAL(shown()),
               this, SLOT(_on_send_panel_visible()));
     }
 
     void
     Onboarder::_on_send_panel_visible()
     {
-      auto* widget = this->_dock->_send_panel;
+      auto& send_panel = this->_dock->send_panel();
 
-      disconnect(this->_dock->_send_panel, SIGNAL(shown()),
+      disconnect(&send_panel, SIGNAL(shown()),
                  this, SLOT(_on_send_panel_visible()));
 
       this->_choose_peer();
-      connect(widget->users(), SIGNAL(peer_found()),
+      connect(send_panel.users(), SIGNAL(peer_found()),
               this, SLOT(_on_peer_chosen()));
-      connect(widget->file_adder(), SIGNAL(file_added()),
+      connect(send_panel.file_adder(), SIGNAL(file_added()),
               this, SLOT(_on_file_added_before_peer()));
-      connect(widget, SIGNAL(sent()),
+      connect(&send_panel, SIGNAL(sent()),
               this, SLOT(_send_onboarding_done()));
-      connect(widget, SIGNAL(canceled()),
+      connect(&send_panel, SIGNAL(canceled()),
               this, SLOT(_send_onboarding_done()));
     }
 
@@ -155,7 +155,7 @@ namespace fist
     Onboarder::_choose_peer()
     {
       this->_set_tooltip(
-        this->_dock->_send_panel->users()->search_field(),
+        this->_dock->send_panel().users()->search_field(),
         "Search for a friend using\n"
         "his fullname or nickname.",
         Qt::AlignLeft);
@@ -164,15 +164,15 @@ namespace fist
     void
     Onboarder::_on_peer_chosen()
     {
-      auto* send_panel = this->_dock->_send_panel;
-      if (send_panel->file_adder()->files().isEmpty())
+      auto& send_panel = this->_dock->send_panel();
+      if (send_panel.file_adder()->files().isEmpty())
       {
         this->_set_tooltip(
-          send_panel->file_adder(),
+          send_panel.file_adder(),
           "Add files by clicking the icon.\n"
           "You can also drop them on that window.",
           Qt::AlignLeft);
-        connect(send_panel->file_adder(), SIGNAL(clicked()),
+        connect(send_panel.file_adder(), SIGNAL(clicked()),
                 this->_tooltip.get(), SLOT(hide()));
       }
       else
@@ -181,34 +181,34 @@ namespace fist
         this->_on_file_added_before_peer();
       }
 
-      disconnect(send_panel->users(), SIGNAL(peer_found()),
+      disconnect(send_panel.users(), SIGNAL(peer_found()),
                  this, SLOT(_on_peer_chosen()));
-      disconnect(send_panel->file_adder(), SIGNAL(file_added()),
+      disconnect(send_panel.file_adder(), SIGNAL(file_added()),
                  this, SLOT(_on_file_added_before_peer()));
-      connect(send_panel->file_adder(), SIGNAL(file_added()),
+      connect(send_panel.file_adder(), SIGNAL(file_added()),
               this, SLOT(_on_transaction_ready()));
     }
 
     void
     Onboarder::_on_file_added()
     {
-      auto* send_panel = this->_dock->_send_panel;
+      auto& send_panel = this->_dock->send_panel();
       this->_on_transaction_ready();
-      connect(send_panel->footer()->send(), SIGNAL(clicked()),
+      connect(send_panel.footer()->send(), SIGNAL(clicked()),
               this->_tooltip.get(), SLOT(hide()));
     }
 
     void
     Onboarder::_on_file_added_before_peer()
     {
-      auto* send_panel = this->_dock->_send_panel;
+      auto& send_panel = this->_dock->send_panel();
       this->_set_tooltip(
-        send_panel->file_adder(),
+        send_panel.file_adder(),
         "Oh, you already get how to add files!",
         Qt::AlignLeft,
         1500);
 
-      if (send_panel->users()->peer_valid())
+      if (send_panel.users()->peer_valid())
       {
         connect(this->_tooltip.get(), SIGNAL(hidden()),
                 this, SLOT(_on_transaction_ready()));
@@ -219,37 +219,37 @@ namespace fist
                 this, SLOT(_choose_peer()));
       }
 
-      disconnect(send_panel, SIGNAL(file_added()),
+      disconnect(&send_panel, SIGNAL(file_added()),
                  this, SLOT(_on_file_added_before_peer()));
-      connect(send_panel, SIGNAL(peer_found()),
+      connect(&send_panel, SIGNAL(peer_found()),
               this, SLOT(_on_transaction_ready()));
     }
 
     void
     Onboarder::_on_transaction_ready()
     {
-      auto* send_panel = this->_dock->_send_panel;
+      auto& send_panel = this->_dock->send_panel();
       this->_set_tooltip(
-        send_panel->footer()->send(),
+        send_panel.footer()->send(),
         "If everything is ready, click here.",
         Qt::AlignLeft);
-      disconnect(send_panel, SIGNAL(file_added()),
+      disconnect(&send_panel, SIGNAL(file_added()),
                  this, SLOT(_on_transaction_ready()));
-      disconnect(send_panel, SIGNAL(peer_found()),
+      disconnect(&send_panel, SIGNAL(peer_found()),
                  this, SLOT(_on_transaction_ready()));
     }
 
     void
     Onboarder::_send_onboarding_done()
     {
-      auto* send_panel = this->_dock->_send_panel;
-      disconnect(send_panel, SIGNAL(peer_found()),
+      auto& send_panel = this->_dock->send_panel();
+      disconnect(&send_panel, SIGNAL(peer_found()),
                  this, SLOT(_on_peer_chosen()));
-      disconnect(send_panel, SIGNAL(file_added()),
+      disconnect(&send_panel, SIGNAL(file_added()),
                  this, SLOT(_on_file_added_before_peer()));
-      disconnect(send_panel, SIGNAL(sent()),
+      disconnect(&send_panel, SIGNAL(sent()),
                  this, SLOT(_send_onboarding_done()));
-      disconnect(send_panel, SIGNAL(canceled()),
+      disconnect(&send_panel, SIGNAL(canceled()),
                  this, SLOT(_send_onboarding_done()));
       emit sending_completed();
     }
