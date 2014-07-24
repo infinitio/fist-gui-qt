@@ -1,5 +1,5 @@
-#ifndef UPDATER_HH
-# define UPDATER_HH
+#ifndef FIST_GUI_QT_UPDATER_HH
+# define FIST_GUI_QT_UPDATER_HH
 
 # include <memory>
 
@@ -22,17 +22,21 @@ class Updater:
 {
 public:
   Updater(QUrl const& version_url =
-            QString("http://www.infinit.io/files/windows/update.json"),
+            QString("http://www.download.infinit.io/windows/32/update.xml"),
           QObject* parent = nullptr);
 
   virtual
   ~Updater() = default;
 
 public Q_SLOTS:
+  // Start update download.
+  void
+  download_update();
+
   // Run the update.
   // Will close the application.
   void
-  update();
+  run_installer();
 
 private:
   void
@@ -47,10 +51,15 @@ private:
   void
   _check_if_up_to_date(QNetworkReply* reply);
 
+private slots:
+  void
+  _remove_old_installer();
+
 Q_SIGNALS:
   // Signal that an update is available.
   void
-  update_available(bool mandatory);
+  update_available(bool mandatory,
+                   QString const& changelog);
 
   // Signal that no update is available.
   void
@@ -64,6 +73,19 @@ Q_SIGNALS:
   void
   update_error(QString const& message,
                QString const& detail);
+
+  // Signal update download progression.
+  void
+  download_progress(qint64 progress,
+                    qint64 total);
+
+  // Signal when the updater is ready to be used.
+  void
+  installer_ready();
+
+private slots:
+  void
+  _set_installer_downloaded();
 
 private Q_SLOTS:
   void
@@ -81,14 +103,31 @@ Q_SIGNALS:
 
 
 private:
-  ELLE_ATTRIBUTE(QUrl, version_url);
+  ELLE_ATTRIBUTE(QUrl, version_file_url);
   ELLE_ATTRIBUTE(QUrl, updater_url);
 
   ELLE_ATTRIBUTE(QDir, installer_folder);
   ELLE_ATTRIBUTE(std::unique_ptr<QFile>, installer);
   ELLE_ATTRIBUTE_X(LoadingDialog*, loading_dialog);
   ELLE_ATTRIBUTE(QNetworkAccessManager*, network_manager);
-  ELLE_ATTRIBUTE(std::unique_ptr<QNetworkReply>, reply);
+  ELLE_ATTRIBUTE_R(QString, changelog);
+  /*
+    * From QNetworkAccessManager docs about request destruction *
+    Note: After the request has finished, it is the responsibility of the user
+    to delete the QNetworkReply object at an appropriate time. Do not directly
+    delete it inside the slot connected to finished(). You can use
+    the deleteLater() function.
+  */
+  struct NetworkReplyLaterDeleter
+  {
+    void
+    operator () (QNetworkReply* reply) const;
+  };
+  typedef
+    std::unique_ptr<QNetworkReply, NetworkReplyLaterDeleter> NetworkReplyPtr;
+  ELLE_ATTRIBUTE(NetworkReplyPtr, reply);
+  ELLE_ATTRIBUTE(QTimer*, check_for_update_timer);
+  ELLE_ATTRIBUTE_R(bool, installer_downloaded);
 /*----------.
 | Printable |
 `----------*/

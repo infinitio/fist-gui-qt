@@ -14,10 +14,18 @@
 #include <QVBoxLayout>
 #include <QXmlStreamReader>
 
-#include <elle/log.hh>
-#include <elle/finally.hh>
-#include <elle/assert.hh>
+#include <elle/AtomicFile.hh>
 #include <elle/Version.hh>
+#include <elle/system/system.hh>
+#include <elle/assert.hh>
+#include <elle/format/hexadecimal.hh>
+#include <elle/os/file.hh>
+#include <elle/finally.hh>
+#include <elle/log.hh>
+#include <elle/serialize/extract.hh>
+#include <elle/serialize/insert.hh>
+
+#include <cryptography/oneway.hh>
 
 #include <common/common.hh>
 
@@ -33,14 +41,21 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.Updater");
 
-Updater::Updater(QUrl const& version_url,
-                 QObject* parent):
-  QObject(parent),
-  _version_url(version_url),
-  _updater_url(),
-  _installer_folder(
-    QDir::toNativeSeparators(QString::fromStdString(common::infinit::home()))),
-  _installer(
+void
+Updater::NetworkReplyLaterDeleter::operator () (QNetworkReply* reply) const
+{
+  reply->disconnect(SIGNAL(downloadProgress(qint64, qint64)));
+  reply->deleteLater();
+}
+
+Updater::Updater(QUrl const& version_file_url,
+                 QObject* parent)
+  : QObject(parent)
+  , _version_file_url(version_file_url)
+  , _updater_url()
+  , _installer_folder(
+    QDir::toNativeSeparators(QString::fromStdString(common::infinit::home())))
+  , _installer(
     new QFile(QDir::toNativeSeparators(
                 this->_installer_folder.path() +
                 QDir::separator() +
@@ -49,27 +64,43 @@ Updater::Updater(QUrl const& version_url,
 #else
                 "installer"
 #endif
-                ))),
-  _loading_dialog(new LoadingDialog(this)),
-  _network_manager(new QNetworkAccessManager(this))
+                )))
+  , _loading_dialog(new LoadingDialog(this))
+  , _network_manager(new QNetworkAccessManager(this))
+  , _check_for_update_timer(nullptr)
+  , _installer_downloaded(false)
 {
-  connect(this, SIGNAL(update_available(bool)),
-          this->_loading_dialog, SLOT(accept_reject_mode(bool)));
-  connect(this, SIGNAL(updating()),
-          this->_loading_dialog, SLOT(loading_mode()));
   connect(this, SIGNAL(no_update_available()),
-          this, SLOT(_close_dialog()));
-  connect(this->_loading_dialog->accept_button(), SIGNAL(released()),
-          this, SLOT(update()));
-  connect(this->_loading_dialog->reject_button(), SIGNAL(released()),
-          this, SLOT(_close_dialog()));
+          this, SLOT(_remove_old_installer()));
   connect(this, SIGNAL(update_error(QString const&, QString const&)),
           this, SLOT(_on_error(QString const&, QString const&)));
   connect(this->_network_manager, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(_handle_reply(QNetworkReply*)));
   connect(this->_loading_dialog, SIGNAL(quit_request()),
           this, SIGNAL(quit_request()));
+  connect(this, SIGNAL(installer_ready()), SLOT(_set_installer_downloaded()));
+}
 
+void
+Updater::download_update()
+{
+  ELLE_TRACE_SCOPE("%s: download updater application (%s)",
+                   *this, this->_updater_url);
+  emit update_available(false, this->_changelog);
+  QNetworkRequest request;
+  request.setUrl(this->_updater_url);
+  request.setRawHeader(
+    "User-Agent",
+    QString::fromStdString(
+      elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
+  this->_reply.reset(this->_network_manager->get(request));
+  connect(this->_reply.get(), SIGNAL(downloadProgress(qint64, qint64)),
+          this, SIGNAL(download_progress(qint64, qint64)));
+}
+
+void
+Updater::_remove_old_installer()
+{
   // Delete the old installer file.
   if (this->_installer->exists())
   {
@@ -80,46 +111,23 @@ Updater::Updater(QUrl const& version_url,
 }
 
 void
-Updater::update()
-{
-  ELLE_TRACE_SCOPE("%s: update application", *this);
-  this->_loading_dialog->text("Downloading update");
-
-  emit this->updating();
-
-  QNetworkRequest request;
-  request.setUrl(this->_updater_url);
-  request.setRawHeader(
-    "User-Agent",
-    QString::fromStdString(elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
-
-  this->_reply.reset(this->_network_manager->get(request));
-}
-
-void
 Updater::check_for_updates()
 {
-  ELLE_TRACE_SCOPE("%s: check for updates at %s", *this, this->_version_url);
-
+  ELLE_TRACE_SCOPE("%s: check for updates at %s", *this, this->_version_file_url);
   QNetworkRequest request;
-  request.setUrl(this->_version_url);
+  request.setUrl(this->_version_file_url);
   request.setRawHeader(
     "User-Agent",
     QString::fromStdString(elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
-
   this->_reply.reset(this->_network_manager->get(request));
-
-  this->_loading_dialog->setModal(true);
-  this->_loading_dialog->show();
-  // this->_loading_dialog->exec();
 }
+
 
 void
 Updater::_handle_reply(QNetworkReply* reply)
 {
   ELLE_ASSERT(reply != nullptr);
   ELLE_TRACE_SCOPE("%s: reply from %s", *this, *reply);
-
   if (this->_reply->error() != QNetworkReply::NoError)
   {
     ELLE_WARN("something went wrong: %s", this->_reply->error());
@@ -145,9 +153,11 @@ Updater::_handle_reply(QNetworkReply* reply)
   {
     if (this->_reply->url() == this->_updater_url)
     {
+      disconnect(this->_reply.get(), SIGNAL(downloadProgress(qint64, qint64)),
+                 this, SIGNAL(download_progress(qint64, qint64)));
       this->_update(reply);
     }
-    else if (this->_reply->url() == this->_version_url)
+    else if (this->_reply->url() == this->_version_file_url)
     {
       this->_check_if_up_to_date(reply);
     }
@@ -160,24 +170,19 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
   ELLE_TRACE_SCOPE("%s: check for new update", *this);
 
   QXmlStreamReader xr(reply->readAll());
-  QMap<QString,QString> updater_info;
+  QMap<QString, QString> updater_info;
 
   ELLE_TRACE_SCOPE("start reading");
-
   {
     QXmlStreamReader::TokenType token = xr.readNext();
-
     if(token == QXmlStreamReader::StartDocument)
     {
       ELLE_DEBUG("first token, ignored");
     }
-
     xr.readNext();
-
     if (xr.name().toString() != "updater")
       ELLE_ERR("xml file not valide");
   }
-
   while(!xr.atEnd() && !xr.hasError())
   {
     ELLE_DEBUG_SCOPE("read a new element");
@@ -231,17 +236,15 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
       ELLE_DEBUG("unknown element: %s", token);
     }
   }
-
   if (xr.hasError())
   {
     emit update_error("update to get update data",
-                      "unable to get update data"); return;
+                      "unable to get update data");
+    return;
   }
-
-  ELLE_TRACE("update data:")
+  ELLE_DEBUG("update data:")
     for (auto const& elem: updater_info.keys())
       ELLE_DEBUG("%s: %s", elem, updater_info[elem]);
-
   if (!updater_info.contains("version"))
   {
     emit update_error("unable to read the update file",
@@ -255,7 +258,6 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
 
     QRegExp version("(\\d+)\\.(\\d+)\\.(\\d+)");
     version.indexIn(updater_info["version"]);
-
     elle::Version update_version(
       version.cap(1).toInt(), version.cap(2).toInt(), version.cap(3).toInt());
     ELLE_TRACE("update version: %s", update_version);
@@ -263,14 +265,21 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     {
       emit no_update_available();
       ELLE_LOG("no update available");
-      return;
+      if (this->_check_for_update_timer == nullptr)
+      {
+        this->_check_for_update_timer = new QTimer(this);
+        auto interval = 1000 * 60 * 60; // ms.
+        this->_check_for_update_timer->setInterval(interval);
+        connect(this->_check_for_update_timer, SIGNAL(timeout()),
+                this, SLOT(check_for_updates()));
+        return;
+      }
     }
     else
     {
       ELLE_LOG("current version is older than remote");
     }
   }
-
   if (updater_info.contains("url"))
   {
     this->_updater_url.setUrl(updater_info["url"]);
@@ -280,36 +289,51 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     emit update_error("update file unavailable",
                       "update file unavailable"); return;
   }
-
   ELLE_TRACE("an update is available at %s", this->_updater_url);
-
 #ifdef INFINIT_WINDOWS
-  auto mandatory = true;
-
   if (updater_info.contains("rich_description"))
-    this->_loading_dialog->body(updater_info["rich_description"]);
+    this->_changelog = updater_info["rich_description"];
   else
-    this->_loading_dialog->body(updater_info["description"]);
-
-  if (mandatory)
-    this->_loading_dialog->text("A mandatory update is available!");
+    this->_changelog = updater_info["description"];
+  if (this->_installer->exists() && updater_info.contains("hash"))
+  {
+    auto check_local_installer = [&] () -> bool
+    {
+      auto const& file =
+        QDir::toNativeSeparators(this->_installer->fileName()).toStdString();
+      auto size = elle::os::file::size(file);
+      ELLE_TRACE_SCOPE("installer found at %s", file);
+      auto const& str = elle::system::read_file_chunk(file, 0, size).string();
+      infinit::cryptography::Plain installer_plain(str);
+      auto hash = infinit::cryptography::oneway::hash(
+        installer_plain, infinit::cryptography::oneway::Algorithm::sha1);
+      std::string updater_hash(elle::format::hexadecimal::encode(hash.buffer()));
+      ELLE_LOG("%s vs %s", updater_info["hash"].toStdString(), updater_hash);
+      return updater_info["hash"].toStdString() == updater_hash;
+    };
+    if (check_local_installer())
+      emit installer_ready();
+    else
+    {
+      this->_remove_old_installer();
+      this->download_update();
+    }
+  }
   else
-    this->_loading_dialog->text("An update is available!");
-
-  emit update_available(mandatory);
+  {
+    this->download_update();
+  }
 #else
   ELLE_WARN("%s: linux update is not avalaible yet", *this);
   emit no_update_available();
 #endif
-
 }
 
 void
 Updater::_update(QNetworkReply* reply)
 {
 #ifdef INFINIT_WINDOWS
-  ELLE_TRACE("Downloading new installer");
-
+  ELLE_TRACE_SCOPE("installer downloaded");
   if (!this->_installer_folder.exists())
     if (!this->_installer_folder.mkpath(this->_installer_folder.path()))
       emit update_error(
@@ -318,7 +342,6 @@ Updater::_update(QNetworkReply* reply)
           elle::sprintf(
             "destination folder %s is unreachable.",
             QDir::toNativeSeparators(this->_installer_folder.path()))));
-
   if (!this->_installer->open(QIODevice::WriteOnly))
   {
     ELLE_ERR("unable to open location: %s", this->_installer->fileName());
@@ -331,12 +354,29 @@ Updater::_update(QNetworkReply* reply)
 
     return;
   }
+  {
+    elle::SafeFinally close_stream([this] { this->_installer->close(); });
+    this->_installer->write(this->_reply->readAll());
+  }
+  emit installer_ready();
+#else
+  ELLE_WARN("%s: linux update is not avalaible yet", *this);
+  emit no_update_available();
+#endif
+}
 
-  this->_installer->write(this->_reply->readAll());
-  this->_installer->close();
+void
+Updater::_set_installer_downloaded()
+{
+  this->_installer_downloaded = true;
+}
 
-  ELLE_TRACE("running installer");
-
+void
+Updater::run_installer()
+{
+  ELLE_ASSERT(this->_installer != nullptr);
+  ELLE_TRACE_SCOPE("running installer");
+#ifdef INFINIT_WINDOWS
   {
     wchar_t psz_wdestfile[MAX_PATH];
     MultiByteToWideChar(
@@ -348,7 +388,17 @@ Updater::_update(QNetworkReply* reply)
       psz_wdestfile,
       MAX_PATH);
 
-    HINSTANCE answer = ShellExecuteW(NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
+    wchar_t psz_parameters[256];
+    MultiByteToWideChar(
+      CP_UTF8,
+      0,
+      "/autoupdate",
+      -1,
+      psz_parameters,
+      256);
+
+    HINSTANCE answer = ShellExecuteW(
+      NULL, L"open", psz_wdestfile, psz_parameters, NULL, SW_SHOW);
     if(answer > (HINSTANCE) 32)
     {
       this->_close_dialog();
