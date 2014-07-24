@@ -99,9 +99,19 @@ private slots:
 | Dock |
 `-----*/
 private slots:
+  // Spawn the dock when the login is successful.
   void
   logged_in();
 
+  // Behavior when trying to login.
+  void
+  _loging_in();
+
+  // Behavior when the login failed.
+  void
+  _login_failed();
+
+  //
   void
   _new_local_socket_connection();
 

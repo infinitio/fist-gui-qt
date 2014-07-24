@@ -12,6 +12,7 @@
 #include <QWidgetAction>
 
 #include <elle/log.hh>
+#include <elle/finally.hh>
 #include <elle/os/environ.hh>
 
 #include <version.hh>
@@ -59,6 +60,9 @@ class InfinitDock::Prologue
   }
 };
 
+/*-------------.
+| Construction |
+`-------------*/
 // Creating the transaction panel is a long operation. So we just wait until all
 // the graphical part is fully load, and then, initialize it.
 InfinitDock::InfinitDock(fist::State& state)
@@ -105,9 +109,6 @@ InfinitDock::InfinitDock(fist::State& state)
           SLOT(_position_panel()));
 
   {
-    connect(this->_transaction_panel.get(),
-            SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
-            this, SLOT(_systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
     connect(this->_transaction_panel->footer()->send(),
             SIGNAL(released()),
             this,
@@ -197,12 +198,57 @@ InfinitDock::InfinitDock(fist::State& state)
 #endif
 }
 
+/*------------.
+| Destruction |
+`------------*/
 InfinitDock::~InfinitDock()
 {
   ELLE_TRACE_SCOPE("%s: quit", *this);
   this->_on_logout();
 }
 
+void
+InfinitDock::_on_logout()
+{
+  ELLE_TRACE_SCOPE("%s: logout", *this);
+  this->_systray->setVisible(true);
+  // Kill everything in order to make sure nothing requiring state is running
+  // when destroying it.
+  this->setCentralWidget(nullptr);
+  this->_send_panel.reset();
+  this->_transaction_panel.reset();
+  emit logout_request();
+}
+
+/*----------------.
+| State Callbacks |
+`----------------*/
+void
+InfinitDock::connection_status_cb(gap_UserStatus const status)
+{
+  ELLE_TRACE_SCOPE("Dock: Connection status changed to %s", status);
+}
+
+void
+InfinitDock::user_status_cb(uint32_t id,
+                            gap_UserStatus const status)
+{
+  ELLE_TRACE_SCOPE("Dock: User (%s) status changed to %s", id, status);
+
+  g_dock->user_status_changed(id, status);
+}
+
+void
+InfinitDock::avatar_available_cb(uint32_t id)
+{
+  ELLE_TRACE_SCOPE("Dock: Avatar available for user %s", id);
+
+  g_dock->avatar_available(id);
+}
+
+/*------------.
+| System Tray |
+`------------*/
 void
 InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
 {
@@ -224,52 +270,76 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
 }
 
 void
-InfinitDock::_on_logout()
+InfinitDock::_systray_message(fist::SystrayMessageCarrier const& message)
 {
-  ELLE_TRACE_SCOPE("%s: logout", *this);
-  // Kill everything in order to make sure nothing requiring state is running
-  // when destroying it.
-  this->setCentralWidget(nullptr);
-  this->_send_panel.reset();
-  this->_transaction_panel.reset();
-  emit logout_request();
-}
-
-void
-InfinitDock::_systray_message(QString const& title,
-                              QString const& message,
-                              QSystemTrayIcon::MessageIcon icon)
-{
+  this->_last_message = std::move(message.body);
+  auto const& body = *this->_last_message;
   ELLE_TRACE_SCOPE("%s: show system tray message: %s - %s",
-                   *this, title, message);
-  if (!this->isVisible())
-    this->_systray->showMessage(title, message, icon, 3000);
+                   *this, body.title(), body.body());
+  if (body.always_show() || !this->isVisible())
+    this->_systray->showMessage(
+      body.title(), body.body(), body.icon(), body.duration());
 }
 
 void
 InfinitDock::_systray_message_clicked()
 {
-  this->show();
+  ELLE_TRACE_SCOPE("%s: message clicked", *this);
+  elle::SafeFinally show([&] { this->show(); });
+  if (this->_last_message == nullptr)
+  {
+    ELLE_WARN("%s: no systray message stored", *this);
+  }
+  else
+  {
+    if (dynamic_cast<fist::UpdateAvailableMessage const*>(
+          this->_last_message.get()))
+    {
+      emit this->update_application();
+    }
+    this->_last_message.reset();
+  }
+}
+
+/*-------.
+| Update |
+`-------*/
+void
+InfinitDock::update_available(bool mandatory,
+                              QString const& changelog)
+{
+}
+
+void
+InfinitDock::download_progress(qint64 downloaded, qint64 total_size)
+{
+}
+
+void
+InfinitDock::download_ready()
+{
+  ELLE_TRACE_SCOPE("%s: an update is available", *this);
+  this->_systray_message(
+    fist::SystrayMessageCarrier(
+      new fist::UpdateAvailableMessage(
+        "Update!", "An update is available, click to automatically update")));
+  this->_menu->addSeparator();
+  QAction* update = new QAction("Update", this);
+  connect(update, SIGNAL(triggered()), this, SIGNAL(update_application()));
+  this->_menu->addAction(update);
 }
 
 /*------.
 | Panel |
 `------*/
-
 void
 InfinitDock::_register_panel(Panel* panel)
 {
   ELLE_ASSERT(panel != nullptr);
 
   ELLE_TRACE_SCOPE("%s: register panel %s", *this, *panel);
-
-  connect(panel, SIGNAL(systray_message(QString const&,
-                                        QString const&,
-                                        QSystemTrayIcon::MessageIcon)),
-          this, SLOT(_systray_message(QString const&,
-                                      QString const&,
-                                      QSystemTrayIcon::MessageIcon)));
-
+  connect(panel, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
+          this, SLOT(_systray_message(fist::SystrayMessageCarrier const&)));
   connect(panel, SIGNAL(set_background_color(QColor const&)),
           this, SLOT(setBackground(QColor const&)));
   panel->hide();
@@ -281,104 +351,10 @@ InfinitDock::transactionPanel()
   return *this->_transaction_panel;
 }
 
-
 fist::sendview::Panel&
 InfinitDock::send_panel() const
 {
   return *this->_send_panel;
-}
-
-void
-InfinitDock::showEvent(QShowEvent* event)
-{
-  ELLE_LOG_SCOPE("%s: show dock", *this);
-
-  this->updateGeometry();
-  this->update();
-  this->activateWindow();
-  this->setFocus(Qt::ActiveWindowFocusReason);
-  this->_position_panel();
-}
-
-void
-InfinitDock::hideEvent(QHideEvent* event)
-{
-  ELLE_LOG_SCOPE("%s: hide dock", *this);
-
-  if (fist::settings()["onboarding"].exists(onboarded_reception_complete) &&
-      !fist::settings()["dock"].exists("first_minimizing_popup"))
-  {
-    fist::settings()["dock"].set("first_minimizing_popup", "1");
-    this->_systray->showMessage(QString("Infinit is minimized!"),
-                                QString("Make sure the Infinit icon is always "
-                                        "visible by clicking customize!"),
-                                QSystemTrayIcon::Information,
-                                60000);
-
-  }
-}
-
-void
-InfinitDock::toggle_dock(bool toggle_only)
-{
-  ELLE_TRACE_SCOPE("%s: toggle dock", *this);
-
-  if (this->isVisible() and !toggle_only)
-    this->hide();
-  else
-    this->show();
-}
-
-
-void
-InfinitDock::report_a_problem()
-{
-  bool ok;
-  QString text = QInputDialog::getText(this,
-                                       tr("Report a problem"),
-                                       tr("Please describe the problem you had"),
-                                       QLineEdit::Normal,
-                                       "Enter your message",
-                                       &ok);
-
-  if (ok)
-  {
-    ELLE_DEBUG("user message: %s", text);
-
-    auto log_file_picker = [] () -> std::string
-    {
-      for (std::string var: {"INFINIT_LOG_FILE", "ELLE_LOG_FILE"})
-      {
-        if (elle::os::inenv(var))
-          return elle::os::getenv(var);
-      }
-      return "";
-    };
-
-    auto logfile = log_file_picker();
-    ELLE_TRACE("file to report: %s", logfile);
-
-    if (!logfile.empty())
-    {
-      auto std_text = text.toStdString();
-      ELLE_DEBUG("user message as std::string: %s", std_text);
-      gap_send_user_report(
-        this->_state.state(),
-        gap_self_email(this->_state.state()),
-        std_text.c_str(),
-        logfile.c_str(),
-        elle::sprintf("%s on %s",
-                      common::system::platform(),
-                      INFINIT_VERSION).c_str());
-      ELLE_DEBUG("report sent");
-    }
-    else
-    {
-      ELLE_WARN("Fist: No log file to send");
-    }
-  }
-
-  this->setFocus();
 }
 
 void
@@ -406,99 +382,6 @@ InfinitDock::_position_panel()
   }
 }
 
-
-void
-InfinitDock::pick_files()
-{
-  ELLE_TRACE_SCOPE("%s: spawn file picker", *this);
-
-  QStringList selected = QFileDialog::getOpenFileNames(
-    this,
-    tr("Select files to send"));
-
-  if (selected.size())
-  {
-    for (auto const& file: selected)
-      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
-    this->_switch_view(this->_send_panel.get());
-    this->show();
-  }
-}
-
-void
-InfinitDock::enterEvent(QEvent* event)
-{
-  if (this->centralWidget() != nullptr)
-    ELLE_DEBUG("%s currently active", *this->centralWidget());
-  // if (this->centralWidget() == this->_send_panel)
-  //   this->setFocus();
-}
-
-void
-InfinitDock::closeEvent(QCloseEvent* event)
-{
-  ELLE_TRACE_SCOPE("%s: close", *this);
-
-  Super::closeEvent(event);
-  this->deleteLater();
-}
-
-void
-InfinitDock::mouseReleaseEvent(QMouseEvent* event)
-{
-  ELLE_TRACE_SCOPE("%s: mouse released", *this);
-
-  if (event->button() == Qt::LeftButton)
-  {
-    ELLE_DEBUG("left button clicked");
-
-    event->accept();
-    this->toggle_dock(true);
-  }
-  else
-    Super::mouseReleaseEvent(event);
-}
-
-void
-InfinitDock::focusInEvent(QFocusEvent* event)
-{
-  ELLE_TRACE_SCOPE("%s: get focus (%s)", *this, event->reason());
-
-  this->update();
-  this->_position_panel();
-
-  if (this->centralWidget() == nullptr)
-  {
-    this->centralWidget()->setFocus(event->reason());
-  }
-}
-
-void
-InfinitDock::keyPressEvent(QKeyEvent* event)
-{
-  ELLE_TRACE_SCOPE("%s: key pressed (%s)", *this, event->key());
-
-  if (this->centralWidget() != nullptr)
-    ELLE_DEBUG("%s currently active", *this->centralWidget());
-  else
-    return;
-
-  if (this->centralWidget() == this->_transaction_panel.get())
-  {
-    if (event->key() == Qt::Key_Escape)
-    {
-      ELLE_DEBUG("escape pressed");
-      this->toggle_dock(); return;
-    }
-    else if (event->key() == Qt::Key_S)
-    {
-      this->_show_send_view(); return;
-    }
-  }
-
-  QCoreApplication::sendEvent(this->centralWidget(), event);
-}
-
 void
 InfinitDock::_show_send_view()
 {
@@ -511,47 +394,6 @@ InfinitDock::_show_user_view(uint32_t /* sender_id */)
 {
   ELLE_TRACE_SCOPE("%s: show user view", *this);
 }
-
-void
-InfinitDock::_show_menu()
-{
-  ELLE_TRACE_SCOPE("%s: show menu", *this);
-
-  this->_menu->show();
-
-  QPoint pos(this->geometry().bottomLeft());
-
-  int margin = 3;
-  this->_menu->move(pos.x() + margin,
-                    pos.y() - this->_menu->size().height() - margin);
-
-}
-
-void
-InfinitDock::_back_from_send_view()
-{
-  this->_show_transactions_view();
-  this->hide();
-}
-
-void
-InfinitDock::focusOutEvent(QFocusEvent* event)
-{
-  ELLE_TRACE_SCOPE("%s: focus lost (reason %s)", *this, event->reason());
-
-  // Swallow focus lost event to keep the send view on top
-  if (this->centralWidget() == this->_send_panel.get())
-  {
-    event->accept();
-    return;
-  }
-  Super::focusOutEvent(event);
-  if (event->reason() != Qt::MouseFocusReason)
-  {
-    this->hide();
-  }
-}
-
 
 void
 InfinitDock::_show_transactions_view()
@@ -608,28 +450,244 @@ InfinitDock::_activate_new_panel()
 }
 
 void
-InfinitDock::connection_status_cb(gap_UserStatus const status)
+InfinitDock::_back_from_send_view()
 {
-  ELLE_TRACE_SCOPE("Dock: Connection status changed to %s", status);
+  this->_show_transactions_view();
+  this->hide();
+}
+
+/*-----------.
+| Visibility |
+`-----------*/
+void
+InfinitDock::toggle_dock(bool toggle_only)
+{
+  ELLE_TRACE_SCOPE("%s: toggle dock", *this);
+
+  if (this->isVisible() and !toggle_only)
+    this->hide();
+  else
+    this->show();
 }
 
 void
-InfinitDock::user_status_cb(uint32_t id,
-                            gap_UserStatus const status)
+InfinitDock::showEvent(QShowEvent* event)
 {
-  ELLE_TRACE_SCOPE("Dock: User (%s) status changed to %s", id, status);
+  ELLE_LOG_SCOPE("%s: show dock", *this);
 
-  g_dock->user_status_changed(id, status);
+  this->updateGeometry();
+  this->update();
+  this->adjustSize();
+  this->update();
+  this->activateWindow();
+  this->setFocus(Qt::ActiveWindowFocusReason);
+  this->_position_panel();
 }
 
 void
-InfinitDock::avatar_available_cb(uint32_t id)
+InfinitDock::hideEvent(QHideEvent* event)
 {
-  ELLE_TRACE_SCOPE("Dock: Avatar available for user %s", id);
+  ELLE_LOG_SCOPE("%s: hide dock", *this);
 
-  g_dock->avatar_available(id);
+  if (fist::settings()["onboarding"].exists(onboarded_reception_complete) &&
+      !fist::settings()["dock"].exists("first_minimizing_popup"))
+  {
+    fist::settings()["dock"].set("first_minimizing_popup", "1");
+    this->_systray_message(
+      fist::SystrayMessageCarrier(new fist::Message(
+        "Infinit is minimized!",
+        "Make sure the Infinit icon is always "
+        "visible by clicking customize!",
+        QSystemTrayIcon::Information,
+        60000)));
+  }
 }
 
+/*------.
+| Focus |
+`------*/
+void
+InfinitDock::focusInEvent(QFocusEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: get focus (%s)", *this, event->reason());
+  this->update();
+  this->_position_panel();
+  if (this->centralWidget() == nullptr)
+  {
+    this->centralWidget()->setFocus(event->reason());
+  }
+}
+
+void
+InfinitDock::focusOutEvent(QFocusEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: focus lost (reason %s)", *this, event->reason());
+  // Swallow focus lost event to keep the send view on top
+  if (this->centralWidget() == this->_send_panel.get())
+  {
+    event->accept();
+    return;
+  }
+  Super::focusOutEvent(event);
+  if (event->reason() != Qt::MouseFocusReason)
+  {
+    this->hide();
+  }
+}
+
+/*-----------------------------.
+| Mouse / Keyboard interaction |
+`-----------------------------*/
+void
+InfinitDock::enterEvent(QEvent* event)
+{
+  if (this->centralWidget() != nullptr)
+    ELLE_DEBUG("%s currently active", *this->centralWidget());
+  // if (this->centralWidget() == this->_send_panel)
+  //   this->setFocus();
+}
+
+void
+InfinitDock::closeEvent(QCloseEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: close", *this);
+
+  Super::closeEvent(event);
+  this->deleteLater();
+}
+
+void
+InfinitDock::mouseReleaseEvent(QMouseEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: mouse released", *this);
+
+  if (event->button() == Qt::LeftButton)
+  {
+    ELLE_DEBUG("left button clicked");
+
+    event->accept();
+    this->toggle_dock(true);
+  }
+  else
+    Super::mouseReleaseEvent(event);
+}
+
+void
+InfinitDock::keyPressEvent(QKeyEvent* event)
+{
+  ELLE_TRACE_SCOPE("%s: key pressed (%s)", *this, event->key());
+
+  if (this->centralWidget() != nullptr)
+    ELLE_DEBUG("%s currently active", *this->centralWidget());
+  else
+    return;
+
+  if (this->centralWidget() == this->_transaction_panel.get())
+  {
+    if (event->key() == Qt::Key_Escape)
+    {
+      ELLE_DEBUG("escape pressed");
+      this->toggle_dock(); return;
+    }
+    else if (event->key() == Qt::Key_S)
+    {
+      this->_show_send_view(); return;
+    }
+  }
+
+  QCoreApplication::sendEvent(this->centralWidget(), event);
+}
+
+/*------.
+| Other |
+`------*/
+void
+InfinitDock::_show_menu()
+{
+  ELLE_TRACE_SCOPE("%s: show menu", *this);
+
+  this->_menu->show();
+
+  QPoint pos(this->geometry().bottomLeft());
+
+  int margin = 3;
+  this->_menu->move(pos.x() + margin,
+                    pos.y() - this->_menu->size().height() - margin);
+
+}
+
+void
+InfinitDock::pick_files()
+{
+  ELLE_TRACE_SCOPE("%s: spawn file picker", *this);
+
+  QStringList selected = QFileDialog::getOpenFileNames(
+    this,
+    tr("Select files to send"));
+
+  if (selected.size())
+  {
+    for (auto const& file: selected)
+      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
+    this->_switch_view(this->_send_panel.get());
+    this->show();
+  }
+}
+
+void
+InfinitDock::report_a_problem()
+{
+  bool ok;
+  QString text = QInputDialog::getText(this,
+                                       tr("Report a problem"),
+                                       tr("Please describe the problem you had"),
+                                       QLineEdit::Normal,
+                                       "Enter your message",
+                                       &ok);
+
+  if (ok)
+  {
+    ELLE_DEBUG("user message: %s", text);
+
+    auto log_file_picker = [] () -> std::string
+    {
+      for (std::string var: {"INFINIT_LOG_FILE", "ELLE_LOG_FILE"})
+      {
+        if (elle::os::inenv(var))
+          return elle::os::getenv(var);
+      }
+      return "";
+    };
+
+    auto logfile = log_file_picker();
+    ELLE_TRACE("file to report: %s", logfile);
+
+    if (!logfile.empty())
+    {
+      auto std_text = text.toStdString();
+      ELLE_DEBUG("user message as std::string: %s", std_text);
+      gap_send_user_report(
+        this->_state.state(),
+        gap_self_email(this->_state.state()),
+        std_text.c_str(),
+        logfile.c_str(),
+        elle::sprintf("%s on %s",
+                      common::system::platform(),
+                      INFINIT_VERSION).c_str());
+      ELLE_DEBUG("report sent");
+    }
+    else
+    {
+      ELLE_WARN("Fist: No log file to send");
+    }
+  }
+
+  this->setFocus();
+}
+
+/*-----------.
+| Onboarding |
+`-----------*/
 void
 InfinitDock::_start_onboarded_reception()
 {
@@ -693,6 +751,9 @@ InfinitDock::_on_onboarded_sending_completed()
   this->_onboarder.reset();
 }
 
+/*------.
+| Print |
+`------*/
 void
 InfinitDock::print(std::ostream& stream) const
 {

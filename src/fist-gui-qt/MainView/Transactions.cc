@@ -66,14 +66,16 @@ namespace fist
       if (!transaction.is_sender())
       {
         emit systray_message(
-          "Incoming!",
-          elle::sprintf(
-            "%s wants to send %s to you.",
-            transaction.peer_fullname().toStdString(),
-            (transaction.files().size() == 1)
-              ? transaction.files()[0].toStdString()
-              : elle::sprintf("%s files", transaction.files().size())
-                                   ).c_str());
+          fist::SystrayMessageCarrier(
+            new Message(
+              "Incoming!",
+              elle::sprintf(
+                "%s wants to send %s to you.",
+                transaction.peer_fullname().toStdString(),
+                (transaction.files().size() == 1)
+                ? transaction.files()[0].toStdString()
+                : elle::sprintf("%s files", transaction.files().size())
+              ).c_str())));
       }
       auto widget = std::make_shared<TransactionWidget>(transaction);
 
@@ -108,75 +110,68 @@ namespace fist
 
       switch (transaction.status())
       {
-        // case gap_transaction_accepted:
-        //   if (transaction.is_sender())
-        //     emit systray_message(
-        //       "Accepted!",
-        //       elle::sprintf(
-        //         "%s accepted %s.",
-        //         transaction.peer_fullname().toStdString(),
-        //         (transaction.files().size() == 1)
-        //         ? transaction.files()[0].toStdString()
-        //         : elle::sprintf("your %s files", transaction.files().size())
-        //       ).c_str());
-        //   break;
         case gap_transaction_rejected:
           if (transaction.is_sender())
             emit systray_message(
-              "Shenanigans!",
-              elle::sprintf("%s declined your transfer.",
-                            transaction.peer_fullname().toStdString()).c_str(),
-              QSystemTrayIcon::Warning);
-          break;
+              SystrayMessageCarrier(new Message(
+                "Shenanigans!",
+                elle::sprintf("%s declined your transfer.",
+                              transaction.peer_fullname().toStdString()).c_str(),
+                QSystemTrayIcon::Warning)));
+              break;
         case gap_transaction_canceled:
           // Should only be displayed if the user is not the one who cancelled.
           emit systray_message(
-            "Nuts!",
-            elle::sprintf("Your transfer with %s was cancelled.",
-                          transaction.peer_fullname().toStdString()).c_str());
+            SystrayMessageCarrier(new Message(
+              "Nuts!",
+              elle::sprintf("Your transfer with %s was cancelled.",
+                            transaction.peer_fullname().toStdString()).c_str())));
         case gap_transaction_failed:
           if (transaction.is_sender())
             emit systray_message(
-              "Oh no!",
-              elle::sprintf(
-                "%s couldn't be sent to %s.",
-                (transaction.files().size() == 1)
-                ? transaction.files()[0].toStdString()
-                : elle::sprintf("your %s files", transaction.files().size()),
-                transaction.peer_fullname().toStdString()).c_str(),
-              QSystemTrayIcon::Warning);
+              SystrayMessageCarrier(new Message(
+                "Oh no!",
+                elle::sprintf(
+                  "%s couldn't be sent to %s.",
+                  (transaction.files().size() == 1)
+                  ? transaction.files()[0].toStdString()
+                  : elle::sprintf("your %s files", transaction.files().size()),
+                  transaction.peer_fullname().toStdString()).c_str(),
+                QSystemTrayIcon::Warning)));
           else
             emit systray_message(
-              "Oh no!",
-              elle::sprintf(
-                "%s couldn't be received from %s.",
-                (transaction.files().size() == 1)
-                ? transaction.files()[0].toStdString()
-                : elle::sprintf("%s files", transaction.files().size()),
-                transaction.peer_fullname().toStdString()).c_str(),
-              QSystemTrayIcon::Warning);
-
+              SystrayMessageCarrier(new Message(
+                "Oh no!",
+                elle::sprintf(
+                  "%s couldn't be received from %s.",
+                  (transaction.files().size() == 1)
+                  ? transaction.files()[0].toStdString()
+                  : elle::sprintf("%s files", transaction.files().size()),
+                  transaction.peer_fullname().toStdString()).c_str(),
+                QSystemTrayIcon::Warning)));
           break;
         case gap_transaction_finished:
           if (transaction.is_sender())
             emit systray_message(
-              "Success!",
-              elle::sprintf(
-                "%s received %s.",
-                transaction.peer_fullname().toStdString(),
-                (transaction.files().size() == 1)
-                ? transaction.files()[0].toStdString()
-                : elle::sprintf("your %s files", transaction.files().size())
-                ).c_str());
+              SystrayMessageCarrier(new Message(
+                "Success!",
+                elle::sprintf(
+                  "%s received %s.",
+                  transaction.peer_fullname().toStdString(),
+                  (transaction.files().size() == 1)
+                  ? transaction.files()[0].toStdString()
+                  : elle::sprintf("your %s files", transaction.files().size())
+                  ).c_str())));
           else
             emit systray_message(
-              "Success!",
-              elle::sprintf(
-                "%s received from %s.",
-                (transaction.files().size() == 1)
-                ? transaction.files()[0].toStdString()
-                : elle::sprintf("%s files", transaction.files().size()),
-                transaction.peer_fullname().toStdString()).c_str());
+              SystrayMessageCarrier(new Message(
+                "Success!",
+                elle::sprintf(
+                  "%s received from %s.",
+                  (transaction.files().size() == 1)
+                  ? transaction.files()[0].toStdString()
+                  : elle::sprintf("%s files", transaction.files().size()),
+                  transaction.peer_fullname().toStdString()).c_str())));
           break;
         default:
           break;

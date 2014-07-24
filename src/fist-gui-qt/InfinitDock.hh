@@ -16,8 +16,10 @@
 # include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/RoundShadowWidget.hh>
+# include <fist-gui-qt/SystrayMessage.hh>
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
+
 
 class InfinitDock:
   public RoundShadowWidget
@@ -59,38 +61,69 @@ private slots:
   void
   _on_logout();
 
+/*----------------.
+| State callbacks |
+`----------------*/
 public:
   static void connection_status_cb(gap_UserStatus const status);
   static void user_status_cb(uint32_t id, gap_UserStatus const status);
   static void avatar_available_cb(uint32_t id);
-
-public slots:
-  void _systray_activated(QSystemTrayIcon::ActivationReason reason);
 
 Q_SIGNALS:
   void avatar_available(uint32_t id);
   void user_status_changed(uint32_t, gap_UserStatus);
   void connection_status_changed(gap_UserStatus);
 
+/*------------.
+| System Tray |
+`------------*/
+private slots:
+  void
+  _systray_activated(QSystemTrayIcon::ActivationReason reason);
+
+  void
+  _systray_message(fist::SystrayMessageCarrier const& message);
+
+  void
+  _systray_message_clicked();
+
+/*-------.
+| Update |
+`-------*/
+public Q_SLOTS:
+  void
+  update_available(bool mandatory,
+                   QString const& changelog);
+
+  void
+  download_progress(qint64 downloaded, qint64 total_size);
+
+  void
+  download_ready();
+
+signals:
+  void
+  update_application();
+
 /*------.
 | Panel |
 `------*/
-public Q_SLOTS:
+public:
   MainPanel&
   transactionPanel();
 
+  fist::sendview::Panel&
+  send_panel() const;
+
+public Q_SLOTS:
   void
   _register_panel(Panel* panel);
 
   void
   toggle_dock(bool toogle_only = false);
 
-  void pick_files();
-
   void
-  report_a_problem();
-
-  void _position_panel();
+  _position_panel();
 
 public slots:
   void
@@ -108,8 +141,12 @@ public slots:
   void
   _back_from_send_view();
 
+private:
+  void _switch_view(Panel* target);
+
+private slots:
   void
-  _systray_message_clicked();
+  _activate_new_panel();
 
 private:
   void
@@ -127,29 +164,10 @@ private:
   void
   focusOutEvent(QFocusEvent* event) override;
 
-private:
-  void _switch_view(Panel* target);
-
   ELLE_ATTRIBUTE(std::unique_ptr<MainPanel>, transaction_panel);
-//  RoundShadowWidget* _panel;
-
-private Q_SLOTS:
-  void
-  _systray_message(QString const& title,
-                   QString const& message,
-                   QSystemTrayIcon::MessageIcon icon);
-
-private:
   ELLE_ATTRIBUTE(std::unique_ptr<fist::sendview::Panel>, send_panel);
-
-  fist::sendview::Panel&
-  send_panel() const;
-
   Panel* _next_panel;
 
-private slots:
-  void
-  _activate_new_panel();
 /*-----.
 | Menu |
 `-----*/
@@ -183,6 +201,13 @@ protected:
     this->_position_panel();
   }
 
+public slots:
+  void
+  pick_files();
+
+  void
+  report_a_problem();
+
 private:
   QPixmap _logo;
   QSystemTrayIcon* _systray;
@@ -192,7 +217,9 @@ private:
   QAction* _logout;
   QAction* _quit;
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
+  ELLE_ATTRIBUTE(std::unique_ptr<fist::Message>, last_message);
 
+private:
   /*----------.
   | Printable |
   `----------*/

@@ -58,6 +58,29 @@ Q_SIGNALS:
 
   void
   version_rejected();
+
+  void
+  login_attempt();
+
+  void
+  login_failed();
+
+public slots:
+  void
+  update_available(bool mandatory,
+                   QString const& changelog);
+
+  void
+  download_progress(qint64 downloaded,
+                    qint64 total_size);
+
+  void
+  download_ready();
+
+Q_SIGNALS:
+  void
+  update_application();
+
 private:
   void
   focusInEvent(QFocusEvent* event) override;

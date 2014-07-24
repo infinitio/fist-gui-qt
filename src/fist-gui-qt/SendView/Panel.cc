@@ -95,7 +95,6 @@ namespace fist
     Panel::_pick_user()
     {
       ELLE_TRACE_SCOPE("%s: pick user", *this);
-      ELLE_LOG("%s", *this->_link_tab);
       if (!this->_users->recipients().empty())
       {
         this->_send();

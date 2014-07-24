@@ -227,6 +227,23 @@ Fist::_initialize_login_window(bool prefill_fields)
   connect(this->_login_window.get(), SIGNAL(version_rejected()),
           this->_updater.get(), SLOT(check_for_updates()));
   // Notify fist when login is successful.
+  connect(this->_updater.get(), SIGNAL(update_available(bool, QString const&)),
+          this->_login_window.get(), SLOT(update_available(bool, QString const&)));
+  // Forward updater progress to login windows.
+  connect(this->_updater.get(), SIGNAL(download_progress(qint64, qint64)),
+          this->_login_window.get(), SLOT(download_progress(qint64, qint64)));
+  // Notify when the login window that installer is ready to be installed.
+  connect(this->_updater.get(), SIGNAL(installer_ready()),
+          this->_login_window.get(), SLOT(download_ready()));
+  // Launch the update from loginwindow.
+  connect(this->_login_window.get(), SIGNAL(update_application()),
+          this->_updater.get(), SLOT(run_installer()));
+  //
+  connect(this->_login_window.get(), SIGNAL(login_attempt()),
+          this, SLOT(_loging_in()));
+  connect(this->_login_window.get(), SIGNAL(login_failed()),
+          this, SLOT(_login_failed()));
+  // Login.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));
   ELLE_DEBUG("show login window");
@@ -364,12 +381,49 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
+  // Forward updater progress to login windows.
+  disconnect(this->_updater.get(), SIGNAL(download_progress(qint64, qint64)),
+             this->_login_window.get(), SLOT(download_progress(qint64, qint64)));
   this->_dock.reset(new InfinitDock(*this->_state));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
   connect(this->_dock.get(), SIGNAL(logout_request()),
           this, SLOT(logout()));
+  connect(this->_updater.get(), SIGNAL(update_available(bool, QString const&)),
+          this->_dock.get(), SLOT(update_available(bool, QString const&)));
+  connect(this->_updater.get(), SIGNAL(download_progress(qint64, qint64)),
+          this->_dock.get(), SLOT(download_progress(qint64, qint64)));
+  connect(this->_updater.get(), SIGNAL(installer_ready()),
+          this->_dock.get(), SLOT(download_ready()));
+  connect(this->_dock.get(), SIGNAL(update_application()),
+          this->_updater.get(), SLOT(run_installer()));
+  if (this->_updater->installer_downloaded())
+  {
+    this->_dock->download_ready();
+  }
   this->_dock->hide();
+}
+
+void
+Fist::_loging_in()
+{
+  ELLE_TRACE_SCOPE("%s: loging in", *this);
+  disconnect(this->_updater.get(), SIGNAL(installer_ready()),
+             this->_login_window.get(), SLOT(download_ready()));
+}
+
+void
+Fist::_login_failed()
+{
+  if (this->_updater->installer_downloaded())
+  {
+    this->_updater->run_installer();
+  }
+  else
+  {
+    connect(this->_updater.get(), SIGNAL(installer_ready()),
+            this->_login_window.get(), SLOT(download_ready()));
+  }
 }
 
 void

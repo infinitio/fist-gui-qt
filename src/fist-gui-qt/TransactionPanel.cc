@@ -24,12 +24,12 @@ MainPanel::MainPanel(fist::State& state,
           this->_links, SLOT(on_link_updated(uint32_t)));
   connect(
     this->_transactions,
-    SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
-    this, SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
+    SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
+    this, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)));
   connect(
     this->_links,
-    SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)),
-    this, SIGNAL(systray_message(QString const&, QString const&, QSystemTrayIcon::MessageIcon)));
+    SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
+    this, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)));
 
   auto* transfer_tab = this->_tabs->add_tab("TRANSFERS", {this->_transactions});
   connect(&this->_state, SIGNAL(active_transactions_changed(unsigned int)),

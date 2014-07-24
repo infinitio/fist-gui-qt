@@ -13,6 +13,7 @@
 # include <fist-gui-qt/model/Link.hh>
 # include <fist-gui-qt/MainView/LinkWidget.hh>
 # include <fist-gui-qt/State.hh>
+# include <fist-gui-qt/SystrayMessage.hh>
 
 namespace fist
 {
@@ -37,12 +38,6 @@ namespace fist
       void
       on_link_updated(uint32_t id);
 
-    signals:
-      void
-      systray_message(QString const& title,
-                      QString const& body,
-                      QSystemTrayIcon::MessageIcon = QSystemTrayIcon::Information);
-
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
       ELLE_ATTRIBUTE(ListWidget*, link_list);
@@ -51,6 +46,14 @@ namespace fist
     private:
       Q_OBJECT;
 
+      /*--------.
+      | Systray |
+      `--------*/
+    signals:
+      void
+      systray_message(fist::SystrayMessageCarrier const&);
+
+    private:
       /*----------.
       | Printable |
       `----------*/

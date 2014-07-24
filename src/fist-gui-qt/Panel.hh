@@ -8,6 +8,7 @@
 
 # include <fist-gui-qt/SmoothLayout.hh>
 # include <fist-gui-qt/Footer.hh>
+# include <fist-gui-qt/SystrayMessage.hh>
 
 class Panel
   : public SmoothLayout
@@ -43,12 +44,6 @@ public:
 
 Q_SIGNALS:
   void
-  systray_message(QString const& title,
-                  QString const& message,
-                  QSystemTrayIcon::MessageIcon icon =
-                    QSystemTrayIcon::Information);
-
-  void
   set_background_color(QColor const& color);
 
   void
@@ -61,6 +56,13 @@ public:
   virtual
   Footer*
   footer();
+
+/*--------.
+| Systray |
+`--------*/
+  signals:
+    void
+    systray_message(fist::SystrayMessageCarrier const&);
 
 private:
   /*----------.

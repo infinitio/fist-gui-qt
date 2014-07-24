@@ -236,7 +236,9 @@ LoginWindow::_login_attempt()
     this->_save_password(email, password);
     return;
   }
-  else if (status == gap_deprecated)
+  ELLE_TRACE("login failed");
+  emit this->login_failed();
+  if (status == gap_deprecated)
   {
     emit version_rejected();
   }
@@ -279,7 +281,6 @@ LoginWindow::_disable()
   this->_footer->setDisabled(true);
   this->_email_field->setDisabled(true);
   this->_password_field->setDisabled(true);
-
 }
 
 void
@@ -309,7 +310,6 @@ LoginWindow::_login()
     this->_email_field->setFocus();
     return;
   }
-
   if (pw.isEmpty())
   {
     ELLE_DEBUG("no password");
@@ -322,15 +322,19 @@ LoginWindow::_login()
   this->_message_field->setMovie(this->_loading_icon);
   this->_message_field->movie()->start();
 
-  this->_login_future = QtConcurrent::run(
-    [=] {
-      // Will explode if the state is destroyed.
-      char* hash = gap_hash_password(
-        this->_state.state(), email.toStdString().c_str(), pw.toStdString().c_str());
+  ELLE_TRACE("every check passed")
+  {
+    emit this->login_attempt();
+    this->_login_future = QtConcurrent::run(
+      [=] {
+        // Will explode if the state is destroyed.
+        char* hash = gap_hash_password(
+          this->_state.state(), email.toStdString().c_str(), pw.toStdString().c_str());
 
-      elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
-      return gap_login(this->_state.state(), email.toStdString().c_str(), hash);
-    });
+        elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
+        return gap_login(this->_state.state(), email.toStdString().c_str(), hash);
+      });
+  }
 
   this->_message_field->setMovie(this->_loading_icon);
   this->_message_field->movie()->start();
@@ -357,6 +361,28 @@ LoginWindow::set_version()
       elle::sprintf("v%s", INFINIT_VERSION)));
   this->_version_field->show();
   this->update();
+}
+
+void
+LoginWindow::update_available(bool mandatory,
+                              QString const& changelog)
+{
+  ELLE_WARN("update available");
+  if (!mandatory)
+    this->try_auto_login();
+}
+
+void
+LoginWindow::download_progress(qint64 downloaded, qint64 total_size)
+{
+  ELLE_DUMP("progress: %s", 100 * downloaded / total_size);
+}
+
+void
+LoginWindow::download_ready()
+{
+  ELLE_TRACE_SCOPE("%s: download ready", *this);
+  emit update_application();
 }
 
 void

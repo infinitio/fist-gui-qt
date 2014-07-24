@@ -34,6 +34,7 @@ public:
 private:
   fist::State& _state;
   fist::gui::TabWidget* _tabs;
+private:
   ELLE_ATTRIBUTE_R(fist::mainview::Transactions*, transactions);
   ELLE_ATTRIBUTE_R(fist::mainview::Links*, links);
 
@@ -44,12 +45,6 @@ private:
 public:
   TransactionFooter*
   footer();
-
-signals:
-  void
-  systray_message(QString const& title,
-                  QString const& body,
-                  QSystemTrayIcon::MessageIcon = QSystemTrayIcon::Information);
 
 private:
   /*----------.

@@ -10,6 +10,7 @@
 # include <fist-gui-qt/TransactionWidget.hh>
 # include <fist-gui-qt/model/Transaction.hh>
 # include <fist-gui-qt/State.hh>
+# include <fist-gui-qt/SystrayMessage.hh>
 
 namespace fist
 {
@@ -42,11 +43,6 @@ namespace fist
       void
       new_transaction_shown(TransactionWidget* widget);
 
-      void
-      systray_message(QString const& title,
-                      QString const& body,
-                      QSystemTrayIcon::MessageIcon = QSystemTrayIcon::Information);
-
     private:
       typedef std::unordered_map<uint32_t, std::shared_ptr<TransactionWidget>> Widgets;
       ELLE_ATTRIBUTE(fist::State&, state);
@@ -55,6 +51,14 @@ namespace fist
     private:
       Q_OBJECT;
 
+      /*--------.
+      | Systray |
+      `--------*/
+    signals:
+      void
+      systray_message(fist::SystrayMessageCarrier const&);
+
+    private:
       /*----------.
       | Printable |
       `----------*/
