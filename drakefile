@@ -154,6 +154,9 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/Settings.cc",
       "src/fist-gui-qt/Settings.hh",
 
+      "src/fist-gui-qt/SystrayMessage.hh",
+      "src/fist-gui-qt/SystrayMessage.cc",
+
       "src/fist-gui-qt/Updater.hh",
       "src/fist-gui-qt/Updater.cc",
       "src/fist-gui-qt/LoadingDialog.hh",
