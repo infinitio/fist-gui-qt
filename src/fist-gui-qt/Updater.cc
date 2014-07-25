@@ -151,6 +151,7 @@ Updater::_handle_reply(QNetworkReply* reply)
   }
   else if (this->_reply->isFinished())
   {
+    ELLE_DEBUG("finished response from %s", this->_updater_url);
     if (this->_reply->url() == this->_updater_url)
     {
       disconnect(this->_reply.get(), SIGNAL(downloadProgress(qint64, qint64)),
@@ -168,10 +169,8 @@ void
 Updater::_check_if_up_to_date(QNetworkReply* reply)
 {
   ELLE_TRACE_SCOPE("%s: check for new update", *this);
-
   QXmlStreamReader xr(reply->readAll());
   QMap<QString, QString> updater_info;
-
   ELLE_TRACE_SCOPE("start reading");
   {
     QXmlStreamReader::TokenType token = xr.readNext();
@@ -188,14 +187,11 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     ELLE_DEBUG_SCOPE("read a new element");
     // Read the next element.
     QXmlStreamReader::TokenType token = xr.readNext();
-
     if(token == QXmlStreamReader::StartElement)
     {
       auto name = xr.name().toString();
-
       ELLE_DEBUG_SCOPE("%s:", name);
       xr.readNext();
-
       if (name == "rich_description")
       {
         xr.readNext();
@@ -238,8 +234,7 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
   }
   if (xr.hasError())
   {
-    emit update_error("update to get update data",
-                      "unable to get update data");
+    emit update_error("update to get update data", "unable to get update data");
     return;
   }
   ELLE_DEBUG("update data:")
@@ -255,7 +250,6 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     static elle::Version current_version(
       INFINIT_VERSION_MAJOR, INFINIT_VERSION_MINOR, INFINIT_VERSION_SUBMINOR);
     ELLE_TRACE("current version: %s", current_version);
-
     QRegExp version("(\\d+)\\.(\\d+)\\.(\\d+)");
     version.indexIn(updater_info["version"]);
     elle::Version update_version(
@@ -267,11 +261,13 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
       ELLE_LOG("no update available");
       if (this->_check_for_update_timer == nullptr)
       {
-        this->_check_for_update_timer = new QTimer(this);
         auto interval = 1000 * 60 * 60; // ms.
+        ELLE_TRACE_SCOPE("launch update checker (check every %sms", interval);
+        this->_check_for_update_timer = new QTimer(this);
         this->_check_for_update_timer->setInterval(interval);
         connect(this->_check_for_update_timer, SIGNAL(timeout()),
                 this, SLOT(check_for_updates()));
+        this->_check_for_update_timer->start();
         return;
       }
     }
@@ -301,26 +297,31 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     {
       auto const& file =
         QDir::toNativeSeparators(this->_installer->fileName()).toStdString();
+      ELLE_TRACE_SCOPE("check local version of the installer %s", file);
       auto size = elle::os::file::size(file);
-      ELLE_TRACE_SCOPE("installer found at %s", file);
       auto const& str = elle::system::read_file_chunk(file, 0, size).string();
       infinit::cryptography::Plain installer_plain(str);
       auto hash = infinit::cryptography::oneway::hash(
         installer_plain, infinit::cryptography::oneway::Algorithm::sha1);
       std::string updater_hash(elle::format::hexadecimal::encode(hash.buffer()));
-      ELLE_LOG("%s vs %s", updater_info["hash"].toStdString(), updater_hash);
+      ELLE_DEBUG("updater(%s) vs local(%s)", updater_info["hash"].toStdString(), updater_hash);
       return updater_info["hash"].toStdString() == updater_hash;
     };
     if (check_local_installer())
+    {
+      ELLE_TRACE("installer already downloaded");
       emit installer_ready();
+    }
     else
     {
+      ELLE_TRACE("old installer found in local");
       this->_remove_old_installer();
       this->download_update();
     }
   }
   else
   {
+    ELLE_TRACE("no updater already present");
     this->download_update();
   }
 #else
