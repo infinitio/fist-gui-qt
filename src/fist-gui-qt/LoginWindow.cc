@@ -224,6 +224,7 @@ LoginWindow::~LoginWindow()
 void
 LoginWindow::_login_attempt()
 {
+  ELLE_TRACE_SCOPE("%s: attempt to login", *this);
   elle::SafeFinally unlock_login([&] {
       this->_enable(); this->_password_field->setFocus(); });
   auto status = this->_login_future.result();
@@ -286,6 +287,7 @@ LoginWindow::_disable()
 void
 LoginWindow::try_auto_login()
 {
+  ELLE_TRACE_SCOPE("%s: try auto login", *this);
   if (!this->_password_field->text().isEmpty())
     this->_login();
 }
@@ -367,7 +369,7 @@ void
 LoginWindow::update_available(bool mandatory,
                               QString const& changelog)
 {
-  ELLE_WARN("update available");
+  ELLE_TRACE_SCOPE("%s: update available", *this);
   if (!mandatory)
     this->try_auto_login();
 }
