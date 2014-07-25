@@ -79,6 +79,7 @@ InfinitDock::InfinitDock(fist::State& state)
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
   , _logout(new QAction(tr("&Logout"), this))
   , _quit(new QAction(tr("&Quit"), this))
+  , _update(nullptr)
 #ifndef FIST_PRODUCTION_BUILD
   , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
 #endif
@@ -323,10 +324,13 @@ InfinitDock::download_ready()
     fist::SystrayMessageCarrier(
       new fist::UpdateAvailableMessage(
         "Update!", "An update is available, click to automatically update")));
-  this->_menu->addSeparator();
-  QAction* update = new QAction("Update", this);
-  connect(update, SIGNAL(triggered()), this, SIGNAL(update_application()));
-  this->_menu->addAction(update);
+  if (this->_update == nullptr)
+  {
+    this->_menu->addSeparator();
+    this->_update = new QAction("Update", this);
+    connect(this->_update, SIGNAL(triggered()), this, SIGNAL(update_application()));
+    this->_menu->addAction(this->_update);
+  }
 }
 
 /*------.

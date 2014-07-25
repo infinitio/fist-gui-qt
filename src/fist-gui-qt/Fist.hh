@@ -20,6 +20,7 @@ class Fist:
   public elle::Printable
 {
   typedef std::unique_ptr<fist::State> StatePtr;
+  typedef Fist Self;
 /*------------.
 | Contruction |
 `------------*/
@@ -105,7 +106,7 @@ private slots:
 
   // Behavior when trying to login.
   void
-  _loging_in();
+  _logging_in();
 
   // Behavior when the login failed.
   void
@@ -127,6 +128,8 @@ private slots:
   void
   _kicked_out(QString const& reason = "");
 
+  void
+  _update_loginwindow_updater_connections(bool connect);
 /*----.
 | Run |
 `----*/

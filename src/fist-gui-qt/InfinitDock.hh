@@ -216,6 +216,7 @@ private:
   QAction* _report_a_problem;
   QAction* _logout;
   QAction* _quit;
+  QAction* _update;
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::Message>, last_message);
 

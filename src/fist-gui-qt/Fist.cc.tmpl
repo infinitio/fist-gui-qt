@@ -7,6 +7,7 @@
 #endif
 
 #include <memory>
+#include <functional>
 
 #include <QDesktopWidget>
 #include <QFontDatabase>
@@ -211,38 +212,19 @@ Fist::_initialize_login_window(bool prefill_fields)
   ELLE_TRACE_SCOPE("%s: initialize login window", *this);
   ELLE_ASSERT(this->_state != nullptr);
   this->_login_window.reset(new LoginWindow(*this->_state, prefill_fields));
+  this->_update_loginwindow_updater_connections(true);
   // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
-  // If no update is available, try to auto login.
-  connect(this->_updater.get(), SIGNAL(no_update_available()),
-          this->_login_window.get(), SLOT(try_auto_login()));
-  // Forward updater error to login window.
-  connect(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
-          this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
-  // Display version.
-  connect(this->_updater.get(), SIGNAL(no_update_available()),
-          this->_login_window.get(), SLOT(set_version()));
+  // Disable updaters signals while logging in.
+  connect(this->_login_window.get(), SIGNAL(login_attempt()),
+          this, SLOT(_logging_in()));
+  // Reanable updaters signals if login was a failure.
+  connect(this->_login_window.get(), SIGNAL(login_failed()),
+          this, SLOT(_login_failed()));
   // Force version checking if the current has been rejected by meta.
   connect(this->_login_window.get(), SIGNAL(version_rejected()),
           this->_updater.get(), SLOT(check_for_updates()));
-  // Notify fist when login is successful.
-  connect(this->_updater.get(), SIGNAL(update_available(bool, QString const&)),
-          this->_login_window.get(), SLOT(update_available(bool, QString const&)));
-  // Forward updater progress to login windows.
-  connect(this->_updater.get(), SIGNAL(download_progress(qint64, qint64)),
-          this->_login_window.get(), SLOT(download_progress(qint64, qint64)));
-  // Notify when the login window that installer is ready to be installed.
-  connect(this->_updater.get(), SIGNAL(installer_ready()),
-          this->_login_window.get(), SLOT(download_ready()));
-  // Launch the update from loginwindow.
-  connect(this->_login_window.get(), SIGNAL(update_application()),
-          this->_updater.get(), SLOT(run_installer()));
-  //
-  connect(this->_login_window.get(), SIGNAL(login_attempt()),
-          this, SLOT(_loging_in()));
-  connect(this->_login_window.get(), SIGNAL(login_failed()),
-          this, SLOT(_login_failed()));
   // Login.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));
@@ -381,9 +363,6 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
-  // Forward updater progress to login windows.
-  disconnect(this->_updater.get(), SIGNAL(download_progress(qint64, qint64)),
-             this->_login_window.get(), SLOT(download_progress(qint64, qint64)));
   this->_dock.reset(new InfinitDock(*this->_state));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
@@ -405,25 +384,56 @@ Fist::logged_in()
 }
 
 void
-Fist::_loging_in()
+Fist::_update_loginwindow_updater_connections(bool connection)
+{
+  ELLE_TRACE_SCOPE("%s: %sconnect signal between login window and updater",
+                   *this, connection ? "" : "dis");
+  auto func = connection
+    ? [&] (const QObject * sender, const char * signal,
+    const QObject * receiver, const char * method) -> bool
+    { return Self::connect(sender, signal, receiver, method); }
+    : [&] (const QObject * sender, const char * signal,
+    const QObject * receiver, const char * method) -> bool
+      { return Self::disconnect(sender, signal, receiver, method); };
+  // Notify when the login window that installer is ready to be installed.
+  func(this->_updater.get(), SIGNAL(installer_ready()),
+       this->_login_window.get(), SLOT(download_ready()));
+  // Display version.
+  func(this->_updater.get(), SIGNAL(no_update_available()),
+       this->_login_window.get(), SLOT(set_version()));
+  // If no update is available, try to auto login.
+  func(this->_updater.get(), SIGNAL(no_update_available()),
+       this->_login_window.get(), SLOT(try_auto_login()));
+  // Forward updater error to login window.
+  func(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
+       this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
+  // Notify if an update is available.
+  func(this->_updater.get(), SIGNAL(update_available(bool, QString const&)),
+       this->_login_window.get(), SLOT(update_available(bool, QString const&)));
+  // Forward updater progress to login windows.
+  func(this->_updater.get(), SIGNAL(download_progress(qint64, qint64)),
+       this->_login_window.get(), SLOT(download_progress(qint64, qint64)));
+  // Launch the update from loginwindow.
+  func(this->_login_window.get(), SIGNAL(update_application()),
+       this->_updater.get(), SLOT(run_installer()));
+}
+
+void
+Fist::_logging_in()
 {
   ELLE_TRACE_SCOPE("%s: loging in", *this);
-  disconnect(this->_updater.get(), SIGNAL(installer_ready()),
-             this->_login_window.get(), SLOT(download_ready()));
+  this->_update_loginwindow_updater_connections(false);
 }
 
 void
 Fist::_login_failed()
 {
+  ELLE_TRACE_SCOPE("%s: login failed", *this);
   if (this->_updater->installer_downloaded())
   {
     this->_updater->run_installer();
   }
-  else
-  {
-    connect(this->_updater.get(), SIGNAL(installer_ready()),
-            this->_login_window.get(), SLOT(download_ready()));
-  }
+  this->_update_loginwindow_updater_connections(true);
 }
 
 void
