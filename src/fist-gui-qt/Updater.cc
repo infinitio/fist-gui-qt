@@ -99,6 +99,29 @@ Updater::download_update()
 }
 
 void
+Updater::version_rejected()
+{
+  ELLE_TRACE_SCOPE("%s: version rejected", *this);
+
+  if (this->_installer_downloaded)
+  {
+    this->run_installer();
+  }
+  else
+  {
+    this->check_for_updates();
+
+    this->_loading_dialog->text("A mandatory update is available!");
+    this->_loading_dialog->setModal(true);
+    this->_loading_dialog->show();
+
+    connect(this, SIGNAL(installer_ready()), this->_loading_dialog, SLOT(hide()));
+    connect(this->_reply.get(), SIGNAL(downloadProgress(qint64, qint64)),
+            this->_loading_dialog, SLOT(download_progress(qint64, qint64)));
+  }
+}
+
+void
 Updater::_remove_old_installer()
 {
   // Delete the old installer file.
@@ -114,6 +137,11 @@ void
 Updater::check_for_updates()
 {
   ELLE_TRACE_SCOPE("%s: check for updates at %s", *this, this->_version_file_url);
+  if (!this->_updater_url.isEmpty())
+  {
+    ELLE_WARN("%s an update has already been found (currently downloading)", *this);
+    return;
+  }
   QNetworkRequest request;
   request.setUrl(this->_version_file_url);
   request.setRawHeader(
@@ -240,6 +268,10 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
   ELLE_DEBUG("update data:")
     for (auto const& elem: updater_info.keys())
       ELLE_DEBUG("%s: %s", elem, updater_info[elem]);
+  if (updater_info.contains("rich_description"))
+    this->_loading_dialog->body(updater_info["rich_description"]);
+  else
+    this->_loading_dialog->body(updater_info["description"]);
   if (!updater_info.contains("version"))
   {
     emit update_error("unable to read the update file",
@@ -359,6 +391,7 @@ Updater::_update(QNetworkReply* reply)
     elle::SafeFinally close_stream([this] { this->_installer->close(); });
     this->_installer->write(this->_reply->readAll());
   }
+  this->_updater_url.clear();
   emit installer_ready();
 #else
   ELLE_WARN("%s: linux update is not avalaible yet", *this);

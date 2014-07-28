@@ -224,7 +224,7 @@ Fist::_initialize_login_window(bool prefill_fields)
           this, SLOT(_login_failed()));
   // Force version checking if the current has been rejected by meta.
   connect(this->_login_window.get(), SIGNAL(version_rejected()),
-          this->_updater.get(), SLOT(check_for_updates()));
+          this->_updater.get(), SLOT(version_rejected()));
   // Login.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));

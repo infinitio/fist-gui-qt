@@ -5,6 +5,7 @@
 # include <QLabel>
 # include <QPushButton>
 # include <QTextEdit>
+# include <QProgressBar>
 
 # include <elle/attribute.hh>
 
@@ -30,6 +31,9 @@ public Q_SLOTS:
 
   void
   body(QString const& text);
+
+  void
+  download_progress(qint64 bytesReceived, qint64 bytesTotal);
 
 signals:
   void
@@ -59,6 +63,7 @@ private:
   ELLE_ATTRIBUTE(QLabel*, loading_icon);
   ELLE_ATTRIBUTE_R(QPushButton*, accept_button);
   ELLE_ATTRIBUTE_R(QPushButton*, reject_button);
+  ELLE_ATTRIBUTE_R(QProgressBar*, progress_bar);
 
 private:
   Q_OBJECT

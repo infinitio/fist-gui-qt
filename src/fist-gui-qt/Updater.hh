@@ -83,6 +83,10 @@ Q_SIGNALS:
   void
   installer_ready();
 
+public slots:
+  void
+  version_rejected();
+
 private slots:
   void
   _set_installer_downloaded();

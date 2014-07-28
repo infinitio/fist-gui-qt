@@ -22,6 +22,7 @@ LoadingDialog::LoadingDialog(QObject* parent):
   _loading_icon(new QLabel(this)),
   _accept_button(new QPushButton(tr("Accept"), this)),
   _reject_button(new QPushButton(tr("Reject"), this))
+  , _progress_bar(new QProgressBar(this))
 {
   auto layout = new QVBoxLayout(this);
   layout->setContentsMargins(8, 8, 8, 8);
@@ -71,9 +72,24 @@ LoadingDialog::LoadingDialog(QObject* parent):
 
     layout->addLayout(hlayout);
   }
+  layout->addStretch();
+  {
+    this->_progress_bar->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::MinimumExpanding);
+    layout->addWidget(this->_progress_bar);
+    this->_progress_bar->hide();
+  }
   this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   this->loading_mode();
+}
+
+void
+LoadingDialog::download_progress(qint64 bytesReceived, qint64 bytesTotal)
+{
+  ELLE_DEBUG_SCOPE("%s: progress: %s / %s", *this, bytesReceived, bytesTotal);
+  this->_progress_bar->setMaximum(bytesTotal);
+  this->_progress_bar->setValue(bytesReceived);
+  this->_progress_bar->show();
 }
 
 void
@@ -87,7 +103,7 @@ LoadingDialog::accept_reject_mode(bool mandatory)
   this->_accept_button->show();
   if (!mandatory)
     this->_reject_button->show();
-
+  this->_progress_bar->hide();
   this->adjustSize();
 }
 
@@ -99,7 +115,9 @@ LoadingDialog::loading_mode()
   this->_loading_icon->show();
   this->_accept_button->hide();
   this->_reject_button->hide();
-  this->_body->hide();
+  if (!this->_body->toHtml().isEmpty())
+    this->_body->show();
+  this->_progress_bar->show();
   this->adjustSize();
 }
 
