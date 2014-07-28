@@ -294,6 +294,10 @@ def configure(cxx_toolkit = None,
         command = self.command
         return self.cmd(' '.join(command), command)
 
+      @property
+      def target(self):
+        return self.__target
+
     nsis_includes = drake.nodes('NSIS/nsProcess.nsh',
                                 'NSIS/utils.nsh',
                                 'NSIS/UAC.nsh',
@@ -322,7 +326,7 @@ def configure(cxx_toolkit = None,
                              strip_prefix = True),
         installer_resources + dynamic_libraries)) + nsis_plugins + nsis_includes
     signed_app = Signer(application,
-                        installer_resources_folder.name() / 'Infinit.exe').targets()[0]
+                        installer_resources_folder.name() / 'Infinit.exe').target
     installer_resources += [signed_app]
 
     content = {
@@ -370,7 +374,7 @@ def configure(cxx_toolkit = None,
     content.update(architecture_dictionary(cxx_toolkit))
     installer = Signer(
       drake.Node('bin/unsigned_installer.exe'),
-      drake.Path('bin/Infinit_Installer.exe')).targets()[0]
+      drake.Path('bin/Infinit_Installer.exe')).target
 
     templating_context = drake.templating.Context(
       content = content,
