@@ -259,6 +259,9 @@ Section "Install ${product_name}"
   File "${resources_folder}\${icon}"
   File "${resources_folder}\${onboarding_file}"
 
+  ;; Launch at start up.
+  CreateShortCut "$SMSTARTUP\${product_name}.lnk" "$INSTDIR\${executable}"
+
   ;; Uninstaller.
   WriteUninstaller "${'${uninstaller}'}"
 
