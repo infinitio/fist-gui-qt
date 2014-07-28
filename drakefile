@@ -224,8 +224,8 @@ def configure(cxx_toolkit = None,
     'bin/Infinit',
     sources + libraries,
     cxx_toolkit,
-    cxx_config)
-
+    cxx_config,
+    strip = True)
 
   build = drake.Rule('build')
   build << application
