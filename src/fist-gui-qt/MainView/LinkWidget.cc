@@ -149,7 +149,8 @@ namespace fist
       auto old_progress = this->_progress_animation->endValue();
       auto new_progress = this->_model.progress();
       this->_update(
-        QString("Uploading... (%1%)").arg(new_progress * 100));
+        QString::fromStdString(
+          elle::sprintf("Uploading... (%s%%)", int(new_progress * 100))));
       ELLE_DEBUG_SCOPE("update progress from %s to %s",
                        old_progress, new_progress);
       this->_progress_animation->stop();
