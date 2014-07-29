@@ -300,8 +300,8 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
         connect(this->_check_for_update_timer, SIGNAL(timeout()),
                 this, SLOT(check_for_updates()));
         this->_check_for_update_timer->start();
-        return;
       }
+      return;
     }
     else
     {
