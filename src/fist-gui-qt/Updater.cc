@@ -294,7 +294,7 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
       if (this->_check_for_update_timer == nullptr)
       {
         auto interval = 1000 * 60 * 60; // ms.
-        ELLE_TRACE_SCOPE("launch update checker (check every %sms", interval);
+        ELLE_TRACE_SCOPE("launch update checker (check every %sms)", interval);
         this->_check_for_update_timer = new QTimer(this);
         this->_check_for_update_timer->setInterval(interval);
         connect(this->_check_for_update_timer, SIGNAL(timeout()),
