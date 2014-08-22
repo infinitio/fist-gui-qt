@@ -406,6 +406,13 @@ namespace fist
   }
 
   void
+  State::on_transaction_deleted(uint32_t id)
+  {
+    ELLE_ASSERT(id != gap_null());
+    gap_delete_transaction(this->state(), id);
+  }
+
+  void
   State::open_file(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());

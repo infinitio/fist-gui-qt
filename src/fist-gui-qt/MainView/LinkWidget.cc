@@ -27,9 +27,11 @@ namespace fist
       , _model(model)
       , _layout(new QHBoxLayout(this))
       , _picture()
+      , _text_style(view::links::file::style)
       , _name(this->_model.name())
       , _status()
       , _click_counter()
+      , _cancel_button(new IconButton(QPixmap(":/buttons/reject.png")))
       , _go_to_website(new IconButton(QPixmap(":/buttons/share.png")))
       , _copy_link(new IconButton(QPixmap(":/buttons/clipboard.png")))
       , _progress_timer(nullptr)
@@ -41,7 +43,7 @@ namespace fist
               this, SLOT(_on_status_updated()));
 
       this->_layout->setContentsMargins(12, 12, 12, 12);
-      this->_layout->setSpacing(10);
+      this->_layout->setSpacing(5);
       {
         this->_picture.setPixmap(gui::icon_provider().icon(this->_model.name()).scaled(42, 42));
         this->_layout->addWidget(&this->_picture);
@@ -53,7 +55,7 @@ namespace fist
         vlayout->setSpacing(5);
         {
           this->_name.setToolTip(this->_model.name());
-          view::links::file::style(this->_name);
+          this->_text_style(this->_name);
           vlayout->addWidget(&this->_name);
         }
         {
@@ -62,6 +64,15 @@ namespace fist
         }
         vlayout->addStretch();
         this->_layout->addLayout(vlayout, 1);
+      }
+      {
+        this->_cancel_button->setToolTip("Cancel");
+        auto* vlayout = new QVBoxLayout;
+        vlayout->setContentsMargins(0, 0, 0, 0);
+        vlayout->addStretch();
+        vlayout->addWidget(this->_cancel_button);
+        vlayout->addStretch();
+        this->_layout->addLayout(vlayout);
       }
       {
         auto* vlayout = new QVBoxLayout;
@@ -86,6 +97,8 @@ namespace fist
 
       connect(this->_go_to_website, SIGNAL(clicked()),
               this, SLOT(_open_link()));
+      connect(this->_cancel_button, SIGNAL(clicked()),
+              this, SLOT(_cancel()));
       connect(this->_copy_link, SIGNAL(clicked()),
               this, SLOT(_copy_link_to_clipboard()));
 
@@ -118,14 +131,18 @@ namespace fist
       this->_click_counter.setText(
         QString("%1").arg(this->_model.click_count()));
 
-      if (this->_model.status() == gap_transaction_failed)
+      if (this->_model.status() == gap_transaction_failed ||
+          this->_model.status() == gap_transaction_canceled ||
+          this->_model.status() == gap_transaction_deleted)
       {
-          view::links::file::failed_style(this->_name);
+        this->_text_style = view::links::file::failed_style;
       }
       else if (this->_model.status() == gap_transaction_finished)
       {
-          view::links::file::style(this->_name);
+        this->_text_style = view::links::file::style;
       }
+
+      this->_text_style(this->_name);
       if ((this->_model.status() == gap_transaction_transferring) &&
           (this->_progress_timer == nullptr))
       {
@@ -141,6 +158,16 @@ namespace fist
       }
 
       this->repaint();
+    }
+
+    void
+    LinkWidget::_cancel()
+    {
+      ELLE_TRACE_SCOPE("%s: cancel/delete transaction", *this);
+      if (!this->_model.is_finished())
+        emit transaction_canceled(this->_model.id());
+      else
+        emit transaction_deleted(this->_model.id());
     }
 
     void
@@ -164,7 +191,7 @@ namespace fist
     LinkWidget::_set_smooth_progress(float progress)
     {
       this->_smooth_progress = progress;
-      auto style = view::links::file::style;
+      auto style = this->_text_style;
       style.color(style.color().darker(20 + 50 * this->_smooth_progress));
       style(this->_name);
       this->repaint();
@@ -173,6 +200,12 @@ namespace fist
     void
     LinkWidget::enterEvent(QEvent*)
     {
+      if (this->_model.status() == gap_transaction_failed ||
+          this->_model.status() == gap_transaction_canceled ||
+          this->_model.status() == gap_transaction_deleted)
+        return;
+
+      this->_cancel_button->show();
       this->_go_to_website->show();
       this->_copy_link->show();
       this->_click_counter.hide();
@@ -181,6 +214,7 @@ namespace fist
     void
     LinkWidget::leaveEvent(QEvent*)
     {
+      this->_cancel_button->hide();
       this->_go_to_website->hide();
       this->_copy_link->hide();
       this->_click_counter.show();

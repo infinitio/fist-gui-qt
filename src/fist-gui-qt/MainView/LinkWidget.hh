@@ -11,6 +11,7 @@
 # include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/gui/Tooltip.hh>
 # include <fist-gui-qt/utils.hh>
+# include <fist-gui-qt/globals.hh>
 
 namespace fist
 {
@@ -62,13 +63,25 @@ namespace fist
       void
       trigger() override {}
 
+      void
+      _cancel();
+
+    signals:
+      void
+      transaction_canceled(uint32_t);
+
+      void
+      transaction_deleted(uint32_t);
+
     private:
       ELLE_ATTRIBUTE(fist::model::Link const&, model);
       ELLE_ATTRIBUTE(QHBoxLayout*, layout);
       ELLE_ATTRIBUTE(QLabel, picture);
+      ELLE_ATTRIBUTE(style::Text, text_style);
       ELLE_ATTRIBUTE(QLabel, name);
       ELLE_ATTRIBUTE(QLabel, status);
       ELLE_ATTRIBUTE(QLabel, click_counter);
+      ELLE_ATTRIBUTE(IconButton*, cancel_button);
       ELLE_ATTRIBUTE(IconButton*, go_to_website);
       ELLE_ATTRIBUTE(IconButton*, copy_link);
       ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);

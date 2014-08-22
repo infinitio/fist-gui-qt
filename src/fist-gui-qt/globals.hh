@@ -36,44 +36,47 @@ static QString Font(Arial);
 // ...
 // Otherwise, qss should work too.
 
-namespace
+namespace fist
 {
-  // TextStyle provides a friendly api to set Widget font and color.
-  struct TextStyle
+  namespace style
   {
-    TextStyle(QFont const& font,
-              QColor const& color = QColor(0x25, 0x25, 0x25),
-              Qt::Alignment const& aligment = Qt::AlignLeft | Qt::AlignVCenter):
-      _font(font),
-      _color(color),
-      _alignement(aligment)
+    // TextStyle provides a friendly api to set Widget font and color.
+    struct Text
     {
-      this->_font.setStyleStrategy(QFont::PreferAntialias);
-    }
-
-    void
-    operator ()(QLabel& target) const
-    {
-      target.setAlignment(this->_alignement);
-      this->operator ()(*(static_cast<QWidget*>(&target)));
-    }
-
-    void
-    operator ()(QWidget& target) const
-    {
-      target.setFont(this->_font);
-      QPalette palette = target.palette();
+      Text(QFont const& font,
+           QColor const& color = QColor(0x25, 0x25, 0x25),
+           Qt::Alignment const& aligment = Qt::AlignLeft | Qt::AlignVCenter):
+        _font(font),
+        _color(color),
+        _alignement(aligment)
       {
-        palette.setColor(QPalette::WindowText, this->_color);
+        this->_font.setStyleStrategy(QFont::PreferAntialias);
       }
-      target.setPalette(palette);
-    }
 
-  private:
-    ELLE_ATTRIBUTE_RX(QFont, font);
-    ELLE_ATTRIBUTE_RW(QColor, color);
-    ELLE_ATTRIBUTE_R(Qt::Alignment, alignement);
-  };
+      void
+      operator ()(QLabel& target) const
+      {
+        target.setAlignment(this->_alignement);
+        this->operator ()(*(static_cast<QWidget*>(&target)));
+      }
+
+      void
+      operator ()(QWidget& target) const
+      {
+        target.setFont(this->_font);
+        QPalette palette = target.palette();
+        {
+          palette.setColor(QPalette::WindowText, this->_color);
+        }
+        target.setPalette(palette);
+      }
+
+    private:
+      ELLE_ATTRIBUTE_RX(QFont, font);
+      ELLE_ATTRIBUTE_RW(QColor, color);
+      ELLE_ATTRIBUTE_R(Qt::Alignment, alignement);
+    };
+  }
 }
 
 namespace regexp
@@ -100,7 +103,7 @@ namespace view
   namespace tab
   {
     static
-    TextStyle const
+    fist::style::Text const
     style(QFont(Montserrat, 9.5), QColor(0x8B, 0x8B, 0x83));
 
     static
@@ -108,7 +111,7 @@ namespace view
     bar_color(0xE6, 0xE6, 0xE6);
 
     static
-    TextStyle const
+    fist::style::Text const
     hover_style(QFont(Montserrat, 9.5), QColor(0x51, 0x51, 0x49));
 
     static
@@ -116,21 +119,21 @@ namespace view
     bar_hover_color(0xD5, 0xD5, 0xD5);
 
     static
-    TextStyle const
+    fist::style::Text const
     selected_style(QFont(Montserrat, 9.5), QColor(0x2B, 0xBE, 0xBD));
 
     namespace counter
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Montserrat, 7), tab::style.color(), Qt::AlignTop);
 
       static
-      TextStyle const
+      fist::style::Text const
       hover_style(QFont(Montserrat, 7), tab::hover_style.color(), Qt::AlignTop);
 
       static
-      TextStyle const
+      fist::style::Text const
       selected_style(QFont(Montserrat, 7), tab::selected_style.color(), Qt::AlignTop);
     }
 
@@ -139,7 +142,7 @@ namespace view
   namespace tooltip
   {
     static
-    TextStyle const
+    fist::style::Text const
     style(QFont(Font, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
   }
 
@@ -156,7 +159,7 @@ namespace view
     namespace email
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
 
       static
@@ -171,7 +174,7 @@ namespace view
     namespace password
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
 
       static
@@ -186,14 +189,14 @@ namespace view
     namespace message
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 11), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
     }
 
     namespace links
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9), QColor(0x3D, 0x91, 0xD4));
 
       static
@@ -225,14 +228,14 @@ namespace view
     namespace version
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 8.5), QColor(0x88, 0x88, 0x88));
     }
 
     namespace footer
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 11, QFont::Bold), Qt::white);
 
       static
@@ -246,32 +249,32 @@ namespace view
     namespace no_links
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     namespace file
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9.5), QColor(0x25, 0x25, 0x25));
 
       static
-      TextStyle const
+      fist::style::Text const
       failed_style(QFont(Font, 9.5), QColor(0xD3, 0x15, 0x15));
     }
 
     namespace status
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 8.5), QColor(0xA8, 0xA8, 0xA8));
     }
 
     namespace counter
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
 
     }
@@ -282,7 +285,7 @@ namespace view
     namespace no_notification
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
@@ -293,25 +296,25 @@ namespace view
     namespace peer
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 10), QColor(0x25, 0x25, 0x25));
     }
 
     namespace files
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9.5), QColor(0xA8, 0xA8, 0xA8));
 
       static
-      TextStyle const
+      fist::style::Text const
       hover_style(QFont(Font, 9), QColor(0x3D, 0x91, 0xD4));
     }
 
     namespace date
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 8), QColor(0xA8, 0xA8, 0xA8));
     }
   }
@@ -323,14 +326,14 @@ namespace view
       namespace name
       {
         static
-        TextStyle const
+        fist::style::Text const
         style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       namespace size
       {
         static
-        TextStyle const
+        fist::style::Text const
         style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
@@ -342,11 +345,11 @@ namespace view
     namespace file_adder
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
 
       static
-      TextStyle const
+      fist::style::Text const
       hover_style(QFont(Font, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
 
       static
@@ -365,7 +368,7 @@ namespace view
     namespace search_field
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
@@ -376,7 +379,7 @@ namespace view
     namespace message
     {
       static
-      TextStyle const
+      fist::style::Text const
       style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
@@ -386,7 +389,7 @@ namespace view
       namespace remaining_characters
       {
         static
-        TextStyle const
+        fist::style::Text const
         style(QFont(Font, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
 
       }
@@ -397,14 +400,14 @@ namespace view
       namespace fullname
       {
         static
-        TextStyle const
+        fist::style::Text const
         style(QFont(Font, 9), QColor(0x25, 0x25, 0x25));
       }
 
       namespace handle
       {
         static
-        TextStyle const
+        fist::style::Text const
         style(QFont(Font, 8), QColor(0xC4, 0xC4, 0xC4));
       }
     }

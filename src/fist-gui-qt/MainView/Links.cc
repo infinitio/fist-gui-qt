@@ -39,13 +39,11 @@ namespace fist
 
       for (model::Link const& model: this->_state.links().get<0>())
       {
-        this->add_link(model);
+        if (model.status() != gap_transaction_canceled &&
+            model.status() != gap_transaction_failed &&
+            model.status() != gap_transaction_deleted)
+          this->add_link(model);
       }
-
-      // connect(&this->_state, SIGNAL(new_transaction(id)),
-      //         this, SLOT(add_transaction(uint32_t)));
-      // connect(&this->_state, SIGNAL(transaction_updated(uint32_t)),
-      //         this, SLOT(_on_transaction_updated(uint32_t)));
     }
 
     void
@@ -67,6 +65,7 @@ namespace fist
     {
       if (this->_widgets.empty())
       {
+        // Get rid of the "TextListItem".
         this->_link_list->clearWidgets();
       }
 
@@ -76,6 +75,11 @@ namespace fist
       }
 
       auto widget = std::make_shared<LinkWidget>(model);
+
+      connect(widget.get(), SIGNAL(transaction_canceled(uint32_t)),
+              &this->_state, SLOT(on_transaction_canceled(uint32_t)));
+      connect(widget.get(), SIGNAL(transaction_deleted(uint32_t)),
+              &this->_state, SLOT(on_transaction_deleted(uint32_t)));
 
       this->_link_list->add_widget(widget,
                                    ListWidget::Position::Top);
@@ -89,7 +93,6 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: update link %s", *this, id);
 
-      auto const& link = this->_state.link(id);
       if (this->_widgets.find(id) == this->_widgets.end())
       {
         ELLE_WARN("%s: update for an non displayed link: %s",

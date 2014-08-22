@@ -170,6 +170,8 @@ namespace fist
     void
     on_transaction_canceled(uint32_t id);
     void
+    on_transaction_deleted(uint32_t id);
+    void
     open_file(uint32_t id);
   signals:
     void
