@@ -20,7 +20,10 @@ namespace fist
     class Transaction
       : public Model
     {
+    private:
       typedef Model Super;
+    public:
+      typedef gap_TransactionStatus Status;
     public:
       Transaction(fist::State& state,
                     uint32_t id);
@@ -66,7 +69,7 @@ namespace fist
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
       ELLE_ATTRIBUTE_RP(boost::logic::tribool, is_sender, mutable);
-      ELLE_ATTRIBUTE_rw(gap_TransactionStatus, status);
+      ELLE_ATTRIBUTE_rw(Status, status);
       ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
       ELLE_ATTRIBUTE_RP(uint32_t, peer_id, mutable);
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);

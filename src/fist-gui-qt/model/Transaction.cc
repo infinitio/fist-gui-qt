@@ -49,11 +49,12 @@ namespace fist
           gap_transaction_failed,
           gap_transaction_canceled,
           gap_transaction_rejected,
+          gap_transaction_deleted,
           gap_transaction_cloud_buffered,
         };
 
-      return gap_transaction_is_final(this->_state.state(), this->id()) ||
-        final_states.contains(this->status());
+      return final_states.contains(this->status()) ||
+        gap_transaction_is_final(this->_state.state(), this->id());
     }
 
     QString const&

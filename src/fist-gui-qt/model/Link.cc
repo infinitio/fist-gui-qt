@@ -86,8 +86,7 @@ namespace fist
           gap_transaction_canceled,
         };
 
-      return gap_transaction_is_final(this->_state.state(), this->id()) ||
-        final_states.contains(this->status());
+      return final_states.contains(this->status()) || gap_transaction_is_final(this->_state.state(), this->id());
     }
 
     void
