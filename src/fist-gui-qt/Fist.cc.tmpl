@@ -179,20 +179,12 @@ Fist::about_to_quit()
   auto kicked = false;
   auto final = true;
   this->logout(kicked, final);
-  ELLE_DEBUG("cleaning done");
   ELLE_ASSERT(this->_state == nullptr);
-}
-
-void
-Fist::quit()
-{
-  ELLE_TRACE_SCOPE("%s: quit", *this);
   ELLE_DEBUG("clear lock")
   {
     this->_filelock.setPermissions(QFile::WriteOwner);
     this->_filelock.remove();
   }
-  this->_application->setQuitOnLastWindowClosed(false);
   ELLE_DEBUG("close updater")
     if (this->_updater != nullptr)
     {
@@ -200,6 +192,14 @@ Fist::quit()
       this->_updater->loading_dialog()->close();
       this->_updater.reset();
     }
+  ELLE_LOG("cleaning done");
+}
+
+void
+Fist::quit()
+{
+  ELLE_TRACE_SCOPE("%s: quit", *this);
+  this->_application->setQuitOnLastWindowClosed(false);
   this->about_to_quit();
   this->_application->setQuitOnLastWindowClosed(true);
   ELLE_LOG("quit")
