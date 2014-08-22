@@ -212,6 +212,7 @@ private:
   QPixmap _logo;
   QSystemTrayIcon* _systray;
   QMenu* _systray_menu;
+  QAction* _show;
   QAction* _send_files;
   QAction* _report_a_problem;
   QAction* _logout;

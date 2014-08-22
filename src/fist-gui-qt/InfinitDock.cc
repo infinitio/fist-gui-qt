@@ -75,6 +75,7 @@ InfinitDock::InfinitDock(fist::State& state)
   , _logo(":/icons/menu-bar-fire@2x.png")
   , _systray(new QSystemTrayIcon(this))
   , _systray_menu(new QMenu(this))
+  , _show(new QAction(tr("&Show dock"), this))
   , _send_files(new QAction(tr("&Send files..."), this))
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
   , _logout(new QAction(tr("&Logout"), this))
@@ -94,6 +95,7 @@ InfinitDock::InfinitDock(fist::State& state)
           this,
           SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
 
+  this->_systray_menu->addAction(_show);
   this->_systray_menu->addAction(_send_files);
   this->_systray_menu->addAction(_quit);
   this->_systray->setContextMenu(_systray_menu);
@@ -171,6 +173,7 @@ InfinitDock::InfinitDock(fist::State& state)
   this->_show_transactions_view();
 
   this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
+  this->connect(_show, SIGNAL(triggered()), this, SLOT(show()));
   this->connect(_report_a_problem, SIGNAL(triggered()),
                 this, SLOT(report_a_problem()));
   this->connect(_logout, SIGNAL(triggered()), this, SLOT(_on_logout()));
