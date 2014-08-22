@@ -18,7 +18,7 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 
-TransactionWidget::TransactionWidget(fist::model::Transaction const& model):
+TransactionWidget::TransactionWidget(Model const& model):
   ListItem(nullptr, view::background, false),
   _transaction(model),
   _peer_avatar(new AvatarWidget(this->_transaction.avatar())),
@@ -296,10 +296,8 @@ TransactionWidget::apply_update()
             this, SLOT(update_progress()));
     this->_progress_timer->start(AvatarWidget::progress_update_interval);
 
-    connect(this,
-            SIGNAL(onProgressChanged(float)),
-            this->_peer_avatar,
-            SLOT(setProgress(float)));
+    connect(this, SIGNAL(onProgressChanged(float)),
+            this->_peer_avatar, SLOT(setProgress(float)));
   }
   else if (this->_transaction.status() != gap_transaction_transferring &&
            this->_progress_timer != nullptr)
@@ -343,7 +341,6 @@ void
 TransactionWidget::cancel()
 {
   ELLE_TRACE_SCOPE("%s: cancel transaction", *this);
-
   emit transaction_canceled(this->_transaction.id());
 }
 
@@ -357,8 +354,8 @@ TransactionWidget::_on_status_updated()
     public elle::Printable
   {
     StatusUpdater(QString const& image_path,
-                  bool animated,
-                  QString const& tooltip):
+                  bool animated = false,
+                  QString const& tooltip = ""):
       _image_path(image_path),
       _animated(animated),
       _tooltip(tooltip)
@@ -393,38 +390,51 @@ TransactionWidget::_on_status_updated()
     }
   };
 
-  static std::map<gap_TransactionStatus, StatusUpdater> tooltips{
-    { gap_transaction_new, StatusUpdater(QString(), false, "New") },
-    { gap_transaction_waiting_accept,
-        StatusUpdater(QString(":/icons/loading.gif"),
-                      true,
-                      "Wait for user to accept") },
-    { gap_transaction_waiting_data,
-        StatusUpdater(QString(":/icons/loading.gif"),
-                      true,
-                      "Waiting for data") },
-    { gap_transaction_connecting,
-        StatusUpdater(QString(":/icons/loading.gif"),
-                      true,
-                      "Connecting") },
-    { gap_transaction_transferring,
-        StatusUpdater(QString(), false, "Transferring") },
-    { gap_transaction_finished,
-        StatusUpdater(QString(":/icons/check.png"), false, "Finished") },
-    { gap_transaction_cloud_buffered,
-        StatusUpdater(QString(":/icons/check.png"), false, "Cloud Buffered") },
-    { gap_transaction_failed,
-        StatusUpdater(QString(":/icons/error.png"), false, "Failed") },
-    { gap_transaction_canceled,
-        StatusUpdater(QString(":/icons/error.png"), false, "Canceled") },
-    { gap_transaction_rejected,
-        StatusUpdater(QString(":/icons/error.png"), false, "Rejected") },
-  };
+  auto tooltip = [] (Model::Status const& status) -> StatusUpdater
+    {
+      switch (status)
+      {
+        case gap_transaction_new:
+          return StatusUpdater(
+            QString(), false, "New");
+        case gap_transaction_waiting_accept:
+          return StatusUpdater(
+            QString(":/icons/loading.gif"), true, "Wait for user to accept");
+        case gap_transaction_waiting_data:
+          return StatusUpdater(
+            QString(":/icons/loading.gif"), true, "Waiting for data");
+        case gap_transaction_connecting:
+          return StatusUpdater(
+            QString(":/icons/loading.gif"), true, "Connecting");
+        case gap_transaction_transferring:
+          return StatusUpdater(QString(), false, "Transferring");
+        case gap_transaction_finished:
+          return StatusUpdater(
+            QString(":/icons/check.png"), false, "Finished");
+        case gap_transaction_cloud_buffered:
+          return StatusUpdater(
+            QString(":/icons/check.png"), false, "Cloud Buffered");
+        case gap_transaction_failed:
+          return StatusUpdater(QString(":/icons/error.png"), false, "Failed");
+        case gap_transaction_canceled:
+          return StatusUpdater(QString(":/icons/error.png"), false, "Canceled");
+        case gap_transaction_rejected:
+          return StatusUpdater(QString(":/icons/error.png"), false, "Rejected");
+        case gap_transaction_deleted:
+          return StatusUpdater(QString(":/icons/error.png"), false, "Deleted");
+        case gap_transaction_on_other_device:
+          return StatusUpdater(
+            QString(":/icons/loading.gif"), true, "On another device");
+      }
+
+      return StatusUpdater(QString(), false, "Something wrong append");
+    };
 
   if (this->_transaction.status() == gap_transaction_finished)
     emit transaction_finished(this->_transaction.id());
 
-  tooltips.at(this->_transaction.status())(*this->_status);
+  tooltip(this->_transaction.status())(*this->_status);
+
   if (this->_transaction.status() == gap_transaction_transferring)
   {
     if (this->_transaction.is_sender())

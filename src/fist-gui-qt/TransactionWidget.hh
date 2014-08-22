@@ -20,9 +20,10 @@ class TransactionWidget:
   public ListItem
 {
   typedef ListItem Super;
+  typedef fist::model::Transaction Model;
 
 public:
-  TransactionWidget(fist::model::Transaction const& model);
+  TransactionWidget(Model const& model);
   virtual
   ~TransactionWidget();
 
@@ -89,7 +90,7 @@ private slots:
   void _on_status_updated();
 
 private:
-  ELLE_ATTRIBUTE_R(fist::model::Transaction const&, transaction);
+  ELLE_ATTRIBUTE_R(Model const&, transaction);
   ELLE_ATTRIBUTE_R(AvatarWidget*, peer_avatar);
   ELLE_ATTRIBUTE_R(QLabel*, peer_fullname);
   QLabel* _peer_status;
