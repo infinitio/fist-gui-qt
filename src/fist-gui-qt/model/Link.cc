@@ -7,6 +7,8 @@
 #include <fist-gui-qt/model/Link.hh>
 #include <fist-gui-qt/State.hh>
 
+ELLE_LOG_COMPONENT("infinit.FIST.model.Link");
+
 namespace fist
 {
   namespace model
@@ -21,6 +23,7 @@ namespace fist
     void
     Link::update()
     {
+      ELLE_TRACE_SCOPE("%s: update", *this);
       surface::gap::LinkTransaction old = this->_link;
       this->_link = gap_link_transaction_by_id(this->_state.state(), this->id());
 
@@ -84,6 +87,7 @@ namespace fist
           gap_transaction_finished,
           gap_transaction_failed,
           gap_transaction_canceled,
+          gap_transaction_deleted,
         };
 
       return final_states.contains(this->status()) || gap_transaction_is_final(this->_state.state(), this->id());
@@ -92,7 +96,7 @@ namespace fist
     void
     Link::print(std::ostream& stream) const
     {
-      stream << "Link(" << this->id() << ")";
+      stream << "Link(" << this->id() << ", " << this->status() << ")";
     }
   }
 }

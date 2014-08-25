@@ -47,6 +47,10 @@ namespace fist
     g_state = this;
     ELLE_DEBUG("transaction updated callback")
       gap_transaction_callback(this->state(), State::transaction_callback);
+    ELLE_DEBUG("link updated callback")
+      gap_link_callback(
+        this->state(),
+        std::bind(&State::on_link_updated_callback, this, std::placeholders::_1));
     ELLE_DEBUG("user status updated callback")
       gap_user_status_callback(this->state(), State::user_status_callback);
     ELLE_DEBUG("avatar updated callback")
@@ -340,10 +344,17 @@ namespace fist
       };
 
       this->_links.modify(this->_links.get<0>().find(id), UpdateLink());
-      emit link_updated(id);
+      ELLE_DEBUG("update link")
+        emit link_updated(id);
 
       this->_compute_active_links();
     }
+  }
+
+  void
+  State::on_link_updated_callback(surface::gap::LinkTransaction const& tr)
+  {
+    this->on_transaction_callback(tr.id, tr.status);
   }
 
   model::Transaction const&

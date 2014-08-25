@@ -156,6 +156,9 @@ namespace fist
     on_transaction_callback(uint32_t,
                             gap_TransactionStatus);
 
+    void
+    on_link_updated_callback(surface::gap::LinkTransaction const& tr);
+
     model::Transaction const&
     transaction(uint32_t id);
 

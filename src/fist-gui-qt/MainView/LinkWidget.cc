@@ -156,7 +156,8 @@ namespace fist
       {
         this->_progress_timer.reset();
       }
-
+      if (this->_name.text().isEmpty())
+        this->_name.setText(this->_model.name());
       this->repaint();
     }
 
