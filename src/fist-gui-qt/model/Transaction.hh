@@ -37,6 +37,9 @@ namespace fist
       bool
       is_final() const;
 
+      bool
+      concerns_device() const;
+
       QString const&
       peer_fullname() const;
 
@@ -69,6 +72,7 @@ namespace fist
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
       ELLE_ATTRIBUTE_RP(boost::logic::tribool, is_sender, mutable);
+      ELLE_ATTRIBUTE_RP(boost::logic::tribool, is_recipient, mutable);
       ELLE_ATTRIBUTE_rw(Status, status);
       ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
       ELLE_ATTRIBUTE_RP(uint32_t, peer_id, mutable);

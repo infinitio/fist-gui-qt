@@ -20,6 +20,9 @@ namespace fist
       , _is_sender(
         gap_self_id(this->_state.state()) ==
         gap_transaction_sender_id(this->_state.state(), this->id()))
+      , _is_recipient(
+        gap_self_id(this->_state.state()) ==
+        gap_transaction_recipient_id(this->_state.state(), this->id()))
       , _status(gap_transaction_status(this->_state.state(), this->id()))
       , _peer_fullname((char const*) nullptr)
       , _peer_id(
@@ -32,6 +35,11 @@ namespace fist
       , _new_avatar(true)
     {
       ELLE_TRACE_SCOPE("%s: create transaction model", *this);
+      if (this->is_sender())
+        ELLE_DEBUG("as sender");
+      if (this->is_recipient())
+        ELLE_DEBUG("as recipient");
+      ELLE_DEBUG("status %s", this->_status);
     }
 
     model::User const&
@@ -93,6 +101,13 @@ namespace fist
       }
 
       return this->_files;
+    }
+
+    bool
+    Transaction::concerns_device() const
+    {
+      return gap_transaction_concern_device(
+        this->_state.state(), this->id(), false);
     }
 
     QString

@@ -300,6 +300,8 @@ namespace fist
         this->_transactions.emplace(*this, id);
         emit new_transaction(id);
       }
+      else if (it->status() == status)
+        return;
 
       struct UpdateStatus
       {
@@ -316,11 +318,9 @@ namespace fist
         ELLE_ATTRIBUTE(gap_TransactionStatus, status);
       };
 
-      this->_transactions.modify(
-        this->_transactions.get<0>().find(id), UpdateStatus(status));
+      this->_transactions.modify(it, UpdateStatus(status));
       this->_transactions.get<0>().find(id)->status_updated();
       emit transaction_updated(id);
-
       this->_compute_active_transactions();
     }
     else
@@ -331,6 +331,8 @@ namespace fist
         this->_links.emplace(*this, id);
         emit new_link(id);
       }
+      else if (it->status() == status)
+        return;
 
       struct UpdateLink
       {
@@ -343,10 +345,9 @@ namespace fist
         }
       };
 
-      this->_links.modify(this->_links.get<0>().find(id), UpdateLink());
+      this->_links.modify(it, UpdateLink());
       ELLE_DEBUG("update link")
         emit link_updated(id);
-
       this->_compute_active_links();
     }
   }

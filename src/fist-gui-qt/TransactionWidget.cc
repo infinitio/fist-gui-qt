@@ -253,9 +253,9 @@ TransactionWidget::apply_update()
   else
     this->_peer_status->hide();
 
-
-  if (this->_transaction.status() == gap_transaction_waiting_accept &&
-      !this->_transaction.is_sender())
+  if ((this->_transaction.status() == gap_transaction_waiting_accept || this->_transaction.status() == gap_transaction_cloud_buffered) &&
+      ((!this->_transaction.is_sender()) ||
+       (this->_transaction.is_sender() && this->_transaction.is_recipient() && !this->_transaction.concerns_device())))
   {
     ELLE_DEBUG("show accept / reject buttons");
     this->_accept_reject_area->show();
