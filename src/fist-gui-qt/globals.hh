@@ -211,7 +211,7 @@ namespace view
         static
         QString const
         text("<a style=\"text-decoration: none; color: #489FCE;\" "
-             "href=\"https://infinit.io/forgot_password\">"
+             "href=\"https://infinit.io/forgot_password?utm_source=app&utm_medium=windows\">"
              "forgot password?</a>");
       }
 
@@ -220,7 +220,7 @@ namespace view
         static
         QString const
         text("<a style=\"text-decoration: none; color: #489FCE;\" "
-             "href=\"https://infinit.io/register\">"
+             "href=\"https://infinit.io/register?utm_source=app&utm_medium=windows\">"
              "need an account?</a>");
       }
     }
