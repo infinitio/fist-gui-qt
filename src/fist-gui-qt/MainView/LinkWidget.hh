@@ -74,6 +74,11 @@ namespace fist
       transaction_deleted(uint32_t);
 
     private:
+      bool
+      eventFilter(QObject *obj,
+                  QEvent *event) override;
+
+    private:
       ELLE_ATTRIBUTE(fist::model::Link const&, model);
       ELLE_ATTRIBUTE(QHBoxLayout*, layout);
       ELLE_ATTRIBUTE(QLabel, picture);
@@ -81,7 +86,8 @@ namespace fist
       ELLE_ATTRIBUTE(QLabel, name);
       ELLE_ATTRIBUTE(QLabel, status);
       ELLE_ATTRIBUTE(QLabel, click_counter);
-      ELLE_ATTRIBUTE(IconButton*, cancel_button);
+      ELLE_ATTRIBUTE(IconButton*, cancel_link);
+      ELLE_ATTRIBUTE(bool, first_click);
       ELLE_ATTRIBUTE(IconButton*, go_to_website);
       ELLE_ATTRIBUTE(IconButton*, copy_link);
       ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, progress_timer);

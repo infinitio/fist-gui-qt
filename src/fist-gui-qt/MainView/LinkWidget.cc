@@ -31,7 +31,7 @@ namespace fist
       , _name(this->_model.name())
       , _status()
       , _click_counter()
-      , _cancel_button(new IconButton(QPixmap(":/buttons/reject.png")))
+      , _cancel_link(new IconButton(QPixmap(":/buttons/reject.png")))
       , _go_to_website(new IconButton(QPixmap(":/buttons/share.png")))
       , _copy_link(new IconButton(QPixmap(":/buttons/clipboard.png")))
       , _progress_timer(nullptr)
@@ -41,7 +41,6 @@ namespace fist
     {
       connect(&this->_model, SIGNAL(status_updated()),
               this, SLOT(_on_status_updated()));
-
       this->_layout->setContentsMargins(12, 12, 12, 12);
       this->_layout->setSpacing(5);
       {
@@ -66,48 +65,44 @@ namespace fist
         this->_layout->addLayout(vlayout, 1);
       }
       {
-        this->_cancel_button->setToolTip("Cancel");
-        auto* vlayout = new QVBoxLayout;
-        vlayout->setContentsMargins(0, 0, 0, 0);
-        vlayout->addStretch();
-        vlayout->addWidget(this->_cancel_button);
-        vlayout->addStretch();
-        this->_layout->addLayout(vlayout);
-      }
-      {
-        auto* vlayout = new QVBoxLayout;
-        vlayout->setContentsMargins(0, 0, 0, 0);
-        vlayout->setSpacing(0);
-        vlayout->addStretch();
+        auto* hlayout = new QHBoxLayout;
+        hlayout->setContentsMargins(0, 0, 0, 0);
+        hlayout->setSpacing(0);
+        hlayout->addStretch();
+        hlayout->addWidget(this->_go_to_website);
+        this->_go_to_website->setToolTip("Open the link");
+        hlayout->addSpacing(5);
+        hlayout->addWidget(this->_copy_link);
+        this->_copy_link->setToolTip("Copy the link to clipboard");
+        hlayout->addSpacing(5);
+        hlayout->addWidget(this->_cancel_link);
+        this->_cancel_link->installEventFilter(this);
+        this->_cancel_link->setToolTip("Cancel");
         {
+          auto* vlayout = new QVBoxLayout;
+          vlayout->addStretch();
+          vlayout->setContentsMargins(0, 0, 0, 0);
           view::links::counter::style(this->_click_counter);
           this->_click_counter.setStyleSheet(
-            "border: 5px solid rgb(204,204,204); border-radius: 8px; background-color: rgb(204,204,204);");
+            "border: 5px solid rgb(204,204,204); border-radius: 5px; background-color: rgb(204,204,204);");
+          vlayout->addStretch();
+          vlayout->addWidget(&this->_click_counter);
+          vlayout->addStretch();
+          hlayout->addLayout(vlayout);
         }
-
-        vlayout->addWidget(&this->_click_counter);
-        vlayout->addWidget(this->_go_to_website);
-        this->_go_to_website->setToolTip("Open the link");
-        vlayout->addSpacing(5);
-        vlayout->addWidget(this->_copy_link);
-        this->_copy_link->setToolTip("Copy the link to clipboard");
-        vlayout->addStretch();
-        this->_layout->addLayout(vlayout);
+        this->_layout->addLayout(hlayout);
       }
-
       connect(this->_go_to_website, SIGNAL(clicked()),
               this, SLOT(_open_link()));
-      connect(this->_cancel_button, SIGNAL(clicked()),
+      connect(this->_cancel_link, SIGNAL(clicked()),
               this, SLOT(_cancel()));
       connect(this->_copy_link, SIGNAL(clicked()),
               this, SLOT(_copy_link_to_clipboard()));
-
       {
         this->_progress_animation->setDuration(this->_update_progress_interval);
         this->_progress_animation->setEasingCurve(QEasingCurve::Linear);
         this->_progress_animation->setEndValue(0.0f);
       }
-
       this->leaveEvent(nullptr);
       this->_on_status_updated();
     }
@@ -115,6 +110,7 @@ namespace fist
     void
     LinkWidget::_on_status_updated()
     {
+      ELLE_TRACE_SCOPE("%s: on status updated", *this);
       if (this->_model.is_finished())
         this->_update(pretty_date(this->_model.mtime()));
       else
@@ -127,6 +123,7 @@ namespace fist
     void
     LinkWidget::_update(QString const& status)
     {
+      ELLE_TRACE_SCOPE("%s: update (%s)", *this, status);
       this->_status.setText(status);
       this->_click_counter.setText(
         QString("%1").arg(this->_model.click_count()));
@@ -165,10 +162,36 @@ namespace fist
     LinkWidget::_cancel()
     {
       ELLE_TRACE_SCOPE("%s: cancel/delete transaction", *this);
-      if (!this->_model.is_finished())
-        emit transaction_canceled(this->_model.id());
+      this->_first_click = !this->_first_click;
+      if (this->_first_click)
+      {
+        this->_go_to_website->hide();
+        this->_copy_link->hide();
+        QToolTip::showText(
+          this->_cancel_link->mapToGlobal(
+            QPoint(this->_cancel_link->width(),
+                   -this->_cancel_link->height())),
+          "Click again to cancel");
+      }
       else
+      {
         emit transaction_deleted(this->_model.id());
+      }
+    }
+
+    bool
+    LinkWidget::eventFilter(QObject *obj, QEvent *event)
+    {
+      if (obj == this->_cancel_link)
+      {
+        if (event->type() == QEvent::Leave)
+        {
+          this->_go_to_website->show();
+          this->_copy_link->show();
+          this->_first_click = false;
+        }
+      }
+      return Super::eventFilter(obj, event);
     }
 
     void
@@ -206,7 +229,7 @@ namespace fist
           this->_model.status() == gap_transaction_deleted)
         return;
 
-      this->_cancel_button->show();
+      this->_cancel_link->show();
       this->_go_to_website->show();
       this->_copy_link->show();
       this->_click_counter.hide();
@@ -215,7 +238,7 @@ namespace fist
     void
     LinkWidget::leaveEvent(QEvent*)
     {
-      this->_cancel_button->hide();
+      this->_cancel_link->hide();
       this->_go_to_website->hide();
       this->_copy_link->hide();
       this->_click_counter.show();

@@ -118,7 +118,7 @@ namespace fist
                 elle::sprintf("%s declined your transfer.",
                               transaction.peer_fullname().toStdString()).c_str(),
                 QSystemTrayIcon::Warning)));
-              break;
+          break;
         case gap_transaction_canceled:
           // Should only be displayed if the user is not the one who cancelled.
           emit systray_message(
@@ -126,6 +126,7 @@ namespace fist
               "Nuts!",
               elle::sprintf("Your transfer with %s was cancelled.",
                             transaction.peer_fullname().toStdString()).c_str())));
+          break;
         case gap_transaction_failed:
           if (transaction.is_sender())
             emit systray_message(
