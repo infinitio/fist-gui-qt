@@ -42,9 +42,6 @@ namespace fist
       {
         this->add_transaction(model, true);
       }
-
-      connect(&this->_state, SIGNAL(transaction_updated(uint32_t)),
-              this, SLOT(on_transaction_updated(uint32_t)));
     }
 
     void
