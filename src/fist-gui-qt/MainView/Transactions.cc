@@ -63,19 +63,17 @@ namespace fist
         this->_transaction_list->clearWidgets();
       }
 
-      if (!transaction.is_sender())
+      if (!init && !transaction.is_sender())
       {
         emit systray_message(
           fist::SystrayMessageCarrier(
             new Message(
               "Incoming!",
-              elle::sprintf(
-                "%s wants to send %s to you.",
-                transaction.peer_fullname().toStdString(),
-                (transaction.files().size() == 1)
-                ? transaction.files()[0].toStdString()
-                : elle::sprintf("%s files", transaction.files().size())
-              ).c_str())));
+              QString("%1 wants to send %2 to you.")
+              .arg(transaction.peer_fullname())
+              .arg((transaction.files().size() == 1)
+                   ? transaction.files()[0]
+                   : QString("%1 files").arg(transaction.files().size())))));
       }
       auto widget = std::make_shared<TransactionWidget>(transaction);
 
@@ -115,8 +113,8 @@ namespace fist
             emit systray_message(
               SystrayMessageCarrier(new Message(
                 "Shenanigans!",
-                elle::sprintf("%s declined your transfer.",
-                              transaction.peer_fullname().toStdString()).c_str(),
+                QString("%1 declined your transfer.")
+                .arg(transaction.peer_fullname()),
                 QSystemTrayIcon::Warning)));
           break;
         case gap_transaction_canceled:
@@ -124,55 +122,51 @@ namespace fist
           emit systray_message(
             SystrayMessageCarrier(new Message(
               "Nuts!",
-              elle::sprintf("Your transfer with %s was cancelled.",
-                            transaction.peer_fullname().toStdString()).c_str())));
+              QString("Your transfer with %1 was cancelled.")
+              .arg(transaction.peer_fullname()))));
           break;
         case gap_transaction_failed:
           if (transaction.is_sender())
             emit systray_message(
               SystrayMessageCarrier(new Message(
                 "Oh no!",
-                elle::sprintf(
-                  "%s couldn't be sent to %s.",
-                  (transaction.files().size() == 1)
-                  ? transaction.files()[0].toStdString()
-                  : elle::sprintf("your %s files", transaction.files().size()),
-                  transaction.peer_fullname().toStdString()).c_str(),
+                QString("%1 couldn't be sent to %2.")
+                .arg((transaction.files().size() == 1)
+                     ? transaction.files()[0]
+                     : QString("your %1 files").arg(transaction.files().size()))
+                .arg(transaction.peer_fullname()),
                 QSystemTrayIcon::Warning)));
           else
             emit systray_message(
-              SystrayMessageCarrier(new Message(
-                "Oh no!",
-                elle::sprintf(
-                  "%s couldn't be received from %s.",
-                  (transaction.files().size() == 1)
-                  ? transaction.files()[0].toStdString()
-                  : elle::sprintf("%s files", transaction.files().size()),
-                  transaction.peer_fullname().toStdString()).c_str(),
-                QSystemTrayIcon::Warning)));
+              SystrayMessageCarrier(
+                new Message(
+                  "Oh no!",
+                  QString("%1 couldn't be received from %2.")
+                  .arg((transaction.files().size() == 1)
+                       ? transaction.files()[0]
+                       : QString("%1 files").arg(transaction.files().size()))
+                  .arg(transaction.peer_fullname()),
+                  QSystemTrayIcon::Warning)));
           break;
         case gap_transaction_finished:
           if (transaction.is_sender())
             emit systray_message(
               SystrayMessageCarrier(new Message(
                 "Success!",
-                elle::sprintf(
-                  "%s received %s.",
-                  transaction.peer_fullname().toStdString(),
-                  (transaction.files().size() == 1)
-                  ? transaction.files()[0].toStdString()
-                  : elle::sprintf("your %s files", transaction.files().size())
-                  ).c_str())));
+                QString("%1 received %2.")
+                .arg(transaction.peer_fullname())
+                .arg((transaction.files().size() == 1)
+                     ? transaction.files()[0]
+                     : QString("your %1 files").arg(transaction.files().size())))));
           else
             emit systray_message(
               SystrayMessageCarrier(new Message(
                 "Success!",
-                elle::sprintf(
-                  "%s received from %s.",
-                  (transaction.files().size() == 1)
-                  ? transaction.files()[0].toStdString()
-                  : elle::sprintf("%s files", transaction.files().size()),
-                  transaction.peer_fullname().toStdString()).c_str())));
+                QString("%1 received from %2.")
+                .arg((transaction.files().size() == 1)
+                     ? transaction.files()[0]
+                     : QString("%1 files").arg(transaction.files().size()))
+                .arg(transaction.peer_fullname()))));
           break;
         default:
           break;

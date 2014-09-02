@@ -44,7 +44,7 @@ namespace fist
     QString
     Link::name() const
     {
-      return QString::fromStdString(this->_link.name);
+      return QString::fromUtf8(this->_link.name.c_str());
     }
 
     QDateTime const&

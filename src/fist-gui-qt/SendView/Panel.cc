@@ -123,8 +123,8 @@ namespace fist
       std::vector<std::string> files;
       for (int i = 0; i < this->_file_adder->files().size(); ++i)
       {
-        files.push_back(
-          QDir::toNativeSeparators(this->_file_adder->files().keys().at(i).toLocalFile()).toStdString());
+        auto array = this->_file_adder->files().keys().at(i).toLocalFile().toUtf8();
+        files.push_back(std::string(array.constData()));
       }
 
       std::string message = this->_message->text().toStdString();
@@ -160,8 +160,8 @@ namespace fist
       std::vector<std::string> files;
       for (int i = 0; i < this->_file_adder->files().size(); ++i)
       {
-        files.push_back(
-          QDir::toNativeSeparators(this->_file_adder->files().keys().at(i).toLocalFile()).toStdString());
+        auto array = this->_file_adder->files().keys().at(i).toLocalFile().toUtf8();
+        files.push_back(std::string(array.constData()));
       }
 
       for (auto const& recipient: this->_users->recipients())
