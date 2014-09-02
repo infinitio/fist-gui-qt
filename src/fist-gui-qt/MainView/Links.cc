@@ -72,15 +72,13 @@ namespace fist
       if (this->_widgets.find(model.id()) != this->_widgets.end())
       {
         ELLE_WARN("%s: link %s already present", *this, model);
+        return;
       }
-
       auto widget = std::make_shared<LinkWidget>(model);
-
       connect(widget.get(), SIGNAL(transaction_canceled(uint32_t)),
               &this->_state, SLOT(on_transaction_canceled(uint32_t)));
       connect(widget.get(), SIGNAL(transaction_deleted(uint32_t)),
               &this->_state, SLOT(on_transaction_deleted(uint32_t)));
-
       this->_link_list->add_widget(widget,
                                    ListWidget::Position::Top);
       this->_widgets[model.id()] = widget;
