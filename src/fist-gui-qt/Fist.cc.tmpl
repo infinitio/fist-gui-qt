@@ -174,10 +174,6 @@ void
 Fist::about_to_quit()
 {
   ELLE_TRACE_SCOPE("%s: run cleaning operations", *this);
-  auto kicked = false;
-  auto final = true;
-  this->logout(kicked, final);
-  ELLE_ASSERT(this->_state == nullptr);
   ELLE_DEBUG("clear lock")
   {
     this->_filelock.setPermissions(QFile::WriteOwner);
@@ -190,6 +186,10 @@ Fist::about_to_quit()
       this->_updater->loading_dialog()->close();
       this->_updater.reset();
     }
+  auto kicked = false;
+  auto final = true;
+  this->logout(kicked, final);
+  ELLE_ASSERT(this->_state == nullptr);
   ELLE_LOG("cleaning done");
 }
 
