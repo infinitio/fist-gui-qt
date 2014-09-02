@@ -299,9 +299,12 @@ namespace fist
       {
         this->_transactions.emplace(*this, id);
         emit new_transaction(id);
+        it = this->_transactions.get<0>().find(id);
       }
       else if (it->status() == status)
+      {
         return;
+      }
 
       struct UpdateStatus
       {
@@ -317,7 +320,6 @@ namespace fist
 
         ELLE_ATTRIBUTE(gap_TransactionStatus, status);
       };
-
       this->_transactions.modify(it, UpdateStatus(status));
       this->_transactions.get<0>().find(id)->status_updated();
       emit transaction_updated(id);
@@ -330,9 +332,12 @@ namespace fist
       {
         this->_links.emplace(*this, id);
         emit new_link(id);
+        it = this->_links.get<0>().find(id);
       }
       else if (it->status() == status)
+      {
         return;
+      }
 
       struct UpdateLink
       {
@@ -372,7 +377,7 @@ namespace fist
     return *this->_transactions.get<0>().find(id);
   }
 
-  // XXX: Use a per transaction boolean which says if it's activ or not.
+  // XXX: Use a per transaction boolean which says if it's active or not.
   void
   State::_compute_active_transactions()
   {
