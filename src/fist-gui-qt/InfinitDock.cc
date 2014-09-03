@@ -168,6 +168,7 @@ InfinitDock::InfinitDock(fist::State& state)
                 this, SLOT(report_a_problem()));
   this->connect(_logout, SIGNAL(triggered()), this, SLOT(_on_logout()));
   this->connect(_logout, SIGNAL(triggered()), this, SLOT(hide()));
+  this->connect(_logout, SIGNAL(triggered()), this, SIGNAL(logout_request()));
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(_on_logout()));
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
 
@@ -205,13 +206,12 @@ void
 InfinitDock::_on_logout()
 {
   ELLE_TRACE_SCOPE("%s: logout", *this);
-  this->_systray->setVisible(true);
+  this->_systray->setVisible(false);
   // Kill everything in order to make sure nothing requiring state is running
   // when destroying it.
   this->setCentralWidget(nullptr);
   this->_send_panel.reset();
   this->_transaction_panel.reset();
-  emit logout_request();
 }
 
 /*----------------.
