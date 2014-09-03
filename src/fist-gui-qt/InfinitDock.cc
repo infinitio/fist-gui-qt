@@ -144,16 +144,6 @@ InfinitDock::InfinitDock(fist::State& state)
           this->_send_panel.get(),
           SLOT(avatar_available(uint32_t)));
 
-  connect(this,
-          SIGNAL(avatar_available(uint32_t)),
-          this->_transaction_panel.get(),
-          SLOT(avatar_available(uint32_t)));
-
-  connect(this,
-          SIGNAL(user_status_changed(uint32_t, gap_UserStatus)),
-          this->_transaction_panel.get(),
-          SLOT(user_status_changed(uint32_t, gap_UserStatus)));
-
   // XXX: Specialize a QWidgetAction to add a better visual and for example,
   // to copy the version in the user clipboard on click.
   QWidgetAction* version = new QWidgetAction(this);
