@@ -157,8 +157,8 @@ Fist::_initialize_application()
 {
   ELLE_TRACE_SCOPE("%s: initialize Qt", *this);
   QFontDatabase database;
-  auto luc = database.addApplicationFont(":/fonts/LucidaGrande.ttc");
-  auto mont = database.addApplicationFont(":/fonts/Montserrat-Regular.ttf");
+  auto luc = database.addApplicationFont(":/font/LucidaGrande");
+  auto mont = database.addApplicationFont(":/font/Montserrat");
   if (luc == -1 || mont == -1)
     ELLE_WARN("%s: impossible to install fonts", *this);
 
@@ -166,7 +166,7 @@ Fist::_initialize_application()
   arial.setStyleStrategy(QFont::PreferAntialias);
   this->_application->setFont(arial);
 
-  this->_application->setWindowIcon(QIcon(QPixmap(":/images/logo.png")));
+  this->_application->setWindowIcon(QIcon(QPixmap(":/logo")));
   this->_application->setQuitOnLastWindowClosed(false);
 }
 

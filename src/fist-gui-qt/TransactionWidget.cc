@@ -25,10 +25,10 @@ TransactionWidget::TransactionWidget(Model const& model):
   _peer_status(new QLabel),
   _layout(nullptr),
   _filename(new QLabel(this)),
-  _accept_button(new IconButton(QPixmap(":/buttons/accept.png"))),
-  _reject_button(new IconButton(QPixmap(":/buttons/reject.png"))),
+  _accept_button(new IconButton(QPixmap(":/conversation/accept"))),
+  _reject_button(new IconButton(QPixmap(":/conversation/reject"))),
   _accept_reject_area(new QWidget),
-  _cancel_button(new IconButton(QPixmap(":/buttons/cancel.png"))),
+  _cancel_button(new IconButton(QPixmap(":/conversation/cancel"))),
   _mtime(new QLabel),
   _status(new QLabel),
   _info_area(new QWidget),
@@ -43,7 +43,7 @@ TransactionWidget::TransactionWidget(Model const& model):
 
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
-  this->_peer_status->setPixmap(QPixmap(":/icons/status.png"));
+  this->_peer_status->setPixmap(QPixmap(":/conversation/peer-online"));
 
   connect(this->_accept_button, SIGNAL(released()),
           this, SLOT(accept()));
@@ -399,32 +399,32 @@ TransactionWidget::_on_status_updated()
             QString(), false, "New");
         case gap_transaction_waiting_accept:
           return StatusUpdater(
-            QString(":/icons/loading.gif"), true, "Wait for user to accept");
+            QString(":/loading"), true, "Wait for user to accept");
         case gap_transaction_waiting_data:
           return StatusUpdater(
-            QString(":/icons/loading.gif"), true, "Waiting for data");
+            QString(":/loading"), true, "Waiting for data");
         case gap_transaction_connecting:
           return StatusUpdater(
-            QString(":/icons/loading.gif"), true, "Connecting");
+            QString(":/loading"), true, "Connecting");
         case gap_transaction_transferring:
           return StatusUpdater(QString(), false, "Transferring");
         case gap_transaction_finished:
           return StatusUpdater(
-            QString(":/icons/check.png"), false, "Finished");
+            QString(":/conversation/finished"), false, "Finished");
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
-            QString(":/icons/check.png"), false, "Cloud Buffered");
+            QString(":/conversation/bufferised"), false, "Cloud Buffered");
         case gap_transaction_failed:
-          return StatusUpdater(QString(":/icons/error.png"), false, "Failed");
+          return StatusUpdater(QString(":/conversation/error"), false, "Failed");
         case gap_transaction_canceled:
-          return StatusUpdater(QString(":/icons/error.png"), false, "Canceled");
+          return StatusUpdater(QString(":/conversation/canceled"), false, "Canceled");
         case gap_transaction_rejected:
-          return StatusUpdater(QString(":/icons/error.png"), false, "Rejected");
+          return StatusUpdater(QString(":/conversation/canceled"), false, "Rejected");
         case gap_transaction_deleted:
-          return StatusUpdater(QString(":/icons/error.png"), false, "Deleted");
+          return StatusUpdater(QString(":/conversation/error"), false, "Deleted");
         case gap_transaction_on_other_device:
           return StatusUpdater(
-            QString(":/icons/loading.gif"), true, "On another device");
+            QString(":/loading"), true, "On another device");
       }
 
       return StatusUpdater(QString(), false, "Something wrong append");
@@ -439,12 +439,12 @@ TransactionWidget::_on_status_updated()
   {
     if (this->_transaction.is_sender())
     {
-      this->_status->setPixmap(QPixmap(QString(":/icons/main-upload.png")));
+      this->_status->setPixmap(QPixmap(QString(":/conversation/upload")));
       this->_status->setToolTip(QString("Uploading"));
     }
     else
     {
-      this->_status->setPixmap(QPixmap(QString(":/icons/main-download.png")));
+      this->_status->setPixmap(QPixmap(QString(":/conversation/download")));
       this->_status->setToolTip(QString("Downloading"));
     }
   }

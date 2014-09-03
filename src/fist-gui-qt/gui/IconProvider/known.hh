@@ -114,18 +114,18 @@ namespace fist
       if (known == nullptr)
       {
         known.reset(new IconProvider::TypeIcon{
-          { IconProvider::Type::archive, QPixmap(":/mimetypes/archive.png") },
-          { IconProvider::Type::cat, QPixmap(":/mimetypes/cat.png") },
-          { IconProvider::Type::document, QPixmap(":/mimetypes/document.png") },
-          { IconProvider::Type::folder, QPixmap(":/mimetypes/folder.png") },
-          { IconProvider::Type::illustrator, QPixmap(":/mimetypes/illustrator.png") },
-          { IconProvider::Type::music, QPixmap(":/mimetypes/music.png") },
-          { IconProvider::Type::photoshop, QPixmap(":/mimetypes/photoshop.png") },
-          { IconProvider::Type::image, QPixmap(":/mimetypes/picture.png") },
-          { IconProvider::Type::powerpoint, QPixmap(":/mimetypes/powerpoint.png") },
-          { IconProvider::Type::text, QPixmap(":/mimetypes/document.png") },
-          { IconProvider::Type::unknown, QPixmap(":/mimetypes/document.png") },
-          { IconProvider::Type::video, QPixmap(":/mimetypes/video.png") },
+          { IconProvider::Type::archive, QPixmap(":/mimetypes/archive") },
+          { IconProvider::Type::cat, QPixmap(":/mimetypes/cat") },
+          { IconProvider::Type::document, QPixmap(":/mimetypes/document") },
+          { IconProvider::Type::folder, QPixmap(":/mimetypes/folder") },
+          { IconProvider::Type::illustrator, QPixmap(":/mimetypes/illustrator") },
+          { IconProvider::Type::music, QPixmap(":/mimetypes/music") },
+          { IconProvider::Type::photoshop, QPixmap(":/mimetypes/photoshop") },
+          { IconProvider::Type::image, QPixmap(":/mimetypes/picture") },
+          { IconProvider::Type::powerpoint, QPixmap(":/mimetypes/powerpoint") },
+          { IconProvider::Type::text, QPixmap(":/mimetypes/document") },
+          { IconProvider::Type::unknown, QPixmap(":/mimetypes/document") },
+          { IconProvider::Type::video, QPixmap(":/mimetypes/video") },
         });
       }
       return *known;

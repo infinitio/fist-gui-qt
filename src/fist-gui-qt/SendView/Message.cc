@@ -19,7 +19,7 @@
     {
       this->setContentsMargins(0, 0, 0, 0);
       {
-        this->_icon.setPixmap(QPixmap(":/icons/note.png"));
+        this->_icon.setPixmap(QPixmap(":/send/note"));
       }
       {
         this->_message->setMaxLength(100);
@@ -27,7 +27,7 @@
         this->_message->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
         this->_message->setFrame(false);
         this->_message->setPlaceholderText("Optional message...");
-        this->_message->setFixedHeight(QPixmap(":/icons/note.png").height());
+        this->_message->setFixedHeight(QPixmap(":/send/note").height());
       }
       {
         view::send::message::remaining_characters::style(this->_remaining_characters);

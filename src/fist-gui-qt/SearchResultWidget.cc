@@ -18,11 +18,12 @@ SearchResultWidget::SearchResultWidget(fist::model::User const& model,
   _model(model),
   _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
   _selector(new fist::TwoStateIconButton(
-    QPixmap(":/buttons/user-unselected@2x.png"),
-    QPixmap(":/buttons/user-selected@2x"),
-    QPixmap(":/buttons/user-unselected-hover@2x.png"),
-    QPixmap(":/buttons/user-selected@2x.png"),
-    preselected)),
+    QPixmap(":/send/user-selected"),
+    QPixmap(":/send/user-selected-active"),
+    QPixmap(":/send/user-selected-hover"),
+    QPixmap(":/send/user-selected-active"),
+    preselected,
+    23)),
   _layout(new QHBoxLayout(this))
 {
   connect(&this->_model, SIGNAL(avatar_updated()), this, SLOT(_on_avatar_updated()));

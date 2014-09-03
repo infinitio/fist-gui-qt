@@ -8,8 +8,8 @@ namespace fist
   {
     Footer::Footer():
       ::Footer(),
-      _back(new IconButton(QPixmap(":/icons/cancel-send.png"))),
-      _send(new IconButton(QPixmap(":/icons/transfer.png")))
+      _back(new IconButton(QPixmap(":/send/cancel"))),
+      _send(new IconButton(QPixmap(":/send/transfer")))
     {
       this->_back->setToolTip("Cancel");
       this->_layout->addWidget(this->_back);
@@ -22,7 +22,7 @@ namespace fist
     void
     Footer::peer_transaction_mode()
     {
-      this->_send->set_pixmap(QPixmap(":/icons/transfer.png"));
+      this->_send->set_pixmap(QPixmap(":/send/transfer"));
       this->_send->setToolTip("Send");
       this->update();
     }
@@ -30,7 +30,7 @@ namespace fist
     void
     Footer::link_mode()
     {
-      this->_send->set_pixmap(QPixmap(":/buttons/upload.png"));
+      this->_send->set_pixmap(QPixmap(":/send/upload"));
       this->_send->setToolTip("Generate a link");
       this->update();
     }

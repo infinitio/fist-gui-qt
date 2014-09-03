@@ -26,13 +26,14 @@ namespace fist
     Files::Files(QWidget* parent)
       : Super(parent)
       , _foo(new QWidget(this))
-      , _attach(new IconButton(QPixmap(":/icons/files.png")))
+      , _attach(new IconButton(QPixmap(":/send/files")))
       , _text(new QLabel(view::send::file_adder::text))
-      , _expanser(new fist::TwoStateIconButton(QPixmap(":/buttons/show@2x.png"),
-                                               QPixmap(":/buttons/hide@2x.png"),
-                                               QPixmap(":/buttons/show@2x.png"),
-                                               QPixmap(":/buttons/hide@2x.png"), true, 10))
-      , _add_file(new IconButton(QPixmap(":/icons/add-file.png")))
+      , _expanser(
+        new fist::TwoStateIconButton(QPixmap(":/send/show-files@2x"),
+                                     QPixmap(":/send/hide-files@2x"),
+                                     QPixmap(":/send/show-files@2x"),
+                                     QPixmap(":/send/hide-files@2x"), true, 10))
+      , _add_file(new IconButton(QPixmap(":/send/add-file")))
       , _files()
       , _separator(new HorizontalSeparator(this))
       , _list(new ListWidget(this))
@@ -137,11 +138,11 @@ namespace fist
       {
         if (event->type() == QEvent::Enter || event->type() == QEvent::DragEnter)
         {
-          this->_attach->set_pixmap(QPixmap(":/icons/files-hover.png"));
+          this->_attach->set_pixmap(QPixmap(":/send/files-hover"));
         }
         else if (event->type() == QEvent::Leave || event->type() == QEvent::DragLeave || event->type() == QEvent::WindowBlocked)
         {
-          this->_attach->set_pixmap(QPixmap(":/icons/files.png"));
+          this->_attach->set_pixmap(QPixmap(":/send/files"));
         }
       }
 
@@ -204,7 +205,7 @@ namespace fist
       ELLE_DEBUG_SCOPE("%s: mouse entered", *this);
       if (this->_files.isEmpty())
       {
-        this->_attach->set_pixmap(QPixmap(":/icons/files-hover.png"));
+        this->_attach->set_pixmap(QPixmap(":/send/files-hover"));
         view::send::file_adder::hover_style(*this->_text);
         this->setCursor(QCursor(Qt::PointingHandCursor));
       }
@@ -221,7 +222,7 @@ namespace fist
       ELLE_DEBUG_SCOPE("%s: mouse left", *this);
       if (this->_files.isEmpty())
       {
-        this->_attach->set_pixmap(QPixmap(":/icons/files.png"));
+        this->_attach->set_pixmap(QPixmap(":/send/files"));
         view::send::file_adder::style(*this->_text);
         this->setCursor(QCursor(Qt::ArrowCursor));
       }

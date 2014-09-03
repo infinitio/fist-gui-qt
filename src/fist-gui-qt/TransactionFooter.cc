@@ -2,8 +2,8 @@
 
 TransactionFooter::TransactionFooter():
   Footer(nullptr),
-  _menu(new IconButton(QPixmap(":/icons/gear.png"))),
-  _send(new IconButton(QPixmap(":/icons/transfer.png")))
+  _menu(new IconButton(QPixmap(":/main/gear"))),
+  _send(new IconButton(QPixmap(":/main/transfer")))
 {
   this->_menu->setToolTip("Options");
   this->_send->setToolTip("Send files");

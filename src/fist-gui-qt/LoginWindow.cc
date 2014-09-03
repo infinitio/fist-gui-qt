@@ -88,8 +88,8 @@ LoginWindow::LoginWindow(fist::State& state,
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
   _message_field(new QLabel),
-  _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this)),
-  _quit_button(new IconButton(QPixmap(QString(":/icons/onboarding-close.png")))),
+  _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this)),
+  _quit_button(new IconButton(QPixmap(QString(":/login/close")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
   _version_field(new QLabel),
@@ -98,7 +98,7 @@ LoginWindow::LoginWindow(fist::State& state,
   _login_watcher()
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
-  this->setWindowIcon(QIcon(":/images/logo.png"));
+  this->setWindowIcon(QIcon(":/login/logo"));
   this->resize(view::login::size);
   // Quit button.
   {
@@ -135,7 +135,7 @@ LoginWindow::LoginWindow(fist::State& state,
   auto logo = new QLabel;
   {
     logo->setScaledContents(true);
-    logo->setPixmap(QPixmap(QString(":/images/logo-complete.png")));
+    logo->setPixmap(QPixmap(QString(":/login/logo")));
   }
   // Message field.
   {

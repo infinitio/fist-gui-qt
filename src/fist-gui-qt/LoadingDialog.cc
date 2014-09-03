@@ -48,7 +48,7 @@ LoadingDialog::LoadingDialog(QObject* parent):
   layout->addSpacing(8);
 
   {
-    this->_loading_icon->setMovie(new QMovie(QString(":/icons/loading.gif")));
+    this->_loading_icon->setMovie(new QMovie(QString(":/icons/loading")));
     this->_loading_icon->movie()->start();
     layout->addWidget(this->_loading_icon, 0, Qt::AlignCenter);
   }

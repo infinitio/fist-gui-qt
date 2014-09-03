@@ -1,196 +1,235 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
+
   <qresource>
+    <!-- main -->
+    <file alias="avatar_default">../slices/mac/main/avatar_default.png</file>
 
-    <!-- icons -->
-    <file>../icons/add-file.png</file>
-    <file>../icons/add-file@2x.png</file>
-    <file>../icons/accept.png</file>
-    <file>../icons/accept@2x.png</file>
-    <file>../icons/add-cancel-hover.png</file>
-    <file>../icons/add-cancel-hover@2x.png</file>
-    <file>../icons/add-cancel.png</file>
-    <file>../icons/add-cancel@2x.png</file>
-    <file>../icons/add-note-hover.png</file>
-    <file>../icons/add-note-hover@2x.png</file>
-    <file>../icons/add-note.png</file>
-    <file>../icons/add-note@2x.png</file>
-    <file>../icons/add-people-hover.png</file>
-    <file>../icons/add-people-hover@2x.png</file>
-    <file>../icons/add-people.png</file>
-    <file>../icons/add-people@2x.png</file>
-    <file>../icons/back.png</file>
-    <file>../icons/back@2x.png</file>
-    <file>../icons/badge.png</file>
-    <file>../icons/badge@2x.png</file>
-    <file>../icons/cancel-send.png</file>
-    <file>../icons/cancel-send@2x.png</file>
-    <file>../icons/check.png</file>
-    <file>../icons/check@2x.png</file>
-    <file>../icons/collapse.png</file>
-    <file>../icons/collapse@2x.png</file>
-    <file>../icons/delete.png</file>
-    <file>../icons/delete@2x.png</file>
-    <file>../icons/edit-hover.png</file>
-    <file>../icons/edit-hover@2x.png</file>
-    <file>../icons/error.png</file>
-    <file>../icons/error@2x.png</file>
-    <file>../icons/expand-left.png</file>
-    <file>../icons/expand-left@2x.png</file>
-    <file>../icons/expand-right.png</file>
-    <file>../icons/expand-right@2x.png</file>
-    <file>../icons/expand.png</file>
-    <file>../icons/expand@2x.png</file>
-    <file>../icons/files-hover.png</file>
-    <file>../icons/files-hover@2x.png</file>
-    <file>../icons/files.png</file>
-    <file>../icons/files@2x.png</file>
-    <file>../icons/gear.png</file>
-    <file>../icons/gear@2x.png</file>
-    <file>../icons/icons-dragged.png</file>
-    <file>../icons/icons-dragged@2x.png</file>
-    <file>../icons/loading-bar.gif</file>
-    <file>../icons/loading.gif</file>
-    <file>../icons/main-download.png</file>
-    <file>../icons/main-download@2x.png</file>
-    <file>../icons/main-unread.png</file>
-    <file>../icons/main-unread@2x.png</file>
-    <file>../icons/main-upload.png</file>
-    <file>../icons/main-upload@2x.png</file>
-    <file>../icons/menu-bar-active.png</file>
-    <file>../icons/menu-bar-active@2x.png</file>
-    <file>../icons/menu-bar-clicked.png</file>
-    <file>../icons/menu-bar-clicked@2x.png</file>
-    <file>../icons/menu-bar-fire.png</file>
-    <file>../icons/menu-bar-fire@2x.png</file>
-    <file>../icons/menu-bar-inactive.png</file>
-    <file>../icons/menu-bar-inactive@2x.png</file>
-    <file>../icons/note-clicked.png</file>
-    <file>../icons/note-clicked@2x.png</file>
-    <file>../icons/note.png</file>
-    <file>../icons/note@2x.png</file>
-    <file>../icons/onboarding-back.png</file>
-    <file>../icons/onboarding-back@2x.png</file>
-    <file>../icons/onboarding-close-hover.png</file>
-    <file>../icons/onboarding-close-hover@2x.png</file>
-    <file>../icons/onboarding-close.png</file>
-    <file>../icons/onboarding-close@2x.png</file>
-    <file>../icons/onboarding-next.png</file>
-    <file>../icons/onboarding-next@2x.png</file>
-    <file>../icons/reject.png</file>
-    <file>../icons/reject@2x.png</file>
-    <file>../icons/remove-people.png</file>
-    <file>../icons/remove-people@2x.png</file>
-    <file>../icons/remove-tag-people.png</file>
-    <file>../icons/remove-tag-people@2x.png</file>
-    <file>../icons/scrollbar.png</file>
-    <file>../icons/scrollbar@2x.png</file>
-    <file>../icons/search.png</file>
-    <file>../icons/search@2x.png</file>
-    <file>../icons/separator-file.png</file>
-    <file>../icons/separator-file@2x.png</file>
-    <file>../icons/separator-search-input.png</file>
-    <file>../icons/separator-search-input@2x.png</file>
-    <file>../icons/star-selected.png</file>
-    <file>../icons/star-selected@2x.png</file>
-    <file>../icons/star.png</file>
-    <file>../icons/star@2x.png</file>
-    <file>../icons/status.png</file>
-    <file>../icons/status@2x.png</file>
-    <file>../icons/transfer.png</file>
-    <file>../icons/transfer@2x.png</file>
-    <file>../icons/waiting.png</file>
+    <file alias="menu-bar/active">../slices/mac/main/icon-menu-bar-active.png</file>
+    <file alias="menu-bar/active@2x">../slices/mac/main/icon-menu-bar-active@2x.png</file>
 
-    <!-- buttons -->
-    <file>../buttons/accept-decline@2x.png</file>
-    <file>../buttons/accept-decline.png</file>
-    <file>../buttons/cancel@2x.png</file>
-    <file>../buttons/cancel.png</file>
-    <file>../buttons/reject@2x.png</file>
-    <file>../buttons/reject.png</file>
-    <file>../buttons/accept@2x.png</file>
-    <file>../buttons/accept.png</file>
-    <file>../buttons/send-files-simple@2x.png</file>
-    <file>../buttons/send-files-simple-disabled@2x.png</file>
-    <file>../buttons/send-files-simple-disabled.png</file>
-    <file>../buttons/send-files-simple.png</file>
-    <file>../buttons/user-selected@2x.png</file>
-    <file>../buttons/user-unselected@2x.png</file>
-    <file>../buttons/user-unselected-hover@2x.png</file>
+    <file alias="menu-bar/clicked">../slices/mac/main/icon-menu-bar-clicked.png</file>
+    <file alias="menu-bar/clicked@2x">../slices/mac/main/icon-menu-bar-clicked@2x.png</file>
 
-    <file>../buttons/show@2x.png</file>
-    <file>../buttons/hide@2x.png</file>
-    <file>../buttons/clipboard@2x.png</file>
-    <file>../buttons/clipboard.png</file>
-    <file>../buttons/share@2x.png</file>
-    <file>../buttons/share.png</file>
-    <file>../buttons/upload@2x.png</file>
-    <file>../buttons/upload.png</file>
+    <file alias="menu-bar/fire">../slices/mac/main/icon-menu-bar-fire.png</file>
+    <file alias="menu-bar/fire@2x">../slices/mac/main/icon-menu-bar-fire@2x.png</file>
 
-    <!-- bgs -->
-    <file>../bgs/header-top-gray@2x.png</file>
-    <file>../bgs/header-top-gray.png</file>
-    <file>../bgs/header-top-white@2x.png</file>
-    <file>../bgs/header-top-white.png</file>
-    <file>../bgs/login@2x.png</file>
-    <file>../bgs/login.png</file>
-    <file>../bgs/main-button@2x.png</file>
-    <file>../bgs/main-button-disabled@2x.png</file>
-    <file>../bgs/main-button-disabled.png</file>
-    <file>../bgs/main-button.png</file>
-    <file>../bgs/message-left@2x.png</file>
-    <file>../bgs/message-left.png</file>
-    <file>../bgs/message-triangle-left@2x.png</file>
-    <file>../bgs/message-triangle-left.png</file>
-    <file>../bgs/note@2x.png</file>
-    <file>../bgs/note.png</file>
-    <file>../bgs/onboarding@2x.png</file>
-    <file>../bgs/onboarding.png</file>
-    <file>../bgs/popup-group@2x.png</file>
-    <file>../bgs/popup-group.png</file>
-    <file>../bgs/tag-people@2x.png</file>
-    <file>../bgs/tag-people.png</file>
-    <file>../bgs/triangle-top@2x.png</file>
-    <file>../bgs/triangle-top-grey@2x.png</file>
-    <file>../bgs/triangle-top-grey.png</file>
-    <file>../bgs/triangle-top.png</file>
-    <file>../bgs/triangle-top-white@2x.png</file>
-    <file>../bgs/triangle-top-white.png</file>
+    <file alias="menu-bar/inactive">../slices/mac/main/icon-menu-bar-inactive.png</file>
+    <file alias="menu-bar/inactive@2x">../slices/mac/main/icon-menu-bar-inactive@2x.png</file>
 
-    <!-- images -->
-    <file>../images/avatar_default.png</file>
-    <file>../images/loading.gif</file>
-    <file>../images/loginLogo.png</file>
-    <file>../images/logo-complete@2x.png</file>
-    <file>../images/logo-complete.png</file>
-    <file>../images/logo.png</file>
+    <file alias="menu-bar/link">../slices/mac/main/icon-menu-bar-link.png</file>
+    <file alias="menu-bar/link@2x">../slices/mac/main/icon-menu-bar-link@2x.png</file>
+
+    <file alias="star">../slices/mac/main/icon-star.png</file>
+    <file alias="star@2x">../slices/mac/main/icon-star@2x.png</file>
+    <file alias="star-active">../slices/mac/main/icon-star-selected.png</file>
+    <file alias="star-active@2x">../slices/mac/main/icon-star-selected@2x.png</file>
+
+    <file alias="loading">../slices/mac/main/loading-win.gif</file>
+
+    <file alias="logo">../slices/mac/main/logo.png</file>
+    <file alias="logo@2x">../slices/mac/main/logo@2x.png</file>
+
+    <!-- conversation -->
+    <file alias="conversation/accept">../slices/mac/view_conversation/conversation-icon-accept.png</file>
+    <file alias="conversation/accept@2x">../slices/mac/view_conversation/conversation-icon-accept@2x.png</file>
+    <file alias="conversation/accept-active">../slices/mac/view_conversation/conversation-icon-accept-active.png</file>
+    <file alias="conversation/accept-active@2x">../slices/mac/view_conversation/conversation-icon-accept-active@2x.png</file>
+    <file alias="conversation/accept-hover">../slices/mac/view_conversation/conversation-icon-accept-hover.png</file>
+    <file alias="conversation/accept-hover@2x">../slices/mac/view_conversation/conversation-icon-accept-hover@2x.png</file>
+
+    <file alias="conversation/reject">../slices/mac/view_conversation/conversation-icon-reject.png</file>
+    <file alias="conversation/reject@2x">../slices/mac/view_conversation/conversation-icon-reject@2x.png</file>
+    <file alias="conversation/reject-active">../slices/mac/view_conversation/conversation-icon-reject-active.png</file>
+    <file alias="conversation/reject-active@2x">../slices/mac/view_conversation/conversation-icon-reject-active@2x.png</file>
+    <file alias="conversation/reject-hover">../slices/mac/view_conversation/conversation-icon-reject-hover.png</file>
+    <file alias="conversation/reject-hover@2x">../slices/mac/view_conversation/conversation-icon-reject-hover@2x.png</file>
+
+    <file alias="conversation/cancel">../slices/mac/view_conversation/conversation-icon-cancel.png</file>
+    <file alias="conversation/cancel@2x">../slices/mac/view_conversation/conversation-icon-cancel@2x.png</file>
+    <file alias="conversation/cancel-hover">../slices/mac/view_conversation/conversation-icon-cancel-hover.png</file>
+    <file alias="conversation/cancel-hover@2x">../slices/mac/view_conversation/conversation-icon-cancel-hover@2x.png</file>
+
+    <file alias="conversation/bufferised">../slices/mac/view_conversation/conversation-icon-bufferised.png</file>
+    <file alias="conversation/bufferised@2x">../slices/mac/view_conversation/conversation-icon-bufferised@2x.png</file>
+
+    <file alias="conversation/canceled">../slices/mac/view_conversation/conversation-icon-canceled.png</file>
+    <file alias="conversation/canceled@2x">../slices/mac/view_conversation/conversation-icon-canceled@2x.png</file>
+
+    <file alias="conversation/error">../slices/mac/view_conversation/conversation-icon-error.png</file>
+    <file alias="conversation/error@2x">../slices/mac/view_conversation/conversation-icon-error@2x.png</file>
+
+    <file alias="conversation/finished">../slices/mac/view_conversation/conversation-icon-finished.png</file>
+    <file alias="conversation/finished@2x">../slices/mac/view_conversation/conversation-icon-finished@2x.png</file>
+
+    <file alias="conversation/upload">../slices/mac/view_conversation/conversation-icon-upload.png</file>
+    <file alias="conversation/upload@2x">../slices/mac/view_conversation/conversation-icon-upload@2x.png</file>
+
+    <file alias="conversation/download">../slices/mac/view_conversation/conversation-icon-download.png</file>
+    <file alias="conversation/download@2x">../slices/mac/view_conversation/conversation-icon-download@2x.png</file>
+
+    <file alias="conversation/show-files@2x">../slices/mac/view_conversation/conversation-icon-show-files@2x.png</file>
+    <file alias="conversation/show-files">../slices/mac/view_conversation/conversation-icon-show-files.png</file>
+
+    <file alias="conversation/hide-files">../slices/mac/view_conversation/conversation-icon-hide-files.png</file>
+    <file alias="conversation/hide-files@2x">../slices/mac/view_conversation/conversation-icon-hide-files@2x.png</file>
+
+    <file alias="conversation/quote">../slices/mac/view_conversation/conversation-icon-quote.png</file>
+    <file alias="conversation/quote@2x">../slices/mac/view_conversation/conversation-icon-quote@2x.png</file>
+
+    <file alias="conversation/quote-left">../slices/mac/view_conversation/conversation-icon-quote-left.png</file>
+    <file alias="conversation/quote-left@2x">../slices/mac/view_conversation/conversation-icon-quote-left@2x.png</file>
+
+    <file alias="conversation/quote-right">../slices/mac/view_conversation/conversation-icon-quote-right.png</file>
+    <file alias="conversation/quote-right@2x">../slices/mac/view_conversation/conversation-icon-quote-right@2x.png</file>
+
+    <file alias="conversation/retry">../slices/mac/view_conversation/conversation-icon-retry.png</file>
+    <file alias="conversation/retry@2x">../slices/mac/view_conversation/conversation-icon-retry@2x.png</file>
+    <file alias="conversation/retry-active">../slices/mac/view_conversation/conversation-icon-retry-active.png</file>
+    <file alias="conversation/retry-active@2x">../slices/mac/view_conversation/conversation-icon-retry-active@2x.png</file>
+    <file alias="conversation/retry-hover">../slices/mac/view_conversation/conversation-icon-retry-hover.png</file>
+    <file alias="conversation/retry-hover@2x">../slices/mac/view_conversation/conversation-icon-retry-hover@2x.png</file>
+
+    <file alias="conversation/peer-offline@2x">../slices/mac/view_conversation/conversation-icon-status-offline@2x.png</file>
+    <file alias="conversation/peer-offline">../slices/mac/view_conversation/conversation-icon-status-offline.png</file>
+
+    <file alias="conversation/peer-online">../slices/mac/view_conversation/icon-status-online.png</file>
+    <file alias="conversation/peer-online@2x">../slices/mac/view_conversation/icon-status-online@2x.png</file>
+
+    <file alias="conversation/back">../slices/mac/view_conversation/icon-back.png</file>
+    <file alias="conversation/back@2x">../slices/mac/view_conversation/icon-back@2x.png</file>
+
+    <!-- links -->
+    <file alias="link/clipboard">../slices/mac/view_link/icon-clipboard.png</file>
+    <file alias="link/clipboard@2x">../slices/mac/view_link/icon-clipboard@2x.png</file>
+    <file alias="link/clipboard-hover@2x">../slices/mac/view_link/icon-clipboard-hover@2x.png</file>
+    <file alias="link/clipboard-hover">../slices/mac/view_link/icon-clipboard-hover.png</file>
+
+    <file alias="link/delete">../slices/mac/view_link/icon-delete.png</file>
+    <file alias="link/delete@2x">../slices/mac/view_link/icon-delete@2x.png</file>
+    <file alias="link/delete-hover">../slices/mac/view_link/icon-delete-hover.png</file>
+    <file alias="link/delete-hover@2x">../slices/mac/view_link/icon-delete-hover@2x.png</file>
+
+    <file alias="link/delete-confirm">../slices/mac/view_link/icon-delete-confirm.png</file>
+    <file alias="link/delete-confirm@2x">../slices/mac/view_link/icon-delete-confirm@2x.png</file>
+
+    <file alias="link/edit">../slices/mac/view_link/icon-edit.png</file>
+    <file alias="link/edit@2x">../slices/mac/view_link/icon-edit@2x.png</file>
+    <file alias="link/edit-hover@2x">../slices/mac/view_link/icon-edit-hover@2x.png</file>
+    <file alias="link/edit-hover">../slices/mac/view_link/icon-edit-hover.png</file>
+
+    <file alias="link/share">../slices/mac/view_link/icon-share.png</file>
+    <file alias="link/share@2x">../slices/mac/view_link/icon-share@2x.png</file>
+    <file alias="link/share-hover">../slices/mac/view_link/icon-share-hover.png</file>
+    <file alias="link/share-hover@2x">../slices/mac/view_link/icon-share-hover@2x.png</file>
+
+    <file alias="link/upload">../slices/mac/view_link/icon-upload.png</file>
+    <file alias="link/upload@2x">../slices/mac/view_link/icon-upload@2x.png</file>
+
+    <file alias="link/cancel-hover">../slices/mac/view_link/link-icon-cancel-hover.png</file>
+    <file alias="link/cancel-hover@2x">../slices/mac/view_link/link-icon-cancel-hover@2x.png</file>
+
+    <file alias="link/cancel">../slices/mac/view_link/link-icon-cancel.png</file>
+    <file alias="link/cancel@2x">../slices/mac/view_link/link-icon-cancel@2x.png</file>
+
+    <!-- login -->
+    <file alias="login/close">../slices/mac/view_login/login-icon-close.png</file>
+    <file alias="login/close@2x">../slices/mac/view_login/login-icon-close@2x.png</file>
+    <file alias="login/close-hover">../slices/mac/view_login/login-icon-close-hover.png</file>
+    <file alias="login/close-hover@2x">../slices/mac/view_login/login-icon-close-hover@2x.png</file>
+
+    <file alias="login/logo">../slices/mac/view_login/logo.png</file>
+    <file alias="login/logo@2x">../slices/mac/view_login/logo@2x.png</file>
+
+    <!-- main -->
+    <file alias="main/link">../slices/mac/view_main/icon-cancel-link.png</file>
+    <file alias="main/link@2x">../slices/mac/view_main/icon-cancel-link@2x.png</file>
+
+    <file alias="main/edit">../slices/mac/view_main/icon-edit-hover.png</file>
+    <file alias="main/edit@2x">../slices/mac/view_main/icon-edit-hover@2x.png</file>
+
+    <file alias="main/expand">../slices/mac/view_main/icon-expand.png</file>
+    <file alias="main/expand@2x">../slices/mac/view_main/icon-expand@2x.png</file>
+
+    <file alias="main/gear">../slices/mac/view_main/icon-gear.png</file>
+    <file alias="main/gear@2x">../slices/mac/view_main/icon-gear@2x.png</file>
+
+    <file alias="main/unread@2x">../slices/mac/view_main/icon-main-unread@2x.png</file>
+    <file alias="main/unread">../slices/mac/view_main/icon-main-unread.png</file>
+
+    <file alias="main/transfer">../slices/mac/view_main/icon-transfer.png</file>
+    <file alias="main/transfer@2x">../slices/mac/view_main/icon-transfer@2x.png</file>
+
+    <!-- send -->
+    <file alias="send/add-file">../slices/mac/view_send/icon-add-file.png</file>
+    <file alias="send/add-file@2x">../slices/mac/view_send/icon-add-file@2x.png</file>
+
+    <file alias="send/cancel">../slices/mac/view_send/icon-cancel-send.png</file>
+    <file alias="send/cancel@2x">../slices/mac/view_send/icon-cancel-send@2x.png</file>
+
+    <file alias="send/contact-checked">../slices/mac/view_send/icon-contact-checked.png</file>
+    <file alias="send/contact-checked@2x">../slices/mac/view_send/icon-contact-checked@2x.png</file>
+
+    <file alias="send/note">../slices/mac/view_send/icon-note.png</file>
+    <file alias="send/note@2x">../slices/mac/view_send/icon-note@2x.png</file>
+
+    <file alias="send/search">../slices/mac/view_send/icon-search.png</file>
+    <file alias="send/search@2x">../slices/mac/view_send/icon-search@2x.png</file>
+
+    <file alias="send/upload">../slices/mac/view_send/icon-upload.png</file>
+    <file alias="send/upload@2x">../slices/mac/view_send/icon-upload@2x.png</file>
+
+    <file alias="send/transfer">../slices/mac/view_send/icon-transfer.png</file>
+    <file alias="send/transfer@2x">../slices/mac/view_send/icon-transfer@2x.png</file>
+
+    <file alias="send/user-selected">../slices/mac/view_send/icon-select.png</file>
+    <file alias="send/user-selected@2x">../slices/mac/view_send/icon-select@2x.png</file>
+    <file alias="send/user-selected-active">../slices/mac/view_send/icon-select-active.png</file>
+    <file alias="send/user-selected-active@2x">../slices/mac/view_send/icon-select-active@2x.png</file>
+    <file alias="send/user-selected-hover">../slices/mac/view_send/icon-select-hover.png</file>
+    <file alias="send/user-selected-hover@2x">../slices/mac/view_send/icon-select-hover@2x.png</file>
+
+    <file alias="send/delete">../slices/mac/view_send/send-icon-delete.png</file>
+    <file alias="send/delete@2x">../slices/mac/view_send/send-icon-delete@2x.png</file>
+
+    <file alias="send/files">../slices/mac/view_send/send-icon-files.png</file>
+    <file alias="send/files@2x">../slices/mac/view_send/send-icon-files@2x.png</file>
+
+    <file alias="send/files-hover">../slices/mac/view_send/send-icon-files-hover.png</file>
+    <file alias="send/files-hover@2x">../slices/mac/view_send/send-icon-files-hover@2x.png</file>
+
+    <file alias="send/show-files">../slices/mac/view_send/send-icon-show-files.png</file>
+    <file alias="send/show-files@2x">../slices/mac/view_send/send-icon-show-files@2x.png</file>
+
+    <file alias="send/hide-files">../slices/mac/view_send/send-icon-hide-files.png</file>
+    <file alias="send/hide-files@2x">../slices/mac/view_send/send-icon-hide-files@2x.png</file>
 
     <!-- File icons -->
-    <file>../mimetypes/archive.png</file>
-    <file>../mimetypes/archive@2x.png</file>
-    <file>../mimetypes/cat.png</file>
-    <file>../mimetypes/cat@2x.png</file>
-    <file>../mimetypes/document.png</file>
-    <file>../mimetypes/document@2x.png</file>
-    <file>../mimetypes/folder.png</file>
-    <file>../mimetypes/folder@2x.png</file>
-    <file>../mimetypes/illustrator.png</file>
-    <file>../mimetypes/illustrator@2x.png</file>
-    <file>../mimetypes/music.png</file>
-    <file>../mimetypes/music@2x.png</file>
-    <file>../mimetypes/photoshop.png</file>
-    <file>../mimetypes/photoshop@2x.png</file>
-    <file>../mimetypes/picture.png</file>
-    <file>../mimetypes/picture@2x.png</file>
-    <file>../mimetypes/powerpoint.png</file>
-    <file>../mimetypes/powerpoint@2x.png</file>
-    <file>../mimetypes/video.png</file>
-    <file>../mimetypes/video@2x.png</file>
+    <file alias="mimetypes/archive">../mimetypes/archive.png</file>
+    <file alias="mimetypes/archive@2x">../mimetypes/archive@2x.png</file>
+    <file alias="mimetypes/cat">../mimetypes/cat.png</file>
+    <file alias="mimetypes/cat@2x">../mimetypes/cat@2x.png</file>
+    <file alias="mimetypes/document">../mimetypes/document.png</file>
+    <file alias="mimetypes/document@2x">../mimetypes/document@2x.png</file>
+    <file alias="mimetypes/folder">../mimetypes/folder.png</file>
+    <file alias="mimetypes/folder@2x">../mimetypes/folder@2x.png</file>
+    <file alias="mimetypes/illustrator">../mimetypes/illustrator.png</file>
+    <file alias="mimetypes/illustrator@2x">../mimetypes/illustrator@2x.png</file>
+    <file alias="mimetypes/music">../mimetypes/music.png</file>
+    <file alias="mimetypes/music@2x">../mimetypes/music@2x.png</file>
+    <file alias="mimetypes/photoshop">../mimetypes/photoshop.png</file>
+    <file alias="mimetypes/photoshop@2x">../mimetypes/photoshop@2x.png</file>
+    <file alias="mimetypes/picture">../mimetypes/picture.png</file>
+    <file alias="mimetypes/picture@2x">../mimetypes/picture@2x.png</file>
+    <file alias="mimetypes/powerpoint">../mimetypes/powerpoint.png</file>
+    <file alias="mimetypes/powerpoint@2x">../mimetypes/powerpoint@2x.png</file>
+    <file alias="mimetypes/video">../mimetypes/video.png</file>
+    <file alias="mimetypes/video@2x">../mimetypes/video@2x.png</file>
 
     <!-- Fonts -->
-    <file>../fonts/LucidaGrande.ttc</file>
-    <file>../fonts/Montserrat-Bold.ttf</file>
-    <file>../fonts/Montserrat-Regular.ttf</file>
+    <file alias="font/LucidaGrande">../fonts/LucidaGrande.ttc</file>
+    <file alias="font/Montserrat-bold">../fonts/Montserrat-Bold.ttf</file>
+    <file alias="font/Montserrat">../fonts/Montserrat-Regular.ttf</file>
 
   </qresource>
 </RCC>

@@ -51,7 +51,6 @@ namespace fist
         }
         else
           QLineEdit::keyPressEvent(event);
-
       event->accept();
     }
 
@@ -67,8 +66,8 @@ namespace fist
                  QWidget* owner)
       :  QWidget(owner)
       , _state(state)
-      , _magnifier(":/icons/search.png")
-      , _loading_icon(new QMovie(QString(":/icons/loading.gif"), QByteArray(), this))
+      , _magnifier(":/send/search")
+      , _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this))
       , _icon(new QLabel(this))
       , _search_field(new SearchField(this))
       , _results()

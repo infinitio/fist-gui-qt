@@ -179,14 +179,14 @@ namespace fist
           }
           else if(this->_avatar.isNull())
           {
-            this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
+            this->_avatar = QPixmap(QString(":/avatar_default"));
           }
           this->_default_avatar = false;
         }
         else if(this->_avatar.isNull())
         {
           ELLE_DEBUG("%s: avatar not available yet", *this);
-          this->_avatar = QPixmap(QString(":/images/avatar_default.png"));
+          this->_avatar = QPixmap(QString(":/avatar_default"));
         }
       }
 

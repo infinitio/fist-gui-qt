@@ -17,7 +17,7 @@ FileItem::FileItem(QUrl const& path):
   _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last())),
   _icon(new QLabel),
   _size(new QLabel(readable_size(this->_file.size()))),
-  _remove(new IconButton(QPixmap(":/icons/delete.png"), // Remove.
+  _remove(new IconButton(QPixmap(":/send/delete"), // Remove.
                          false,
                          [this]
                          {
