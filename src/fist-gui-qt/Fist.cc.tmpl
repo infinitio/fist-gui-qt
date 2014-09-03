@@ -188,7 +188,8 @@ Fist::about_to_quit()
     }
   auto kicked = false;
   auto final = true;
-  this->logout(kicked, final);
+  if (this->_state)
+    this->logout(kicked, final);
   ELLE_ASSERT(this->_state == nullptr);
   ELLE_LOG("cleaning done");
 }
@@ -198,7 +199,7 @@ Fist::quit()
 {
   ELLE_TRACE_SCOPE("%s: quit", *this);
   this->_application->setQuitOnLastWindowClosed(false);
-  this->about_to_quit();
+  // this->about_to_quit();
   this->_application->setQuitOnLastWindowClosed(true);
   ELLE_LOG("quit")
     this->_application->quit();
