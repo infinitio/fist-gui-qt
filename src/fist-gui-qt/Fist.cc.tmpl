@@ -4,6 +4,7 @@
 # include <boost/filesystem/path.hpp>
 # include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 # include <locale>
+# include <boost/locale.hpp>
 #endif
 
 #include <memory>
@@ -168,6 +169,10 @@ Fist::_initialize_application()
 
   this->_application->setWindowIcon(QIcon(QPixmap(":/logo")));
   this->_application->setQuitOnLastWindowClosed(false);
+#ifdef INFINIT_WINDOWS
+  std::locale::global(boost::locale::generator().generate(""));
+  boost::filesystem::path::imbue(std::locale());
+#endif
 }
 
 void
