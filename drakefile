@@ -11,6 +11,8 @@ from functools import partial
 build = None
 install = None
 check = None
+toolkit = None
+config = None
 
 with open(str(drake.path_source('../elle/drake-utils.py')), 'r') as f:
   exec(f.read(), globals(), globals())
@@ -31,7 +33,7 @@ def configure(cxx_toolkit = None,
               git = None,
               qt = None,
               libraries = []):
-  global build, installer
+  global build, installer, config, toolkit
 
   prefix = drake.Path(prefix)
 
@@ -89,8 +91,9 @@ def configure(cxx_toolkit = None,
     cxx_config.lib('shell32')
     cxx_config.lib('kernel32')
     cxx_config.lib('QtCore')
-    # Remove the command line windows on qt.
-    cxx_config.flag("-Wl,-subsystem,windows")
+    if fist_production_build:
+      # Remove the command line windows on qt.
+      cxx_config.flag("-Wl,-subsystem,windows")
   cxx_config.add_local_include_path('src')
 
   with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
@@ -231,7 +234,8 @@ def configure(cxx_toolkit = None,
   build << application
 
   check = drake.Rule('check')
-
+  config = cxx_config
+  toolkit = cxx_toolkit
   if cxx_toolkit.os == drake.os.windows:
     ## ------------ ##
     ## Osslsigncode ##
