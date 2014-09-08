@@ -39,10 +39,7 @@ namespace fist
 
       for (model::Link const& model: this->_state.links().get<0>())
       {
-        if (model.status() != gap_transaction_canceled &&
-            model.status() != gap_transaction_failed &&
-            model.status() != gap_transaction_deleted)
-          this->add_link(model);
+        this->add_link(model);
       }
     }
 

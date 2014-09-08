@@ -41,6 +41,8 @@ namespace fist
     {
       connect(&this->_model, SIGNAL(status_updated()),
               this, SLOT(_on_status_updated()));
+      connect(&this->_model, SIGNAL(click_count_updated()),
+              this, SLOT(_on_status_updated()));
       this->_layout->setContentsMargins(12, 12, 12, 12);
       this->_layout->setSpacing(5);
       {
@@ -139,7 +141,6 @@ namespace fist
         this->_text_style = view::links::file::style;
       }
 
-      this->_text_style(this->_name);
       if ((this->_model.status() == gap_transaction_transferring) &&
           (this->_progress_timer == nullptr))
       {
@@ -155,6 +156,7 @@ namespace fist
       }
       if (this->_name.text().isEmpty())
         this->_name.setText(this->_model.name());
+      this->_text_style(this->_name);
       this->repaint();
     }
 
@@ -169,8 +171,7 @@ namespace fist
         this->_copy_link->hide();
         QToolTip::showText(
           this->_cancel_link->mapToGlobal(
-            QPoint(this->_cancel_link->width(),
-                   -this->_cancel_link->height())),
+            QPoint(0, -this->_cancel_link->height())),
           "Click again to cancel");
       }
       else

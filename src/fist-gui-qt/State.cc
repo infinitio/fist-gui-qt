@@ -100,7 +100,12 @@ namespace fist
       auto const& links = gap_link_transactions(this->state());
       for (auto const& link: links)
       {
-        this->_links.emplace(*this, link.id);
+        if (link.status != gap_transaction_canceled &&
+            link.status != gap_transaction_failed &&
+            link.status != gap_transaction_deleted)
+          this->_links.emplace(*this, link.id);
+        else
+          ELLE_DEBUG("ignore %s", link);
       }
       this->_compute_active_links();
     }
@@ -330,13 +335,10 @@ namespace fist
       auto it = this->_links.get<0>().find(id);
       if (it == this->_links.get<0>().end())
       {
+        ELLE_TRACE("insert new link to the map");
         this->_links.emplace(*this, id);
         emit new_link(id);
         it = this->_links.get<0>().find(id);
-      }
-      else if (it->status() == status)
-      {
-        return;
       }
 
       struct UpdateLink
