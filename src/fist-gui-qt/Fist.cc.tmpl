@@ -1,9 +1,8 @@
-#include <unistd.h> //Crapy crap.
-
 #ifdef INFINIT_WINDOWS
 # include <boost/filesystem/path.hpp>
 # include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 # include <locale>
+# include <boost/locale.hpp>
 #endif
 
 #include <memory>
@@ -70,6 +69,11 @@ class Fist::Prologue
 
   Prologue()
   {
+#ifdef INFINIT_WINDOWS
+  std::locale::global(boost::locale::generator().generate(""));
+  boost::filesystem::path::imbue(std::locale());
+#endif
+
 #ifdef FIST_PRODUCTION_BUILD
     elle::os::setenv("INFINIT_CRASH_DEST", "crash@infinit.io", false);
     if (!elle::os::inenv("INFINIT_LOG_FILE") && !elle::os::inenv("ELLE_LOG_FILE"))
