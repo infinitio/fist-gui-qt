@@ -1,3 +1,5 @@
+#include <QApplication>
+#include <QClipboard>
 #include <QString>
 #include <QVector>
 #include <QStringList>
@@ -6,6 +8,7 @@
 
 #include <fist-gui-qt/model/Link.hh>
 #include <fist-gui-qt/State.hh>
+
 
 ELLE_LOG_COMPONENT("infinit.FIST.model.Link");
 
@@ -26,11 +29,16 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: update", *this);
       surface::gap::LinkTransaction old = this->_link;
       this->_link = gap_link_transaction_by_id(this->_state.state(), this->id());
-
+      ELLE_DEBUG("%s -> %s", old, this->_link);
       if (old.status != this->status())
         emit status_updated();
       if (old.click_count != this->click_count())
         emit click_count_updated();
+      if (!old.link && !this->url().isEmpty())
+      {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(this->url().toString());
+      }
     }
 
     QUrl
