@@ -21,6 +21,7 @@ class Fist:
 {
   typedef std::unique_ptr<fist::State> StatePtr;
   typedef Fist Self;
+  typedef QObject Super;
 /*------------.
 | Contruction |
 `------------*/
@@ -123,6 +124,9 @@ private:
   static
   void
   _kicked_out_callback();
+
+  bool
+  eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
   void

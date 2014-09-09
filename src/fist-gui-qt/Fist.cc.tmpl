@@ -121,6 +121,7 @@ Fist::Fist(int argc, char** argv):
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
   g_fist = this;
+  this->_application->installEventFilter(this);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
   if (!this->_set_uniqunness_guard())
@@ -131,6 +132,31 @@ Fist::Fist(int argc, char** argv):
   this->_put_lock_file();
   this->_initialize_application();
 }
+
+bool
+Fist::eventFilter(QObject *obj, QEvent *event)
+{
+  if (obj != this->_application.get())
+    return Super::eventFilter(obj, event);
+
+  if (event->type() == QEvent::Close)
+  {
+    ELLE_DEBUG("clear lock")
+    {
+      this->_filelock.setPermissions(QFile::WriteOwner);
+      this->_filelock.remove();
+    }
+    ELLE_DEBUG("close updater")
+      if (this->_updater != nullptr)
+      {
+        this->_updater->loading_dialog()->hide();
+        this->_updater->loading_dialog()->close();
+        this->_updater.reset();
+      }
+  }
+  return Super::eventFilter(obj, event);
+}
+
 
 Fist::~Fist()
 {
