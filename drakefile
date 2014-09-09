@@ -256,7 +256,6 @@ def configure(cxx_toolkit = None,
       osslsigncode_tarball,
       targets = ['%s/configure' % osslsigncode_basename],
     )
-    print(cxx_toolkit.cxx)
     GNUBuilder(
       cxx_toolkit,
       configure = osslsigncode_configure,
@@ -306,8 +305,8 @@ def configure(cxx_toolkit = None,
 
     # Installer.
     installer_resources = drake.nodes(
-      'resources/icons/icon.ico',
-      'resources/images/installer_background.png',
+      'resources/slices/mac/installer/icon.ico',
+      'resources/slices/mac/installer/background.png',
       'resources/fist-gui-qt/Release notes.txt',
       'resources/fist-gui-qt/License.txt',
       'resources/fist-gui-qt/Documentation.txt',
@@ -341,7 +340,7 @@ def configure(cxx_toolkit = None,
         'libraries':
           list(map(lambda lib: str(lib.name().basename()), dynamic_libraries)),
         'icon': 'icon.ico',
-        'background': 'installer_background.png',
+        'background': 'background.png',
         'license': 'License.txt',
         'release_notes': 'Release notes.txt',
         'documentation': 'Documentation.txt',
