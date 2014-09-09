@@ -343,16 +343,22 @@ namespace fist
 
       struct UpdateLink
       {
-        UpdateLink() = default;
+        UpdateLink(gap_TransactionStatus status)
+          : status(status)
+        {}
 
         void
         operator()(model::Link& model)
         {
+          if (this->status > model._link.status)
+            model._link.status = this->status;
           model.update();
         }
+
+        gap_TransactionStatus status;
       };
 
-      this->_links.modify(it, UpdateLink());
+      this->_links.modify(it, UpdateLink(status));
       ELLE_DEBUG("update link")
         emit link_updated(id);
       this->_compute_active_links();

@@ -29,9 +29,9 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: update", *this);
       surface::gap::LinkTransaction old = this->_link;
       this->_link = gap_link_transaction_by_id(this->_state.state(), this->id());
+      this->_link.status = old.status;
       ELLE_DEBUG("%s -> %s", old, this->_link);
-      if (old.status != this->status())
-        emit status_updated();
+      emit status_updated();
       if (old.click_count != this->click_count())
         emit click_count_updated();
       if (!old.link && !this->url().isEmpty())
