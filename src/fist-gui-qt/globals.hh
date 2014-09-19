@@ -104,7 +104,7 @@ namespace view
   {
     static
     fist::style::Text const
-    style(QFont(Montserrat, 9.5), QColor(0x8B, 0x8B, 0x83));
+    style(QFont(Montserrat, 10), QColor(0x8B, 0x8B, 0x83));
 
     static
     QColor
@@ -112,7 +112,7 @@ namespace view
 
     static
     fist::style::Text const
-    hover_style(QFont(Montserrat, 9.5), QColor(0x51, 0x51, 0x49));
+    hover_style(QFont(Montserrat, 10), QColor(0x51, 0x51, 0x49));
 
     static
     QColor
@@ -120,7 +120,7 @@ namespace view
 
     static
     fist::style::Text const
-    selected_style(QFont(Montserrat, 9.5), QColor(0x2B, 0xBE, 0xBD));
+    selected_style(QFont(Montserrat, 10), QColor(0x2B, 0xBE, 0xBD));
 
     namespace counter
     {
