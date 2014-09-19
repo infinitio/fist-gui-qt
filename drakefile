@@ -9,6 +9,7 @@ import drake.templating
 from functools import partial
 
 build = None
+tests = None
 install = None
 check = None
 
@@ -30,8 +31,9 @@ def configure(cxx_toolkit = None,
               boost = None,
               git = None,
               qt = None,
-              libraries = []):
-  global build, installer
+              libraries = [],
+              boost_test = None):
+  global build, check, tests, installer, config, toolkit
 
   prefix = drake.Path(prefix)
 
