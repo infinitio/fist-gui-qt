@@ -213,6 +213,7 @@ LoginWindow::LoginWindow(fist::State& state,
   connect(&this->_login_watcher, SIGNAL(finished()),
           this, SLOT(_login_attempt()));
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
+  connect(this, SIGNAL(login_failed()), SLOT(show()));
   this->update();
 }
 
@@ -289,7 +290,10 @@ LoginWindow::try_auto_login()
 {
   ELLE_TRACE_SCOPE("%s: try auto login", *this);
   if (!this->_password_field->text().isEmpty())
+  {
+    this->hide();
     this->_login();
+  }
 }
 
 void
