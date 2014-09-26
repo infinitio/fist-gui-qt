@@ -664,7 +664,8 @@ InfinitDock::report_a_problem()
 
     if (!logfile.empty())
     {
-      auto std_text = text.toStdString();
+      auto array = text.toUtf8();
+      std::string std_text(array.constData());
       ELLE_DEBUG("user message as std::string: %s", std_text);
       gap_send_user_report(
         this->_state.state(),
