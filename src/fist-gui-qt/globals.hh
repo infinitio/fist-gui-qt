@@ -100,6 +100,10 @@ namespace view
   QColor const
   background(0xF8, 0xF8, 0xF8);
 
+  static
+  fist::style::Text const
+  version_style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+
   namespace tab
   {
     static

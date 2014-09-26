@@ -24,6 +24,7 @@
 #include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
 
@@ -147,7 +148,9 @@ InfinitDock::InfinitDock(fist::State& state)
   // XXX: Specialize a QWidgetAction to add a better visual and for example,
   // to copy the version in the user clipboard on click.
   QWidgetAction* version = new QWidgetAction(this);
-  version->setDefaultWidget(new QLabel(QString(INFINIT_VERSION)));
+  auto* v = new QLabel(QString(INFINIT_VERSION));
+  view::version_style(*v);
+  version->setDefaultWidget(v);
   this->_menu->addAction(version);
   this->_menu->addSeparator();
   this->_menu->addAction(_report_a_problem);
