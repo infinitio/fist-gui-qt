@@ -15,7 +15,7 @@ SmoothScrollBar::SmoothScrollBar(QWidget* parent):
   _displayPageSize(_pageSize),
   _value(0),
   _value_animation(new QPropertyAnimation(this, "value")),
-  _opacity(0.5),
+  _opacity(0.6),
   _opacity_animation(new QPropertyAnimation(this, "opacity"))
 {
   this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -24,7 +24,7 @@ SmoothScrollBar::SmoothScrollBar(QWidget* parent):
 
   this->_opacity_animation->setEasingCurve(QEasingCurve::InOutQuad);
   this->_opacity_animation->setDuration(1250);
-  this->_opacity_animation->setEndValue(0);
+  this->_opacity_animation->setEndValue(0.2);
 
   connect(this->_value_animation, SIGNAL(finished()),
           this, SLOT(fade()));
