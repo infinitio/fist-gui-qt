@@ -90,7 +90,7 @@ TransactionWidget::TransactionWidget(Model const& model):
         QString("%1 files").arg(this->_transaction.files().size()));
 
       this->_filename->installEventFilter(this);
-      this->_filename->setToolTip(this->_transaction.tooltip());
+      this->_filename->setToolTip(this->_transaction.files_tooltip());
       view::transaction::files::style(*this->_filename);
       this->_filename->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
       texts->addWidget(this->_filename);
@@ -162,7 +162,7 @@ TransactionWidget::eventFilter(QObject *obj, QEvent *event)
 
   if (obj == this->_filename)
   {
-    if (!this->_transaction.is_recipient_device() &&
+    if (this->_transaction.is_recipient_device() &&
         this->_transaction.status() == gap_transaction_finished)
     {
       if (event->type() == QEvent::Enter)

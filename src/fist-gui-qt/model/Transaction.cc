@@ -69,10 +69,20 @@ namespace fist
         .arg(gap_transaction_sender_device_id(this->_state.state(), this->id()))
         .arg(gap_transaction_recipient_id(this->_state.state(), this->id()))
         .arg(gap_transaction_recipient_device_id(this->_state.state(), this->id()));
-      for (auto const& file: this->files())
-        this->_tooltip.append(file).append("\n");
-        this->_tooltip.remove(this->_tooltip.size() - 1, 1);
+      this->_tooltip.append(this->files_tooltip());
 #endif
+    }
+
+    QString
+    Transaction::files_tooltip() const
+    {
+      QString tooltip;
+      for (auto const& file: this->files())
+      {
+        tooltip.append(file).append("\n");
+      }
+      tooltip.remove(this->_tooltip.size() - 1, 1);
+      return tooltip;
     }
 
     bool

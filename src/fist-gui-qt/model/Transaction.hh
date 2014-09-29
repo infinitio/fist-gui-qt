@@ -52,6 +52,9 @@ namespace fist
       QVector<QString> const&
       files() const;
 
+      QString
+      files_tooltip() const;
+
       QDateTime const&
       mtime() const;
 
