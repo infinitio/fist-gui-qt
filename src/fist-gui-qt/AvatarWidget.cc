@@ -1,4 +1,5 @@
 #include <QPainter>
+#include <qmath.h>
 
 #include <fist-gui-qt/AvatarWidget.hh>
 
@@ -11,10 +12,11 @@ static int const picture_size = 50;
 static int const shadow_width = 0;
 static int const border_width = 0;
 static int const progress_size = 4;
-static int const progress_offset = 0;
+static int const progress_offset = -1;
 static int const badge_size = 16;
 static int const badge_border_size = 0;
 static int const total_size = 2 * progress_size + 2 * progress_offset + picture_size;
+static int const progress_angle_gap = (picture_size * M_PI - badge_size) / 360;
 
 static int const progress_hue = 200;
 static int const progress_saturation = 175;
@@ -207,8 +209,8 @@ AvatarWidget::paintEvent(QPaintEvent*)
     pen.setCapStyle(Qt::RoundCap);
     painter.setPen(pen);
     painter.drawArc(progress_region,
-                    badge_angle * 16,
-                    -this->_smooth_progress * 360 * 16);
+                    (badge_angle - progress_angle_gap / 2) * 16,
+                    -this->_smooth_progress * (360 + progress_angle_gap) * 16);
   }
   // Transaction count badge
   if (this->_transaction_count > 0)
@@ -231,7 +233,7 @@ AvatarWidget::paintEvent(QPaintEvent*)
       painter.setPen(Qt::NoPen);
       painter.drawEllipse(border_region);
     }
-    // Badge
+    // Badge.
     {
       QPointF focal(-badge_size / 2., -badge_size / 2.);
       QRadialGradient gradient(QPoint(0, 0), badge_size, focal);
@@ -240,19 +242,19 @@ AvatarWidget::paintEvent(QPaintEvent*)
                         progress_saturation * 1.4,
                         progress_value * 0.6));
       gradient.setColorAt(0, progress_color);
-      gradient.setColorAt(1, progress_color_dark);
+      gradient.setColorAt(1, progress_color);
       painter.setBrush(gradient);
       painter.setPen(Qt::NoPen);
       painter.drawEllipse(badge_region);
     }
-    // Border
+    // Border.
     {
       painter.setBrush(Qt::NoBrush);
       painter.setPen(border_pen);
       painter.drawEllipse(border_region);
       painter.drawEllipse(badge_region);
     }
-    // Count
+    // Count.
     {
       QFont font("Lucida Grande");
       font.setBold(true);
