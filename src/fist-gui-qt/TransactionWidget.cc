@@ -291,6 +291,7 @@ TransactionWidget::apply_update()
     this->_peer_avatar->setTransactionCount(this->_transaction.files().size());
 
     this->_progress_timer.reset(new QTimer);
+    this->_progress_timer->setInterval(AvatarWidget::progress_update_interval);
     connect(this->_progress_timer.get(), SIGNAL(timeout()),
             this, SLOT(update_progress()));
     this->_progress_timer->start(AvatarWidget::progress_update_interval);
