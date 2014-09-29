@@ -100,10 +100,12 @@ namespace fist
     bool
     Transaction::acceptable() const
     {
-      return (this->status() == gap_transaction_waiting_accept && this->is_recipient()) ||
-        (this->status() == gap_transaction_on_other_device) && (this->is_sender() && this->is_recipient() && !this->is_sender_device());
-    }
+      if (this->is_sender_device())
+        return false;
 
+      return (this->status() == gap_transaction_waiting_accept && this->is_recipient()) ||
+        (this->status() == gap_transaction_on_other_device && this->is_sender() && this->is_recipient());
+    }
 
     bool
     Transaction::is_final() const
