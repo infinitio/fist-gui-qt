@@ -81,7 +81,7 @@ namespace fist
       {
         tooltip.append(file).append("\n");
       }
-      tooltip.remove(this->_tooltip.size() - 1, 1);
+      tooltip.remove(tooltip.size() - 1, 1);
       return tooltip;
     }
 
