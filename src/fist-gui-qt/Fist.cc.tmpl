@@ -8,9 +8,11 @@
 #include <memory>
 #include <functional>
 
+#include <QDesktopServices>
 #include <QDesktopWidget>
-#include <QFontDatabase>
+#include <QDir>
 #include <QFont>
+#include <QFontDatabase>
 #include <QIcon>
 #include <QLocalSocket>
 #include <QMessageBox>
@@ -192,6 +194,7 @@ Fist::_initialize_application()
   if (luc == -1 || mont == -1)
     ELLE_WARN("%s: impossible to install fonts", *this);
 
+  QDir::setCurrent(QDesktopServices::storageLocation(QDesktopServices::DesktopLocation));
   QFont arial("Arial", 11);
   arial.setStyleStrategy(QFont::PreferAntialias);
   this->_application->setFont(arial);
