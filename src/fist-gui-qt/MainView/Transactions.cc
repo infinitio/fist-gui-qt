@@ -103,16 +103,33 @@ namespace fist
         this->add_transaction(id);
       }
 
+      if (!transaction.concerns_device())
+        return;
+
       switch (transaction.status())
       {
+        case gap_transaction_new:
+          if (transaction.is_sender())
+          {
+            emit systray_message(
+              SystrayMessageCarrier(new Message(
+                "Sent",
+                (transaction.files().size() == 1)
+                  ? QString("Your file is on it way")
+                  : QString("Your files are on their way"),
+                QSystemTrayIcon::Warning)));
+          }
+          break;
         case gap_transaction_rejected:
           if (transaction.is_sender())
+          {
             emit systray_message(
               SystrayMessageCarrier(new Message(
                 "Shenanigans!",
                 QString("%1 declined your transfer.")
                 .arg(transaction.peer_fullname()),
                 QSystemTrayIcon::Warning)));
+          }
           break;
         case gap_transaction_canceled:
           // Should only be displayed if the user is not the one who cancelled.
