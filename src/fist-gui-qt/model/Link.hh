@@ -31,6 +31,7 @@ namespace fist
     private:
       ELLE_ATTRIBUTE_P(surface::gap::LinkTransaction, link, mutable);
       ELLE_ATTRIBUTE_P(QDateTime, mtime, mutable);
+      ELLE_ATTRIBUTE_P(bool, final, mutable);
 
     public:
       void
@@ -54,6 +55,9 @@ namespace fist
 
       gap_TransactionStatus
       status() const;
+
+      bool
+      unavailable() const;
 
       bool
       is_finished() const;

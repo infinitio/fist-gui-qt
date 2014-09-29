@@ -223,13 +223,11 @@ namespace fist
     }
 
     void
-    LinkWidget::enterEvent(QEvent*)
+    LinkWidget::enterEvent(QEvent* e)
     {
-      if (this->_model.status() == gap_transaction_failed ||
-          this->_model.status() == gap_transaction_canceled ||
-          this->_model.status() == gap_transaction_deleted)
+      Super::enterEvent(e);
+      if (this->_model.unavailable())
         return;
-
       this->_cancel_link->show();
       this->_go_to_website->show();
       this->_copy_link->show();
@@ -237,8 +235,9 @@ namespace fist
     }
 
     void
-    LinkWidget::leaveEvent(QEvent*)
+    LinkWidget::leaveEvent(QEvent* e)
     {
+      Super::leaveEvent(e);
       this->_cancel_link->hide();
       this->_go_to_website->hide();
       this->_copy_link->hide();

@@ -17,6 +17,7 @@ namespace fist
     Transaction::Transaction(fist::State& state,
                              uint32_t id)
       : Model(state, id)
+      , _concerns_device(gap_transaction_concern_device(this->_state.state(), this->id(), false))
       , _is_sender(
         gap_self_id(this->_state.state()) ==
         gap_transaction_sender_id(this->_state.state(), this->id()))
@@ -30,11 +31,15 @@ namespace fist
         ? gap_transaction_recipient_id(this->_state.state(), this->id())
         : gap_transaction_sender_id(this->_state.state(), this->id()))
       , _files()
+      , _mtime()
+      , _final(false)
       , _avatar()
       , _default_avatar(true)
       , _new_avatar(true)
     {
+      this->_final = this->is_final();
       ELLE_TRACE_SCOPE("%s: create transaction model", *this);
+      this->update();
       if (this->is_sender())
         ELLE_DEBUG("as sender");
       if (this->is_recipient())
@@ -48,9 +53,54 @@ namespace fist
       return this->_state.user(this->peer_id());
     }
 
+    void
+    Transaction::update() const
+    {
+      this->_concerns_device = gap_transaction_concern_device(this->_state.state(), this->id(), false);
+      this->_is_recipient = gap_self_id(this->_state.state()) == gap_transaction_recipient_id(this->_state.state(), this->id());
+
+#ifndef FIST_PRODUCTION_BUILD
+      this->_tooltip = QString("id: %1, status: %2, (%3) (%4 device)\nsender: %5 (%6)\nrecipient %7 (%8)\n")
+        .arg(this->id())
+        .arg(this->status())
+        .arg(this->is_sender() ? "sender" : "recipient")
+        .arg(this->_concerns_device ? "concerns" : "doesn't concern")
+        .arg(gap_transaction_sender_id(this->_state.state(), this->id()))
+        .arg(gap_transaction_sender_device_id(this->_state.state(), this->id()))
+        .arg(gap_transaction_recipient_id(this->_state.state(), this->id()))
+        .arg(gap_transaction_recipient_device_id(this->_state.state(), this->id()));
+      for (auto const& file: this->files())
+        this->_tooltip.append(file).append("\n");
+        this->_tooltip.remove(this->_tooltip.size() - 1, 1);
+#endif
+    }
+
+    bool
+    Transaction::is_sender_device() const
+    {
+      return this->is_sender() && this->_concerns_device;
+    }
+
+    bool
+    Transaction::is_recipient_device() const
+    {
+      return this->is_recipient() && this->_concerns_device;
+    }
+
+    bool
+    Transaction::acceptable() const
+    {
+      return (this->status() == gap_transaction_waiting_accept && this->is_recipient()) ||
+        (this->status() == gap_transaction_on_other_device) && (this->is_sender() && this->is_recipient() && !this->is_sender_device());
+    }
+
+
     bool
     Transaction::is_final() const
     {
+      if (this->_final)
+        return true;
+
       static QVector<gap_TransactionStatus> final_states =
         {
           gap_transaction_finished,
@@ -61,8 +111,15 @@ namespace fist
           gap_transaction_cloud_buffered,
         };
 
-      return final_states.contains(this->status()) ||
-        gap_transaction_is_final(this->_state.state(), this->id());
+      if (final_states.contains(this->status()))
+      {
+        this->_final = true;
+      }
+      else if (gap_transaction_is_final(this->_state.state(), this->id()))
+      {
+        this->_final = true;
+      }
+      return this->_final;
     }
 
     QString const&
@@ -101,28 +158,6 @@ namespace fist
       }
 
       return this->_files;
-    }
-
-    bool
-    Transaction::concerns_device() const
-    {
-      return gap_transaction_concern_device(
-        this->_state.state(), this->id(), false);
-    }
-
-    QString
-    Transaction::tooltip() const
-    {
-      if (this->_tooltip.isNull())
-      {
-        for (auto const& file: this->files())
-          this->_tooltip.append(file).append("\n");
-        this->_tooltip.remove(this->_tooltip.size() - 1, 1);
-
-        ELLE_DEBUG("%s: fetched 'tooltip': %s", *this, this->_tooltip);
-      }
-
-      return this->_tooltip;
     }
 
     gap_TransactionStatus
@@ -209,8 +244,8 @@ namespace fist
     void
     Transaction::print(std::ostream& stream) const
     {
-      stream << "Transaction(" << this->id() << ")";
-      if (!boost::logic::indeterminate(this->_is_sender))
+      stream << "Transaction(" << this->id() << ", " << this->status() << ")";
+      if (this->_is_sender)
       {
         stream << " "
                << (this->is_sender() ? "to" : "from")

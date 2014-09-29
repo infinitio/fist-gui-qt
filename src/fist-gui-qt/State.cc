@@ -321,6 +321,7 @@ namespace fist
         operator()(model::Transaction& model)
         {
           model.status(this->_status);
+          model.update();
         }
 
         ELLE_ATTRIBUTE(gap_TransactionStatus, status);
@@ -341,27 +342,35 @@ namespace fist
         it = this->_links.get<0>().find(id);
       }
 
+      bool update = false;
       struct UpdateLink
       {
-        UpdateLink(gap_TransactionStatus status)
+        UpdateLink(gap_TransactionStatus status,
+                   bool& update)
           : status(status)
+          , update(update)
         {}
 
         void
         operator()(model::Link& model)
         {
           if (this->status > model._link.status)
+          {
+            update = true;
             model._link.status = this->status;
+          }
           model.update();
         }
 
         gap_TransactionStatus status;
+        bool& update;
       };
 
-      this->_links.modify(it, UpdateLink(status));
+      this->_links.modify(it, UpdateLink(status, update));
       ELLE_DEBUG("update link")
         emit link_updated(id);
-      this->_compute_active_links();
+      if (update)
+        this->_compute_active_links();
     }
   }
 

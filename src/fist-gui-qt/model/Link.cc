@@ -20,7 +20,10 @@ namespace fist
                uint32_t id)
       : Super(state, id)
       , _link(gap_link_transaction_by_id(this->_state.state(), this->id()))
+      , _mtime()
+      , _final(false)
     {
+      this->_final = this->is_finished();
     }
 
     void
@@ -71,9 +74,11 @@ namespace fist
     float
     Link::progress() const
     {
+      ELLE_DEBUG_SCOPE("%s: ask for progress", *this);
       if (this->status() == gap_transaction_transferring)
       {
-        return gap_transaction_progress(this->_state.state(), this->id());
+        ELLE_DEBUG("ask gap")
+          return gap_transaction_progress(this->_state.state(), this->id());
       }
       else if (this->is_finished())
         return 1.0f;
@@ -88,17 +93,31 @@ namespace fist
     }
 
     bool
-    Link::is_finished() const
+    Link::unavailable() const
     {
       static QVector<gap_TransactionStatus> final_states =
         {
-          gap_transaction_finished,
           gap_transaction_failed,
           gap_transaction_canceled,
           gap_transaction_deleted,
         };
+      return final_states.contains(this->status());
+    }
 
-      return final_states.contains(this->status()) || gap_transaction_is_final(this->_state.state(), this->id());
+    bool
+    Link::is_finished() const
+    {
+      if (this->_final)
+        return true;
+      if (this->unavailable() || (gap_transaction_finished == this->status()))
+      {
+        this->_final = true;
+      }
+      else if (gap_transaction_is_final(this->_state.state(), this->id()))
+      {
+        this->_final = true;
+      }
+      return this->_final;
     }
 
     void

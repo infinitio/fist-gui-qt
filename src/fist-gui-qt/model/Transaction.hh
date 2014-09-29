@@ -31,14 +31,14 @@ namespace fist
       ~Transaction() = default;
       Transaction(Transaction const&) = default;
 
+      void
+      update() const;
+
       model::User const&
       peer() const;
 
       bool
       is_final() const;
-
-      bool
-      concerns_device() const;
 
       QString const&
       peer_fullname() const;
@@ -51,9 +51,6 @@ namespace fist
 
       QVector<QString> const&
       files() const;
-
-      QString
-      tooltip() const;
 
       QDateTime const&
       mtime() const;
@@ -71,14 +68,15 @@ namespace fist
     private:
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
-      ELLE_ATTRIBUTE_RP(boost::logic::tribool, is_sender, mutable);
-      ELLE_ATTRIBUTE_RP(boost::logic::tribool, is_recipient, mutable);
+      ELLE_ATTRIBUTE_RP(bool, concerns_device, mutable);
+      ELLE_ATTRIBUTE_RP(bool, is_sender, mutable);
+      ELLE_ATTRIBUTE_RP(bool, is_recipient, mutable);
       ELLE_ATTRIBUTE_rw(Status, status);
       ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
       ELLE_ATTRIBUTE_RP(uint32_t, peer_id, mutable);
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);
-      ELLE_ATTRIBUTE_P(QString, tooltip, mutable);
       ELLE_ATTRIBUTE_P(QDateTime, mtime, mutable);
+      ELLE_ATTRIBUTE_P(bool, final, mutable);
 
       // XXX/ Should be there.
       ELLE_ATTRIBUTE_P(QPixmap, avatar, mutable);
@@ -105,6 +103,16 @@ namespace fist
       void
       peer_status_updated() const;
 
+    public:
+      bool
+      is_sender_device() const;
+
+      bool
+      is_recipient_device() const;
+
+      bool
+      acceptable() const;
+
     private:
   /*----------.
   | Printable |
@@ -118,6 +126,10 @@ namespace fist
     private:
       // Make State friend in order to allow it to send signals.
       friend fist::State;
+
+#ifndef FIST_PRODUCTION_BUILD
+      ELLE_ATTRIBUTE_RP(QString, tooltip, mutable);
+#endif
     };
   }
 }

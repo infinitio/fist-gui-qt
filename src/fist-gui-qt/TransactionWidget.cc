@@ -136,10 +136,8 @@ TransactionWidget::TransactionWidget(Model const& model):
                 QSizePolicy::Minimum);
   adjustSize();
 
-#if 0
-  connect(this->_peer_avatar,
-          SIGNAL(onProgressChanged(float)),
-          SIGNAL(onProgressChanged(float)));
+#ifndef FIST_PRODUCTION_BUILD
+  this->setToolTip(this->_transaction.tooltip());
 #endif
 
   this->apply_update();
@@ -164,7 +162,8 @@ TransactionWidget::eventFilter(QObject *obj, QEvent *event)
 
   if (obj == this->_filename)
   {
-    if (!this->_transaction.is_sender() && this->_transaction.status() == gap_transaction_finished)
+    if (!this->_transaction.is_recipient_device() &&
+        this->_transaction.status() == gap_transaction_finished)
     {
       if (event->type() == QEvent::Enter)
       {
@@ -255,9 +254,7 @@ TransactionWidget::apply_update()
   else
     this->_peer_status->hide();
 
-  if ((this->_transaction.status() == gap_transaction_waiting_accept || this->_transaction.status() == gap_transaction_cloud_buffered) &&
-      ((!this->_transaction.is_sender()) ||
-       (this->_transaction.is_sender() && this->_transaction.is_recipient() && !this->_transaction.concerns_device())))
+  if (this->_transaction.acceptable())
   {
     ELLE_DEBUG("show accept / reject buttons");
     this->_accept_reject_area->show();
@@ -314,6 +311,9 @@ TransactionWidget::apply_update()
     this->_peer_avatar->setTransactionCount(0);
   }
 
+#ifndef FIST_PRODUCTION_BUILD
+  this->setToolTip(this->_transaction.tooltip());
+#endif
   this->_on_status_updated();
 }
 
