@@ -69,7 +69,7 @@ namespace fist
       {
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 0);
-        hlayout->setSpacing(0);
+        hlayout->setSpacing(3);
         hlayout->addStretch();
         hlayout->addWidget(this->_go_to_website);
         this->_go_to_website->setToolTip("Open the link");
