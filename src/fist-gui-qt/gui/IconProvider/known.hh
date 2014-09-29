@@ -61,6 +61,7 @@ namespace fist
       { "pbm", IconProvider::Type::image },
       { "pgm", IconProvider::Type::image },
       { "pot", IconProvider::Type::powerpoint },
+      { "png", IconProvider::Type::image },
       { "ppm", IconProvider::Type::image },
       { "pps", IconProvider::Type::powerpoint },
       { "ppt", IconProvider::Type::powerpoint },
