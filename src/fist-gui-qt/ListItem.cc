@@ -41,7 +41,7 @@ ListItem::enterEvent(QEvent*)
 {
   if (!this->_clickable)
     return;
-
+  this->setCursor(QCursor(Qt::PointingHandCursor));
   QPalette palette = this->palette();
   {
     palette.setColor(QPalette::Window, QColor(0xF5, 0xFE, 0xFF));
@@ -54,7 +54,7 @@ ListItem::leaveEvent(QEvent*)
 {
   if (!this->_clickable)
     return;
-
+  this->setCursor(QCursor(Qt::ArrowCursor));
   QPalette palette = this->palette();
   {
     palette.setColor(QPalette::Window, this->_background);

@@ -23,7 +23,7 @@ namespace fist
   {
     LinkWidget::LinkWidget(fist::model::Link const& model,
                            QWidget* parent)
-      : Super(parent)
+      : Super(parent, Qt::transparent, false)
       , _model(model)
       , _layout(new QHBoxLayout(this))
       , _picture()

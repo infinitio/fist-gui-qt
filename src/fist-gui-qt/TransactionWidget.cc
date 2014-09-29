@@ -169,11 +169,13 @@ TransactionWidget::eventFilter(QObject *obj, QEvent *event)
       if (event->type() == QEvent::Enter)
       {
         view::transaction::files::hover_style(*this->_filename);
+        this->setCursor(QCursor(Qt::PointingHandCursor));
         this->update();
       }
       else if (event->type() == QEvent::Leave)
       {
         view::transaction::files::style(*this->_filename);
+        this->setCursor(QCursor(Qt::ArrowCursor));
         this->update();
       }
       else if (event->type() == QEvent::MouseButtonPress)

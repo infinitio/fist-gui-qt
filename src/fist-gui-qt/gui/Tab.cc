@@ -39,6 +39,7 @@ namespace fist
     {
       if (!this->_tabber.is_active_tab(*this))
         this->_hover();
+      this->setCursor(QCursor(Qt::PointingHandCursor));
       Super::enterEvent(event);
     }
 
@@ -49,6 +50,7 @@ namespace fist
         this->_active();
       else
         this->_inactive();
+      this->setCursor(QCursor(Qt::ArrowCursor));
       Super::leaveEvent(event);
     }
 
