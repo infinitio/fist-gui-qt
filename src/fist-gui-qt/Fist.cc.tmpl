@@ -25,6 +25,7 @@
 #include <elle/memory.hh>
 #include <elle/os/environ.hh>
 #include <elle/os/path.hh>
+#include <elle/system/platform.hh>
 
 #include <common/common.hh>
 #include <surface/gap/gap.hh>
@@ -368,7 +369,7 @@ Fist::_put_lock_file()
         "",
         previous_log.c_str(),
         elle::sprintf("%s on %s",
-                      common::system::platform(),
+                      elle::system::platform::os_description(),
                       INFINIT_VERSION).c_str(),
         "");
 #else
