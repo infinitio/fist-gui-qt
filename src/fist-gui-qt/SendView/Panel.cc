@@ -7,6 +7,8 @@
 
 #include <elle/assert.hh>
 #include <elle/finally.hh>
+#include <elle/container/vector.hh>
+#include <elle/container/set.hh>
 #include <elle/log.hh>
 
 #include <surface/gap/gap.hh>
@@ -118,45 +120,18 @@ namespace fist
     }
 
     void
-    Panel::_generate_link()
-    {
-      std::vector<std::string> files;
-      for (int i = 0; i < this->_file_adder->files().size(); ++i)
-      {
-        auto array = this->_file_adder->files().keys().at(i).toLocalFile().toUtf8();
-        files.push_back(std::string(array.constData()));
-      }
-
-      std::string message = this->_message->text().toStdString();
-      ELLE_DEBUG("message: %s", message);
-      ELLE_TRACE("generate link")
-        gap_create_link_transaction(this->_state.state(), files, message.c_str());
-      ELLE_DEBUG("done!");
-      emit sent();
-    }
-
-    void
     Panel::_send()
     {
-
       if (!this->_check_files())
         return;
 
-      if (this->_tabs->is_active_tab(*this->_link_tab))
-      {
-        this->_generate_link(); return;
-      }
-
-      ELLE_TRACE_SCOPE("%s: send", *this);
-
-      if (!this->_users->peer_valid())
+      if (this->_tabs->is_active_tab(*this->_transaction_tab) && !this->_users->peer_valid())
       {
         ELLE_DEBUG("peer is not set");
         this->_users->search_field()->setFocus();
         return;
       }
 
-      std::string message = this->_message->text().toStdString();
       std::vector<std::string> files;
       for (int i = 0; i < this->_file_adder->files().size(); ++i)
       {
@@ -164,23 +139,36 @@ namespace fist
         files.push_back(std::string(array.constData()));
       }
 
-      for (auto const& recipient: this->_users->recipients())
+      auto message_array = this->_message->text().toUtf8();
+      std::string message = std::string(message_array.constData());
+
+      ELLE_DEBUG("message: %s", message);
+
+      if (this->_tabs->is_active_tab(*this->_link_tab))
       {
-        if (recipient != gap_null())
+        ELLE_TRACE("generate link")
+          gap_create_link_transaction(this->_state.state(), files, message.c_str());
+      }
+      else
+      {
+        for (auto const& recipient: this->_users->recipients())
         {
-          gap_send_files(
-            this->_state.state(), recipient, files, message);
+          if (recipient != gap_null())
+          {
+            gap_send_files(
+              this->_state.state(), recipient, files, message);
+          }
+        }
+        if (email_checker.exactMatch(this->_users->text()))
+        {
+          QString recipient = this->_users->text();
+          ELLE_TRACE_SCOPE("send files to %s", this->_users->text());
+          gap_send_files_by_email(
+            this->_state.state(), recipient.toStdString(), files, message);
         }
       }
-      if (email_checker.exactMatch(this->_users->text()))
-      {
-        QString recipient = this->_users->text();
-        ELLE_TRACE_SCOPE("send files to %s", this->_users->text());
-        gap_send_files_by_email(
-          this->_state.state(), recipient.toStdString(), files, message);
-      }
-
-      emit sent();
+      ELLE_DEBUG("done!")
+        emit sent();
     }
 
     void

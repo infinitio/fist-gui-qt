@@ -70,9 +70,6 @@ namespace fist
       _check_files();
 
       void
-      _generate_link();
-
-      void
       _send();
 
       void
