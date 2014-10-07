@@ -336,6 +336,10 @@ namespace fist
       auto it = this->_links.get<0>().find(id);
       if (it == this->_links.get<0>().end())
       {
+        if (status == gap_transaction_canceled ||
+            status == gap_transaction_failed ||
+            status == gap_transaction_deleted)
+          return;
         ELLE_TRACE("insert new link to the map");
         this->_links.emplace(*this, id);
         emit new_link(id);
