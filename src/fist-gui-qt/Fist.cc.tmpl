@@ -368,9 +368,6 @@ Fist::_put_lock_file()
         email.toStdString().c_str(),
         "",
         previous_log.c_str(),
-        elle::sprintf("%s on %s",
-                      elle::system::platform::os_description(),
-                      INFINIT_VERSION).c_str(),
         "");
 #else
     ELLE_WARN("Previous session crashed");
