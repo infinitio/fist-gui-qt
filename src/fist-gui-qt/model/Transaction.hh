@@ -73,7 +73,9 @@ namespace fist
       // evaluation.
       ELLE_ATTRIBUTE_RP(bool, concerns_device, mutable);
       ELLE_ATTRIBUTE_RP(bool, is_sender, mutable);
+      ELLE_ATTRIBUTE_RP(bool, is_sender_device, mutable);
       ELLE_ATTRIBUTE_RP(bool, is_recipient, mutable);
+      ELLE_ATTRIBUTE_RP(bool, is_recipient_device, mutable);
       ELLE_ATTRIBUTE_rw(Status, status);
       ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
       ELLE_ATTRIBUTE_RP(uint32_t, peer_id, mutable);
@@ -107,12 +109,6 @@ namespace fist
       peer_status_updated() const;
 
     public:
-      bool
-      is_sender_device() const;
-
-      bool
-      is_recipient_device() const;
-
       bool
       acceptable() const;
 

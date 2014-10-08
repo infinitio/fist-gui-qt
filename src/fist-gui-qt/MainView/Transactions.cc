@@ -60,7 +60,7 @@ namespace fist
         this->_transaction_list->clearWidgets();
       }
 
-      if (!init && !transaction.is_sender())
+      if (!init && transaction.is_recipient() && !transaction.is_sender_device())
       {
         emit systray_message(
           fist::SystrayMessageCarrier(

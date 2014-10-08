@@ -21,9 +21,12 @@ namespace fist
       , _is_sender(
         gap_self_id(this->_state.state()) ==
         gap_transaction_sender_id(this->_state.state(), this->id()))
+      , _is_sender_device(this->_is_sender &&
+                          gap_transaction_sender_device_id(this->_state.state(), this->id()) == gap_self_device_id(this->_state.state()))
       , _is_recipient(
         gap_self_id(this->_state.state()) ==
         gap_transaction_recipient_id(this->_state.state(), this->id()))
+      , _is_recipient_device(false)
       , _status(gap_transaction_status(this->_state.state(), this->id()))
       , _peer_fullname((char const*) nullptr)
       , _peer_id(
@@ -58,6 +61,8 @@ namespace fist
     {
       this->_concerns_device = gap_transaction_concern_device(this->_state.state(), this->id(), false);
       this->_is_recipient = gap_self_id(this->_state.state()) == gap_transaction_recipient_id(this->_state.state(), this->id());
+      this->_is_recipient_device = this->_is_recipient &&
+        gap_transaction_recipient_device_id(this->_state.state(), this->id()) == gap_self_device_id(this->_state.state());
 
 #ifndef FIST_PRODUCTION_BUILD
       this->_tooltip = QString("id: %1, status: %2, (%3) (%4 device)\nsender: %5 (%6)\nrecipient %7 (%8)\n")
@@ -83,18 +88,6 @@ namespace fist
       }
       tooltip.remove(tooltip.size() - 1, 1);
       return tooltip;
-    }
-
-    bool
-    Transaction::is_sender_device() const
-    {
-      return this->is_sender() && this->_concerns_device;
-    }
-
-    bool
-    Transaction::is_recipient_device() const
-    {
-      return this->is_recipient() && this->_concerns_device;
     }
 
     bool
