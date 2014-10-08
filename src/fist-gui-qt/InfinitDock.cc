@@ -671,10 +671,7 @@ InfinitDock::report_a_problem()
         this->_state.state(),
         gap_self_email(this->_state.state()),
         std_text.c_str(),
-        logfile.c_str(),
-        elle::sprintf("%s on %s",
-                      common::system::platform(),
-                      INFINIT_VERSION).c_str());
+        logfile.c_str());
       ELLE_DEBUG("report sent");
     }
     else
