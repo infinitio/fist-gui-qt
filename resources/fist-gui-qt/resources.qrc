@@ -148,14 +148,14 @@
     <file alias="main/edit">../slices/mac/view_main/icon-edit-hover.png</file>
     <file alias="main/edit@2x">../slices/mac/view_main/icon-edit-hover@2x.png</file>
 
-    <file alias="main/expand">../slices/mac/view_main/icon-expand.png</file>
-    <file alias="main/expand@2x">../slices/mac/view_main/icon-expand@2x.png</file>
+    <file alias="main/expand">../slices/mac/view_main/main-icon-expand.png</file>
+    <file alias="main/expand@2x">../slices/mac/view_main/main-icon-expand@2x.png</file>
 
     <file alias="main/gear">../slices/mac/view_main/icon-gear.png</file>
     <file alias="main/gear@2x">../slices/mac/view_main/icon-gear@2x.png</file>
 
-    <file alias="main/unread@2x">../slices/mac/view_main/icon-main-unread@2x.png</file>
-    <file alias="main/unread">../slices/mac/view_main/icon-main-unread.png</file>
+    <file alias="main/unread@2x">../slices/mac/view_main/main-icon-unread@2x.png</file>
+    <file alias="main/unread">../slices/mac/view_main/main-icon-unread.png</file>
 
     <file alias="main/transfer">../slices/mac/view_main/icon-transfer.png</file>
     <file alias="main/transfer@2x">../slices/mac/view_main/icon-transfer@2x.png</file>
