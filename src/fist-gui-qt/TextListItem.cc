@@ -9,11 +9,13 @@ TextListItem::TextListItem(QString const& string,
   : Super(parent, Qt::transparent, false)
   , _layout(new QHBoxLayout(this))
   , _height(height)
+  , _text(new QLabel(this))
 {
   this->_layout->setContentsMargins(42, 0, 32, 0);
-  QLabel* text = new QLabel(string);
-  view::transaction::no_notification::style(*text);
-  this->_layout->addWidget(text, 1);
+  this->_text->setText(string);
+  view::transaction::no_notification::style(*this->_text);
+  this->_layout->addWidget(this->_text, 1);
+  this->show();
 }
 
 /*-------.
@@ -35,4 +37,10 @@ TextListItem::minimumSizeHint() const
 void
 TextListItem::trigger()
 {
+}
+
+void
+TextListItem::print(std::ostream& out) const
+{
+  out << "Text(" << this->_text->text().toStdString() << ")";
 }
