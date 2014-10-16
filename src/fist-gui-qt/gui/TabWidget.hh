@@ -9,7 +9,7 @@
 # include <QVector>
 
 # include <elle/attribute.hh>
-
+# include <elle/Printable.hh>
 
 # include <fist-gui-qt/gui/Tab.hh>
 
@@ -18,9 +18,10 @@ namespace fist
   namespace gui
   {
     // TabWidget is a simpler version of the QTabWidget that just manipulate
-    // visibility of a bunch of widgets.
-    class TabWidget:
-      public QWidget
+    // visibility of a bunch of widget
+    class TabWidget
+      : public QWidget
+      , public elle::Printable
     {
       typedef QWidget Super;
     public:
@@ -29,7 +30,7 @@ namespace fist
       // Add a tab associated with a list a widgets.
       Tab*
       add_tab(QString const& name,
-              QVector<QWidget*> const& widgets = {});
+              QVector<QWidget*> const& widgets = QVector<QWidget*>{});
 
       // Add a tab associated with one widget.
       Tab*
@@ -70,6 +71,10 @@ namespace fist
 
       QSize
       sizeHint() const override;
+
+    private:
+      void
+      print(std::ostream& stream) const override;
 
     private:
       ELLE_ATTRIBUTE(QHBoxLayout*, layout);

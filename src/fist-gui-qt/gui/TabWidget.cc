@@ -145,5 +145,12 @@ namespace fist
       return QSize(320, Super::sizeHint().height());
     }
 
+    void
+    TabWidget::print(std::ostream& stream) const
+    {
+      stream << "TabWidget";
+      if (this->_active_tab)
+        stream << "(active: " << *this->_active_tab << ")";
+    }
   }
 }

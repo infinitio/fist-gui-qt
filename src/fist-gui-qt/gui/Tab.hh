@@ -9,16 +9,17 @@
 # include <QVector>
 
 # include <elle/attribute.hh>
+# include <elle/Printable.hh>
 
 namespace fist
 {
   namespace gui
   {
-
     class TabWidget;
 
-    class Tab:
-      public QWidget
+    class Tab
+      : public QWidget
+      , public elle::Printable
     {
       typedef QWidget Super;
 
@@ -77,6 +78,10 @@ namespace fist
     signals:
       void
       activated();
+
+    private:
+      void
+      print(std::ostream& stream) const override;
 
     private:
       ELLE_ATTRIBUTE(TabWidget&, tabber);

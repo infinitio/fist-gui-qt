@@ -1,10 +1,15 @@
 #include <iostream>
 
 #include <QPainter>
+
+#include <elle/log.hh>
+
 #include "Tab.hh"
 
 #include <fist-gui-qt/gui/TabWidget.hh>
 #include <fist-gui-qt/globals.hh>
+
+ELLE_LOG_COMPONENT("fist.gui.Tab");
 
 namespace fist
 {
@@ -160,6 +165,12 @@ namespace fist
         widget->hide();
       this->_inactive();
       this->update();
+    }
+
+    void
+    Tab::print(std::ostream& stream) const
+    {
+      stream << "Tab(" << this->_name->text().toStdString() << ")";
     }
   }
 }
