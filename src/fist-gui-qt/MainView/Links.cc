@@ -11,7 +11,7 @@
 #include <elle/assert.hh>
 #include <elle/log.hh>
 
-ELLE_LOG_COMPONENT("infinit.FIST.Transactions");
+ELLE_LOG_COMPONENT("infinit.FIST.MainView.Links");
 
 namespace fist
 {
@@ -29,14 +29,12 @@ namespace fist
       layout->setContentsMargins(0, 0, 0, 0);
       layout->setMargin(0);
       layout->addWidget(this->_link_list);
-
       if (this->_state.links().get<0>().empty())
       {
         this->_link_list->add_widget(
-          std::make_shared<TextListItem>("You have no links yet", 70, this));
+          std::make_shared<TextListItem>("You have no links yet", 75, this));
         return;
       }
-
       for (model::Link const& model: this->_state.links().get<0>())
       {
         this->add_link(model);
