@@ -38,6 +38,14 @@ onboarded_reception_complete("reception_complete");
 static const QString
 onboarded_sending_complete("sending_complete");
 
+// This ugly macro prevent method to be called multiple times.
+#define ENSURE_ONE_AT_A_TIME()                                          \
+  static bool __tag__ = false;                                          \
+  if (__tag__ == true)                                                  \
+    return;                                                             \
+  __tag__ = true;                                                       \
+  elle::SafeFinally release_reporting([] { __tag__ = false; }); /**/
+
 /*-------------.
 | Construction |
 `-------------*/
@@ -619,9 +627,18 @@ InfinitDock::_show_menu()
 
 }
 
+// XXX: Qt file dialog implementation is really broken.
+// You have two ways to spawn a file dialog:
+// - Instantiating a QFileDialog, which would be the optimal solution because
+//   you get full control over lifetime, signals / slots, automatic current
+//   directory update... But it's not a native one (basically it's ugly).
+// - Use the static methods, which give you a native window but you don't have
+//   any control on it (e.g. force quit) from the code.
 void
 InfinitDock::pick_files()
 {
+  ENSURE_ONE_AT_A_TIME();
+
   ELLE_TRACE_SCOPE("%s: spawn file picker", *this);
 
   QStringList selected = QFileDialog::getOpenFileNames(
@@ -640,6 +657,8 @@ InfinitDock::pick_files()
 void
 InfinitDock::report_a_problem()
 {
+  ENSURE_ONE_AT_A_TIME();
+
   bool ok;
   QString text = QInputDialog::getText(this,
                                        tr("Report a problem"),
