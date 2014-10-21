@@ -288,11 +288,13 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     ELLE_TRACE_SCOPE("transaction %s updated with status %s", id, status);
-    g_state->on_transaction_callback(id, status);
+    g_state->on_transaction_callback(id, status, false);
   }
 
   void
-  State::on_transaction_callback(uint32_t id, gap_TransactionStatus status)
+  State::on_transaction_callback(uint32_t id,
+                                 gap_TransactionStatus status,
+                                 bool manual)
   {
     ELLE_TRACE_SCOPE("%s: transaction notification (%s) with status %s",
                      *this, id, status);
@@ -302,6 +304,9 @@ namespace fist
       auto it = this->_transactions.get<0>().find(id);
       if (it == this->_transactions.get<0>().end())
       {
+        if (manual)
+          return;
+
         this->_transactions.emplace(*this, id);
         emit new_transaction(id);
         it = this->_transactions.get<0>().find(id);
@@ -336,6 +341,9 @@ namespace fist
       auto it = this->_links.get<0>().find(id);
       if (it == this->_links.get<0>().end())
       {
+        if (manual)
+          return;
+
         if (status == gap_transaction_canceled ||
             status == gap_transaction_failed ||
             status == gap_transaction_deleted)
@@ -427,6 +435,7 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     gap_accept_transaction(this->state(), id);
+    this->on_transaction_callback(id, gap_transaction_connecting, true);
   }
 
   void
@@ -434,6 +443,7 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     gap_reject_transaction(this->state(), id);
+    this->on_transaction_callback(id, gap_transaction_rejected, true);
   }
 
   void
@@ -441,6 +451,7 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     gap_cancel_transaction(this->state(), id);
+    this->on_transaction_callback(id, gap_transaction_canceled, true);
   }
 
   void
@@ -448,6 +459,7 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     gap_delete_transaction(this->state(), id);
+    this->on_transaction_callback(id, gap_transaction_deleted, true);
   }
 
   void

@@ -154,7 +154,8 @@ namespace fist
                          gap_TransactionStatus status);
     void
     on_transaction_callback(uint32_t,
-                            gap_TransactionStatus);
+                            gap_TransactionStatus,
+                            bool manual = false);
 
     void
     on_link_updated_callback(surface::gap::LinkTransaction const& tr);
