@@ -319,6 +319,8 @@ namespace fist
 
       if (!text.isEmpty())
         this->_search_delay.start(300);
+      else
+        this->delay_expired();
     }
 
     void
@@ -332,8 +334,8 @@ namespace fist
       if (trimmed_search.size() != 0)
       {
         this->set_icon(*this->_loading_icon);
-        this->_state.search(trimmed_search);
       }
+      this->_state.search(trimmed_search);
     }
 
     void

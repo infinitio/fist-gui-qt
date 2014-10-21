@@ -217,18 +217,21 @@ namespace fist
     ELLE_DEBUG("search %s", filter);
     ELLE_DEBUG("cancel future")
       this->cancel_search();
-    ELLE_DEBUG("make concurent run")
-      this->_search_future = QtConcurrent::run(
-        [&,filter] {
-          std::string text = filter.toStdString();
-          if (filter.count('@') == 1 && email_checker.exactMatch(filter))
-          {
-            return std::vector<uint32_t>{gap_user_by_email(this->state(), text.c_str())};
-          }
-        else
-          return gap_users_search(this->state(), text.c_str());
-      });
-    this->_search_watcher.setFuture(this->_search_future);
+    if (!filter.isEmpty())
+    {
+      ELLE_DEBUG("make concurent run")
+        this->_search_future = QtConcurrent::run(
+          [&,filter] {
+            std::string text = filter.toStdString();
+            if (filter.count('@') == 1 && email_checker.exactMatch(filter))
+            {
+              return std::vector<uint32_t>{gap_user_by_email(this->state(), text.c_str())};
+            }
+            else
+              return gap_users_search(this->state(), text.c_str());
+          });
+      this->_search_watcher.setFuture(this->_search_future);
+    }
     return this->swaggers(filter);
   }
 
