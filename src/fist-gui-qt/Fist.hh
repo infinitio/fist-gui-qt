@@ -59,7 +59,7 @@ private:
   // Try to set a lock using QLocalServer as a guard mechanism.
   // Return false if the lock couldn't be set.
   bool
-  _set_uniqunness_guard();
+  _set_uniqunness_guard(int argc, char** argv);
 
   // Write a lock file in the .infinit folder.
   // This lock is used to detect if a previous instance of the app crashed.
@@ -118,6 +118,9 @@ private slots:
   _new_local_socket_connection();
 
   void
+  _read_local_socket();
+
+  void
   _kicked_by_another_instance();
 
 private:
@@ -134,6 +137,11 @@ private slots:
 
   void
   _update_loginwindow_updater_connections(bool connect);
+
+signals:
+  void
+  add_file(QUrl const& url);
+
 /*----.
 | Run |
 `----*/

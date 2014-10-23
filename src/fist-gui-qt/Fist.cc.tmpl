@@ -153,7 +153,7 @@ Fist::Fist(int argc, char** argv):
   this->_application->installEventFilter(this);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
-  if (!this->_set_uniqunness_guard())
+  if (!this->_set_uniqunness_guard(argc, argv))
     throw elle::Exception("unable to set lock");
   // We have to create a state here because crash report need a
   // state to be ran.
@@ -318,7 +318,7 @@ Fist::operator ()()
 }
 
 bool
-Fist::_set_uniqunness_guard()
+Fist::_set_uniqunness_guard(int argc, char** argv)
 {
   ELLE_TRACE_SCOPE("%s: set uniqueness guard", *this);
   auto locked = [this] () -> bool
@@ -360,6 +360,22 @@ Fist::_set_uniqunness_guard()
     this->_other_instance->connectToServer(lock_name);
   if (this->_other_instance->waitForConnected(500))
   {
+    ELLE_WARN(">>>>>>>");
+    if (argc > 1)
+    {
+      std::string res;
+      for (int i = 1; i < argc; ++i)
+        res.append(argv[i]);
+      res.append("\n", 1);
+      ELLE_WARN("%s", res);
+      auto i = this->_other_instance->write(res.c_str(), res.length() + 1);
+      ELLE_ERR("%s fuu", i);
+    }
+    else
+    {
+      this->_other_instance->write("\n", 1);
+    }
+    this->_other_instance->waitForBytesWritten(1000);
     // Someone accepted your connection.
     return locked();
   }
@@ -452,6 +468,8 @@ Fist::logged_in()
           this->_dock.get(), SLOT(download_ready()));
   connect(this->_dock.get(), SIGNAL(update_application()),
           this->_updater.get(), SLOT(run_installer()));
+  connect(this, SIGNAL(add_file(QUrl const&)),
+          this->_dock.get(), SLOT(add_file(QUrl const&)));
   if (this->_updater->installer_downloaded())
   {
     this->_dock->download_ready();
@@ -526,10 +544,12 @@ Fist::_new_local_socket_connection()
     ELLE_DEBUG("give login window the focus");
     this->_login_window->setFocus();
   }
-  auto socket = this->_lock->nextPendingConnection();
-  std::string death{"kill your self"};
-  ELLE_DEBUG("send suicide order")
-    socket->write(death.c_str(), death.size());
+  if (this->_lock->hasPendingConnections())
+  {
+    this->_other_instance.reset(this->_lock->nextPendingConnection());
+    connect(this->_other_instance.get(), SIGNAL(readyRead()),
+            this, SLOT(_read_local_socket()));
+  }
 }
 
 void
@@ -612,6 +632,23 @@ Fist::_kicked_out(QString const& reason)
 {
   ELLE_TRACE_SCOPE("%s: kicked out: %s", *this, reason);
   this->logout(true);
+}
+
+void
+Fist::_read_local_socket()
+{
+  // auto available = socket->bytesAvailable();
+  char buff[1024];
+  this->_other_instance->read(buff, sizeof(buff));
+  static std::string contextual = "--contextual";
+  {
+    std::string message(buff);
+    if (message.substr(0, contextual.length()) == contextual)
+    {
+      message.erase(0,  contextual.length());
+      emit add_file(QUrl::fromLocalFile(QString::fromStdString(message)));
+    }
+  }
 }
 
 void

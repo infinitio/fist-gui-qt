@@ -648,10 +648,16 @@ InfinitDock::pick_files()
   if (selected.size())
   {
     for (auto const& file: selected)
-      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
-    this->_switch_view(this->_send_panel.get());
-    this->show();
+      this->add_file(QUrl::fromLocalFile(file));
   }
+}
+
+void
+InfinitDock::add_file(QUrl const& url)
+{
+  this->_show_send_view();
+  this->_send_panel->file_adder()->add_file(url);
+  this->show();
 }
 
 void

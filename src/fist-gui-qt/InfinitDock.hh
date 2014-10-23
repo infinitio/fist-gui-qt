@@ -206,6 +206,9 @@ public slots:
   pick_files();
 
   void
+  add_file(QUrl const&);
+
+  void
   report_a_problem();
 
 private:
