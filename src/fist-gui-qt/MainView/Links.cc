@@ -35,7 +35,7 @@ namespace fist
           std::make_shared<TextListItem>("You have no links yet", 75, this));
         return;
       }
-      for (model::Link const& model: this->_state.links().get<0>())
+      for (model::Link const& model: this->_state.links().get<1>())
       {
         this->add_link(model);
       }
