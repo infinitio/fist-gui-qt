@@ -44,7 +44,7 @@ protected:
   virtual
   void
   childEvent(QChildEvent* event) override;
-protected:
+protected slots:
   void
   _layout();
 private:

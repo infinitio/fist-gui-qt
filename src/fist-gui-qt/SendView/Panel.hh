@@ -75,6 +75,12 @@ namespace fist
       void
       _pick_user();
 
+      void
+      _file_added();
+
+      void
+      _canceled();
+
     public slots:
       void
       avatar_available(uint32_t uid);

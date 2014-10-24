@@ -118,6 +118,12 @@ namespace fist
   }
 
   void
+  State::send_metric(UIMetricsType metric)
+  {
+    gap_send_metric(this->state(), metric);
+  }
+
+  void
   State::_poll()
   {
     ELLE_DUMP("%s: poll", *this);

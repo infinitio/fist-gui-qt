@@ -51,12 +51,16 @@ namespace fist
       return this->_state.get();
     }
 
-  private slots:
-    void
-    _poll();
   public slots:
     void
     on_logged_in();
+
+    void
+    send_metric(UIMetricsType metric);
+
+  private slots:
+    void
+    _poll();
 
     static
     void

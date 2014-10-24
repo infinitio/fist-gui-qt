@@ -63,6 +63,9 @@ namespace fist
       connect(this->_file_adder->add_file(), SIGNAL(released()),
               this, SIGNAL(choose_files()));
 
+      connect(this->_file_adder, SIGNAL(file_added()),
+              this, SLOT(_file_added()));
+
       connect(this->_file_adder, SIGNAL(file_dropped(QUrl const&)),
               this->_file_adder, SLOT(add_file(QUrl const&)));
 
@@ -82,7 +85,7 @@ namespace fist
               this, SIGNAL(switch_signal()));
 
       connect(this, SIGNAL(canceled()),
-              this, SIGNAL(switch_signal()));
+              this, SLOT(_canceled()));
 
       connect(this->_transaction_tab, SIGNAL(activated()),
               this->footer(), SLOT(peer_transaction_mode()));
@@ -169,6 +172,19 @@ namespace fist
       }
       ELLE_DEBUG("done!")
         emit sent();
+    }
+
+    void
+    Panel::_canceled()
+    {
+      this->_state.send_metric(UIMetrics_SendTrash);
+      emit switch_signal();
+    }
+
+    void
+    Panel::_file_added()
+    {
+      this->_state.send_metric(UIMetrics_AddFiles);
     }
 
     void

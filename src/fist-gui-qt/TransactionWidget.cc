@@ -331,6 +331,7 @@ TransactionWidget::accept()
 {
   ELLE_TRACE_SCOPE("%s: accept transaction", *this);
   emit transaction_accepted(this->_transaction.id());
+  emit send_metric(UIMetrics_ConversationAccept);
 }
 
 void
@@ -338,6 +339,7 @@ TransactionWidget::reject()
 {
   ELLE_TRACE_SCOPE("%s: reject transaction", *this);
   emit transaction_rejected(this->_transaction.id());
+  emit send_metric(UIMetrics_ConversationReject);
 }
 
 void
@@ -345,6 +347,7 @@ TransactionWidget::cancel()
 {
   ELLE_TRACE_SCOPE("%s: cancel transaction", *this);
   emit transaction_canceled(this->_transaction.id());
+  emit send_metric(UIMetrics_ConversationCancel);
 }
 
 /*-------.

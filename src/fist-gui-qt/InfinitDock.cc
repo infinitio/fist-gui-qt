@@ -307,6 +307,7 @@ InfinitDock::_systray_message_clicked()
     }
     this->_last_message.reset();
   }
+  this->_state.send_metric(UIMetrics_DesktopNotification);
 }
 
 /*-------.
@@ -426,6 +427,10 @@ InfinitDock::_switch_view(Panel* panel)
     return;
   }
 
+  if (this->centralWidget() == this->_transaction_panel.get())
+    if (panel == this->_send_panel.get())
+      this->_state.send_metric(UIMetrics_MainSend);
+
   this->_next_panel = panel;
   if (this->centralWidget() != nullptr)
   {
@@ -478,7 +483,10 @@ InfinitDock::toggle_dock(bool toggle_only)
   if (this->isVisible() and !toggle_only)
     this->hide();
   else
+  {
+    this->_state.send_metric(UIMetrics_OpenPanel);
     this->show();
+  }
 }
 
 void

@@ -53,6 +53,8 @@ Q_SIGNALS:
   transaction_canceled(uint32_t);
   void
   transaction_finished(uint32_t);
+  void
+  send_metric(UIMetricsType);
 
 /*-------.
 | Layout |
