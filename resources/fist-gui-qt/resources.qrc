@@ -161,48 +161,48 @@
     <file alias="main/transfer@2x">../slices/mac/view_main/icon-transfer@2x.png</file>
 
     <!-- send -->
-    <file alias="send/add-file">../slices/mac/view_send/icon-add-file.png</file>
-    <file alias="send/add-file@2x">../slices/mac/view_send/icon-add-file@2x.png</file>
+    <file alias="send/add-file">../slices/windows/view_send/icon-add-file.png</file>
+    <file alias="send/add-file@2x">../slices/windows/view_send/icon-add-file@2x.png</file>
 
-    <file alias="send/cancel">../slices/mac/view_send/icon-cancel-send.png</file>
-    <file alias="send/cancel@2x">../slices/mac/view_send/icon-cancel-send@2x.png</file>
+    <file alias="send/cancel">../slices/windows/view_send/icon-cancel-send.png</file>
+    <file alias="send/cancel@2x">../slices/windows/view_send/icon-cancel-send@2x.png</file>
 
-    <file alias="send/contact-checked">../slices/mac/view_send/icon-contact-checked.png</file>
-    <file alias="send/contact-checked@2x">../slices/mac/view_send/icon-contact-checked@2x.png</file>
+    <file alias="send/contact-checked">../slices/windows/view_send/icon-contact-checked.png</file>
+    <file alias="send/contact-checked@2x">../slices/windows/view_send/icon-contact-checked@2x.png</file>
 
-    <file alias="send/note">../slices/mac/view_send/icon-note.png</file>
-    <file alias="send/note@2x">../slices/mac/view_send/icon-note@2x.png</file>
+    <file alias="send/note">../slices/windows/view_send/icon-note.png</file>
+    <file alias="send/note@2x">../slices/windows/view_send/icon-note@2x.png</file>
 
-    <file alias="send/search">../slices/mac/view_send/icon-search.png</file>
-    <file alias="send/search@2x">../slices/mac/view_send/icon-search@2x.png</file>
+    <file alias="send/search">../slices/windows/view_send/icon-search.png</file>
+    <file alias="send/search@2x">../slices/windows/view_send/icon-search@2x.png</file>
 
-    <file alias="send/upload">../slices/mac/view_send/icon-upload.png</file>
-    <file alias="send/upload@2x">../slices/mac/view_send/icon-upload@2x.png</file>
+    <file alias="send/upload">../slices/windows/view_send/icon-upload.png</file>
+    <file alias="send/upload@2x">../slices/windows/view_send/icon-upload@2x.png</file>
 
-    <file alias="send/transfer">../slices/mac/view_send/icon-transfer.png</file>
-    <file alias="send/transfer@2x">../slices/mac/view_send/icon-transfer@2x.png</file>
+    <file alias="send/transfer">../slices/windows/view_send/icon-transfer.png</file>
+    <file alias="send/transfer@2x">../slices/windows/view_send/icon-transfer@2x.png</file>
 
-    <file alias="send/user-selected">../slices/mac/view_send/icon-select.png</file>
-    <file alias="send/user-selected@2x">../slices/mac/view_send/icon-select@2x.png</file>
-    <file alias="send/user-selected-active">../slices/mac/view_send/icon-select-active.png</file>
-    <file alias="send/user-selected-active@2x">../slices/mac/view_send/icon-select-active@2x.png</file>
-    <file alias="send/user-selected-hover">../slices/mac/view_send/icon-select-hover.png</file>
-    <file alias="send/user-selected-hover@2x">../slices/mac/view_send/icon-select-hover@2x.png</file>
+    <file alias="send/user-selected">../slices/windows/view_send/icon-select.png</file>
+    <file alias="send/user-selected@2x">../slices/windows/view_send/icon-select@2x.png</file>
+    <file alias="send/user-selected-active">../slices/windows/view_send/icon-select-active.png</file>
+    <file alias="send/user-selected-active@2x">../slices/windows/view_send/icon-select-active@2x.png</file>
+    <file alias="send/user-selected-hover">../slices/windows/view_send/icon-select-hover.png</file>
+    <file alias="send/user-selected-hover@2x">../slices/windows/view_send/icon-select-hover@2x.png</file>
 
-    <file alias="send/delete">../slices/mac/view_send/send-icon-delete.png</file>
-    <file alias="send/delete@2x">../slices/mac/view_send/send-icon-delete@2x.png</file>
+    <file alias="send/delete">../slices/windows/view_send/send-icon-delete.png</file>
+    <file alias="send/delete@2x">../slices/windows/view_send/send-icon-delete@2x.png</file>
 
-    <file alias="send/files">../slices/mac/view_send/send-icon-files.png</file>
-    <file alias="send/files@2x">../slices/mac/view_send/send-icon-files@2x.png</file>
+    <file alias="send/files">../slices/windows/view_send/send-icon-files.png</file>
+    <file alias="send/files@2x">../slices/windows/view_send/send-icon-files@2x.png</file>
 
-    <file alias="send/files-hover">../slices/mac/view_send/send-icon-files-hover.png</file>
-    <file alias="send/files-hover@2x">../slices/mac/view_send/send-icon-files-hover@2x.png</file>
+    <file alias="send/files-hover">../slices/windows/view_send/send-icon-files-hover.png</file>
+    <file alias="send/files-hover@2x">../slices/windows/view_send/send-icon-files-hover@2x.png</file>
 
-    <file alias="send/show-files">../slices/mac/view_send/send-icon-show-files.png</file>
-    <file alias="send/show-files@2x">../slices/mac/view_send/send-icon-show-files@2x.png</file>
+    <file alias="send/show-files">../slices/windows/view_send/send-icon-show-files.png</file>
+    <file alias="send/show-files@2x">../slices/windows/view_send/send-icon-show-files@2x.png</file>
 
-    <file alias="send/hide-files">../slices/mac/view_send/send-icon-hide-files.png</file>
-    <file alias="send/hide-files@2x">../slices/mac/view_send/send-icon-hide-files@2x.png</file>
+    <file alias="send/hide-files">../slices/windows/view_send/send-icon-hide-files.png</file>
+    <file alias="send/hide-files@2x">../slices/windows/view_send/send-icon-hide-files@2x.png</file>
 
     <!-- File icons -->
     <file alias="mimetypes/archive">../mimetypes/archive.png</file>
