@@ -267,9 +267,9 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::Unknown:
     case QSystemTrayIcon::MiddleClick:
-    case QSystemTrayIcon::DoubleClick:
       this->toggle_dock();
       break;
+    case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Context:
       break;
     default:
