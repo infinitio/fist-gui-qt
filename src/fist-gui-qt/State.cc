@@ -118,9 +118,10 @@ namespace fist
   }
 
   void
-  State::send_metric(UIMetricsType metric)
+  State::send_metric(UIMetricsType metric,
+                     std::unordered_map<std::string, std::string> const& add)
   {
-    gap_send_metric(this->state(), metric);
+    gap_send_metric(this->state(), metric, add);
   }
 
   void

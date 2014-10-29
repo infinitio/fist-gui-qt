@@ -103,6 +103,10 @@ public slots:
   void
   setFocus();
 
+public:
+  int
+  index(ItemPtr ptr);
+
   /*-------.
   | Layout |
   `-------*/

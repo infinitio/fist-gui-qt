@@ -82,8 +82,8 @@ namespace fist
               &this->_state, SLOT(on_transaction_canceled(uint32_t)));
       connect(widget.get(), SIGNAL(open_file(uint32_t)),
               &this->_state, SLOT(open_file(uint32_t)));
-      connect(widget.get(), SIGNAL(send_metric(UIMetricsType)),
-              &this->_state, SLOT(send_metric(UIMetricsType)));
+      connect(widget.get(), SIGNAL(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)),
+              &this->_state, SLOT(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)));
       this->_widgets[transaction.id()] = widget;
       this->_transaction_list->add_widget(widget,
                                           ListWidget::Position::Top);

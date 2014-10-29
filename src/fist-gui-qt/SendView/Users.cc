@@ -238,6 +238,21 @@ namespace fist
     Users::_add_peer(uint32_t uid)
     {
       ELLE_TRACE_SCOPE("%s: add peer: %s", *this, uid);
+      auto index = [&] {
+        try
+        {
+          return this->_users->index(this->_results.at(uid));
+        }
+        catch (std::out_of_range const&)
+        {
+          return -1;
+        }
+      }();
+      emit send_metric(UIMetrics_SelectPeer,
+                       {
+                         { "filter", this->text().toStdString() },
+                         { "index", std::to_string(index) },
+                       });
       this->_recipients.insert(uid);
       emit peer_found();
     }
@@ -246,6 +261,21 @@ namespace fist
     Users::_remove_peer(uint32_t uid)
     {
       ELLE_TRACE_SCOPE("%s: remove peer: %s", *this, uid);
+      auto index = [&] {
+        try
+        {
+          return this->_users->index(this->_results.at(uid));
+        }
+        catch (std::out_of_range const&)
+        {
+          return -1;
+        }
+      }();
+      emit send_metric(UIMetrics_UnselectPeer,
+                       {
+                         { "filter", this->text().toStdString() },
+                         { "index", std::to_string(index) },
+                       });
       this->_recipients.erase(uid);
     }
 

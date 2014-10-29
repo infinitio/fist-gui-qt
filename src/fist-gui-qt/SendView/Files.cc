@@ -248,23 +248,30 @@ namespace fist
             ELLE_DEBUG("%s dropped", url);
             emit file_dropped(url);
           }
+      emit dropped();
       view::send::file_adder::style(*this->_text);
     }
 
     void
-    Files::add_file(QUrl const& path)
+    Files::add_file(QUrl const& file)
     {
-      ELLE_TRACE_SCOPE("%s: add file: %s", *this, path);
-
-      if (this->_files.contains(path))
+      if (this->_files.contains(file))
         return;
-
-      auto it = this->_files.insert(path, std::make_shared<FileItem>(path));
-      emit file_added();
+      auto it = this->_files.insert(file, std::make_shared<FileItem>(file));
       connect(it->get(), SIGNAL(remove(QUrl const&)),
               this, SLOT(remove_file(QUrl const&)));
       this->_separator->show();
-      this->_list->add_widget(this->_files[path]);
+      this->_list->add_widget(this->_files[file]);
+      emit file_added();
+    }
+    void
+    Files::add_files(QList<QUrl> const& paths)
+    {
+      ELLE_TRACE_SCOPE("%s: add files: %s", *this, paths);
+      for (auto path: paths)
+      {
+        this->add_file(path);
+      }
     }
 
     void

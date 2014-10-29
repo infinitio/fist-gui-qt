@@ -115,17 +115,13 @@ public:
   fist::sendview::Panel&
   send_panel() const;
 
-public Q_SLOTS:
+public slots:
   void
   _register_panel(Panel* panel);
 
   void
-  toggle_dock(bool toogle_only = false);
-
-  void
   _position_panel();
 
-public slots:
   void
   _show_send_view();
 
@@ -148,7 +144,13 @@ private slots:
   void
   _activate_new_panel();
 
+/*-----------.
+| Visibility |
+`-----------*/
 private:
+  bool
+  toggle_dock(bool toogle_only = false);
+
   void
   showEvent(QShowEvent* event) override;
 
@@ -160,6 +162,24 @@ private:
   {
     return QSize(326, Super::sizeHint().height());
   }
+
+private slots:
+  /// Show method depending on the source.
+  /// Because Qt uses meta prog to handle signals, it makes impossible to do
+  /// elegant stuff like:
+  /// connect(button, SIGNAL(triggered()), [] { send_metric(...); });
+  /// So instead, afaik, the only option is to create an indirection and do the
+  /// common behavior at the end.
+  void
+  _show_from_menu();
+
+  void
+  _show_from_system_tray_click();
+
+public:
+  void
+  show_from_another_instance();
+
 private:
   void
   focusOutEvent(QFocusEvent* event) override;
@@ -200,10 +220,16 @@ protected:
   {
     this->_position_panel();
   }
-
-public slots:
+private:
   void
-  pick_files();
+  _pick_files();
+
+private slots:
+  void
+  _pick_files_from_menu();
+
+  void
+  _pick_files_from_sendview();
 
   void
   report_a_problem();

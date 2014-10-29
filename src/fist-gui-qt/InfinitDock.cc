@@ -148,7 +148,7 @@ InfinitDock::InfinitDock(fist::State& state)
     connect(this->_send_panel.get(),
             SIGNAL(choose_files()),
             this,
-            SLOT(pick_files()));
+            SLOT(_pick_files_from_sendview()));
   }
 
   connect(this,
@@ -176,8 +176,8 @@ InfinitDock::InfinitDock(fist::State& state)
 
   this->_show_transactions_view();
 
-  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(pick_files()));
-  this->connect(_show, SIGNAL(triggered()), this, SLOT(show()));
+  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(_pick_files_from_menu()));
+  this->connect(_show, SIGNAL(triggered()), this, SLOT(_show_from_menu()));
   this->connect(_report_a_problem, SIGNAL(triggered()),
                 this, SLOT(report_a_problem()));
   this->connect(_logout, SIGNAL(triggered()), this, SLOT(_on_logout()));
@@ -267,8 +267,11 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::Unknown:
     case QSystemTrayIcon::MiddleClick:
-      this->toggle_dock();
+    {
+      if (this->toggle_dock())
+        this->_show_from_system_tray_click();
       break;
+    }
     case QSystemTrayIcon::DoubleClick:
     case QSystemTrayIcon::Context:
       break;
@@ -475,18 +478,42 @@ InfinitDock::_back_from_send_view()
 /*-----------.
 | Visibility |
 `-----------*/
-void
+bool
 InfinitDock::toggle_dock(bool toggle_only)
 {
   ELLE_TRACE_SCOPE("%s: toggle dock", *this);
 
   if (this->isVisible() and !toggle_only)
+  {
     this->hide();
+    return false;
+  }
   else
   {
-    this->_state.send_metric(UIMetrics_OpenPanel);
     this->show();
+    return true;
   }
+}
+
+void
+InfinitDock::_show_from_menu()
+{
+  this->_state.send_metric(UIMetrics_OpenPanelMenu);
+  this->show();
+}
+
+void
+InfinitDock::_show_from_system_tray_click()
+{
+  this->_state.send_metric(UIMetrics_OpenPanelIcon);
+  this->show();
+}
+
+void
+InfinitDock::show_from_another_instance()
+{
+  this->_state.send_metric(UIMetrics_OpenPanelOtherInstance);
+  this->show();
 }
 
 void
@@ -643,7 +670,7 @@ InfinitDock::_show_menu()
 // - Use the static methods, which give you a native window but you don't have
 //   any control on it (e.g. force quit) from the code.
 void
-InfinitDock::pick_files()
+InfinitDock::_pick_files()
 {
   ENSURE_ONE_AT_A_TIME();
 
@@ -655,11 +682,27 @@ InfinitDock::pick_files()
 
   if (selected.size())
   {
+    QList<QUrl> files;
     for (auto const& file: selected)
-      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
+      files.append(QUrl::fromLocalFile(file));
+    this->_send_panel->file_adder()->add_files(files);
     this->_switch_view(this->_send_panel.get());
     this->show();
   }
+}
+
+void
+InfinitDock::_pick_files_from_menu()
+{
+  this->_state.send_metric(UIMetrics_AddFilesMenu);
+  this->_pick_files();
+}
+
+void
+InfinitDock::_pick_files_from_sendview()
+{
+  this->_state.send_metric(UIMetrics_AddFilesSendView);
+  this->_pick_files();
 }
 
 void

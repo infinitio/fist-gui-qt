@@ -54,9 +54,10 @@ namespace fist
   public slots:
     void
     on_logged_in();
-
     void
-    send_metric(UIMetricsType metric);
+    send_metric(UIMetricsType metric,
+                std::unordered_map<std::string, std::string> const& additional =
+                  std::unordered_map<std::string, std::string>());
 
   private slots:
     void

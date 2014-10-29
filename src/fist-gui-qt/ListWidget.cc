@@ -138,6 +138,12 @@ ListWidget::widgets() const
   return this->_widgets;
 }
 
+int
+ListWidget::index(ListWidget::ItemPtr ptr)
+{
+  return this->_widgets.indexOf(ptr);
+}
+
 void
 ListWidget::clearWidgets()
 {

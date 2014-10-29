@@ -519,7 +519,7 @@ Fist::_new_local_socket_connection()
   if (this->_dock)
   {
     ELLE_DEBUG("show dock");
-    this->_dock->show();
+    this->_dock->show_from_another_instance();
   }
   else if (this->_login_window)
   {
