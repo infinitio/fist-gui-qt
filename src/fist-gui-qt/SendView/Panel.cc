@@ -63,6 +63,12 @@ namespace fist
       connect(this->_file_adder->add_file(), SIGNAL(released()),
               this, SIGNAL(choose_files()));
 
+      connect(this->_users, SIGNAL(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)),
+              &this->_state, SLOT(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)));
+
+      connect(this->_file_adder, SIGNAL(dropped()),
+              this, SLOT(_dropped()));
+
       connect(this->footer()->send(), SIGNAL(clicked()),
               this, SLOT(_send()));
 
@@ -169,6 +175,19 @@ namespace fist
     }
 
     void
+    Panel::_dropped()
+    {
+      this->_state.send_metric(UIMetrics_AddFilesDropOnSendView);
+    }
+
+    void
+    Panel::_canceled()
+    {
+      this->_state.send_metric(UIMetrics_SendTrash);
+      emit switch_signal();
+    }
+
+    void
     Panel::avatar_available(uint32_t uid)
     {
       ELLE_TRACE_SCOPE("%s: user (%s) avatar available", *this, uid);
@@ -260,13 +279,16 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: drop", *this);
 
+      QList<QUrl> files;
       if (event->mimeData()->hasUrls())
         for (auto const& url: event->mimeData()->urls())
           if (url.isLocalFile())
           {
             event->acceptProposedAction();
-            this->_file_adder->add_file(url);
+            files.append(url);
           }
+      this->_dropped();
+      this->_file_adder->add_files(files);
     }
 
     void

@@ -51,13 +51,19 @@ namespace fist
       return this->_state.get();
     }
 
-  private slots:
-    void
-    _poll();
   public slots:
     void
     on_logged_in();
+    void
+    send_metric(UIMetricsType metric,
+                std::unordered_map<std::string, std::string> const& additional =
+                  std::unordered_map<std::string, std::string>());
 
+  private slots:
+    void
+    _poll();
+
+  public slots:
     static
     void
     critical_callback(char const*);

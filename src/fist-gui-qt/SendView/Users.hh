@@ -124,6 +124,10 @@ namespace fist
       void
       peer_found();
 
+      void
+      send_metric(UIMetricsType,
+                  std::unordered_map<std::string, std::string> const&);
+
     private slots:
       void
       delay_expired();

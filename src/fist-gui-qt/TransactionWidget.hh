@@ -42,8 +42,7 @@ public:
 
 public Q_SLOTS:
   void setProgress(float value);
-
-Q_SIGNALS:
+signals:
   void onProgressChanged(float);
   void
   transaction_accepted(uint32_t);
@@ -53,6 +52,10 @@ Q_SIGNALS:
   transaction_canceled(uint32_t);
   void
   transaction_finished(uint32_t);
+  void
+  send_metric(UIMetricsType,
+              std::unordered_map<std::string, std::string> const& p =
+                std::unordered_map<std::string, std::string>());
 
 /*-------.
 | Layout |

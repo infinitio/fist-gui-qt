@@ -6,6 +6,7 @@
 # include <QColor>
 # include <QHash>
 # include <QLabel>
+# include <QList>
 # include <QPropertyAnimation>
 # include <QUrl>
 # include <QWidget>
@@ -71,9 +72,15 @@ namespace fist
       void
       file_dropped(QUrl const&);
 
+      void
+      dropped();
+
     public slots:
       void
-      add_file(QUrl const& path);
+      add_file(QUrl const& file);
+
+      void
+      add_files(QList<QUrl> const& path);
 
       void
       remove_file(QUrl const& path);

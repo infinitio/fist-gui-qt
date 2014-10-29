@@ -75,9 +75,16 @@ namespace fist
       void
       _pick_user();
 
+      void
+      _canceled();
+
     public slots:
       void
       avatar_available(uint32_t uid);
+
+    private slots:
+      void
+      _dropped();
 
     Q_SIGNALS:
       void

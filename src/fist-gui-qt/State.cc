@@ -119,6 +119,13 @@ namespace fist
   }
 
   void
+  State::send_metric(UIMetricsType metric,
+                     std::unordered_map<std::string, std::string> const& add)
+  {
+    gap_send_metric(this->state(), metric, add);
+  }
+
+  void
   State::_poll()
   {
     ELLE_DUMP("%s: poll", *this);
