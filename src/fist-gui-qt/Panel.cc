@@ -6,7 +6,7 @@
 #include <fist-gui-qt/Panel.hh>
 #include <fist-gui-qt/globals.hh>
 
-ELLE_LOG_COMPONENT("infinit.FIST.Panel");
+// ELLE_LOG_COMPONENT("infinit.FIST.Panel");
 
 Panel::Panel(Footer* footer,
              QWidget* owner)

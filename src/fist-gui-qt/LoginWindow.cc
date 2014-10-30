@@ -7,8 +7,6 @@
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
-#include <QFuture>
-#include <QtConcurrentRun>
 
 #include <elle/Buffer.hh>
 #include <elle/finally.hh>
@@ -94,8 +92,7 @@ LoginWindow::LoginWindow(fist::State& state,
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
   _version_field(new QLabel),
   _footer(new LoginFooter(this)),
-  _login_future(),
-  _login_watcher()
+  _login_thread(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
   this->setWindowIcon(QIcon(":/login/logo"));
@@ -210,25 +207,47 @@ LoginWindow::LoginWindow(fist::State& state,
   layout->addWidget(this->_footer);
   this->setCentralWidget(central_widget);
 
-  connect(&this->_login_watcher, SIGNAL(finished()),
-          this, SLOT(_login_attempt()));
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   connect(this, SIGNAL(login_failed()), SLOT(show()));
   this->update();
 }
 
-LoginWindow::~LoginWindow()
+void
+LoginWindow::cancel_login()
 {
-  ELLE_TRACE_SCOPE("%s: destruction", *this);
+  ELLE_TRACE_SCOPE("%s: cancel login", *this);
+  if (this->_login_thread && !this->_login_thread->isFinished())
+  {
+    ELLE_LOG("quit thread")
+    {
+      this->_login_thread->terminate();
+      this->_login_thread->wait();
+    }
+  }
 }
 
 void
-LoginWindow::_login_attempt()
+LoginWindow::_clear_login_thread()
+{
+  ELLE_TRACE_SCOPE("%s: bite", *this);
+  this->_login_thread = nullptr;
+}
+
+LoginWindow::~LoginWindow()
+{
+  ELLE_TRACE_SCOPE("%s: destruction", *this);
+  this->cancel_login();
+}
+
+void
+LoginWindow::_login_attempt(gap_Status status)
 {
   ELLE_TRACE_SCOPE("%s: attempt to login", *this);
   elle::SafeFinally unlock_login([&] {
-      this->_enable(); this->_password_field->setFocus(); });
-  auto status = this->_login_future.result();
+      this->_enable();
+      this->_password_field->setFocus();
+    });
+
   if (status == gap_ok || status == gap_already_logged_in)
   {
     emit logged_in();
@@ -292,12 +311,12 @@ LoginWindow::try_auto_login()
   if (!this->_password_field->text().isEmpty())
   {
     this->hide();
-    this->_login();
+    this->_login(true);
   }
 }
 
 void
-LoginWindow::_login()
+LoginWindow::_login(bool is_auto)
 {
   elle::SafeFinally unlock_login([&] { this->_enable(); });
   this->_message_field->clear();
@@ -331,21 +350,19 @@ LoginWindow::_login()
   ELLE_TRACE("every check passed")
   {
     emit this->login_attempt();
-    this->_login_future = QtConcurrent::run(
-      [=] {
-        // Will explode if the state is destroyed.
-        char* hash = gap_hash_password(
-          this->_state.state(), email.toStdString().c_str(), pw.toStdString().c_str());
 
-        elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
-        return gap_login(this->_state.state(), email.toStdString().c_str(), hash);
-      });
+    this->_login_thread = new fist::LoginThread(this->_state, email, pw, is_auto, this);
+    connect(this->_login_thread, SIGNAL(result_ready(gap_Status)),
+            this, SLOT(_login_attempt(gap_Status)));
+    connect(this->_login_thread, SIGNAL(finished()),
+            this->_login_thread, SLOT(deleteLater()));
+    connect(this->_login_thread, SIGNAL(destroyed()),
+            this, SLOT(_clear_login_thread()));
+    this->_login_thread->start();
   }
 
   this->_message_field->setMovie(this->_loading_icon);
   this->_message_field->movie()->start();
-
-  this->_login_watcher.setFuture(this->_login_future);
 
   unlock_login.abort();
 }

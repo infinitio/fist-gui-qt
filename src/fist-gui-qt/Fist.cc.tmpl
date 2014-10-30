@@ -186,7 +186,6 @@ Fist::eventFilter(QObject *obj, QEvent *event)
   return Super::eventFilter(obj, event);
 }
 
-
 Fist::~Fist()
 {
   ELLE_TRACE_SCOPE("%s: destruction", *this);
@@ -211,6 +210,8 @@ void
 Fist::_initialize_application()
 {
   ELLE_TRACE_SCOPE("%s: initialize Qt", *this);
+
+  qRegisterMetaType<gap_Status>("gap_Status");
   QFontDatabase database;
   auto luc = database.addApplicationFont(":/font/LucidaGrande");
   auto mont = database.addApplicationFont(":/font/Montserrat");
@@ -268,6 +269,8 @@ Fist::_initialize_login_window(bool prefill_fields)
   // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
+  connect(this, SIGNAL(logging_out()),
+          this->_login_window.get(), SLOT(cancel_login()));
   // Disable updaters signals while logging in.
   connect(this->_login_window.get(), SIGNAL(login_attempt()),
           this, SLOT(_logging_in()));
@@ -561,6 +564,7 @@ Fist::logout(bool kicked_out,
                    *this,
                    (kicked_out ? "kicked out" : "manual"),
                    (final ? " to quit app" : ""));
+  emit logging_out();
   if (this->_dock)
   {
     // deleteLater is used there because the initiator of the logout is a

@@ -20,6 +20,7 @@
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/InfinitDock.hh>
 # include <fist-gui-qt/RoundShadowWidget.hh>
+# include <fist-gui-qt/LoginThread.hh>
 
 class LoginWindow:
   public RoundShadowWidget
@@ -40,10 +41,10 @@ private slots:
   _reduce();
 
   void
-  _login();
+  _login(bool is_auto = false);
 
   void
-  _login_attempt();
+  _login_attempt(gap_Status status);
 
 public slots:
   void
@@ -98,8 +99,7 @@ private:
   ELLE_ATTRIBUTE(QLabel*, version_field);
   ELLE_ATTRIBUTE(LoginFooter*, footer);
 
-  ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
-  ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
+  ELLE_ATTRIBUTE(fist::LoginThread*, login_thread);
 public:
   void
   closeEvent(QCloseEvent* event) override;
@@ -117,6 +117,13 @@ public Q_SLOTS:
 
   void
   _disable();
+
+  void
+  cancel_login();
+
+private slots:
+  void
+  _clear_login_thread();
 
 private:
   // Save the password into user settings.

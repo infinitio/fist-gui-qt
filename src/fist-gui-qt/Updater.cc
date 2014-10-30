@@ -172,6 +172,7 @@ Updater::_handle_reply(QNetworkReply* reply)
         ELLE_WARN("unable to check for udpates");
       }
     }
+    emit no_update_available();
   }
   else if (this->_reply->isRunning())
   {

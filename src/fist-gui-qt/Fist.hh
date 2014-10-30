@@ -85,6 +85,10 @@ public slots:
   void
   quit();
 
+signals:
+  void
+  logging_out();
+
 private:
   // Destroy the state, dock and login window.
   void

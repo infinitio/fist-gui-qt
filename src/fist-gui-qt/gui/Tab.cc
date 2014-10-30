@@ -4,12 +4,11 @@
 
 #include <elle/log.hh>
 
-#include "Tab.hh"
-
+#include <fist-gui-qt/gui/Tab.hh>
 #include <fist-gui-qt/gui/TabWidget.hh>
 #include <fist-gui-qt/globals.hh>
 
-ELLE_LOG_COMPONENT("fist.gui.Tab");
+// ELLE_LOG_COMPONENT("fist.gui.Tab");
 
 namespace fist
 {
