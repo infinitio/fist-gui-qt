@@ -38,7 +38,8 @@ namespace fist
     , _search_watcher()
     , _last_results()
     , _transactions()
-    , _active_transactions()
+    , _acceptable_transactions()
+    , _running_transactions()
     , _links()
     , _active_links()
     , _poll_timer(new QTimer)
@@ -420,23 +421,35 @@ namespace fist
   void
   State::_compute_active_transactions()
   {
-    unsigned int count = 0;
+    size_t acceptable = 0, running = 0;
     for (auto const& transaction: this->_transactions.get<0>())
     {
-      if (!transaction.is_final() &&
-          gap_transaction_concern_device(this->state(), transaction.id()))
-        ++count;
+      if (!transaction.acceptable())
+        ++acceptable;
+      if (!transaction.running())
+        ++running;
     }
-    this->active_transactions(count);
+    this->acceptable_transactions(acceptable);
+    this->running_transactions(running);
   }
 
   void
-  State::active_transactions(unsigned int count)
+  State::acceptable_transactions(size_t acceptable)
   {
-    if (this->_active_transactions != count)
+    if (this->_acceptable_transactions != acceptable)
     {
-      this->_active_transactions = count;
-      emit active_transactions_changed(this->_active_transactions);
+      this->_acceptable_transactions = acceptable;
+      emit acceptable_transactions_changed(this->_acceptable_transactions);
+    }
+  }
+
+  void
+  State::running_transactions(size_t running)
+  {
+    if (this->_running_transactions != running)
+    {
+      this->_running_transactions = running;
+      emit running_transactions_changed(this->_running_transactions);
     }
   }
 

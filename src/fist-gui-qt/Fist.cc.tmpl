@@ -40,6 +40,7 @@
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/State.hh>
+#include <fist-gui-qt/icons.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
@@ -145,6 +146,7 @@ Fist::Fist(int argc, char** argv):
       elle::os::path::join(common::infinit::home(), "lock"))),
   _application(new QApplication(argc, argv)),
   _updater(nullptr),
+  _systray(fist::icon::grey, this),
   _login_window(nullptr),
   _dock(nullptr)
 {
@@ -196,7 +198,6 @@ Fist::_initialize_state()
 {
   // Destroy previous state first.
   this->_state.reset();
-
   std::unique_ptr<fist::State> state(new fist::State(gap_state()));
   connect(state.get(), SIGNAL(critical_failure(QString const&)),
           this, SLOT(_kicked_out()));
@@ -210,7 +211,6 @@ void
 Fist::_initialize_application()
 {
   ELLE_TRACE_SCOPE("%s: initialize Qt", *this);
-
   qRegisterMetaType<gap_Status>("gap_Status");
   QFontDatabase database;
   auto luc = database.addApplicationFont(":/font/LucidaGrande");
@@ -264,7 +264,7 @@ Fist::_initialize_login_window(bool prefill_fields)
 {
   ELLE_TRACE_SCOPE("%s: initialize login window", *this);
   ELLE_ASSERT(this->_state != nullptr);
-  this->_login_window.reset(new LoginWindow(*this->_state, prefill_fields));
+  this->_login_window.reset(new LoginWindow(*this->_state, this->_systray, prefill_fields));
   this->_update_loginwindow_updater_connections(true);
   // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
@@ -442,7 +442,7 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
-  this->_dock.reset(new InfinitDock(*this->_state));
+  this->_dock.reset(new InfinitDock(*this->_state, this->_systray));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
   connect(this->_dock.get(), SIGNAL(logout_request()),

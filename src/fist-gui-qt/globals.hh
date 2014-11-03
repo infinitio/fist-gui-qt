@@ -13,6 +13,9 @@ static QString Lucida("LucidaGrande");
 static QString Montserrat("Montserrat");
 static QString Font(Arial);
 
+static QColor FontDark(0x25, 0x25, 0x25);
+static QColor FontHint(0x33, 0x33, 0x33);
+static QColor FontLight(0xB3, 0xB3, 0xB3);
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
 
@@ -44,7 +47,7 @@ namespace fist
     struct Text
     {
       Text(QFont const& font,
-           QColor const& color = QColor(0x25, 0x25, 0x25),
+           QColor const& color = FontDark,
            Qt::Alignment const& aligment = Qt::AlignLeft | Qt::AlignVCenter):
         _font(font),
         _color(color),
@@ -102,7 +105,7 @@ namespace view
 
   static
   fist::style::Text const
-  version_style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+  version_style(QFont(Font, 10), FontDark, Qt::AlignCenter);
 
   namespace tab
   {
@@ -164,7 +167,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
+      style(QFont(Font, 11), FontHint);
 
       static
       QString const
@@ -179,7 +182,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
+      style(QFont(Font, 11), FontHint);
 
       static
       QString const
@@ -254,14 +257,14 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(QFont(Font, 10), FontDark, Qt::AlignCenter);
     }
 
     namespace file
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9.5), QColor(0x25, 0x25, 0x25));
+      style(QFont(Font, 9.5), FontDark);
 
       static
       fist::style::Text const
@@ -272,7 +275,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 8.5), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont(Font, 8.5), FontLight);
     }
 
     namespace counter
@@ -290,7 +293,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(QFont(Font, 10), FontDark, Qt::AlignCenter);
     }
 
     static
@@ -301,14 +304,14 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25));
+      style(QFont(Font, 10), FontDark);
     }
 
     namespace files
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9.5), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont(Font, 9.5), FontLight);
 
       static
       fist::style::Text const
@@ -319,7 +322,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 8), QColor(0xA8, 0xA8, 0xA8));
+      style(QFont(Font, 8), FontLight);
     }
   }
 
@@ -331,14 +334,14 @@ namespace view
       {
         static
         fist::style::Text const
-        style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(QFont(Font, 9), FontLight, Qt::AlignVCenter);
       }
 
       namespace size
       {
         static
         fist::style::Text const
-        style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(QFont(Font, 9), FontLight, Qt::AlignVCenter);
       }
 
       static
@@ -350,7 +353,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+      style(QFont(Font, 9), FontLight, Qt::AlignVCenter);
 
       static
       fist::style::Text const
@@ -373,7 +376,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+      style(QFont(Font, 9), FontDark, Qt::AlignVCenter);
 
       static
       QString const
@@ -384,7 +387,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+      style(QFont(Font, 9), FontDark, Qt::AlignVCenter);
 
       static
       QString const
@@ -394,8 +397,7 @@ namespace view
       {
         static
         fist::style::Text const
-        style(QFont(Font, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
-
+        style(QFont(Font, 7), FontLight, Qt::AlignVCenter);
       }
     }
 
@@ -405,14 +407,14 @@ namespace view
       {
         static
         fist::style::Text const
-        style(QFont(Font, 9), QColor(0x25, 0x25, 0x25));
+        style(QFont(Font, 9), FontDark);
       }
 
       namespace handle
       {
         static
         fist::style::Text const
-        style(QFont(Font, 8), QColor(0xC4, 0xC4, 0xC4));
+        style(QFont(Font, 8), FontLight);
       }
     }
 

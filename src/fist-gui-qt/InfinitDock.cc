@@ -29,6 +29,7 @@
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/Settings.hh>
+#include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Dock");
@@ -77,7 +78,8 @@ class InfinitDock::Prologue
 `-------------*/
 // Creating the transaction panel is a long operation. So we just wait until all
 // the graphical part is fully load, and then, initialize it.
-InfinitDock::InfinitDock(fist::State& state)
+InfinitDock::InfinitDock(fist::State& state,
+                         fist::gui::systray::Icon& systray)
   : _prologue(new Prologue(state.state()))
   , _state(state)
   , _transaction_panel(nullptr)
@@ -85,7 +87,6 @@ InfinitDock::InfinitDock(fist::State& state)
   , _next_panel(nullptr)
   , _menu(new QMenu(this))
   , _logo(":/menu-bar/fire@2x")
-  , _systray(new QSystemTrayIcon(this))
   , _systray_menu(new QMenu(this))
   , _show(new QAction(tr("&Show dock"), this))
   , _send_files(new QAction(tr("&Send files..."), this))
@@ -93,81 +94,82 @@ InfinitDock::InfinitDock(fist::State& state)
   , _logout(new QAction(tr("&Logout"), this))
   , _quit(new QAction(tr("&Quit"), this))
   , _update(nullptr)
+  , _systray(systray)
 #ifndef FIST_PRODUCTION_BUILD
   , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
 #endif
 {
   g_dock = this;
-
-  QIcon icon(this->_logo);
-  _systray->setIcon(icon);
-  _systray->setVisible(true);
-  connect(_systray,
+  this->_systray.set_icon(fist::icon::white);
+  // System Tray.
+  {
+    connect(this->_systray.inner(),
           SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
           this,
           SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
 
-  this->_systray_menu->addAction(_show);
-  this->_systray_menu->addAction(_send_files);
-  this->_systray_menu->addAction(_quit);
-  this->_systray->setContextMenu(_systray_menu);
+    this->_systray_menu->addAction(this->_show);
+    this->_systray_menu->addAction(this->_send_files);
+    this->_systray_menu->addAction(this->_quit);
+    this->_systray.inner()->setContextMenu(this->_systray_menu);
 
-  this->connect(this->_systray, SIGNAL(messageClicked()),
-                this, SLOT(_systray_message_clicked()));
-
-  this->_transaction_panel.reset(new MainPanel(this->_state));
-
-  this->_register_panel(this->_transaction_panel.get());
-  this->_register_panel(this->_send_panel.get());
-
-  connect(this, SIGNAL(onSizeChanged()),
-          SLOT(_position_panel()));
-
-  {
-    connect(this->_transaction_panel->footer()->send(),
-            SIGNAL(released()),
-            this,
-            SLOT(_show_send_view()));
-    connect(this->_transaction_panel->footer()->menu(),
-            SIGNAL(released()),
-            this,
-            SLOT(_show_menu()));
+    this->connect(this->_systray.inner(), SIGNAL(messageClicked()),
+                  this, SLOT(_systray_message_clicked()));
   }
 
+  // Panels
   {
-    connect(this->_send_panel->footer()->back(),
-            SIGNAL(released()),
-            this,
-            SLOT(_back_from_send_view()));
+    this->_transaction_panel.reset(new MainPanel(this->_state));
 
-    connect(this->_send_panel.get(),
-            SIGNAL(switch_signal()),
-            this,
-            SLOT(_back_from_send_view()));
+    this->_register_panel(this->_transaction_panel.get());
+    this->_register_panel(this->_send_panel.get());
+    {
+      connect(this->_transaction_panel->footer()->send(),
+              SIGNAL(released()),
+              this,
+              SLOT(_show_send_view()));
+      connect(this->_transaction_panel->footer()->menu(),
+              SIGNAL(released()),
+              this,
+              SLOT(_show_menu()));
+    }
+    {
+      connect(this->_send_panel->footer()->back(),
+              SIGNAL(released()),
+              this,
+              SLOT(_back_from_send_view()));
 
-    connect(this->_send_panel.get(),
-            SIGNAL(choose_files()),
-            this,
-            SLOT(_pick_files_from_sendview()));
+      connect(this->_send_panel.get(),
+              SIGNAL(switch_signal()),
+              this,
+              SLOT(_back_from_send_view()));
+
+      connect(this->_send_panel.get(),
+              SIGNAL(choose_files()),
+              this,
+              SLOT(_pick_files_from_sendview()));
+    }
   }
 
-  connect(this,
-          SIGNAL(avatar_available(uint32_t)),
-          this->_send_panel.get(),
-          SLOT(avatar_available(uint32_t)));
+  connect(this, SIGNAL(onSizeChanged()), SLOT(_position_panel()));
+  connect(this, SIGNAL(avatar_available(uint32_t)),
+          this->_send_panel.get(), SLOT(avatar_available(uint32_t)));
 
-  // XXX: Specialize a QWidgetAction to add a better visual and for example,
-  // to copy the version in the user clipboard on click.
-  QWidgetAction* version = new QWidgetAction(this);
-  auto* v = new QLabel(QString(INFINIT_VERSION));
-  view::version_style(*v);
-  version->setDefaultWidget(v);
-  this->_menu->addAction(version);
-  this->_menu->addSeparator();
-  this->_menu->addAction(_report_a_problem);
-  this->_menu->addSeparator();
-  this->_menu->addAction(_logout);
-  this->_menu->addAction(_quit);
+  // Menu.
+  {
+    // XXX: Specialize a QWidgetAction to add a better visual and for example,
+    // to copy the version in the user clipboard on click.
+    QWidgetAction* version = new QWidgetAction(this);
+    auto* v = new QLabel(QString(INFINIT_VERSION));
+    view::version_style(*v);
+    version->setDefaultWidget(v);
+    this->_menu->addAction(version);
+    this->_menu->addSeparator();
+    this->_menu->addAction(_report_a_problem);
+    this->_menu->addSeparator();
+    this->_menu->addAction(_logout);
+    this->_menu->addAction(_quit);
+  }
 
   // Register gap callback.
   gap_connection_callback(_state.state(), InfinitDock::connection_status_cb);
@@ -176,15 +178,22 @@ InfinitDock::InfinitDock(fist::State& state)
 
   this->_show_transactions_view();
 
-  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(_pick_files_from_menu()));
-  this->connect(_show, SIGNAL(triggered()), this, SLOT(_show_from_menu()));
-  this->connect(_report_a_problem, SIGNAL(triggered()),
+  this->connect(this->_send_files, SIGNAL(triggered()),
+                this, SLOT(_pick_files_from_menu()));
+  this->connect(this->_show, SIGNAL(triggered()),
+                this, SLOT(_show_from_menu()));
+  this->connect(this->_report_a_problem, SIGNAL(triggered()),
                 this, SLOT(report_a_problem()));
-  this->connect(_logout, SIGNAL(triggered()), this, SLOT(_on_logout()));
-  this->connect(_logout, SIGNAL(triggered()), this, SLOT(hide()));
-  this->connect(_logout, SIGNAL(triggered()), this, SIGNAL(logout_request()));
-  this->connect(_quit, SIGNAL(triggered()), this, SLOT(_on_logout()));
-  this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
+  this->connect(this->_logout, SIGNAL(triggered()),
+                this, SLOT(_on_logout()));
+  this->connect(this->_logout, SIGNAL(triggered()),
+                this, SLOT(hide()));
+  this->connect(this->_logout, SIGNAL(triggered()),
+                this, SIGNAL(logout_request()));
+  this->connect(this->_quit, SIGNAL(triggered()),
+                this, SLOT(_on_logout()));
+  this->connect(this->_quit, SIGNAL(triggered()),
+                this, SIGNAL(quit_request()));
 
   ELLE_DEBUG("check if onboarded reception has been done")
     if (!fist::settings()["onboarding"].exists(onboarded_reception_complete))
@@ -197,6 +206,11 @@ InfinitDock::InfinitDock(fist::State& state)
               this, SLOT(_start_onboarded_reception()));
       delay_onboarding->start(delay);
     }
+
+  connect(&this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
+          this, SLOT(_active_transactions_changed(size_t)));
+  connect(&this->_state, SIGNAL(running_transactions_changed(size_t)),
+          this, SLOT(_active_transactions_changed(size_t)));
 
   this->hide();
 
@@ -220,7 +234,6 @@ void
 InfinitDock::_on_logout()
 {
   ELLE_TRACE_SCOPE("%s: logout", *this);
-  this->_systray->setVisible(false);
   // Kill everything in order to make sure nothing requiring state is running
   // when destroying it.
   this->setCentralWidget(nullptr);
@@ -288,7 +301,7 @@ InfinitDock::_systray_message(fist::SystrayMessageCarrier const& message)
   ELLE_TRACE_SCOPE("%s: show system tray message: %s - %s",
                    *this, body.title(), body.body());
   if (body.always_show() || !this->isVisible())
-    this->_systray->showMessage(
+    this->_systray.inner()->showMessage(
       body.title(), body.body(), body.icon(), body.duration());
 }
 
@@ -311,6 +324,28 @@ InfinitDock::_systray_message_clicked()
     this->_last_message.reset();
   }
   this->_state.send_metric(UIMetrics_DesktopNotification);
+}
+
+void
+InfinitDock::_active_transactions_changed(size_t)
+{
+  bool acceptable = (this->_state.acceptable_transactions() == 0);
+  bool running = (this->_state.running_transactions() == 0);
+
+  if (acceptable)
+  {
+    if (running)
+      this->_systray.set_icon(fist::icon::animated_red);
+    else
+      this->_systray.set_icon(fist::icon::red);
+  }
+  else
+  {
+    if (running)
+      this->_systray.set_icon(fist::icon::animated_black);
+    else
+      this->_systray.set_icon(fist::icon::white);
+  }
 }
 
 /*-------.
@@ -379,7 +414,7 @@ InfinitDock::_position_panel()
 
   ELLE_DUMP("%s: old position: (%s, %s)", *this, this->x(), this->y());
 
-  QPoint systray_position(this->_systray->geometry().center());
+  QPoint systray_position(this->_systray.inner()->geometry().center());
 
   auto screen = QDesktopWidget().availableGeometry();
 

@@ -24,10 +24,9 @@ namespace fist
   LoginThread::run()
   {
     ELLE_TRACE_SCOPE("%s: run", *this);
-
     // Cooldown before retrying (in ms).
-    auto cooldown = 1000;
-    auto max_cooldown = 60000;
+    int cooldown = 1000;
+    int max_cooldown = 60000;
 
     // Will explode if the state is destroyed.
     char* _hash = gap_hash_password(

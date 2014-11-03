@@ -106,6 +106,20 @@ Function un.KillRunningProcess
 FunctionEnd
 ;------------------------------------------------------------------------------
 
+; ------------------------------------------------------------------------------
+; Register contextual options.
+Function RegisterExtension
+  WriteRegStr HKCR "*\shell\Send via ${product_name}" "" "Send via ${product_name}"
+  WriteRegStr HKCR "*\shell\Send via ${product_name}\command" "" '"${'${company_install}'}\${product_name}\${executable}" --contextual "%1"'
+FunctionEnd
+
+; ------------------------------------------------------------------------------
+; Unregister contextual options.
+Function un.RegisterExtension
+  DeleteRegKey HKCR "*\shell\Send via ${product_name}"
+  DeleteRegKey HKCR "*\shell\Send via ${product_name}\command"
+FunctionEnd
+
 Function .onInit
   Call KillRunningProcess
   Call CheckArchitecture
@@ -244,6 +258,7 @@ Section "Install ${product_name}"
   WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
   WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
 
+  Call RegisterExtension
   SetOutPath $INSTDIR
 
   ;; Executable and libraries.
@@ -305,6 +320,7 @@ Section "un.install"
   RMDir "${'${startmenu}'}"
   RMDir "${'${company_startmenu}'}"
 
+  Call un.RegisterExtension
   ;; Documentation.
   Delete "$INSTDIR\${license}"
   Delete "$INSTDIR\${release_notes}"

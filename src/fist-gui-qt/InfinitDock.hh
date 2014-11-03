@@ -16,10 +16,10 @@
 # include <surface/gap/fwd.hh>
 
 # include <fist-gui-qt/RoundShadowWidget.hh>
-# include <fist-gui-qt/SystrayMessage.hh>
 # include <fist-gui-qt/State.hh>
+# include <fist-gui-qt/SystrayMessage.hh>
 # include <fist-gui-qt/fwd.hh>
-
+# include <fist-gui-qt/gui/SystemTrayIcon.hh>
 
 class InfinitDock:
   public RoundShadowWidget
@@ -42,7 +42,8 @@ public:
 | Construction |
 `-------------*/
 public:
-  InfinitDock(fist::State& state);
+  InfinitDock(fist::State& state,
+              fist::gui::systray::Icon& systray);
 
 /*------------.
 | Destruction |
@@ -86,6 +87,9 @@ private slots:
 
   void
   _systray_message_clicked();
+
+  void
+  _active_transactions_changed(size_t);
 
 /*-------.
 | Update |
@@ -220,7 +224,7 @@ protected:
   {
     this->_position_panel();
   }
-private:
+private slots:
   void
   _pick_files();
 
@@ -235,15 +239,15 @@ private slots:
   report_a_problem();
 
 private:
-  QPixmap _logo;
-  QSystemTrayIcon* _systray;
-  QMenu* _systray_menu;
-  QAction* _show;
-  QAction* _send_files;
-  QAction* _report_a_problem;
-  QAction* _logout;
-  QAction* _quit;
-  QAction* _update;
+  ELLE_ATTRIBUTE(QPixmap, logo);
+  ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
+  ELLE_ATTRIBUTE(QMenu*, systray_menu);
+  ELLE_ATTRIBUTE(QAction*, show);
+  ELLE_ATTRIBUTE(QAction*, send_files);
+  ELLE_ATTRIBUTE(QAction*, report_a_problem);
+  ELLE_ATTRIBUTE(QAction*, logout);
+  ELLE_ATTRIBUTE(QAction*, quit);
+  ELLE_ATTRIBUTE(QAction*, update);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::Message>, last_message);
 

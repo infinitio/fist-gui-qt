@@ -25,6 +25,7 @@
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/Settings.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.LoginWindow");
@@ -80,9 +81,11 @@ LoginWindow::_saved_password(QString const& email) const
 }
 
 LoginWindow::LoginWindow(fist::State& state,
+                         fist::gui::systray::Icon& systray,
                          bool fill_email_and_password_fields):
   RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
+  _systray(systray),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
   _message_field(new QLabel),
@@ -243,6 +246,7 @@ void
 LoginWindow::_login_attempt(gap_Status status)
 {
   ELLE_TRACE_SCOPE("%s: attempt to login", *this);
+  this->_systray.set_icon(fist::icon::grey);
   elle::SafeFinally unlock_login([&] {
       this->_enable();
       this->_password_field->setFocus();
@@ -349,8 +353,8 @@ LoginWindow::_login(bool is_auto)
 
   ELLE_TRACE("every check passed")
   {
+    this->_systray.set_icon(fist::icon::grey);
     emit this->login_attempt();
-
     this->_login_thread = new fist::LoginThread(this->_state, email, pw, is_auto, this);
     connect(this->_login_thread, SIGNAL(result_ready(gap_Status)),
             this, SLOT(_login_attempt(gap_Status)));

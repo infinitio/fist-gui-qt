@@ -6,13 +6,16 @@
 
 # include <QApplication>
 # include <QFile>
-# include <QObject>
 # include <QLocalServer>
+# include <QObject>
+# include <QSystemTrayIcon>
 
 # include <elle/Printable.hh>
 # include <elle/attribute.hh>
 
 # include <surface/gap/fwd.hh>
+
+# include <fist-gui-qt/gui/SystemTrayIcon.hh>
 # include <fist-gui-qt/fwd.hh>
 
 class Fist:
@@ -164,6 +167,7 @@ private:
   ELLE_ATTRIBUTE(QFile, filelock);
   ELLE_ATTRIBUTE(std::unique_ptr<QApplication>, application);
   ELLE_ATTRIBUTE(std::unique_ptr<Updater>, updater);
+  ELLE_ATTRIBUTE(fist::gui::systray::Icon, systray);
   ELLE_ATTRIBUTE(std::unique_ptr<LoginWindow>, login_window);
   ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
 
