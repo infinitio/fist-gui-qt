@@ -28,6 +28,7 @@
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
 
@@ -76,7 +77,8 @@ class InfinitDock::Prologue
 `-------------*/
 // Creating the transaction panel is a long operation. So we just wait until all
 // the graphical part is fully load, and then, initialize it.
-InfinitDock::InfinitDock(fist::State& state)
+InfinitDock::InfinitDock(fist::State& state,
+                         fist::gui::systray::Icon& systray)
   : _prologue(new Prologue(state.state()))
   , _state(state)
   , _transaction_panel(nullptr)
@@ -84,7 +86,7 @@ InfinitDock::InfinitDock(fist::State& state)
   , _next_panel(nullptr)
   , _menu(new QMenu(this))
   , _logo(":/menu-bar/fire@2x")
-  , _systray(new QSystemTrayIcon(this))
+  , _systray(systray)
   , _systray_menu(new QMenu(this))
   , _show(new QAction(tr("&Show dock"), this))
   , _send_files(new QAction(tr("&Send files..."), this))
@@ -97,22 +99,21 @@ InfinitDock::InfinitDock(fist::State& state)
 #endif
 {
   g_dock = this;
+  this->_systray.set_icon(fist::icon::white);
+  // System Tray.
+  {
+    this->_systray_menu->addAction(_show);
+    this->_systray_menu->addAction(_send_files);
+    this->_systray_menu->addAction(_quit);
+    this->_systray.inner()->setContextMenu(_systray_menu);
+    connect(this->_systray.inner(),
+            SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this,
+            SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
+    connect(this->_systray.inner(), SIGNAL(messageClicked()),
+            this, SLOT(_systray_message_clicked()));
+  }
 
-  QIcon icon(this->_logo);
-  _systray->setIcon(icon);
-  _systray->setVisible(true);
-  connect(_systray,
-          SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-          this,
-          SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
-
-  this->_systray_menu->addAction(_show);
-  this->_systray_menu->addAction(_send_files);
-  this->_systray_menu->addAction(_quit);
-  this->_systray->setContextMenu(_systray_menu);
-
-  this->connect(this->_systray, SIGNAL(messageClicked()),
-                this, SLOT(_systray_message_clicked()));
 
   this->_transaction_panel.reset(new MainPanel(this->_state));
 
@@ -196,6 +197,11 @@ InfinitDock::InfinitDock(fist::State& state)
       delay_onboarding->start(delay);
     }
 
+  connect(&this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
+          this, SLOT(_active_transactions_changed(size_t)));
+  connect(&this->_state, SIGNAL(running_transactions_changed(size_t)),
+          this, SLOT(_active_transactions_changed(size_t)));
+
   this->hide();
 
 #ifndef FIST_PRODUCTION_BUILD
@@ -218,7 +224,6 @@ void
 InfinitDock::_on_logout()
 {
   ELLE_TRACE_SCOPE("%s: logout", *this);
-  this->_systray->setVisible(false);
   // Kill everything in order to make sure nothing requiring state is running
   // when destroying it.
   this->setCentralWidget(nullptr);
@@ -277,7 +282,7 @@ InfinitDock::_systray_message(fist::SystrayMessageCarrier const& message)
   ELLE_TRACE_SCOPE("%s: show system tray message: %s - %s",
                    *this, body.title(), body.body());
   if (body.always_show() || !this->isVisible())
-    this->_systray->showMessage(
+    this->_systray.inner()->showMessage(
       body.title(), body.body(), body.icon(), body.duration());
 }
 
@@ -298,6 +303,28 @@ InfinitDock::_systray_message_clicked()
       emit this->update_application();
     }
     this->_last_message.reset();
+  }
+}
+
+void
+InfinitDock::_active_transactions_changed(size_t)
+{
+  bool acceptable = (this->_state.acceptable_transactions() == 0);
+  bool running = (this->_state.running_transactions() == 0);
+
+  if (acceptable)
+  {
+    if (running)
+      this->_systray.set_icon(fist::icon::animated_red);
+    else
+      this->_systray.set_icon(fist::icon::red);
+  }
+  else
+  {
+    if (running)
+      this->_systray.set_icon(fist::icon::animated_black);
+    else
+      this->_systray.set_icon(fist::icon::white);
   }
 }
 
@@ -367,7 +394,7 @@ InfinitDock::_position_panel()
 
   ELLE_DUMP("%s: old position: (%s, %s)", *this, this->x(), this->y());
 
-  QPoint systray_position(this->_systray->geometry().center());
+  QPoint systray_position(this->_systray.inner()->geometry().center());
 
   auto screen = QDesktopWidget().availableGeometry();
 

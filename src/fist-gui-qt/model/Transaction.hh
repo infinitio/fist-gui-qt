@@ -40,6 +40,9 @@ namespace fist
       bool
       is_final() const;
 
+      bool
+      running() const;
+
       QString const&
       peer_fullname() const;
 

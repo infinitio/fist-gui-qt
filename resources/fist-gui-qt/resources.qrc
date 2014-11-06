@@ -5,20 +5,55 @@
     <!-- main -->
     <file alias="avatar_default">../slices/mac/main/avatar_default.png</file>
 
-    <file alias="menu-bar/active">../slices/mac/main/icon-menu-bar-active.png</file>
-    <file alias="menu-bar/active@2x">../slices/mac/main/icon-menu-bar-active@2x.png</file>
+    <file alias="menu-bar/white">../slices/windows/main/icon-systray-white.png</file>
+    <file alias="menu-bar/white@2x">../slices/windows/main/icon-systray-white@2x.png</file>
 
-    <file alias="menu-bar/clicked">../slices/mac/main/icon-menu-bar-clicked.png</file>
-    <file alias="menu-bar/clicked@2x">../slices/mac/main/icon-menu-bar-clicked@2x.png</file>
+    <file alias="menu-bar/red">../slices/windows/main/icon-systray-red.png</file>
+    <file alias="menu-bar/red@2x">../slices/windows/main/icon-systray-red@2x.png</file>
 
-    <file alias="menu-bar/fire">../slices/mac/main/icon-menu-bar-fire.png</file>
-    <file alias="menu-bar/fire@2x">../slices/mac/main/icon-menu-bar-fire@2x.png</file>
+    <file alias="menu-bar/grey">../slices/windows/main/icon-systray-grey.png</file>
+    <file alias="menu-bar/grey@2x">../slices/windows/main/icon-systray-grey@2x.png</file>
 
-    <file alias="menu-bar/inactive">../slices/mac/main/icon-menu-bar-inactive.png</file>
-    <file alias="menu-bar/inactive@2x">../slices/mac/main/icon-menu-bar-inactive@2x.png</file>
+    <!-- Animation red -->
+    <file alias="menu-bar/red1">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-1.png</file>
+    <file alias="menu-bar/red2">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-2.png</file>
+    <file alias="menu-bar/red3">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-3.png</file>
+    <file alias="menu-bar/red4">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-4.png</file>
+    <file alias="menu-bar/red5">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-5.png</file>
+    <file alias="menu-bar/red6">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-6.png</file>
+    <file alias="menu-bar/red7">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-7.png</file>
+    <file alias="menu-bar/red8">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-8.png</file>
+    <file alias="menu-bar/red9">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-9.png</file>
+    <file alias="menu-bar/red10">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-10.png</file>
+    <file alias="menu-bar/red11">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-11.png</file>
+    <file alias="menu-bar/red12">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-12.png</file>
+    <file alias="menu-bar/red13">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-13.png</file>
+    <file alias="menu-bar/red14">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-14.png</file>
+    <file alias="menu-bar/red15">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-15.png</file>
+    <file alias="menu-bar/red16">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-16.png</file>
+    <file alias="menu-bar/red17">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-17.png</file>
+    <file alias="menu-bar/red18">../slices/mac/main/GIF - Animation - red/icon-menu-bar-animated-red-18.png</file>
 
-    <file alias="menu-bar/link">../slices/mac/main/icon-menu-bar-link.png</file>
-    <file alias="menu-bar/link@2x">../slices/mac/main/icon-menu-bar-link@2x.png</file>
+    <!-- Animation black -->
+    <file alias="menu-bar/black1">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-1.png</file>
+    <file alias="menu-bar/black2">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-2.png</file>
+    <file alias="menu-bar/black3">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-3.png</file>
+    <file alias="menu-bar/black4">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-4.png</file>
+    <file alias="menu-bar/black5">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-5.png</file>
+    <file alias="menu-bar/black6">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-6.png</file>
+    <file alias="menu-bar/black7">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-7.png</file>
+    <file alias="menu-bar/black8">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-8.png</file>
+    <file alias="menu-bar/black9">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-9.png</file>
+    <file alias="menu-bar/black10">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-10.png</file>
+    <file alias="menu-bar/black11">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-11.png</file>
+    <file alias="menu-bar/black12">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-12.png</file>
+    <file alias="menu-bar/black13">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-13.png</file>
+    <file alias="menu-bar/black14">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-14.png</file>
+    <file alias="menu-bar/black15">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-15.png</file>
+    <file alias="menu-bar/black16">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-16.png</file>
+    <file alias="menu-bar/black17">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-17.png</file>
+    <file alias="menu-bar/black18">../slices/mac/main/GIF - Animation - black/icon-menu-bar-animated-black-18.png</file>
+
 
     <file alias="star">../slices/mac/main/icon-star.png</file>
     <file alias="star@2x">../slices/mac/main/icon-star@2x.png</file>

@@ -152,8 +152,8 @@ namespace fist
         >
       > Transactions;
     ELLE_ATTRIBUTE_R(Transactions, transactions);
-    ELLE_ATTRIBUTE_Rw(unsigned int, active_transactions);
-
+    ELLE_ATTRIBUTE_Rw(size_t, acceptable_transactions);
+    ELLE_ATTRIBUTE_Rw(size_t, running_transactions);
     // Some method are static in order to provide a prototype matching  callback
     // the the C api.
     // A global instance of state is accessible in order to allow the bouncing
@@ -194,7 +194,9 @@ namespace fist
     void
     transaction_updated(uint32_t id);
     void
-    active_transactions_changed(unsigned int);
+    acceptable_transactions_changed(size_t);
+    void
+    running_transactions_changed(size_t);
 
   private:
     /*------.

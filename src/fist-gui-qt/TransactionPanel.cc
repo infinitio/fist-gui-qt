@@ -32,9 +32,11 @@ MainPanel::MainPanel(fist::State& state,
     this, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)));
 
   auto* transfer_tab = this->_tabs->add_tab("TRANSFERS", {this->_transactions});
-  connect(&this->_state, SIGNAL(active_transactions_changed(unsigned int)),
-          transfer_tab, SLOT(on_notification_count_changed(unsigned int)));
-  transfer_tab->on_notification_count_changed(this->_state.active_transactions());
+  connect(
+    &this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
+    transfer_tab, SLOT(on_notification_count_changed(size_t)));
+  transfer_tab->on_notification_count_changed(this->_state.acceptable_transactions());
+
   auto* link_tab = this->_tabs->add_tab("LINKS", {this->_links});
   connect(&this->_state, SIGNAL(active_links_changed(unsigned int)),
           link_tab, SLOT(on_notification_count_changed(unsigned int)));
