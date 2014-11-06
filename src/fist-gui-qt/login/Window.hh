@@ -66,6 +66,10 @@ namespace fist
 
       void
       _register_attempt();
+
+      void
+      _internet_issue(QString const&);
+
     public slots:
       void
       try_auto_login();
