@@ -26,6 +26,7 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/LoginFooter.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/Settings.hh>
 
@@ -82,9 +83,11 @@ LoginWindow::_saved_password(QString const& email) const
 }
 
 LoginWindow::LoginWindow(fist::State& state,
+                         fist::gui::systray::Icon& systray,
                          bool fill_email_and_password_fields):
   RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
+  _systray(systray),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
   _message_field(new QLabel),
@@ -226,6 +229,12 @@ void
 LoginWindow::_login_attempt()
 {
   ELLE_TRACE_SCOPE("%s: attempt to login", *this);
+  disconnect(
+    this->_systray.inner(),
+    SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+    this,
+    SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
+  this->_systray.hide();
   elle::SafeFinally unlock_login([&] {
       this->_enable(); this->_password_field->setFocus(); });
   auto status = this->_login_future.result();
@@ -291,6 +300,11 @@ LoginWindow::try_auto_login()
   ELLE_TRACE_SCOPE("%s: try auto login", *this);
   if (!this->_password_field->text().isEmpty())
   {
+    this->_systray.show();
+    connect(this->_systray.inner(),
+            SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this,
+            SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
     this->hide();
     this->_login();
   }
@@ -302,9 +316,7 @@ LoginWindow::_login()
   elle::SafeFinally unlock_login([&] { this->_enable(); });
   this->_message_field->clear();
   this->_disable();
-
   ELLE_TRACE_SCOPE("%s: login attempt", *this);
-
   QString email = this->_email_field->text();
   QString pw = this->_password_field->text();
 

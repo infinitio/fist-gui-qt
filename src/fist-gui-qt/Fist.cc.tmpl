@@ -35,6 +35,7 @@
 #include <fist-gui-qt/log/CircularSelector.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/Fist.hh>
+#include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/LoginWindow.hh>
 #include <fist-gui-qt/Updater.hh>
 #include <fist-gui-qt/InfinitDock.hh>
@@ -145,11 +146,13 @@ Fist::Fist(int argc, char** argv):
       elle::os::path::join(common::infinit::home(), "lock"))),
   _application(new QApplication(argc, argv)),
   _updater(nullptr),
+  _systray(fist::icon::grey, this),
   _login_window(nullptr),
   _dock(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
   g_fist = this;
+  this->_systray.hide();
   this->_application->installEventFilter(this);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
@@ -263,7 +266,7 @@ Fist::_initialize_login_window(bool prefill_fields)
 {
   ELLE_TRACE_SCOPE("%s: initialize login window", *this);
   ELLE_ASSERT(this->_state != nullptr);
-  this->_login_window.reset(new LoginWindow(*this->_state, prefill_fields));
+  this->_login_window.reset(new LoginWindow(*this->_state, this->_systray, prefill_fields));
   this->_update_loginwindow_updater_connections(true);
   // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
@@ -439,7 +442,7 @@ Fist::logged_in()
 {
   ELLE_TRACE_SCOPE("%s: logged in", *this);
   this->_login_window->hide();
-  this->_dock.reset(new InfinitDock(*this->_state));
+  this->_dock.reset(new InfinitDock(*this->_state, this->_systray));
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
   connect(this->_dock.get(), SIGNAL(logout_request()),
@@ -547,6 +550,7 @@ Fist::_clear()
     this->_login_window.reset();
     this->_dock.reset();
   }
+  this->_systray.hide();
   ELLE_DEBUG("clear state")
   {
     this->_state.reset();

@@ -30,6 +30,7 @@ private:
   ELLE_ATTRIBUTE(fist::State&, state);
 public:
   LoginWindow(fist::State& state,
+              fist::gui::systray::Icon& systray,
               bool fill_email_and_password_fields = true);
   ~LoginWindow();
 
@@ -84,8 +85,11 @@ Q_SIGNALS:
 private:
   void
   focusInEvent(QFocusEvent* event) override;
-
+private slots:
+  void
+  _systray_activated(QSystemTrayIcon::ActivationReason);
 private:
+  ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
   ELLE_ATTRIBUTE(QLineEdit*, email_field);
   ELLE_ATTRIBUTE(QLineEdit*, password_field);
   ELLE_ATTRIBUTE(QLabel*, message_field);

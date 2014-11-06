@@ -19,7 +19,7 @@
 # include <fist-gui-qt/SystrayMessage.hh>
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
-
+# include <fist-gui-qt/gui/SystemTrayIcon.hh>
 
 class InfinitDock:
   public RoundShadowWidget
@@ -42,7 +42,8 @@ public:
 | Construction |
 `-------------*/
 public:
-  InfinitDock(fist::State& state);
+  InfinitDock(fist::State& state,
+              fist::gui::systray::Icon& systray);
 
 /*------------.
 | Destruction |
@@ -86,6 +87,10 @@ private slots:
 
   void
   _systray_message_clicked();
+
+  void
+  _active_transactions_changed(size_t);
+
 
 /*-------.
 | Update |
@@ -210,7 +215,7 @@ public slots:
 
 private:
   QPixmap _logo;
-  QSystemTrayIcon* _systray;
+  fist::gui::systray::Icon& _systray;
   QMenu* _systray_menu;
   QAction* _show;
   QAction* _send_files;

@@ -101,6 +101,13 @@ namespace fist
     }
 
     bool
+    Transaction::running() const
+    {
+      return (this->status() == gap_transaction_transferring ||
+              this->status() == gap_transaction_connecting);
+    }
+
+    bool
     Transaction::is_final() const
     {
       if (this->_final)
