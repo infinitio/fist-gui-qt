@@ -199,11 +199,8 @@ Fist::_initialize_state()
   this->_state.reset();
 
   std::unique_ptr<fist::State> state(new fist::State(gap_state()));
-  connect(state.get(), SIGNAL(critical_failure(QString const&)),
-          this, SLOT(_kicked_out()));
-  gap_kicked_out_callback(state->state(),
-                          Fist::_kicked_out_callback);
-
+  connect(state.get(), SIGNAL(kicked_out(QString const&)),
+          this, SLOT(_kicked_out(QString const&)));
   this->_state = std::move(state);
 }
 
@@ -280,8 +277,6 @@ Fist::_initialize_login_window(bool prefill_fields)
   // Login.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));
-  ELLE_DEBUG("show login window");
-  this->_login_window->show();
   this->_login_window->setFocus();
 }
 
@@ -477,9 +472,6 @@ Fist::_update_loginwindow_updater_connections(bool connection)
   // Display version.
   func(this->_updater.get(), SIGNAL(no_update_available()),
        this->_login_window.get(), SLOT(set_version()));
-  // If no update is available, try to auto login.
-  func(this->_updater.get(), SIGNAL(no_update_available()),
-       this->_login_window.get(), SLOT(try_auto_login()));
   // Forward updater error to login window.
   func(this->_updater.get(), SIGNAL(update_error(QString const&, QString const&)),
        this->_login_window.get(), SLOT(set_message(QString const&, QString const&)));
@@ -530,12 +522,6 @@ Fist::_new_local_socket_connection()
   std::string death{"kill your self"};
   ELLE_DEBUG("send suicide order")
     socket->write(death.c_str(), death.size());
-}
-
-void
-Fist::_kicked_out_callback()
-{
-  g_fist->_kicked_out();
 }
 
 void
@@ -611,7 +597,8 @@ void
 Fist::_kicked_out(QString const& reason)
 {
   ELLE_TRACE_SCOPE("%s: kicked out: %s", *this, reason);
-  this->logout(true);
+  if (this->_dock)
+    this->logout(true);
 }
 
 void

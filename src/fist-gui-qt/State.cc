@@ -55,18 +55,51 @@ namespace fist
       gap_user_status_callback(this->state(), State::user_status_callback);
     ELLE_DEBUG("avatar updated callback")
       gap_avatar_available_callback(this->state(), State::avatar_available_callback);
+    ELLE_DEBUG("connection callback")
+      gap_connection_callback(this->state(), State::connection_callback);
 
     connect(&this->_search_watcher, SIGNAL(finished()),
             this, SLOT(_on_results_ready()));
+
+    ELLE_DEBUG("start the update loop")
+    {
+      connect(this->_poll_timer.get(), SIGNAL(timeout()), this, SLOT(_poll()));
+      this->_poll_timer->start(1000);
+    }
   }
 
   State::~State()
   {
     ELLE_DEBUG_SCOPE("%s: destruction", *this);
+    g_state = nullptr;
     ELLE_DEBUG("destroy poll timer")
       this->_poll_timer.reset();
     ELLE_DEBUG("cancel search")
       this->cancel_search();
+  }
+
+  void
+  State::connection_callback(gap_Bool status,
+                             gap_Bool still_retrying,
+                             char const* reason)
+  {
+    g_state->on_connection_callback(status, still_retrying, reason);
+  }
+
+  void
+  State::on_connection_callback(bool status,
+                                bool still_retrying,
+                                std::string last_error)
+  {
+    ELLE_TRACE_SCOPE("connection callback: %sconnected will%s retry",
+                     status ? "" : "dis",
+                     still_retrying ? "" : "n't");
+    if (status)
+      emit connection_enable();
+    else if (status == false && still_retrying)
+      emit internet_issue(QString::fromStdString(last_error));
+    else
+      emit kicked_out(QString::fromStdString(last_error));
   }
 
   void
@@ -109,12 +142,6 @@ namespace fist
       }
       this->_compute_active_links();
     }
-
-    ELLE_DEBUG("start the update loop")
-    {
-      connect(this->_poll_timer.get(), SIGNAL(timeout()), this, SLOT(_poll()));
-      this->_poll_timer->start(1000);
-    }
   }
 
   void
@@ -125,19 +152,6 @@ namespace fist
 
     if (!res)
       ELLE_ERR("poll failed: %s", res);
-  }
-
-  void
-  State::critical_callback(char const* str)
-  {
-    g_state->on_critical_callback(str);
-  }
-
-  void
-  State::on_critical_callback(char const* str)
-  {
-    ELLE_WARN_SCOPE("%s: critical problem %s", *this, str);
-    emit critical_failure(QString(str));
   }
 
   void

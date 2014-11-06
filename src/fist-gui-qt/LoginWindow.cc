@@ -87,8 +87,9 @@ LoginWindow::LoginWindow(fist::State& state,
   _state(state),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
-  _message_field(new QLabel),
   _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this)),
+  _loading(new QLabel),
+  _message_field(new QLabel),
   _quit_button(new IconButton(QPixmap(QString(":/login/close")))),
   _reset_password_link(new QLabel(view::login::links::forgot_password::text)),
   _create_account_link(new QLabel(view::login::links::need_an_account::text)),
@@ -137,12 +138,17 @@ LoginWindow::LoginWindow(fist::State& state,
     logo->setScaledContents(true);
     logo->setPixmap(QPixmap(QString(":/login/logo")));
   }
-  // Message field.
-  {
-    view::login::message::style(*this->_message_field);
-  }
   // Loading icon.
   {
+    this->_loading->setMovie(this->_loading_icon);
+    this->_loading->movie()->start();
+    this->_loading->hide();
+  }
+  // Message field.
+  {
+    view::login::message::error_style(*this->_message_field);
+    this->_message_field->setWordWrap(true);
+    this->_message_field->setFixedWidth(this->width() - 10);
   }
   // Create account.
   {
@@ -190,6 +196,7 @@ LoginWindow::LoginWindow(fist::State& state,
   layout->addSpacing(15);
   layout->addWidget(logo, 0, Qt::AlignCenter);
   layout->addStretch();
+  layout->addWidget(this->_loading, 0, Qt::AlignCenter);
   layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
   layout->addStretch();
   layout->addWidget(this->_email_field, 0, Qt::AlignCenter);
@@ -214,7 +221,11 @@ LoginWindow::LoginWindow(fist::State& state,
           this, SLOT(_login_attempt()));
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   connect(this, SIGNAL(login_failed()), SLOT(show()));
+  connect(this, SIGNAL(login_failed()), this->_loading, SLOT(hide()));
+  connect(&this->_state, SIGNAL(internet_issue(QString const&)),
+          this, SLOT(_internet_issue(QString const&)));
   this->update();
+  this->try_auto_login();
 }
 
 LoginWindow::~LoginWindow()
@@ -294,12 +305,24 @@ LoginWindow::try_auto_login()
     this->hide();
     this->_login();
   }
+  else
+  {
+    this->show();
+  }
+}
+
+void
+LoginWindow::_internet_issue(QString const& reason)
+{
+  ELLE_WARN("%s: something went wrong while logging in: %s", *this, reason);
+  this->set_message(reason, reason, false);
 }
 
 void
 LoginWindow::_login()
 {
   elle::SafeFinally unlock_login([&] { this->_enable(); });
+  elle::SafeFinally login_failed_guard([&] { emit this->login_failed(); });
   this->_message_field->clear();
   this->_disable();
 
@@ -324,10 +347,8 @@ LoginWindow::_login()
     this->_password_field->setFocus();
     return;
   }
-
-  this->_message_field->setMovie(this->_loading_icon);
-  this->_message_field->movie()->start();
-
+  this->_loading->show();
+  login_failed_guard.abort();
   ELLE_TRACE("every check passed")
   {
     emit this->login_attempt();
@@ -341,19 +362,20 @@ LoginWindow::_login()
         return gap_login(this->_state.state(), email.toStdString().c_str(), hash);
       });
   }
-
-  this->_message_field->setMovie(this->_loading_icon);
-  this->_message_field->movie()->start();
-
   this->_login_watcher.setFuture(this->_login_future);
-
   unlock_login.abort();
 }
 
 void
 LoginWindow::set_message(QString const& message,
-                         QString const& tooltip)
+                         QString const& tooltip,
+                         bool critical)
 {
+  ELLE_TRACE_SCOPE("%s: set message (%s)", *this, message);
+  if (critical)
+    view::login::message::error_style(*this->_message_field);
+  else
+    view::login::message::warning_style(*this->_message_field);
   this->_message_field->setText(message);
   this->_message_field->setToolTip(tooltip);
 }
@@ -374,8 +396,6 @@ LoginWindow::update_available(bool mandatory,
                               QString const& changelog)
 {
   ELLE_TRACE_SCOPE("%s: update available", *this);
-  if (!mandatory)
-    this->try_auto_login();
 }
 
 void

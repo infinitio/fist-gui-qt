@@ -45,6 +45,9 @@ private slots:
   void
   _login_attempt();
 
+  void
+  _internet_issue(QString const&);
+
 public slots:
   void
   try_auto_login();
@@ -88,8 +91,9 @@ private:
 private:
   ELLE_ATTRIBUTE(QLineEdit*, email_field);
   ELLE_ATTRIBUTE(QLineEdit*, password_field);
-  ELLE_ATTRIBUTE(QLabel*, message_field);
   ELLE_ATTRIBUTE(QMovie*, loading_icon);
+  ELLE_ATTRIBUTE(QLabel*, loading);
+  ELLE_ATTRIBUTE(QLabel*, message_field);
 
   ELLE_ATTRIBUTE(IconButton*, quit_button);
   ELLE_ATTRIBUTE(QLabel*, reset_password_link);
@@ -107,7 +111,8 @@ public:
 public Q_SLOTS:
   void
   set_message(QString const& message,
-              QString const& tooltip);
+              QString const& tooltip,
+              bool critical = true);
 
   void
   set_version();
