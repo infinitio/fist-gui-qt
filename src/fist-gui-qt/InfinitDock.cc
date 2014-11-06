@@ -67,7 +67,6 @@ class InfinitDock::Prologue
     ELLE_TRACE_SCOPE("ininitialize Prologue");
 
     // Register gap callback.
-    gap_connection_callback(state, InfinitDock::connection_status_cb);
     gap_user_status_callback(state, InfinitDock::user_status_cb);
     gap_avatar_available_callback(state, InfinitDock::avatar_available_cb);
   }
@@ -172,7 +171,6 @@ InfinitDock::InfinitDock(fist::State& state,
   this->_menu->addAction(_quit);
 
   // Register gap callback.
-  gap_connection_callback(_state.state(), InfinitDock::connection_status_cb);
   gap_user_status_callback(_state.state(), InfinitDock::user_status_cb);
   gap_avatar_available_callback(_state.state(), InfinitDock::avatar_available_cb);
 
@@ -237,12 +235,6 @@ InfinitDock::_on_logout()
 /*----------------.
 | State Callbacks |
 `----------------*/
-void
-InfinitDock::connection_status_cb(gap_UserStatus const status)
-{
-  ELLE_TRACE_SCOPE("Dock: Connection status changed to %s", status);
-}
-
 void
 InfinitDock::user_status_cb(uint32_t id,
                             gap_UserStatus const status)

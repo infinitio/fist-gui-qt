@@ -203,11 +203,8 @@ Fist::_initialize_state()
   this->_state.reset();
 
   std::unique_ptr<fist::State> state(new fist::State(gap_state()));
-  connect(state.get(), SIGNAL(critical_failure(QString const&)),
-          this, SLOT(_kicked_out()));
-  gap_kicked_out_callback(state->state(),
-                          Fist::_kicked_out_callback);
-
+  connect(state.get(), SIGNAL(kicked_out(QString const&)),
+          this, SLOT(_kicked_out(QString const&)));
   this->_state = std::move(state);
 }
 
@@ -290,7 +287,6 @@ Fist::_initialize_login_window(bool prefill_fields)
   // Login.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));
-  ELLE_DEBUG("show login window");
   this->_login_window->setFocus();
 }
 
@@ -540,12 +536,6 @@ Fist::_new_local_socket_connection()
 }
 
 void
-Fist::_kicked_out_callback()
-{
-  g_fist->_kicked_out();
-}
-
-void
 Fist::_clear()
 {
   ELLE_TRACE_SCOPE("%s: clear everything", *this);
@@ -619,7 +609,8 @@ void
 Fist::_kicked_out(QString const& reason)
 {
   ELLE_TRACE_SCOPE("%s: kicked out: %s", *this, reason);
-  this->logout(true);
+  if (this->_dock)
+    this->logout(true);
 }
 
 void

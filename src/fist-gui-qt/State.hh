@@ -63,15 +63,23 @@ namespace fist
     void
     _poll();
 
-  public slots:
+  public:
     static
     void
-    critical_callback(char const*);
+    connection_callback(bool, bool, std::string const&);
     void
-    on_critical_callback(char const*);
+    on_connection_callback(bool status,
+                           bool still_retrying,
+                           std::string last_error);
+
   signals:
     void
-    critical_failure(QString const&);
+    connection_enable();
+    void
+    internet_issue(QString const&);
+    void
+    kicked_out(QString const&);
+
   public:
     /*------.
     | Users |
@@ -118,11 +126,13 @@ namespace fist
     avatar_available_callback(uint32_t id);
     void
     on_avatar_available_callback(uint32_t);
+
     static
     void
     user_status_callback(uint32_t id, gap_UserStatus status);
     void
     on_user_status_callback(uint32_t, gap_UserStatus status);
+
   signals:
     void
     results_ready();

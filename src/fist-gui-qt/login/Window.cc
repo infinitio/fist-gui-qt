@@ -254,6 +254,8 @@ namespace fist
       connect(this, SIGNAL(login_failed()), SLOT(show()));
       connect(&this->_register_watcher, SIGNAL(finished()),
               this, SLOT(_register_attempt()));
+      connect(&this->_state, SIGNAL(internet_issue(QString const&)),
+              this, SLOT(_internet_issue(QString const&)));
       this->update();
 
       if (this->_email_field->text().isEmpty())
@@ -487,6 +489,13 @@ namespace fist
       {
         this->show();
       }
+    }
+
+    void
+    Window::_internet_issue(QString const& reason)
+    {
+      ELLE_WARN("%s: something went wrong while logging in: %s", *this, reason);
+      this->set_message(reason, reason, false);
     }
 
     bool
