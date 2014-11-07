@@ -141,6 +141,7 @@ Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
   _state(nullptr),
   _lock(nullptr),
+  _previous_session_crashed(false),
   _filelock(
     QString::fromStdString(
       elle::os::path::join(common::infinit::home(), "lock"))),
@@ -266,7 +267,8 @@ Fist::_initialize_login_window(bool prefill_fields)
 {
   ELLE_TRACE_SCOPE("%s: initialize login window", *this);
   ELLE_ASSERT(this->_state != nullptr);
-  this->_login_window.reset(new LoginWindow(*this->_state, this->_systray, prefill_fields));
+  this->_login_window.reset(new LoginWindow(*this->_state, this->_systray, prefill_fields, this->_previous_session_crashed));
+  this->_previous_session_crashed = false;
   this->_update_loginwindow_updater_connections(true);
   // Handle quit from login window.
   connect(this->_login_window.get(), SIGNAL(quit_request()),
@@ -402,6 +404,7 @@ Fist::_put_lock_file()
   //     Do nothing, just write a lock.
   if (crash_witness.exists())
   {
+    this->_previous_session_crashed = true;
 #ifdef FIST_PRODUCTION_BUILD
     auto previous_log = logger ? logger->previous_log_file() : "";
 

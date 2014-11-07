@@ -84,9 +84,11 @@ LoginWindow::_saved_password(QString const& email) const
 
 LoginWindow::LoginWindow(fist::State& state,
                          fist::gui::systray::Icon& systray,
-                         bool fill_email_and_password_fields):
+                         bool fill_email_and_password_fields,
+                         bool previous_session_crashed):
   RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
+      _previous_session_crashed(previous_session_crashed),
   _systray(systray),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
@@ -146,7 +148,14 @@ LoginWindow::LoginWindow(fist::State& state,
   }
   // Loading icon.
   {
+    view::login::message::error_style(*this->_message_field);
+    this->_message_field->setWordWrap(true);
+    this->_message_field->setFixedWidth(this->width() - 10);
+    this->_message_field->setTextInteractionFlags(
+      view::login::links::interration_flags);
+    this->_message_field->setOpenExternalLinks(true);
   }
+
   // Create account.
   {
     view::login::links::style(*this->_create_account_link);
@@ -218,6 +227,24 @@ LoginWindow::LoginWindow(fist::State& state,
   connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
   connect(this, SIGNAL(login_failed()), SLOT(show()));
   this->update();
+  if (!this->_previous_session_crashed)
+    this->try_auto_login();
+  else
+  {
+    this->show();
+    this->set_message(
+      "<a>"
+        "Previous session crashed<br>"
+        "Feel free tocontact us at "
+        "<a "
+          " style=\"text-decoration: none; color: #489FCE;\""
+          " href=\"mailto:contact@infinit.io\">"
+            "contact@infinit.io"
+        "</a>"
+      "</a>",
+      "Previous session crashed.",
+      false);
+  }
 }
 
 LoginWindow::~LoginWindow()
@@ -386,8 +413,12 @@ LoginWindow::update_available(bool mandatory,
                               QString const& changelog)
 {
   ELLE_TRACE_SCOPE("%s: update available", *this);
-  if (!mandatory)
-    this->try_auto_login();
+  if (this->_previous_session_crashed)
+    this->set_message("Previous session crashed and an update is available!\n"
+                      "We recommand you to wait for the update!",
+                      "Previous session crashed and an update is available!\n"
+                      "We recommand you to wait for the update!",
+                      false);
 }
 
 void

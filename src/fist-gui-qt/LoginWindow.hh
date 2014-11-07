@@ -31,7 +31,8 @@ private:
 public:
   LoginWindow(fist::State& state,
               fist::gui::systray::Icon& systray,
-              bool fill_email_and_password_fields = true);
+              bool fill_email_and_password_fields = true,
+              bool previous_session_crashed = false);
   ~LoginWindow();
 
   void keyPressEvent(QKeyEvent* event);
@@ -89,6 +90,7 @@ private slots:
   void
   _systray_activated(QSystemTrayIcon::ActivationReason);
 private:
+  ELLE_ATTRIBUTE(bool, previous_session_crashed);
   ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
   ELLE_ATTRIBUTE(QLineEdit*, email_field);
   ELLE_ATTRIBUTE(QLineEdit*, password_field);

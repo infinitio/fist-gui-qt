@@ -194,7 +194,11 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 11), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
+      error_style(QFont(Font, 10.5), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
+
+      static
+      fist::style::Text const
+      warning_style(QFont(Font, 10.5), QColor(0x88, 0x88, 0x88), Qt::AlignCenter);
     }
 
     namespace links
