@@ -157,6 +157,7 @@ private:
   // See: http://developer.nokia.com/community/wiki/Run_only_one_instance_of_a_Qt_application
   typedef QLocalServer Lock;
   ELLE_ATTRIBUTE(std::unique_ptr<Lock>, lock);
+  ELLE_ATTRIBUTE(bool, previous_session_crashed);
   ELLE_ATTRIBUTE(std::unique_ptr<QLocalSocket>, other_instance);
   ELLE_ATTRIBUTE(QFile, filelock);
   ELLE_ATTRIBUTE(std::unique_ptr<QApplication>, application);

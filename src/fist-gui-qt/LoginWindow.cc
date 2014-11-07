@@ -84,9 +84,11 @@ LoginWindow::_saved_password(QString const& email) const
 
 LoginWindow::LoginWindow(fist::State& state,
                          fist::gui::systray::Icon& systray,
-                         bool fill_email_and_password_fields):
+                         bool fill_email_and_password_fields,
+                         bool previous_session_crashed):
   RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
   _state(state),
+      _previous_session_crashed(previous_session_crashed),
   _systray(systray),
   _email_field(new QLineEdit),
   _password_field(new QLineEdit),
@@ -228,7 +230,12 @@ LoginWindow::LoginWindow(fist::State& state,
   connect(&this->_state, SIGNAL(internet_issue(QString const&)),
           this, SLOT(_internet_issue(QString const&)));
   this->update();
-  this->try_auto_login();
+  if (!this->_previous_session_crashed)
+    this->try_auto_login();
+  else
+    this->set_message("Previous session crashed.",
+                      "Previous session crashed.",
+                      false);
 }
 
 LoginWindow::~LoginWindow()
@@ -400,6 +407,12 @@ LoginWindow::update_available(bool mandatory,
                               QString const& changelog)
 {
   ELLE_TRACE_SCOPE("%s: update available", *this);
+  if (this->_previous_session_crashed)
+    this->set_message("Previous session crashed and an update is available!\n"
+                      "We recommand you to wait for the update!",
+                      "Previous session crashed and an update is available!\n"
+                      "We recommand you to wait for the update!",
+                      false);
 }
 
 void
