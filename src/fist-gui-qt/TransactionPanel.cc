@@ -38,8 +38,8 @@ MainPanel::MainPanel(fist::State& state,
   transfer_tab->on_notification_count_changed(this->_state.acceptable_transactions());
 
   auto* link_tab = this->_tabs->add_tab("LINKS", {this->_links});
-  connect(&this->_state, SIGNAL(active_links_changed(unsigned int)),
-          link_tab, SLOT(on_notification_count_changed(unsigned int)));
+  connect(&this->_state, SIGNAL(active_links_changed(size_t)),
+          link_tab, SLOT(on_notification_count_changed(size_t)));
   link_tab->on_notification_count_changed(this->_state.active_links());
 }
 

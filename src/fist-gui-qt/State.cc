@@ -492,7 +492,7 @@ namespace fist
   void
   State::_compute_active_links()
   {
-    unsigned int count = 0;
+    size_t count = 0;
     for (auto const& link: this->_links.get<0>())
     {
       if (!link.is_finished())
@@ -502,7 +502,7 @@ namespace fist
   }
 
   void
-  State::active_links(unsigned int count)
+  State::active_links(size_t count)
   {
     if (this->_active_links != count)
     {

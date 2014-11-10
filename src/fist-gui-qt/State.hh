@@ -203,7 +203,7 @@ namespace fist
         >
       > Links;
     ELLE_ATTRIBUTE_R(Links, links);
-    ELLE_ATTRIBUTE_Rw(unsigned int, active_links);
+    ELLE_ATTRIBUTE_Rw(size_t, active_links);
     ELLE_ATTRIBUTE(std::unique_ptr<QTimer>, poll_timer);
   public:
     model::Link const&
@@ -215,7 +215,7 @@ namespace fist
     void
     link_updated(uint32_t id);
     void
-    active_links_changed(unsigned int);
+    active_links_changed(size_t);
   private:
     void
     _compute_active_links();

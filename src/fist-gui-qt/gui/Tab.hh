@@ -73,7 +73,7 @@ namespace fist
 
     public slots:
       void
-      on_notification_count_changed(unsigned int count);
+      on_notification_count_changed(size_t count);
 
     signals:
       void
@@ -86,7 +86,7 @@ namespace fist
     private:
       ELLE_ATTRIBUTE(TabWidget&, tabber);
       ELLE_ATTRIBUTE_R(QLabel*, name)
-      ELLE_ATTRIBUTE_R(unsigned int, notification_count);
+      ELLE_ATTRIBUTE_R(size_t, notification_count);
       ELLE_ATTRIBUTE(QLabel*, counter)
       ELLE_ATTRIBUTE(QVector<QWidget*>, widgets);
       ELLE_ATTRIBUTE_Rw(QColor, color);

@@ -76,7 +76,7 @@ namespace fist
     }
 
     void
-    Tab::on_notification_count_changed(unsigned int count)
+    Tab::on_notification_count_changed(size_t count)
     {
       this->_notification_count = count;
       if (this->_notification_count == 0)
