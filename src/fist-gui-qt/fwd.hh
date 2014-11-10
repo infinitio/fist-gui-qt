@@ -4,7 +4,6 @@
 // Windows.
 class InfinitDock;
 class LoadingDialog;
-class LoginWindow;
 class Updater;
 
 // Dock Elements.
@@ -12,7 +11,6 @@ class AvatarWidget;
 class FileItem;
 class IconButton;
 class Footer;
-class LoginFooter;
 class ListWidget;
 class TextListItem;
 class Panel;
@@ -28,6 +26,11 @@ namespace fist
 {
   class State;
 
+  namespace login
+  {
+    class Window;
+    class Footer;
+  }
   namespace model
   {
     class User;

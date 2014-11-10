@@ -1,10 +1,8 @@
-#include <iostream> // FIXME
-#include <cassert>
-
 #include <QEvent>
 #include <QPropertyAnimation>
 #include <QResizeEvent>
 #include <QWidget>
+#include <QLayout>
 
 #include <fist-gui-qt/SmoothLayout.hh>
 #include <elle/log.hh>
@@ -36,23 +34,49 @@ SmoothLayout::SmoothLayout(QWidget* owner,
 | Layout |
 `-------*/
 
+// void
+// SmoothLayout::addSpacing(int height)
+// {
+//   QWidget* empty = new QWidget(this);
+//   empty->setFixedHeight(height);
+//   empty->setFixedWidth(1);
+// }
+
+// void
+// SmoothLayout::addStretch()
+// {
+//   QWidget* empty = new QWidget(this);
+//   empty->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+//   empty->setFixedWidth(1);
+// }
+
+// void
+// SmoothLayout::addLayout(QLayout* l)
+// {
+//   QWidget* empty = new QWidget(this);
+//   empty->setLayout(l);
+// }
+
 void
 SmoothLayout::childEvent(QChildEvent* event)
 {
   Super::childEvent(event);
   if (event->added() || event->removed())
-    if (dynamic_cast<QWidget*>(event->child()))
+    if (
+      dynamic_cast<QWidget*>(event->child())
+      || dynamic_cast<QLayout*>(event->child())
+      )
     {
-      auto* widget = static_cast<QWidget*>(event->child());
+      auto* object = static_cast<QObject*>(event->child());
       if (event->added())
       {
-        ELLE_DEBUG("install event filter to new widget: %s", *widget)
-          widget->installEventFilter(this);
+        ELLE_DEBUG("install event filter to new object: %s", *object)
+          object->installEventFilter(this);
       }
       else if (event->removed())
       {
-        ELLE_DEBUG("remove event filter from deleted widget: %s", *widget)
-          widget->removeEventFilter(this);
+        ELLE_DEBUG("remove event filter from deleted object: %s", *object)
+          object->removeEventFilter(this);
       }
       this->_layout();
     }
@@ -61,27 +85,43 @@ SmoothLayout::childEvent(QChildEvent* event)
 bool
 SmoothLayout::eventFilter(QObject *obj, QEvent *event)
 {
-  if (!dynamic_cast<QWidget*>(obj))
+  if (!dynamic_cast<QWidget*>(obj)
+      && !dynamic_cast<QLayout*>(obj)
+    )
     return Super::eventFilter(obj, event);
 
-  auto action = [&] { this->_layout(); this->update(); this->updateGeometry(); };
-  if (event->type() == QEvent::Hide)
-    action();
-  else if (event->type() == QEvent::Show)
-    action();
-  else if (event->type() == QEvent::GraphicsSceneResize)
-    action();
-  else if (event->type() == QEvent::Resize)
-    action();
-  else if (event->type() == QEvent::LayoutRequest)
-    action();
-  else if (event->type() == QEvent::Move)
-    action();
-  else if (event->type() == QEvent::Paint);
-  else if (event->type() == QEvent::Leave);
-  else if (event->type() == QEvent::Enter);
-
+  if (QWidget* widget = dynamic_cast<QWidget*>(obj))
+  {
+    auto action = [&] {
+      this->redraw();
+    };
+    if (event->type() == QEvent::Hide)
+      action();
+    else if (event->type() == QEvent::Show)
+      action();
+    else if (event->type() == QEvent::GraphicsSceneResize)
+      action();
+    else if (event->type() == QEvent::Resize)
+      action();
+    else if (event->type() == QEvent::LayoutRequest)
+      action();
+    else if (event->type() == QEvent::Move)
+      action();
+    else if (event->type() == QEvent::Paint);
+    else if (event->type() == QEvent::Leave);
+    else if (event->type() == QEvent::Enter);
+  }
+  else if (QLayout* layout = dynamic_cast<QLayout*>(obj))
+  {
+    layout->activate();
+  }
   return Super::eventFilter(obj, event);
+}
+
+void
+SmoothLayout::redraw()
+{
+  this->_layout(); this->update(); this->updateGeometry();
 }
 
 void

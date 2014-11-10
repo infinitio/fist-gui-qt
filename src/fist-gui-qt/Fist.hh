@@ -163,7 +163,7 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<QApplication>, application);
   ELLE_ATTRIBUTE(std::unique_ptr<Updater>, updater);
   ELLE_ATTRIBUTE(fist::gui::systray::Icon, systray);
-  ELLE_ATTRIBUTE(std::unique_ptr<LoginWindow>, login_window);
+  ELLE_ATTRIBUTE(std::unique_ptr<fist::login::Window>, login_window);
   ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
 
 private:

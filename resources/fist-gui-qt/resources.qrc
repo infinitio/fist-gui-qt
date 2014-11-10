@@ -61,8 +61,8 @@
 
     <file alias="loading">../slices/mac/main/loading-win.gif</file>
 
-    <file alias="logo">../slices/mac/main/logo.png</file>
-    <file alias="logo@2x">../slices/mac/main/logo@2x.png</file>
+    <file alias="logo">../slices/mac/icon/icon_128x128.png</file>
+    <file alias="logo@2x">../slices/mac/icon/icon_128x128@2x.png</file>
 
     <!-- conversation -->
     <file alias="conversation/accept">../slices/mac/view_conversation/conversation-icon-accept.png</file>
@@ -172,8 +172,8 @@
     <file alias="login/close-hover">../slices/mac/view_login/login-icon-close-hover.png</file>
     <file alias="login/close-hover@2x">../slices/mac/view_login/login-icon-close-hover@2x.png</file>
 
-    <file alias="login/logo">../slices/mac/view_login/logo.png</file>
-    <file alias="login/logo@2x">../slices/mac/view_login/logo@2x.png</file>
+    <file alias="login/logo">../slices/windows/view_login/logotype.png</file>
+    <file alias="login/logo@2x">../slices/windows/view_login/logotype@2x.png</file>
 
     <!-- main -->
     <file alias="main/link">../slices/mac/view_main/icon-cancel-link.png</file>

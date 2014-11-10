@@ -47,6 +47,17 @@ protected:
 protected:
   void
   _layout();
+public:
+  void
+  addSpacing(int height);
+  void
+  addStretch();
+  void
+  addLayout(QLayout* l);
+
+public:
+  void
+  redraw();
 private:
   QList<QWidget*>
   _child_widgets(bool visible_only = false) const;

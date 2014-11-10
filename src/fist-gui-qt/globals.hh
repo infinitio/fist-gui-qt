@@ -154,11 +154,60 @@ namespace view
   {
     static
     QSize const
-    size(320, 400);
+    size(340, 400);
 
     static
     Qt::WindowFlags const
     flags = Qt::FramelessWindowHint;
+
+    namespace fullname
+    {
+      static
+      fist::style::Text const
+      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
+
+      static
+      QString const
+      placeholder("Fullname");
+
+      static
+      QSize const
+      size(login::size.width() - 80, 38);
+    }
+
+    namespace tagline
+    {
+      static
+      fist::style::Text const
+      style(QFont(Font, 10), QColor(0x58, 0x58, 0x58), Qt::AlignCenter);
+
+      static
+      QString const
+      text("The smartest way to send your files");
+
+      static
+      QSize const
+      size(login::size.width() - 20, 38);
+    }
+
+    namespace info
+    {
+      static
+      fist::style::Text const
+      style(QFont(Font, 10, QFont::Bold), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
+
+      static
+      QString const
+      login_text("LOGIN");
+
+      static
+      QString const
+      register_text("CREATE YOUR ACCOUNT");
+
+      static
+      QSize const
+      size(login::size.width() - 114, 20);
+    }
 
     namespace email
     {
@@ -172,7 +221,7 @@ namespace view
 
       static
       QSize const
-      size(240, 38);
+      size(login::size.width() - 80, 38);
     }
 
     namespace password
@@ -187,7 +236,7 @@ namespace view
 
       static
       QSize const
-      size(240, 38);
+      size(login::size.width() - 80, 38);
     }
 
     namespace message
@@ -219,17 +268,33 @@ namespace view
         static
         QString const
         text("<a style=\"text-decoration: none; color: #489FCE;\" "
-             "href=\"https://infinit.io/forgot_password?utm_source=app&utm_medium=windows\">"
-             "forgot password?</a>");
+             "href=\"https://infinit.io/forgot_password?utm_source=app&utm_medium=windows&utm_campaign=forgot_password\">"
+             "Forgot password?</a>");
+      }
+
+      namespace help
+      {
+        static
+        QString const
+        text("<a style=\"text-decoration: none; color: #489FCE;\" "
+             "href=\"https://infinit.io/faq?utm_source=app&utm_medium=windows&utm_campaign=help\">"
+             "Help!</a>");
       }
 
       namespace need_an_account
       {
         static
         QString const
-        text("<a style=\"text-decoration: none; color: #489FCE;\" "
-             "href=\"https://infinit.io/register?utm_source=app&utm_medium=windows\">"
-             "need an account?</a>");
+        text("<a style=\"text-decoration: none; color: #489FCE;\">"
+             "Need an account?</a>");
+      }
+
+      namespace already_have_an_account
+      {
+        static
+        QString const
+        text("<a style=\"text-decoration: none; color: #489FCE;\">"
+             "Already have an account?</a>");
       }
     }
 
@@ -248,7 +313,11 @@ namespace view
 
       static
       QString const
-      text("LOGIN");
+      login_text("LOGIN");
+
+      static
+      QString const
+      register_text("REGISTER");
     }
   }
 

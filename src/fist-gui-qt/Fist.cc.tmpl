@@ -36,7 +36,7 @@
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/Fist.hh>
 #include <fist-gui-qt/icons.hh>
-#include <fist-gui-qt/LoginWindow.hh>
+#include <fist-gui-qt/login/Window.hh>
 #include <fist-gui-qt/Updater.hh>
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/Settings.hh>
@@ -267,7 +267,12 @@ Fist::_initialize_login_window(bool prefill_fields)
 {
   ELLE_TRACE_SCOPE("%s: initialize login window", *this);
   ELLE_ASSERT(this->_state != nullptr);
-  this->_login_window.reset(new LoginWindow(*this->_state, this->_systray, prefill_fields, this->_previous_session_crashed));
+  this->_login_window.reset(
+    new fist::login::Window(
+      *this->_state,
+      this->_systray,
+      prefill_fields,
+      this->_previous_session_crashed));
   this->_previous_session_crashed = false;
   this->_update_loginwindow_updater_connections(true);
   // Handle quit from login window.

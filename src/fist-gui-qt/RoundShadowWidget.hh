@@ -44,6 +44,14 @@ public:
   QColor const&
   background();
 
+// private:
+//   void
+//   childEvent(QChildEvent* event) override;
+
+// protected:
+//   bool
+//   eventFilter(QObject *obj, QEvent *event) override;
+
 public Q_SLOTS:
   void
   setBackground(QColor const& value);
