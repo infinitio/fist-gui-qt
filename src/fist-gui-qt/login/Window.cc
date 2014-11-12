@@ -242,7 +242,6 @@ namespace fist
               this, SLOT(_login_attempt()));
       connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
       connect(this, SIGNAL(login_failed()), SLOT(show()));
-      connect(this, SIGNAL(login_failed()), this->_systray.inner(), SLOT(hide()));
       connect(&this->_register_watcher, SIGNAL(finished()),
               this, SLOT(_register_attempt()));
       connect(&this->_state, SIGNAL(internet_issue(QString const&)),
@@ -258,7 +257,10 @@ namespace fist
       {
         this->mode(Mode::Login);
         if (!this->_previous_session_crashed)
+        {
+          this->_systray.show();
           this->try_auto_login();
+        }
         else
         {
           this->show();
@@ -706,5 +708,20 @@ namespace fist
 
       emit quit_request();
     }
+
+    void
+    Window::showEvent(QShowEvent* event)
+    {
+      Super::showEvent(event);
+      this->_systray.hide();
+    }
+
+    void
+    Window::hideEvent(QHideEvent* event)
+    {
+      Super::hideEvent(event);
+      this->_systray.show();
+    }
+
   }
 }

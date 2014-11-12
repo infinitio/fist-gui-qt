@@ -172,7 +172,17 @@ namespace fist
       // Get the password from settings.
       QString
       _saved_password(QString const& email) const;
-/*----------.
+
+  /*-----------.
+  | Visibility |
+  `-----------*/
+      void
+      showEvent(QShowEvent*) override;
+
+      void
+      hideEvent(QHideEvent*) override;
+
+  /*----------.
   | Printable |
   `----------*/
     private:
