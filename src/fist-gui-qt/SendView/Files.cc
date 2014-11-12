@@ -103,6 +103,9 @@ namespace fist
       this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
       this->setAcceptDrops(true);
 
+      connect(this, SIGNAL(file_dropped(QUrl const&)),
+              this, SLOT(add_file(QUrl const&)));
+
       connect(this->_expanser, SIGNAL(pressed()), this->_growing_area, SLOT(expand()));
       connect(this->_expanser, SIGNAL(released()), this->_growing_area, SLOT(shrink()));
       connect(this->_growing_area, SIGNAL(shrinked()), this, SLOT(update()));

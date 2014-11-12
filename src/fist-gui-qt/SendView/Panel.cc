@@ -63,9 +63,6 @@ namespace fist
       connect(this->_file_adder->add_file(), SIGNAL(released()),
               this, SIGNAL(choose_files()));
 
-      connect(this->_file_adder, SIGNAL(file_dropped(QUrl const&)),
-              this->_file_adder, SLOT(add_file(QUrl const&)));
-
       connect(this->footer()->send(), SIGNAL(clicked()),
               this, SLOT(_send()));
 
