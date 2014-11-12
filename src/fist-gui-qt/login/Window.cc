@@ -109,7 +109,7 @@ namespace fist
       _login_watcher()
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
-      this->setWindowIcon(QIcon(":/login/logo"));
+      this->setWindowIcon(QIcon(":/logo"));
       this->resize(view::login::size);
       // Quit button.
       {
@@ -159,7 +159,7 @@ namespace fist
       auto logo = new QLabel;
       {
         logo->setScaledContents(true);
-        logo->setPixmap(QPixmap(QString(":/login/logo")));
+        logo->setPixmap(QPixmap(":/login/logo"));
       }
       // Message field.
       {
