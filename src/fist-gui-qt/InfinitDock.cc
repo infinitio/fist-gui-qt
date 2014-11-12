@@ -100,7 +100,8 @@ InfinitDock::InfinitDock(fist::State& state,
 #endif
 {
   g_dock = this;
-  this->_systray.set_icon(fist::icon::white);
+  this->_systray.set_icon(fist::icon::normal);
+  this->_systray.show();
   // System Tray.
   {
     this->_systray_menu->addAction(_show);
@@ -323,16 +324,16 @@ InfinitDock::_active_transactions_changed(size_t)
   if (acceptable)
   {
     if (running)
-      this->_systray.set_icon(fist::icon::animated_red);
+      this->_systray.set_icon(fist::icon::transferring_waiting_for_decistion);
     else
-      this->_systray.set_icon(fist::icon::red);
+      this->_systray.set_icon(fist::icon::waiting_for_decistion);
   }
   else
   {
     if (running)
-      this->_systray.set_icon(fist::icon::animated_black);
+      this->_systray.set_icon(fist::icon::transferring_waiting_for_decistion);
     else
-      this->_systray.set_icon(fist::icon::white);
+      this->_systray.set_icon(fist::icon::normal);
   }
 }
 

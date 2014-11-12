@@ -242,6 +242,7 @@ namespace fist
               this, SLOT(_login_attempt()));
       connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
       connect(this, SIGNAL(login_failed()), SLOT(show()));
+      connect(this, SIGNAL(login_failed()), this->_systray.inner(), SLOT(hide()));
       connect(&this->_register_watcher, SIGNAL(finished()),
               this, SLOT(_register_attempt()));
       connect(&this->_state, SIGNAL(internet_issue(QString const&)),
@@ -396,7 +397,6 @@ namespace fist
     {
       this->_footer->mode(Mode::Login);
       ELLE_TRACE_SCOPE("%s: attempt to login", *this);
-      this->_systray.set_icon(fist::icon::grey);
       elle::SafeFinally unlock_login([&] {
           this->_enable(); this->_password_field->setFocus(); });
       auto status = this->_login_future.result();

@@ -20,7 +20,10 @@ namespace fist
         this->_rotation_timer->setInterval(80);
         connect(this->_rotation_timer, SIGNAL(timeout()),
                 this, SLOT(_change_icon()));
-        this->_rotation_timer->start();
+        if (serie.number() > 1)
+          this->_rotation_timer->start();
+        else
+          this->_change_icon();
       }
 
       void

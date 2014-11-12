@@ -147,7 +147,7 @@ Fist::Fist(int argc, char** argv):
       elle::os::path::join(common::infinit::home(), "lock"))),
   _application(new QApplication(argc, argv)),
   _updater(nullptr),
-  _systray(fist::icon::grey, this),
+  _systray(fist::icon::inactive, this),
   _login_window(nullptr),
   _dock(nullptr)
 {
