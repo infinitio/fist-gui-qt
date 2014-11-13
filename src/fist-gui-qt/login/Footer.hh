@@ -34,10 +34,6 @@ namespace fist
       void
       click();
 
-    public slots:
-      void
-      loading();
-
     private:
       void
       mouseReleaseEvent(QMouseEvent * event) override;

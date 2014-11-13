@@ -14,7 +14,6 @@ namespace fist
   {
     Footer::Footer(QWidget* parent)
       : Super(parent)
-      , _loading(new QMovie(QString(":/loading"), QByteArray(), this))
       , _text(new QLabel(this))
       , _mode(Mode::None)
     {
@@ -35,18 +34,9 @@ namespace fist
           this->_text->setText(view::login::footer::register_text);
           break;
         case Mode::Loading:
-          this->_text->setMovie(this->_loading);
-          this->_text->movie()->start();
-          break;
         default:
           ;
       }
-    }
-
-    void
-    Footer::loading()
-    {
-      this->mode(Mode::Loading);
     }
 
     void

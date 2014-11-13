@@ -116,8 +116,8 @@ namespace fist
       ELLE_ATTRIBUTE(bool, previous_session_crashed);
       ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
       ELLE_ATTRIBUTE_Rw(Mode, mode);
-
-      ELLE_ATTRIBUTE(SmoothLayout*, body);
+      ELLE_ATTRIBUTE(QMovie*, loading_icon);
+      ELLE_ATTRIBUTE(QLabel*, loading);
       ELLE_ATTRIBUTE(QLabel*, info);
       ELLE_ATTRIBUTE(QLineEdit*, fullname_field);
       ELLE_ATTRIBUTE(QLineEdit*, email_field);
@@ -147,7 +147,7 @@ namespace fist
     public Q_SLOTS:
       void
       set_message(QString const& message,
-                  QString const& tooltip,
+                  QString const& tooltip = "",
                   bool critical = true);
 
       void

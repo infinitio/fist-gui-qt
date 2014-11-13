@@ -95,6 +95,8 @@ namespace fist
       _previous_session_crashed(previous_session_crashed),
       _systray(systray),
       _mode(Mode::None),
+      _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this)),
+      _loading(new QLabel(this)),
       _info(new QLabel(view::login::info::login_text, this)),
       _fullname_field(new QLineEdit(this)),
       _email_field(new QLineEdit(this)),
@@ -118,6 +120,12 @@ namespace fist
       }
       {
         auto saved_email = fist::settings()["Login"].get("email", "").toString();
+        // Info
+        {
+          this->_loading->setMovie(this->_loading_icon);
+          this->_loading->movie()->start();
+          this->_loading->hide();
+        }
         // Info
         {
           this->_info->setFixedSize(view::login::info::size);
@@ -217,6 +225,8 @@ namespace fist
       layout->addWidget(logo, 0, Qt::AlignCenter);
       layout->addSpacing(20);
       layout->addStretch();
+      layout->addWidget(this->_loading, 0, Qt::AlignCenter);
+      layout->addStretch();
       layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
       layout->addStretch();
       layout->addSpacing(15);
@@ -286,10 +296,11 @@ namespace fist
     void
     Window::mode(fist::login::Mode mode)
     {
-      ELLE_LOG("Set mode %s", mode);
+      ELLE_TRACE_SCOPE("Set mode %s", mode);
       this->_mode = mode;
       this->_message_field->clear();
       this->_footer->mode(mode);
+      this->_loading->hide();
       switch (mode)
       {
         case Mode::Register:
@@ -300,7 +311,7 @@ namespace fist
           this->_info->setText(
             view::login::info::register_text);
           this->_fullname_field->show();
-          this->_fullname_field->setFocus();
+          this->_footer->setFocus();
           break;
         case Mode::Login:
           this->_switch_mode->setText(
@@ -311,6 +322,9 @@ namespace fist
             view::login::info::login_text);
           this->_fullname_field->hide();
           this->_email_field->setFocus();
+          break;
+        case Mode::Loading:
+          this->_loading->show();
           break;
         default:
           ;
@@ -341,8 +355,8 @@ namespace fist
     void
     Window::_register_attempt()
     {
-      this->_footer->mode(Mode::Register);
       ELLE_TRACE_SCOPE("%s: attempt to register", *this);
+      this->mode(Mode::Register);
       elle::SafeFinally unlock_register([&] {
           this->_enable(); this->_password_field->setFocus(); });
       auto status = this->_register_future.result();
@@ -350,7 +364,7 @@ namespace fist
       {
         auto email = this->_email_field->text();
         auto password = this->_password_field->text();
-        fist::settings()["Register"].set("email", email);
+        fist::settings()["Login"].set("email", email);
         this->_save_password(email, password);
         emit logged_in();
         return;
@@ -361,41 +375,38 @@ namespace fist
       {
         emit version_rejected();
       }
-      static auto fill_error_field = [&] (std::string const& error_message,
-                                          std::string const& sub_message = "")
-        {
-          ELLE_WARN("%s", error_message);
-          this->set_message(error_message.c_str(), sub_message.c_str());
-        };
       switch (status)
       {
-#define ERR(error_code, msg)                    \
-        case error_code:                        \
-          fill_error_field(msg);                \
-          break                                 \
+#define ERR(error_code, msg, comp_to_focus)                   \
+        case error_code:                                      \
+          this->set_message(msg);                             \
+          if (comp_to_focus != nullptr)                       \
+          {                                                   \
+            static_cast<QWidget*>(comp_to_focus)->setFocus(); \
+          }                                                   \
+          break                                               \
             /**/
-        ERR(gap_network_error, "No connection to the Internet");
-        ERR(gap_meta_unreachable, "Unable to contact Infinit server");
-        ERR(gap_meta_down_with_message, "Infinit server unavailable");
-        ERR(gap_trophonius_unreachable, "Unable to contact Infinit server");
-        ERR(gap_email_not_valid, "Email not valid");
-        ERR(gap_fullname_not_valid, "Fullname not valid");
+        ERR(gap_network_error, "No connection to the Internet", nullptr);
+        ERR(gap_meta_unreachable, "Unable to contact Infinit server", nullptr);
+        ERR(gap_meta_down_with_message, "Infinit server unavailable", nullptr);
+        ERR(gap_trophonius_unreachable, "Unable to contact Infinit server", nullptr);
+        ERR(gap_email_not_valid, "Email not valid", this->_email_field);
+        ERR(gap_fullname_not_valid, "Fullname not valid", this->_fullname_field);
         // Handle is generated automatically from fullname...
-        ERR(gap_handle_already_registered, "Fullname not valid");
-        ERR(gap_handle_not_valid, "Fullname not valid");
-        ERR(gap_email_password_dont_match, "Wrong email/password");
-        ERR(gap_email_already_registered, "This email has already been taken");
-        ERR(gap_deprecated, "Your version is no longer supported");
-        ERR(gap_email_not_confirmed, "You need to confirm your email\nCheck your inbox");
+        ERR(gap_handle_already_registered, "Fullname not valid", this->_fullname_field);
+        ERR(gap_handle_not_valid, "Fullname not valid", this->_fullname_field);
+        ERR(gap_email_already_registered, "This email has already been taken", this->_email_field);
+        ERR(gap_deprecated, "Your version is no longer supported", nullptr);
         default:
-          fill_error_field(elle::sprintf("Internal error (%s)", status));
+          this->set_message(QString::fromStdString(elle::sprintf("Internal error (%s)", status)));
       }
+#undef ERR
     }
 
     void
     Window::_login_attempt()
     {
-      this->_footer->mode(Mode::Login);
+      this->mode(Mode::Login);
       ELLE_TRACE_SCOPE("%s: attempt to login", *this);
       elle::SafeFinally unlock_login([&] {
           this->_enable(); this->_password_field->setFocus(); });
@@ -439,6 +450,7 @@ namespace fist
         default:
           fill_error_field(elle::sprintf("Internal error (%s)", status));
       }
+#undef ERR
     }
 
     void
@@ -531,7 +543,6 @@ namespace fist
       QString pw = this->_password_field->text();
       QString fullname = this->_fullname_field->text();
       register_failed_guard.abort();
-      this->_footer->loading();
       ELLE_TRACE("every check passed")
       {
         emit this->register_attempt();
@@ -552,6 +563,7 @@ namespace fist
       }
       this->_register_watcher.setFuture(this->_register_future);
       unlock_register.abort();
+      this->mode(Mode::Loading);
     }
 
     void
@@ -569,7 +581,6 @@ namespace fist
         return;
       QString email = this->_email_field->text();
       QString pw = this->_password_field->text();
-      this->_footer->loading();
       login_failed_guard.abort();
       ELLE_TRACE("every check passed")
       {
@@ -586,6 +597,7 @@ namespace fist
       }
       this->_login_watcher.setFuture(this->_login_future);
       unlock_login.abort();
+      this->mode(Mode::Loading);
     }
 
     void
