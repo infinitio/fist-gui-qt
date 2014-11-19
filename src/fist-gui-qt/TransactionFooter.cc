@@ -13,3 +13,21 @@ TransactionFooter::TransactionFooter():
                                          QSizePolicy::Minimum));
   this->_layout->addWidget(this->_send);
 }
+
+void
+TransactionFooter::_mode_implementation()
+{
+  switch (this->mode())
+  {
+    case fist::Mode::p2p:
+      this->_send->set_pixmap(QPixmap(":/send/transfer"));
+      this->_send->setToolTip("Send");
+      this->update();
+      break;
+    case fist::Mode::link:
+      this->_send->set_pixmap(QPixmap(":/send/upload"));
+      this->_send->setToolTip("Generate a link");
+      this->update();
+      break;
+  }
+}

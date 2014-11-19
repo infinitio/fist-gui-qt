@@ -451,9 +451,7 @@ TransactionWidget::_on_status_updated()
       this->_status->setToolTip(QString("Downloading"));
     }
   }
-
   this->update_mtime();
-
   if (this->_peer_fullname->text().isEmpty())
     this->_peer_fullname->setText(this->_transaction.peer_fullname());
 }

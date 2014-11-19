@@ -23,13 +23,15 @@
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/gui/TabWidget.hh>
+# include <fist-gui-qt/ModeSelector.hh>
 
 namespace fist
 {
   namespace sendview
   {
-    class Panel:
-      public ::Panel
+    class Panel
+      : public ::Panel
+      , public ModeSelector
     {
 
     /*------.
@@ -78,6 +80,21 @@ namespace fist
     public slots:
       void
       avatar_available(uint32_t uid);
+
+    private:
+      void
+      _mode_implementation() override;
+
+    private slots:
+      void
+      p2p_mode();
+
+      void
+      link_mode();
+
+    public slots:
+      void
+      send();
 
     Q_SIGNALS:
       void

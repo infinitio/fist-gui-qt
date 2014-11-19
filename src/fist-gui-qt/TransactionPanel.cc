@@ -12,7 +12,9 @@ MainPanel::MainPanel(fist::State& state,
   , _state(state)
   , _tabs(new fist::gui::TabWidget(this))
   , _transactions(new fist::mainview::Transactions(state, this))
+  , _transactions_tab(this->_tabs->add_tab("TRANSFERS", {this->_transactions}))
   , _links(new fist::mainview::Links(state, this))
+  , _links_tab(this->_tabs->add_tab("LINKS", {this->_links}))
 {
   connect(&this->_state, SIGNAL(new_transaction(uint32_t)),
           this->_transactions, SLOT(add_transaction(uint32_t)));
@@ -30,18 +32,45 @@ MainPanel::MainPanel(fist::State& state,
     this->_links,
     SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
     this, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)));
-
-  auto* transfer_tab = this->_tabs->add_tab("TRANSFERS", {this->_transactions});
   connect(
     &this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
-    transfer_tab, SLOT(on_notification_count_changed(size_t)));
-  transfer_tab->on_notification_count_changed(this->_state.acceptable_transactions());
-
-  auto* link_tab = this->_tabs->add_tab("LINKS", {this->_links});
+    this->_transactions_tab, SLOT(on_notification_count_changed(size_t)));
+  this->_transactions_tab->on_notification_count_changed(
+    this->_state.acceptable_transactions());
+  connect(this->_transactions_tab, SIGNAL(activated()), this, SLOT(p2p_mode()));
   connect(&this->_state, SIGNAL(active_links_changed(size_t)),
-          link_tab, SLOT(on_notification_count_changed(size_t)));
-  link_tab->on_notification_count_changed(this->_state.active_links());
+          this->_links_tab, SLOT(on_notification_count_changed(size_t)));
+  this->_links_tab->on_notification_count_changed(this->_state.active_links());
+  connect(this->_links_tab, SIGNAL(activated()), this, SLOT(link_mode()));
 }
+
+void
+MainPanel::_mode_implementation()
+{
+  switch (this->mode())
+  {
+    case fist::Mode::p2p:
+      this->_transactions_tab->click();
+      break;
+    case fist::Mode::link:
+      this->_links_tab->click();
+      break;
+  }
+  this->footer()->mode(this->mode());
+}
+
+void
+MainPanel::p2p_mode()
+{
+  this->mode(fist::Mode::p2p);
+}
+
+void
+MainPanel::link_mode()
+{
+  this->mode(fist::Mode::link);
+}
+
 
 void
 MainPanel::keyPressEvent(QKeyEvent* event)

@@ -20,6 +20,7 @@ class TransactionWidget:
   public ListItem
 {
   typedef ListItem Super;
+public:
   typedef fist::model::Transaction Model;
 
 public:
