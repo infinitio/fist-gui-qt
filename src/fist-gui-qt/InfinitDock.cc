@@ -141,21 +141,17 @@ InfinitDock::InfinitDock(fist::State& state,
             this,
             SLOT(_back_from_send_view()));
 
-    connect(this->_send_panel.get(),
-            SIGNAL(switch_signal()),
-            this,
-            SLOT(_back_from_send_view()));
+    connect(
+      this->_send_panel.get(), SIGNAL(switch_signal()),
+      this, SLOT(_back_from_send_view()));
 
-    connect(this->_send_panel.get(),
-            SIGNAL(choose_files()),
-            this,
-            SLOT(_pick_files_from_sendview()));
+    connect(this->_send_panel.get(), SIGNAL(choose_files()),
+            this, SLOT(_pick_files_from_sendview()));
   }
 
-  connect(this,
-          SIGNAL(avatar_available(uint32_t)),
-          this->_send_panel.get(),
-          SLOT(avatar_available(uint32_t)));
+  connect(
+    this, SIGNAL(avatar_available(uint32_t)),
+    this->_send_panel.get(), SLOT(avatar_available(uint32_t)));
 
   // XXX: Specialize a QWidgetAction to add a better visual and for example,
   // to copy the version in the user clipboard on click.
@@ -421,6 +417,7 @@ InfinitDock::_show_send_view()
 {
   ELLE_TRACE_SCOPE("%s: show send view", *this);
   this->_switch_view(this->_send_panel.get());
+  this->_send_panel->mode(this->_transaction_panel->mode());
 }
 
 void

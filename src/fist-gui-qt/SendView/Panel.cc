@@ -51,17 +51,34 @@ namespace fist
       , _users(new Users(_state, this))
       , _message(new Message(this))
       , _file_adder(new Files(this))
-      , _transaction_tab(_tabs->add_tab("SEND TO USER", { this->_users, this->_message, this->_file_adder, this->_message->top_separator(), }))
-      , _link_tab(_tabs->add_tab("GET A LINK", { this->_message, this->_file_adder, }))
+      , _transaction_tab(
+        this->_tabs->add_tab(
+          "SEND TO USER",
+          {
+            this->_users,
+            this->_message,
+            this->_file_adder,
+            this->_message->top_separator(),
+          }))
+      , _link_tab(
+        this->_tabs->add_tab(
+          "GET A LINK",
+          {
+            this->_message,
+            this->_file_adder,
+          }))
     {
-      connect(this->_file_adder, SIGNAL(clicked()),
-              this, SIGNAL(choose_files()));
+      connect(
+        this->_file_adder, SIGNAL(clicked()),
+        this, SIGNAL(choose_files()));
 
-      connect(this->_file_adder->attach(), SIGNAL(released()),
-              this, SIGNAL(choose_files()));
+      connect(
+        this->_file_adder->attach(), SIGNAL(released()),
+        this, SIGNAL(choose_files()));
 
-      connect(this->_file_adder->add_file(), SIGNAL(released()),
-              this, SIGNAL(choose_files()));
+      connect(
+        this->_file_adder->add_file(), SIGNAL(released()),
+        this, SIGNAL(choose_files()));
 
       connect(this->_users, SIGNAL(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)),
               &this->_state, SLOT(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)));
@@ -72,28 +89,62 @@ namespace fist
       connect(this->footer()->send(), SIGNAL(clicked()),
               this, SLOT(_send()));
 
-      connect(this->footer()->back(), SIGNAL(clicked()),
-              this, SIGNAL(canceled()));
+      connect(
+        this->footer()->back(), SIGNAL(clicked()),
+        this, SIGNAL(canceled()));
 
-      connect(this, SIGNAL(drag_entered()),
-              this->_file_adder, SLOT(on_entered()));
+      connect(
+        this, SIGNAL(drag_entered()),
+        this->_file_adder, SLOT(on_entered()));
 
-      connect(this, SIGNAL(drag_left()),
-              this->_file_adder, SLOT(on_left()));
+      connect(
+        this, SIGNAL(drag_left()),
+        this->_file_adder, SLOT(on_left()));
 
-      connect(this, SIGNAL(sent()),
-              this, SIGNAL(switch_signal()));
+      connect(
+        this, SIGNAL(sent()),
+        this, SIGNAL(switch_signal()));
 
-      connect(this, SIGNAL(canceled()),
-              this, SIGNAL(switch_signal()));
+      connect(
+        this, SIGNAL(canceled()),
+        this, SIGNAL(switch_signal()));
 
-      connect(this->_transaction_tab, SIGNAL(activated()),
-              this->footer(), SLOT(peer_transaction_mode()));
+      connect(
+        this->_transaction_tab, SIGNAL(activated()),
+        this, SLOT(p2p_mode()));
 
-      connect(this->_link_tab, SIGNAL(activated()),
-              this->footer(), SLOT(link_mode()));
+      connect(
+        this->_link_tab, SIGNAL(activated()),
+        this, SLOT(link_mode()));
 
       this->setAcceptDrops(true);
+    }
+
+    void
+    Panel::_mode_implementation()
+    {
+      switch (this->mode())
+      {
+        case Mode::p2p:
+          this->_transaction_tab->click();
+          break;
+        case Mode::link:
+          this->_link_tab->click();
+          break;
+      }
+      this->footer()->mode(this->mode());
+    }
+
+    void
+    Panel::p2p_mode()
+    {
+      this->mode(Mode::p2p);
+    }
+
+    void
+    Panel::link_mode()
+    {
+      this->mode(Mode::link);
     }
 
     void
@@ -185,6 +236,12 @@ namespace fist
     {
       this->_state.send_metric(UIMetrics_SendTrash);
       emit switch_signal();
+    }
+
+    void
+    Panel::send()
+    {
+      this->_send();
     }
 
     void

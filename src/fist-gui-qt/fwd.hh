@@ -31,6 +31,7 @@ namespace fist
     class Window;
     class Footer;
   }
+
   namespace model
   {
     class User;
@@ -45,6 +46,12 @@ namespace fist
     class Files;
     class Users;
   }
+
+  enum class Mode
+  {
+    p2p,
+    link,
+  };
 
   namespace onboarding
   {

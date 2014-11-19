@@ -8,15 +8,21 @@
 
 # include <fist-gui-qt/Footer.hh>
 # include <fist-gui-qt/IconButton.hh>
+# include <fist-gui-qt/ModeSelector.hh>
 
-class TransactionFooter:
-  public Footer
+class TransactionFooter
+  : public Footer
+  , public fist::ModeSelector
 {
 public:
   TransactionFooter();
 
   virtual
   ~TransactionFooter() = default;
+
+private:
+  void
+  _mode_implementation() override;
 
 private:
   ELLE_ATTRIBUTE_R(IconButton*, menu);

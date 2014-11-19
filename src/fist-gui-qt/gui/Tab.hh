@@ -50,6 +50,10 @@ namespace fist
       QSize
       minimumSizeHint() const override;
 
+    public slots:
+      void
+      click();
+
     private:
       void
       _hover();

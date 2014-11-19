@@ -62,6 +62,12 @@ namespace fist
     void
     Tab::mouseReleaseEvent(QMouseEvent* event)
     {
+      this->click();
+    }
+
+    void
+    Tab::click()
+    {
       this->_notify_tabber();
     }
 
@@ -90,6 +96,7 @@ namespace fist
       }
       this->update();
     }
+
     QSize
     Tab::minimumSizeHint() const
     {

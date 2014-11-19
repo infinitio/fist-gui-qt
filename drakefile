@@ -155,6 +155,8 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/globals.hh",
       "src/fist-gui-qt/Settings.cc",
       "src/fist-gui-qt/Settings.hh",
+      "src/fist-gui-qt/ModeSelector.cc",
+      "src/fist-gui-qt/ModeSelector.hh",
 
       "src/fist-gui-qt/SystrayMessage.hh",
       "src/fist-gui-qt/SystrayMessage.cc",
