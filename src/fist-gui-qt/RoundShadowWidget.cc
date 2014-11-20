@@ -22,7 +22,8 @@ RoundShadowWidget::RoundShadowWidget(int radius,
   , _shadow(shadow)
 {
   ELLE_DEBUG_SCOPE("%s: construction", *this);
-  this->setAttribute(Qt::WA_TranslucentBackground, true);
+  if (this->_radius > 0 || this->_shadow > 0)
+    this->setAttribute(Qt::WA_TranslucentBackground, true);
 
   auto margin = this->_radius + this->_shadow;
   this->setContentsMargins(this->_shadow, margin,

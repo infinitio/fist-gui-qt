@@ -128,7 +128,6 @@ namespace fist
       ELLE_ATTRIBUTE(QLineEdit*, password_field);
       ELLE_ATTRIBUTE(QLabel*, message_field);
 
-      ELLE_ATTRIBUTE(IconButton*, quit_button);
       // Can be forgot password or help depending on the view.
       ELLE_ATTRIBUTE(QLabel*, help_link);
       // Can be need or already have an account, depending on the view.
