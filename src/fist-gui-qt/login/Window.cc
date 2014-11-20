@@ -90,7 +90,7 @@ namespace fist
                      fist::gui::systray::Icon& systray,
                      bool fill_email_and_password_fields,
                      bool previous_session_crashed):
-      RoundShadowWidget(5, 3, Qt::FramelessWindowHint),
+      RoundShadowWidget(0, 0, Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint),
       _state(state),
       _previous_session_crashed(previous_session_crashed),
       _systray(systray),
@@ -102,7 +102,6 @@ namespace fist
       _email_field(new QLineEdit(this)),
       _password_field(new QLineEdit(this)),
       _message_field(new QLabel(this)),
-      _quit_button(new IconButton(QPixmap(QString(":/login/close")), false)),
       _help_link(new QLabel(view::login::links::forgot_password::text, this)),
       _switch_mode(new QLabel(this)),
       _version_field(new QLabel(this)),
@@ -113,11 +112,6 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
       this->resize(view::login::size);
-      // Quit button.
-      {
-        connect(this->_quit_button, SIGNAL(released()),
-                this, SIGNAL(quit_request()));
-      }
       {
         auto saved_email = fist::settings()["Login"].get("email", "").toString();
         // Info
@@ -218,7 +212,6 @@ namespace fist
         hlayout->setContentsMargins(7, 0, 7, 0);
         hlayout->addWidget(this->_version_field, 0, Qt::AlignCenter);
         hlayout->addStretch();
-        hlayout->addWidget(this->_quit_button, 0, Qt::AlignRight);
         layout->addLayout(hlayout);
       }
       layout->addSpacing(10);
