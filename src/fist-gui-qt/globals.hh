@@ -305,8 +305,12 @@ namespace view
       style(QFont(Font, 8.5), QColor(0x88, 0x88, 0x88));
     }
 
-    namespace footer
+    namespace login_button
     {
+      static
+      QSize const
+      size(login::size.width() - 80, 32);
+
       static
       fist::style::Text const
       style(QFont(Font, 11, QFont::Bold), Qt::white);

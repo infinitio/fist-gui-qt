@@ -23,7 +23,6 @@
 #include <version.hh>
 
 #include <fist-gui-qt/login/Window.hh>
-#include <fist-gui-qt/login/Footer.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/icons.hh>
@@ -32,12 +31,17 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.login.Window");
 
+#ifndef INFINIT_WINDOWS
+// # define VIDEO
+static Phonon::VideoPlayer* player;
+#endif
+
 namespace fist
 {
   namespace login
   {
-    static QRegExp email_checker(regexp::email,
-                                 Qt::CaseInsensitive);
+    static QRegExp email_checker(regexp::email, Qt::CaseInsensitive);
+
     static
     infinit::cryptography::SecretKey
     secret_key(QString const& email)
@@ -90,7 +94,10 @@ namespace fist
                      fist::gui::systray::Icon& systray,
                      bool fill_email_and_password_fields,
                      bool previous_session_crashed):
-      RoundShadowWidget(0, 0, Qt::Window | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint),
+      RoundShadowWidget(
+        0, 0, Qt::Window | Qt::WindowCloseButtonHint |
+              Qt::WindowMinimizeButtonHint |
+              Qt::MSWindowsFixedSizeDialogHint),
       _state(state),
       _previous_session_crashed(previous_session_crashed),
       _systray(systray),
@@ -105,9 +112,10 @@ namespace fist
       _help_link(new QLabel(view::login::links::forgot_password::text, this)),
       _switch_mode(new QLabel(this)),
       _version_field(new QLabel(this)),
-      _footer(new Footer(this)),
+      _login_button(new QPushButton(this)),
       _login_future(),
-      _login_watcher()
+      _login_watcher(),
+      _video(nullptr)
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
@@ -190,22 +198,53 @@ namespace fist
         view::login::version::style(*this->_version_field);
         this->_version_field->hide();
       }
-      // Footer.
+      // LoginButton.
       {
-        connect(this->_footer, SIGNAL(login()),
-                this, SLOT(_login()));
-        connect(this->_footer, SIGNAL(register_()),
-                this, SLOT(_register()));
+        this->_login_button->setFixedSize(view::login::login_button::size);
+        view::login::login_button::style(*this->_login_button);
+        this->_login_button->setStyleSheet(
+          "QPushButton {"
+          "  background-color: rgb(248, 93, 91);"
+          "  color: white;"
+          "  font: bold 14px;"
+          "  border-radius: 2px;"
+          "} "
+          );
+      }
+      // Video Logo
+      {
+ #ifdef VIDEO
+        player = new Phonon::VideoPlayer(Phonon::VideoCategory, this);
+        player->play(Phonon::MediaSource(":/login/preboardingideo.avi"));
+        player->pause();
+        auto* widget = player->videoWidget();
+        widget->setScaleMode(Phonon::VideoWidget::ScaleAndCrop);
+        widget->setAspectRatio(Phonon::VideoWidget::AspectRatioWidget);
+        // widget->setFixedSize(400, 470);
+        this->_video = widget;
+#else
+        auto* widget = new QLabel(this);
+        widget->setMovie(new QMovie(":/login/preboarding"));
+        widget->movie()->start();
+        widget->setScaledContents(true);
+        this->updateGeometry();
+        this->_video = widget;
+#endif
+        widget->setFixedSize(400, 470);
+        widget->show();
+        widget->installEventFilter(this);
       }
       auto central_widget = new QWidget(this);
       {
-        central_widget->setFixedWidth(this->width());
-        // central_widget->setMinimumHeight(300);
+        // central_widget->setFixedWidth(this->width());
       }
-      auto layout = new QVBoxLayout(central_widget);
+      auto glayout = new QHBoxLayout(central_widget);
+      glayout->setContentsMargins(0, 0, 0, 0); // 5, 5, 5, 5);
+      glayout->setSpacing(0);
+      auto layout = new QVBoxLayout;
       layout->setSizeConstraint(QLayout::SetFixedSize);
       layout->setSpacing(5);
-      layout->setContentsMargins(0, 2, 0, 0);
+      layout->setContentsMargins(55, 5, 55, 0);
       {
         auto hlayout = new QHBoxLayout();
         hlayout->setSizeConstraint(QLayout::SetFixedSize);
@@ -237,10 +276,21 @@ namespace fist
         hlayout->addSpacing(40);
         layout->addLayout(hlayout, Qt::AlignCenter);
       }
-      layout->addStretch();
+      // layout->addStretch();
       layout->addSpacing(25);
-      layout->addWidget(this->_footer);
+      layout->addWidget(this->_login_button, 0, Qt::AlignCenter);
+      layout->addSpacing(25);
+      glayout->addLayout(layout);
+      {
+        auto layout = new QVBoxLayout;
+        layout->setContentsMargins(2, 2, 2, 2); // 15, 15, 15, 15);
+        layout->addWidget(this->_video);
+        glayout->addLayout(layout);
+      }
+
       this->setCentralWidget(central_widget);
+      connect(this->_login_button, SIGNAL(clicked()),
+              this, SLOT(_perform_login_or_register()));
       connect(&this->_login_watcher, SIGNAL(finished()),
               this, SLOT(_login_attempt()));
       connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
@@ -258,6 +308,9 @@ namespace fist
       }
       else
       {
+#ifdef VIDEO
+        player->pause();
+#endif
         this->mode(Mode::Login);
         if (!this->_previous_session_crashed)
         {
@@ -281,11 +334,16 @@ namespace fist
             false);
         }
       }
+
+      this->updateGeometry();
     }
 
     Window::~Window()
     {
       ELLE_TRACE_SCOPE("%s: destruction", *this);
+#ifdef VIDEO
+      delete player;
+#endif
     }
 
     void
@@ -294,7 +352,6 @@ namespace fist
       ELLE_TRACE_SCOPE("Set mode %s", mode);
       this->_mode = mode;
       this->_message_field->clear();
-      this->_footer->mode(mode);
       this->_loading->hide();
       switch (mode)
       {
@@ -305,8 +362,9 @@ namespace fist
             view::login::links::help::text);
           this->_info->setText(
             view::login::info::register_text);
+          this->_login_button->setText(view::login::login_button::register_text);
           this->_fullname_field->show();
-          this->_footer->setFocus();
+          this->_login_button->setFocus();
           break;
         case Mode::Login:
           this->_switch_mode->setText(
@@ -315,6 +373,7 @@ namespace fist
             view::login::links::forgot_password::text);
           this->_info->setText(
             view::login::info::login_text);
+          this->_login_button->setText(view::login::login_button::login_text);
           this->_fullname_field->hide();
           this->_email_field->setFocus();
           break;
@@ -323,6 +382,23 @@ namespace fist
           break;
         default:
           ;
+      }
+    }
+
+    void
+    Window::_perform_login_or_register()
+    {
+      switch (this->mode())
+      {
+        case Mode::Login:
+          this->_login();
+          break;
+        case Mode::Register:
+          this->_register();
+          break;
+        case Mode::Loading:
+        default:
+          break;
       }
     }
 
@@ -344,6 +420,30 @@ namespace fist
             this->mode(Mode::Login);
         }
       }
+      else if (obj == this->_video)
+      {
+        if (event->type() == QEvent::MouseButtonRelease)
+        {
+#ifdef VIDEO
+          if (player->isPaused())
+            player->play();
+          else
+            player->pause();
+#else
+          auto* movie = static_cast<QLabel*>(this->_video)->movie();
+          if (movie->state() == QMovie::MovieState::Paused)
+            movie->setPaused(false);
+          else if (movie->state() == QMovie::MovieState::Running)
+            movie->setPaused(true);
+          else
+          {
+            movie->setPaused(false);
+            movie->start();
+          }
+#endif
+        }
+      }
+
       return Super::eventFilter(obj, event);
     }
 
@@ -451,7 +551,7 @@ namespace fist
     void
     Window::_enable()
     {
-      this->_footer->setDisabled(false);
+      this->_login_button->setDisabled(false);
       this->_switch_mode->setDisabled(false);
       this->_email_field->setDisabled(false);
       this->_password_field->setDisabled(false);
@@ -462,7 +562,7 @@ namespace fist
     Window::_disable(bool disable_fullname)
     {
       this->_switch_mode->setDisabled(true);
-      this->_footer->setDisabled(true);
+      this->_login_button->setDisabled(true);
       this->_email_field->setDisabled(true);
       this->_password_field->setDisabled(true);
       if (disable_fullname)
@@ -492,8 +592,9 @@ namespace fist
     }
 
     bool
-    Window::_test_fields(bool test_fullname)
+    Window::_test_fields(bool register_)
     {
+      bool test_fullname = register_;
       if (test_fullname && this->_fullname_field->text().isEmpty())
       {
         ELLE_DEBUG("invalid fullname field");
@@ -508,8 +609,13 @@ namespace fist
       {
         ELLE_DEBUG("invalid email field");
         if (this->_email_field->text().isEmpty())
-          this->set_message("You must choose an email address",
-                            "We need your email, sorry");
+        {
+          this->set_message(
+            register_
+            ? "You must choose an email address"
+            : "You must enter your email address",
+            "We need your email, sorry");
+        }
         else
           this->set_message("This email address seems invalid",
                             "We need your email, sorry");
@@ -520,8 +626,11 @@ namespace fist
       if (this->_password_field->text().isEmpty())
       {
         ELLE_DEBUG("no password");
-        this->set_message("Choose a password",
-                          "It will be stored locally, not a big deal if you don't remember");
+        this->set_message(
+          register_
+          ? "Choose a password"
+          : "Enter your password",
+          "It will be stored locally, not a big deal if you don't remember");
         this->_password_field->setDisabled(false);
         this->_password_field->setFocus();
         return false;
@@ -534,7 +643,7 @@ namespace fist
     {
       elle::SafeFinally unlock_register([&] {
           this->_enable();
-          this->_footer->mode(Mode::Register);
+          // this->_footer->mode(Mode::Register);
         });
       this->_disable(true);
       elle::SafeFinally register_failed_guard([&] { emit this->register_failed(); });
@@ -573,7 +682,7 @@ namespace fist
     {
       elle::SafeFinally unlock_login([&] {
           this->_enable();
-          this->_footer->mode(Mode::Login);
+          // this->_footer->mode(Mode::Login);
         });
       this->_disable();
       elle::SafeFinally login_failed_guard([&] { emit this->login_failed(); });
@@ -661,7 +770,7 @@ namespace fist
       if (event->key() == Qt::Key_Escape)
         this->_reduce();
       else if (event->key() == Qt::Key_Return)
-        emit this->_footer->click();
+        emit this->_login_button->click();
     }
 
     void
