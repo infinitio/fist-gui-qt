@@ -30,6 +30,7 @@ def configure(cxx_toolkit = None,
               fist_production_build = False,
               boost = None,
               git = None,
+              elle = None,
               qt = None,
               libraries = [],
               boost_test = None):
@@ -68,6 +69,7 @@ def configure(cxx_toolkit = None,
   # Add file config first.
   cxx_config += qt.config
   cxx_config += qt.config_gui
+  cxx_config += qt.config_phonon
   cxx_config += qt.config_network
 
   cxx_config.lib_path_runtime('../lib')
@@ -118,8 +120,6 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/ListItem.hh",
       "src/fist-gui-qt/ListWidget.cc",
       "src/fist-gui-qt/ListWidget.hh",
-      "src/fist-gui-qt/login/Footer.cc",
-      "src/fist-gui-qt/login/Footer.hh",
       "src/fist-gui-qt/login/Window.cc",
       "src/fist-gui-qt/login/Window.hh",
       "src/fist-gui-qt/Panel.cc",

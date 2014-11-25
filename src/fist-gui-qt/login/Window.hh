@@ -23,6 +23,10 @@
 # include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/SmoothLayout.hh>
 
+# include <phonon/VideoPlayer>
+# include <phonon/MediaSource>
+# include <phonon/VideoWidget>
+
 namespace fist
 {
   namespace login
@@ -57,6 +61,9 @@ namespace fist
 
       void
       _register();
+
+      void
+      _perform_login_or_register();
 
       // Login register and login attempt are pretty similar in term of
       // implementation, but I rather split both behavior, so each one use it's
@@ -134,12 +141,13 @@ namespace fist
       ELLE_ATTRIBUTE(QLabel*, switch_mode);
 
       ELLE_ATTRIBUTE(QLabel*, version_field);
-      ELLE_ATTRIBUTE(Footer*, footer);
+      ELLE_ATTRIBUTE(QPushButton*, login_button);
 
       ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
       ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
       ELLE_ATTRIBUTE(QFuture<gap_Status>, register_future);
       ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, register_watcher);
+      ELLE_ATTRIBUTE(QWidget*, video);
     public:
       void
       closeEvent(QCloseEvent* event) override;
