@@ -133,6 +133,12 @@ namespace fist
     void
     on_user_status_callback(uint32_t, gap_UserStatus status);
 
+    static
+    void
+    swagger_deleted_callback(uint32_t id);
+    void
+    on_swagger_deleted(uint32_t id);
+
   signals:
     void
     results_ready();

@@ -51,13 +51,18 @@ namespace fist
     ELLE_DEBUG("link updated callback")
       gap_link_callback(
         this->state(),
-        std::bind(&State::on_link_updated_callback, this, std::placeholders::_1));
+        std::bind(
+          &State::on_link_updated_callback, this, std::placeholders::_1));
     ELLE_DEBUG("user status updated callback")
       gap_user_status_callback(this->state(), State::user_status_callback);
     ELLE_DEBUG("avatar updated callback")
-      gap_avatar_available_callback(this->state(), State::avatar_available_callback);
+      gap_avatar_available_callback(
+        this->state(), State::avatar_available_callback);
     ELLE_DEBUG("connection callback")
       gap_connection_callback(this->state(), State::connection_callback);
+    ELLE_DEBUG("swagger deleted callback")
+      gap_deleted_swagger_callback(
+        this->state(), State::swagger_deleted_callback);
 
     connect(&this->_search_watcher, SIGNAL(finished()),
             this, SLOT(_on_results_ready()));
@@ -123,7 +128,8 @@ namespace fist
       for (uint32_t i = 0; trs[i] != gap_null(); ++i)
       {
         this->_transactions.emplace(*this, trs[i]);
-        ELLE_DEBUG("transaction: %s", *this->_transactions.get<0>().find(trs[i]));
+        ELLE_DEBUG("transaction: %s",
+                   *this->_transactions.get<0>().find(trs[i]));
       }
       gap_transactions_free(trs);
       this->_compute_active_transactions();
@@ -177,10 +183,22 @@ namespace fist
     ELLE_DEBUG("update %s avatar", *this->_users[id])
       this->_users[id]->avatar_updated();
     for (model::Transaction const& model: this->_transactions.get<0>())
-    {
       if (model.peer_id() == id)
         model.avatar_updated();
-    }
+  }
+
+  void
+  State::swagger_deleted_callback(uint32_t id)
+  {
+    g_state->on_swagger_deleted(id);
+  }
+
+  void
+  State::on_swagger_deleted(uint32_t id)
+  {
+    if (this->_users.find(id) == this->_users.end())
+      this->_users[id].reset(new model::User(*this, id));
+    this->_users.at(id)->deleted(true);
   }
 
   void
@@ -195,10 +213,8 @@ namespace fist
     ELLE_TRACE_SCOPE("%s: peer %s status updated to %s", *this, id, status);
     this->user(id).avatar_updated();
     for (model::Transaction const& model: this->_transactions.get<0>())
-    {
       if (model.peer_id() == id)
         model.peer_status_updated();
-    }
   }
 
   State::Users
@@ -208,7 +224,11 @@ namespace fist
 
     State::Users res;
     for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
-      res.push_back(this->user(swaggers[i]).id());
+    {
+      auto& u = this->user(swaggers[i]);
+      if (!u.deleted())
+        res.push_back(this->user(swaggers[i]).id());
+    }
     gap_swaggers_free(swaggers);
 
     return res;
@@ -224,9 +244,10 @@ namespace fist
     for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
     {
       auto const& user = this->user(swaggers[i]);
-      if (user.fullname().toLower().contains(filter.toLower()) ||
-          user.handle().toLower().contains(filter.toLower()))
-        res.push_back(user.id());
+      if (!user.deleted())
+        if (user.fullname().toLower().contains(filter.toLower()) ||
+            user.handle().toLower().contains(filter.toLower()))
+          res.push_back(user.id());
     }
     gap_swaggers_free(swaggers);
 
@@ -246,9 +267,8 @@ namespace fist
           [&,filter] {
             std::string text = filter.toStdString();
             if (filter.count('@') == 1 && email_checker.exactMatch(filter))
-            {
-              return std::vector<uint32_t>{gap_user_by_email(this->state(), text.c_str())};
-            }
+              return std::vector<uint32_t>{
+                gap_user_by_email(this->state(), text.c_str())};
             else
               return gap_users_search(this->state(), text.c_str());
           });

@@ -21,6 +21,7 @@ namespace fist
       : Super(state, id)
       , _fullname()
       , _handle()
+      , _deleted(gap_user_deleted(this->_state.state(), this->id()))
       , _avatar()
       , _transactions()
       , _default_avatar(true)
@@ -34,8 +35,8 @@ namespace fist
     {
       if (this->_fullname.isNull())
       {
-        this->_fullname =
-          QString::fromUtf8(gap_user_fullname(this->_state.state(), this->id()));
+        this->_fullname = QString::fromUtf8(
+          gap_user_fullname(this->_state.state(), this->id()));
 
         ELLE_DEBUG("%s: fetched 'fullname': %s", *this, this->_fullname);
       }
@@ -56,6 +57,12 @@ namespace fist
       return this->_handle;
     }
 
+    bool
+    User::deleted()
+    {
+      return this->_deleted;
+    }
+
     User::Transactions const&
     User::transactions() const
     {
@@ -66,8 +73,10 @@ namespace fist
         uint32_t* trs = gap_transactions(this->_state.state());
 
         for (uint32_t v = 0; trs[v] != gap_null(); v += 1)
-          if (this->id() == gap_transaction_sender_id(this->_state.state(), trs[v]) ||
-              this->id() == gap_transaction_recipient_id(this->_state.state(), trs[v]))
+          if (this->id() == gap_transaction_sender_id(
+                this->_state.state(), trs[v]) ||
+              this->id() == gap_transaction_recipient_id(
+                this->_state.state(), trs[v]))
             this->_transactions.emplace(new Transaction(this->_state, trs[v]));
 
         gap_transactions_free(trs);
@@ -94,7 +103,7 @@ namespace fist
     {
       if (this->_avatar.isNull() || this->_default_avatar == true)
       {
-/// Get user icon data.
+        /// Get user icon data.
         void* data = nullptr;
         size_t len = 0;
 

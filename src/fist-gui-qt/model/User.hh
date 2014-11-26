@@ -44,6 +44,9 @@ namespace fist
       handle() const;
 
       bool
+      deleted();
+
+      bool
       user_status();
 
       QPixmap const&
@@ -59,9 +62,11 @@ namespace fist
       avatar_available();
 
     private:
-      // Every attributes are marked as mutable in order to allow lazy evaluation.
+      // Every attributes are marked as mutable in order to allow lazy
+      // evaluation.
       ELLE_ATTRIBUTE_P(QString, fullname, mutable);
       ELLE_ATTRIBUTE_P(QString, handle, mutable);
+      ELLE_ATTRIBUTE_RW(bool, deleted);
       ELLE_ATTRIBUTE_P(QPixmap, avatar, mutable);
       ELLE_ATTRIBUTE_P(Transactions, transactions, mutable);
       ELLE_ATTRIBUTE_P(bool, default_avatar, mutable);
