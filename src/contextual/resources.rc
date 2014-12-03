@@ -1,0 +1,5 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resources.hh"
+
+INFINIT_CONTEXTUAL_ICON BITMAP "../../fist-gui-qt/resources/contextual/infinit.bmp"

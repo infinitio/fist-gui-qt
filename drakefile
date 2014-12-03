@@ -1,6 +1,7 @@
 import os
 import drake
 import drake.cxx
+from drake import Node
 import drake.git
 import drake.nsis
 import drake.cxx.qt
@@ -24,6 +25,8 @@ def architecture_dictionary(cxx_toolkit):
   else:
     raise Exception("unknown architecture: %s" % cxx_toolkit.architecture)
 
+Node.extensions['def'] = drake.cxx.Object
+
 def configure(cxx_toolkit = None,
               cxx_config = drake.cxx.Config(),
               prefix = drake.Path('/usr/local'),
@@ -37,20 +40,21 @@ def configure(cxx_toolkit = None,
   global build, check, tests, installer, config, toolkit
 
   prefix = drake.Path(prefix)
-
   cxx_config = drake.cxx.Config(cxx_config)
   cxx_toolkit = cxx_toolkit or drake.cxx.Toolkit()
   git = git or drake.git.Git(path = drake.path_source('..'))
-
-  if qt is None:
-    qt = drake.cxx.qt.Qt(gui = True)
-
   dynamic_libraries = []
   libraries = [drake.copy(lib, 'lib', strip_prefix = True) for lib in libraries]
   for lib in libraries:
     if isinstance(lib, drake.cxx.DynLib):
       dynamic_libraries.append(lib)
 
+  if fist_production_build:
+    cxx_config.define('FIST_PRODUCTION_BUILD')
+  cxx_config.lib_path_runtime('../lib')
+  cxx_config.add_local_include_path('src')
+
+  # Boost.
   if boost is None:
     boost = drake.cxx.boost.Boost(cxx_toolkit = cxx_toolkit)
     cxx_config += boost.config()
@@ -58,44 +62,48 @@ def configure(cxx_toolkit = None,
     cxx_config += boost.config_filesystem()
     cxx_config += boost.config_locale()
 
-  if fist_production_build:
-    cxx_config.define('FIST_PRODUCTION_BUILD')
-  qt.plug(cxx_toolkit)
+  # Add the OS specific libraries. Windows ones has to be put
+  # after Qt ones.
+  if cxx_toolkit.os == drake.os.windows:
+    cxx_config.lib('uuid')
+    cxx_config.lib('ole32')
+    # Remove the command line windows on qt.
+    cxx_config.flag("-Wl,-subsystem,windows")
 
   # Qt use file generation tools, which create function with
   # missing declaration.
   cxx_config.warnings.missing_declarations = None
 
-  # Add file config first.
-  cxx_config += qt.config
-  cxx_config += qt.config_gui
-  cxx_config += qt.config_phonon
-  cxx_config += qt.config_network
-
-  cxx_config.lib_path_runtime('../lib')
-
-  # Add the OS specific libraries. Windows ones has to be put
-  # after Qt ones.
+  # Qt.
+  if qt is None:
+    qt = drake.cxx.qt.Qt(gui = True)
+  qt.plug(cxx_toolkit)
+  qt_cxx_config = drake.cxx.Config(cxx_config)
+  qt_cxx_config += qt.config
+  qt_cxx_config += qt.config_gui
+  qt_cxx_config += qt.config_phonon
+  qt_cxx_config += qt.config_network
+  # Windows specific libraries.
+  # XXX: Maybe some clean could be made.
   if cxx_toolkit.os == drake.os.windows:
-    cxx_config.lib('shlwapi')
-    cxx_config.lib('ws2_32')
-    cxx_config.lib('gdi32')
-    cxx_config.lib('mswsock')
-    cxx_config.lib('uuid')
-    cxx_config.lib('ole32')
-    cxx_config.lib('winmm')
-    cxx_config.lib('oleaut32')
-    cxx_config.lib('qtmain')
-    cxx_config.lib('z')
-    cxx_config.lib('comdlg32')
-    cxx_config.lib('imm32')
-    cxx_config.lib('winspool')
-    cxx_config.lib('shell32')
-    cxx_config.lib('kernel32')
-    cxx_config.lib('QtCore')
+    qt_cxx_config.lib('shlwapi')
+    qt_cxx_config.lib('ws2_32')
+    qt_cxx_config.lib('gdi32')
+    qt_cxx_config.lib('mswsock')
+    qt_cxx_config.lib('uuid')
+    qt_cxx_config.lib('ole32')
+    qt_cxx_config.lib('winmm')
+    qt_cxx_config.lib('oleaut32')
+    qt_cxx_config.lib('qtmain')
+    qt_cxx_config.lib('z')
+    qt_cxx_config.lib('comdlg32')
+    qt_cxx_config.lib('imm32')
+    qt_cxx_config.lib('winspool')
+    qt_cxx_config.lib('shell32')
+    qt_cxx_config.lib('kernel32')
+    qt_cxx_config.lib('QtCore')
     # Remove the command line windows on qt.
-    cxx_config.flag("-Wl,-subsystem,windows")
-  cxx_config.add_local_include_path('src')
+    qt_cxx_config.flag("-Wl,-subsystem,windows")
 
   with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
     sources = drake.nodes(
@@ -229,19 +237,66 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/MainView/LinkWidget.hh",
     )
 
+  build = drake.Rule('build')
+  test = drake.Rule('test')
+  check = drake.Rule('check')
+
   application = drake.cxx.Executable(
     'bin/Infinit',
     sources + libraries,
     cxx_toolkit,
-    cxx_config,
+    qt_cxx_config,
     strip = True)
 
-  build = drake.Rule('build')
   build << application
 
-  check = drake.Rule('check')
-
   if cxx_toolkit.os == drake.os.windows:
+    helpers = drake.nodes(
+      'src/contextual/helpers.hh',
+      'src/contextual/helpers.cc',
+    )
+
+    dll_cxx_config = drake.cxx.Config(cxx_config);
+    dll_cxx_config.define('UNICODE')
+    dll_cxx_config.define('_UNICODE')
+    dll_cxx_config.define('_WIN32_WINNT=0x0600')
+    dll_cxx_config.flag('-Wl,-enable-stdcall-fixup')
+
+    windows_helpers = drake.cxx.StaticLib(
+      'lib/windows_helpers',
+      helpers,
+      cxx_toolkit,
+      dll_cxx_config)
+
+    resource = drake.cxx.ResourceFile('src/contextual/resources.rc')
+    resource.dependency_add(drake.Node('resources/contextual/infinit.bmp'))
+
+    shell_extension = drake.nodes(
+      'src/contextual/helpers.hh',
+      'src/contextual/helpers.cc',
+      'src/contextual/Handler.cc',
+      'src/contextual/Handler.hh',
+      'src/contextual/HandlerFactory.cc',
+      'src/contextual/HandlerFactory.hh',
+      'src/contextual/Server.cc',
+      'src/contextual/stdafx.hh',
+
+      # Icon.
+      'src/contextual/resources.hh',
+
+      # Rename some symboles.
+      'src/contextual/libcontextual.def'
+    ) + [resource]
+
+
+    shellextension = drake.cxx.DynLib(
+      'lib/contextual',
+      shell_extension + [elle],
+      cxx_toolkit,
+      dll_cxx_config)
+    dynamic_libraries.append(shellextension)
+    build << shellextension
+
     ## ------------ ##
     ## Osslsigncode ##
     ## ------------ ##
