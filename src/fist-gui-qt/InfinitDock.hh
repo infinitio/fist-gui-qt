@@ -208,6 +208,17 @@ public slots:
   void
   pick_files();
 
+private slots:
+  void
+  _add_files(QList<QUrl> const&);
+
+public slots:
+  void
+  p2p(QList<QUrl> const& list);
+
+  void
+  get_a_link(QList<QUrl> const& list);
+
   void
   report_a_problem();
 

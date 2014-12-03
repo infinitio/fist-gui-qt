@@ -665,11 +665,43 @@ InfinitDock::pick_files()
 
   if (selected.size())
   {
-    for (auto const& file: selected)
-      this->_send_panel->file_adder()->add_file(QUrl::fromLocalFile(file));
-    this->_switch_view(this->_send_panel.get());
-    this->show();
+    QList<QUrl> list;
+     for (auto const& file: selected)
+      list.append(QUrl::fromLocalFile(file));
+    this->_add_files(list);
+    this->_send_panel->show();
   }
+}
+
+void
+InfinitDock::_add_files(QList<QUrl> const& list)
+{
+  ELLE_LOG_SCOPE("%s: add files %s", *this, list);
+  for (auto file: list)
+  {
+    ELLE_LOG("add file %s", file)
+      this->_send_panel->file_adder()->add_file(file);
+  }
+}
+
+void
+InfinitDock::p2p(QList<QUrl> const& list)
+{
+  ELLE_LOG_SCOPE("p2p");
+  this->_show_send_view();
+  this->_add_files(list);
+  this->_send_panel->mode(fist::Mode::p2p);
+}
+
+void
+InfinitDock::get_a_link(QList<QUrl> const& list)
+{
+  ELLE_LOG_SCOPE("link");
+  this->_send_panel->mode(fist::Mode::link);
+  // FIX.
+  this->_send_panel->file_adder()->clear();
+  this->_add_files(list);
+  this->_send_panel->send();
 }
 
 void

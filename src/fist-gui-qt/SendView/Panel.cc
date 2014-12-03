@@ -68,50 +68,25 @@ namespace fist
             this->_file_adder,
           }))
     {
-      connect(
-        this->_file_adder, SIGNAL(clicked()),
-        this, SIGNAL(choose_files()));
-
+      connect(this->_file_adder, SIGNAL(clicked()),
+              this, SIGNAL(choose_files()));
       connect(
         this->_file_adder->attach(), SIGNAL(released()),
         this, SIGNAL(choose_files()));
-
-      connect(
-        this->_file_adder->add_file(), SIGNAL(released()),
-        this, SIGNAL(choose_files()));
-
-      connect(
-        this->footer()->send(), SIGNAL(clicked()),
-        this, SLOT(_send()));
-
-      connect(
-        this->footer()->back(), SIGNAL(clicked()),
-        this, SIGNAL(canceled()));
-
-      connect(
-        this, SIGNAL(drag_entered()),
-        this->_file_adder, SLOT(on_entered()));
-
-      connect(
-        this, SIGNAL(drag_left()),
-        this->_file_adder, SLOT(on_left()));
-
-      connect(
-        this, SIGNAL(sent()),
-        this, SIGNAL(switch_signal()));
-
-      connect(
-        this, SIGNAL(canceled()),
-        this, SIGNAL(switch_signal()));
-
-      connect(
-        this->_transaction_tab, SIGNAL(activated()),
-        this, SLOT(p2p_mode()));
-
-      connect(
-        this->_link_tab, SIGNAL(activated()),
-        this, SLOT(link_mode()));
-
+      connect(this->_file_adder->add_file(), SIGNAL(released()),
+              this, SIGNAL(choose_files()));
+      connect(this->footer()->send(), SIGNAL(clicked()), this, SLOT(_send()));
+      connect(this->footer()->back(), SIGNAL(clicked()),
+              this, SIGNAL(canceled()));
+      connect(this, SIGNAL(drag_entered()),
+              this->_file_adder, SLOT(on_entered()));
+      connect(this, SIGNAL(drag_left()), this->_file_adder, SLOT(on_left()));
+      connect(this, SIGNAL(sent()), this, SIGNAL(switch_signal()));
+      connect(this, SIGNAL(sent()), this, SIGNAL(switch_signal()));
+      connect(this, SIGNAL(sent()), this, SIGNAL(clear()));
+      connect(this->_transaction_tab, SIGNAL(activated()),
+              this, SLOT(p2p_mode()));
+      connect(this->_link_tab, SIGNAL(activated()), this, SLOT(link_mode()));
       this->setAcceptDrops(true);
     }
 
