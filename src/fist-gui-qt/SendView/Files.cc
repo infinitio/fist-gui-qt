@@ -120,7 +120,7 @@ namespace fist
       this->_expanser->hide();
       this->_separator->hide();
       this->repaint();
-    };
+    }
 
     QSize
     Files::sizeHint() const

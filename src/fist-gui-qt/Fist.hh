@@ -6,6 +6,7 @@
 
 # include <QApplication>
 # include <QFile>
+# include <QList>
 # include <QObject>
 # include <QLocalServer>
 
@@ -59,8 +60,12 @@ private:
 
   // Try to set a lock using QLocalServer as a guard mechanism.
   // Return false if the lock couldn't be set.
+  // Args are used to check if some special options has been passed via the
+  // command line, like "--send C:\file.txt" so we can inform the other process
+  // (if it's running) to handle the commands, if not, arguments are stored to
+  // be proceed as soon as we are logged in.
   bool
-  _set_uniqunness_guard();
+  _set_uniqunness_guard(int argc, char** argv);
 
   // Write a lock file in the .infinit folder.
   // This lock is used to detect if a previous instance of the app crashed.
@@ -114,6 +119,16 @@ private slots:
   void
   _login_failed();
 
+private:
+  QList<QUrl>
+  _extact_files_from_commandline(std::string const& message);
+
+private slots:
+  // When an other instance try to connect to us, it will write his command line
+  // through the LocalSocket.
+  void
+  _read_local_socket();
+
   //
   void
   _new_local_socket_connection();
@@ -128,6 +143,13 @@ private:
 
   bool
   eventFilter(QObject *obj, QEvent *event) override;
+
+signals:
+  void
+  p2p(QList<QUrl> const& url);
+
+  void
+  get_a_link(QList<QUrl> const& url);
 
 private slots:
   void
@@ -165,7 +187,8 @@ private:
   ELLE_ATTRIBUTE(fist::gui::systray::Icon, systray);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::login::Window>, login_window);
   ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
-
+  // Files passed through the command line.
+  ELLE_ATTRIBUTE(QList<QUrl>, files);
 private:
   Q_OBJECT;
 
