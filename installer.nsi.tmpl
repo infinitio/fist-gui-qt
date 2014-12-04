@@ -70,40 +70,103 @@ DirText "Choose the install directory"
 UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
+; Don Tommaso's technique to avoid code duplication between installer and
+;  uninstaller
+!macro INSTALL_UNINSTALL_SWITCH un
+  ;----------------------------------------------------------------------------
+  ; Kill running application if any.
+  ; XXX: Should be move in util and take executable as parameter.
+  ;!include nsProcess.nsh
+  Function ${'${un}'}KillRunningProcess
+      ${'${nsProcess::FindProcess}'} ${executable} $R0
+      StrCmp $R0 0 0 end
+
+      ${'${nsProcess::CloseProcess}'} ${executable} $R0
+      IfSilent end
+      StrCmp $R0 0 end 0      ; Success
+      StrCmp $R0 603 end 0    ; Not running
+
+      end:
+        ${'${nsProcess::Unload}'}
+  FunctionEnd
+
+  ;----------------------------------------------------------------------------
+  ; Delete all the dll.
+  ; If deletion failed, kill the explorer, and retry to delete.
+  Function ${'${un}'}DeleteDll
+    % for lib in libraries:
+      IfFileExists "$INSTDIR\${lib}" 0 ${lib}end
+      UnregDll "$INSTDIR\${lib}"
+      Delete "$INSTDIR\${lib}"
+      IfErrors kill_explorer_and_relaunch
+      IfFileExists "$INSTDIR\${lib}" kill_explorer_and_relaunch 0
+      ${lib}end:
+    % endfor
+    Goto finalize
+    kill_explorer_and_relaunch:
+      ${'${nsProcess::KillProcess}'} explorer.exe $R0
+      Call ${'${un}'}DeleteDll
+      Goto end
+    finalize:
+      ${'${nsProcess::FindProcess}'} explorer.exe $R0
+      IntCmp $R0 0 end relaunch
+    relaunch:
+      Exec "$WINDIR\explorer.exe"
+    end:
+      ${'${nsProcess::Unload}'}
+  FunctionEnd
+!macroend
+
 ;------------------------------------------------------------------------------
-; Kill running application if any.
-; XXX: Should be move in util and take executable as parameter.
-; XXX: Impossible to call KillRunningProcess from the uninstall section,
-;      so function has been duplicated. As ns::Process can do it, investigate
-;      to remove useless code duplication.
-;!include nsProcess.nsh
-Function KillRunningProcess
-    ${'${nsProcess::FindProcess}'} ${executable} $R0
-    StrCmp $R0 0 0 end
-
-    ${'${nsProcess::CloseProcess}'} ${executable} $R0
-    IfSilent end
-    StrCmp $R0 0 end 0      ; Success
-    StrCmp $R0 603 end 0    ; Not running
-    goto end
-
-    end:
+; Replace all the dll.
+Function ReplaceDll
+    Call DeleteDll
+    % for lib in libraries:
+      File "${resources_folder}/${lib}"
+    % endfor
     ${'${nsProcess::Unload}'}
 FunctionEnd
 
-Function un.KillRunningProcess
-    ${'${nsProcess::FindProcess}'} ${executable} $R0
-    StrCmp $R0 0 0 end
+!insertmacro INSTALL_UNINSTALL_SWITCH ""
+!insertmacro INSTALL_UNINSTALL_SWITCH "un."
 
-    ${'${nsProcess::CloseProcess}'} ${executable} $R0
-    IfSilent end
-    StrCmp $R0 0 end 0      ; Success
-    StrCmp $R0 603 end 0    ; Not running
-    goto end
-
-    end:
-    ${'${nsProcess::Unload}'}
+;------------------------------------------------------------------------------
+; Create a GUID (Globally unique identifier).
+Function CreateGUID
+  System::Call 'ole32::CoCreateGuid(g .s)'
 FunctionEnd
+
+;------------------------------------------------------------------------------
+; Get the contextual menu GUID of the shell extension.
+Function RegisterContextual
+    ; SetRegView 32
+    ReadRegStr $R0 HKCR "*\shellex\ContextMenuHandlers\InfinitContextualShellExtension" ""
+    ;already_registered
+    StrCmp $R0 "" todo todo
+    todo:
+      WriteRegStr HKCR "AllFileSystemObjects\shellex\ContextMenuHandlers\Infinit" "" "{256EF94C-697D-4986-B99B-9D3B15D79B49}"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "" "InfinitContextualShellExtension"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\AppId" "" "{256EF94C-697D-4986-B99B-9D3B15D79B49}"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\AppId\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "DllSurrogate" ""
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InprocServer32" "ThreadingModel" "Apartment"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InprocServer32" "Class" "fist.contextual.Handler"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InprocServer32" "CodeBase" "${'${company_install}'}\${product_name}\libcontextual.dll"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "" "${'${company_install}'}\${product_name}\libcontextual.dll"
+      WriteRegStr HKLM "Software\Classes\AppId\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "" ""
+      goto end
+    already_registered:
+    end:
+FunctionEnd
+
+;------------------------------------------------------------------------------
+; Get the contextual menu GUID of the shell extension.
+Function un.RegisterContextual
+    DeleteRegKey HKCR "*\shellex\ContextMenuHandlers\InfinitContextualShellExtension"
+    DeleteRegKey HKCR "AllFileSystemObjects\shellex\ContextMenuHandlers\Infinit"
+    DeleteRegKey HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}"
+    DeleteRegKey HKLM "Software\Classes\AppId\{256EF94C-697D-4986-B99B-9D3B15D79B49}"
+FunctionEnd
+
 ;------------------------------------------------------------------------------
 
 Function .onInit
@@ -143,6 +206,7 @@ UAC_Success:
   MessageBox mb_iconstop "This installer requires admin privileges, try again."
   goto UAC_Elevate
 
+  Call KillRunningProcess
   ;; Look for autoupdate.
   Call ParseCommandline
 
@@ -248,10 +312,9 @@ Section "Install ${product_name}"
 
   ;; Executable and libraries.
   File "${resources_folder}\${executable}"
-  % for lib in libraries:
-    File "${resources_folder}/${lib}"
-  % endfor
+  Call ReplaceDll
 
+  Call RegisterContextual
   ;; Documentation.
   File "${resources_folder}\${license}"
   File "${resources_folder}\${release_notes}"
