@@ -13,6 +13,27 @@ namespace fist
 {
   namespace windows
   {
+    LONG
+    GetStringRegKey(HKEY hKey,
+                    std::string const& name,
+                    std::string& value,
+                    std::string const& strDefaultValue)
+
+    {
+      value = strDefaultValue;
+      CHAR szBuffer[512];
+      DWORD dwBufferSize = sizeof(szBuffer);
+      ULONG nError = ERROR_SUCCESS;
+      nError = ::RegQueryValueExA(
+        hKey,
+        name.c_str(),
+        0, NULL,
+        (LPBYTE)szBuffer, &dwBufferSize);
+      if (nError == ERROR_SUCCESS)
+        value = szBuffer;
+      return nError;
+    }
+
     size_t
     to_wide(wchar_t* outIt,
             std::string const& s,
