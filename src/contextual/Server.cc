@@ -13,7 +13,7 @@
 
 #include <strsafe.h>
 
-HINSTANCE g_DllInstance;
+HINSTANCE g_DllInstance = nullptr;
 
 ELLE_LOG_COMPONENT("fist.contextual");
 

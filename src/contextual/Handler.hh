@@ -28,7 +28,7 @@ namespace fist
 
       enum class CommandId
       {
-        get_a_link,
+        get_a_link = 0,
         send,
         null,
       };
@@ -118,4 +118,8 @@ namespace std
   ostream&
   operator << (ostream& out,
                fist::contextual::Handler::CommandId const& id);
+
+  ostream&
+  operator <<(ostream& out,
+              MENUITEMINFO const& mii);
 }

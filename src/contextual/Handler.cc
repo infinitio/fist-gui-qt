@@ -1,9 +1,10 @@
 #include <winsock2.h>
 #include <windows.h>
-
 #include <shlobj.h>
 #include <tchar.h>
 #include <strsafe.h>
+
+#include <ios>
 
 #include <boost/filesystem/path.hpp>
 
@@ -17,11 +18,9 @@
 #include <contextual/resources.hh>
 #include <contextual/stdafx.h>
 
-#include <ios>
-
 ELLE_LOG_COMPONENT("fist.contextual.Handler");
 
-UINT g_DllLockCounter;
+UINT g_DllLockCounter = 0;
 
 namespace fist
 {
@@ -36,10 +35,10 @@ namespace fist
             {
               CommandId::get_a_link,
               L"&Copy Infinit link",
-              "Link",
+              "GetALink",
               "Copy Infinit link",
               "GetALink",
-              L"Link",
+              L"GetALink",
               L"Copy Infinit link",
               L"GetALink",
             },
@@ -49,10 +48,10 @@ namespace fist
             {
               CommandId::send,
               L"&Send with Infinit",
-              "Send",
+              "SendWithInfinit",
               "Send with Infinit",
               "SendWithInfinit",
-              L"Send",
+              L"SendWithInfinit",
               L"Send with Infinit",
               L"SendWithInfinit",
             }
@@ -127,10 +126,8 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: release ref (currently %s)", *this, this->_count);
       ULONG ref = InterlockedDecrement(&this->_count);
-      if (0 == ref)
-      {
+      if (ref == 0)
         delete this;
-      }
       return ref;
     }
 
@@ -146,7 +143,6 @@ namespace fist
           return E_INVALIDARG;
 
       HRESULT hr = E_FAIL;
-
       FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
       STGMEDIUM stm;
 
@@ -174,9 +170,10 @@ namespace fist
             if (DragQueryFile(hDrop, i, file, MAX_PATH) != 0)
             {
               this->_files.push_back(
-                fist::windows::to_narrow(
-                  std::wstring(file),
-                  fist::windows::CodePage::Specifier::UTF8));
+                elle::sprintf("\"%s\"",
+                              fist::windows::to_narrow(
+                                std::wstring(file),
+                                fist::windows::CodePage::Specifier::Windows)));
             }
           }
 
@@ -266,7 +263,7 @@ namespace fist
     Handler::CommandId
     Handler::find_verb(LPCWSTR wstr) const
     {
-      ELLE_DEBUG_SCOPE("%s: find verb", *this, wstr);
+      ELLE_DEBUG_SCOPE("%s: find verb", *this);
       if (wstr == nullptr)
         return CommandId::null;
       for (auto& entry: this->_commands)
@@ -280,7 +277,7 @@ namespace fist
     HRESULT
     Handler::InvokeCommand(LPCMINVOKECOMMANDINFO command_info)
     {
-      ELLE_TRACE_SCOPE("%s: invokeCommand", *this);
+      ELLE_TRACE_SCOPE("%s: invoke command", *this);
 
       CommandId commandId = CommandId::null;
 
@@ -301,22 +298,27 @@ namespace fist
         else
           commandId = this->find_verb(command_info->lpVerb);
       }
-      ELLE_TRACE_SCOPE("command id: %s", commandId);
+      ELLE_TRACE_SCOPE("-command id: %s", commandId);
 
       if (commandId == CommandId::null)
         return E_FAIL;
 
-      char fullPath[MAX_PATH + 2];
-      ::GetModuleFileNameA(g_DllInstance, fullPath, MAX_PATH + 1);
-      boost::filesystem::path p(fullPath);
-      auto exe = p.parent_path() / "Infinit.exe";
+      std::string install_dir;
+      {
+        HKEY hKey;
+        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Infinit.io\\Infinit", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+          fist::windows::GetStringRegKey(hKey, "Install_Dir", install_dir, "");
+      }
+      boost::filesystem::path install(install_dir);
+      auto exe = install / "Infinit.exe";
+      ELLE_DEBUG("executable path: %s", exe.string());
       auto run = [&] (std::vector<std::string> args)
       {
+        ELLE_TRACE("run %s", args);
         args.insert(args.begin(), exe.string());
         elle::system::Process p{args};
         // p.wait();
       };
-
       switch(commandId)
       {
         case CommandId::send:
@@ -331,7 +333,9 @@ namespace fist
           ELLE_ERR("invalid command");
           break;
       }
-      this->_files.clear();
+      ELLE_DEBUG("clear files")
+        this->_files.clear();
+
       return S_OK;
     }
 
@@ -348,9 +352,7 @@ namespace fist
       // Stolen from the internet...
       if ((uFlags & 0x000F) != CMF_NORMAL &&
           (uFlags & CMF_VERBSONLY) == 0 && (uFlags & CMF_EXPLORE) == 0)
-      {
         return MAKE_HRESULT(SEVERITY_SUCCESS, 0, indexMenu);
-      }
 
       for (auto command_pair: this->_commands)
       {
@@ -364,9 +366,10 @@ namespace fist
         mii.dwTypeData = command.menu_text;
         mii.fState = MFS_ENABLED;
         mii.hbmpItem = static_cast<HBITMAP>(this->_icon);
-        if (!InsertMenuItem(hmenu, indexMenu + index, TRUE, &mii))
-          ELLE_ERR("fail at inserting command on the contextual")
-            return HRESULT_FROM_WIN32(GetLastError());
+        ELLE_DEBUG("insert %s", mii)
+          if (!InsertMenuItem(hmenu, indexMenu + index, TRUE, &mii))
+            ELLE_ERR("fail at inserting command on the contextual")
+              return HRESULT_FROM_WIN32(GetLastError());
       }
 
       // Add a separator.
@@ -431,5 +434,15 @@ namespace std
         break;
     }
     return out;
+  }
+
+  ostream&
+  operator <<(ostream& out,
+              MENUITEMINFO const& mii)
+  {
+    return out << "MenuInfo("
+               << "index: " << mii.wID << ", "
+               << "data: " << mii.dwTypeData
+               << ")";
   }
 }

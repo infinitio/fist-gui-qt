@@ -9,6 +9,12 @@ namespace fist
 {
   namespace windows
   {
+    LONG
+    GetStringRegKey(HKEY hKey,
+                    std::string const& name,
+                    std::string& value,
+                    std::string const& default_data = "");
+
     /*--------------------------------------------------.
     | Yet another string / widestring conversion helper |
     `--------------------------------------------------*/
