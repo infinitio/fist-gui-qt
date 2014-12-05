@@ -416,7 +416,7 @@ TransactionWidget::_on_status_updated()
             QString(":/conversation/finished"), false, "Finished");
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
-            QString(":/conversation/bufferised"), false, "Cloud Buffered");
+            QString(":/conversation/finished"), false, "Cloud Buffered");
         case gap_transaction_failed:
           return StatusUpdater(QString(":/conversation/error"), false, "Failed");
         case gap_transaction_canceled:
