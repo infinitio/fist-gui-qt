@@ -90,7 +90,7 @@ SmoothLayout::eventFilter(QObject *obj, QEvent *event)
     )
     return Super::eventFilter(obj, event);
 
-  if (QWidget* widget = dynamic_cast<QWidget*>(obj))
+  if (dynamic_cast<QWidget*>(obj))
   {
     auto action = [&] {
       this->redraw();
