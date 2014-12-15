@@ -178,7 +178,21 @@ namespace fist
       }
       else
       {
-        for (auto const& recipient: this->_users->recipients())
+        auto recipients = this->_users->recipients();
+        if (email_checker.exactMatch(this->_users->text()))
+        {
+          QString recipient = this->_users->text();
+          uint32_t id = this->_state.user_id(recipient.toStdString());
+          if (id == gap_null())
+          {
+            ELLE_TRACE_SCOPE("send files to %s", recipient);
+            gap_send_files_by_email(
+              this->_state.state(), recipient.toStdString(), files, message);
+          }
+          else if (recipients.find(id) == recipients.end())
+            recipients.insert(id);
+        }
+        for (auto const& recipient: recipients)
         {
           if (recipient != gap_null())
           {
@@ -186,15 +200,8 @@ namespace fist
               this->_state.state(), recipient, files, message);
           }
         }
-        if (email_checker.exactMatch(this->_users->text()))
-        {
-          QString recipient = this->_users->text();
-          ELLE_TRACE_SCOPE("send files to %s", this->_users->text());
-          gap_send_files_by_email(
-            this->_state.state(), recipient.toStdString(), files, message);
-        }
       }
-      ELLE_DEBUG("done!")
+      ELLE_DEBUG("done")
         emit sent();
     }
 

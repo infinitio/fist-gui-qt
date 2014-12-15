@@ -138,7 +138,6 @@ namespace fist
       ELLE_ATTRIBUTE(gui::Tab*, transaction_tab);
       ELLE_ATTRIBUTE(gui::Tab*, link_tab);
 
-
     protected:
       void
       keyPressEvent(QKeyEvent* event) override;

@@ -277,6 +277,12 @@ namespace fist
     return this->swaggers(filter);
   }
 
+  uint32_t
+  State::user_id(std::string const& email)
+  {
+    return gap_user_by_email(this->state(), email.c_str());
+  }
+
   // Cancel the search operation.
   void
   State::cancel_search()

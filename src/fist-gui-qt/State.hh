@@ -112,6 +112,9 @@ namespace fist
     model::User const&
     user(uint32_t user_id);
 
+    uint32_t
+    user_id(std::string const& email);
+
     typedef std::unordered_map<uint32_t, std::unique_ptr<model::User>> UserModels;
     ELLE_ATTRIBUTE_R(UserModels, users);
     typedef std::vector<uint32_t> Results;
