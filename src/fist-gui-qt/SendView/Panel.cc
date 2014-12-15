@@ -82,8 +82,8 @@ namespace fist
               this->_file_adder, SLOT(on_entered()));
       connect(this, SIGNAL(drag_left()), this->_file_adder, SLOT(on_left()));
       connect(this, SIGNAL(sent()), this, SIGNAL(switch_signal()));
-      connect(this, SIGNAL(sent()), this, SIGNAL(switch_signal()));
       connect(this, SIGNAL(sent()), this, SIGNAL(clear()));
+      connect(this, SIGNAL(sent()), this->_file_adder, SLOT(clear()));
       connect(this->_transaction_tab, SIGNAL(activated()),
               this, SLOT(p2p_mode()));
       connect(this->_link_tab, SIGNAL(activated()), this, SLOT(link_mode()));
