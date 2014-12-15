@@ -1,3 +1,5 @@
+#include <contextual/stdafx.h>
+
 #include <stddef.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -6,7 +8,6 @@
 #include <vector>
 #endif
 
-#include <contextual/stdafx.h>
 #include <contextual/helpers.hh>
 
 namespace fist
