@@ -86,24 +86,50 @@ def configure(cxx_toolkit = None,
   # Windows specific libraries.
   # XXX: Maybe some clean could be made.
   if cxx_toolkit.os == drake.os.windows:
-    qt_cxx_config.lib('shlwapi')
-    qt_cxx_config.lib('ws2_32')
-    qt_cxx_config.lib('gdi32')
-    qt_cxx_config.lib('mswsock')
-    qt_cxx_config.lib('uuid')
-    qt_cxx_config.lib('ole32')
-    qt_cxx_config.lib('winmm')
-    qt_cxx_config.lib('oleaut32')
-    qt_cxx_config.lib('qtmain')
-    qt_cxx_config.lib('z')
-    qt_cxx_config.lib('comdlg32')
-    qt_cxx_config.lib('imm32')
-    qt_cxx_config.lib('winspool')
-    qt_cxx_config.lib('shell32')
-    qt_cxx_config.lib('kernel32')
-    qt_cxx_config.lib('QtCore')
+    windows_cxx_config = drake.cxx.Config()
+    windows_cxx_config.lib('shlwapi')
+    windows_cxx_config.lib('ws2_32')
+    windows_cxx_config.lib('gdi32')
+    windows_cxx_config.lib('mswsock')
+    windows_cxx_config.lib('uuid')
+    windows_cxx_config.lib('ole32')
+    windows_cxx_config.lib('winmm')
+    windows_cxx_config.lib('oleaut32')
+    windows_cxx_config.lib('qtmain')
+    windows_cxx_config.lib('z')
+    windows_cxx_config.lib('comdlg32')
+    windows_cxx_config.lib('imm32')
+    windows_cxx_config.lib('winspool')
+    windows_cxx_config.lib('shell32')
+    windows_cxx_config.lib('kernel32')
+    windows_cxx_config.lib('QtCore')
     # Remove the command line windows on qt.
-    qt_cxx_config.flag("-Wl,-subsystem,windows")
+    windows_cxx_config.flag("-Wl,-subsystem,windows")
+    qt_cxx_config += windows_cxx_config
+
+  def copy_lib(lib, where = 'lib'):
+    if isinstance(lib, drake.cxx.StaticLib):
+      return lib
+    else:
+      return drake.copy(lib, where, True)
+
+  if cxx_toolkit.os in (drake.os.macos, drake.os.windows, drake.os.ios):
+    boost_filesystem = drake.cxx.Config(boost.config_filesystem(static = True))
+  else:
+    boost_filesystem = drake.cxx.Config(boost.config_filesystem(link = False))
+    boost_filesystem.library_add(copy_lib(boost.filesystem_dynamic))
+  if cxx_toolkit.os in [drake.os.windows, drake.os.ios]:
+    boost_system = drake.cxx.Config(boost.config_system(static = True))
+    boost_program_options = drake.cxx.Config(boost.config_program_options(static = True))
+  else:
+    boost_system = drake.cxx.Config(boost.config_system(link = False))
+    boost_system.library_add(copy_lib(boost.system_dynamic))
+    boost_program_options = drake.cxx.Config(boost.config_program_options(link = False))
+    boost_program_options.library_add(copy_lib(boost.program_options_dynamic))
+
+  qt_cxx_config += boost_filesystem
+  qt_cxx_config += boost_system
+  qt_cxx_config += boost_program_options
 
   with drake.templating.Context(architecture_dictionary(cxx_toolkit)):
     sources = drake.nodes(
