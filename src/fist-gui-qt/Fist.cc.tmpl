@@ -5,6 +5,8 @@
 # include <boost/locale.hpp>
 #endif
 
+#include <boost/program_options.hpp>
+
 #include <memory>
 #include <sstream>
 #include <string>
@@ -23,6 +25,7 @@
 #include <QTextCodec>
 
 #include <elle/Exception.hh>
+#include <elle/finally.hh>
 #include <elle/log.hh>
 #include <elle/log/TextLogger.hh>
 #include <elle/memory.hh>
@@ -60,6 +63,13 @@ static QFile crash_witness(QString::fromStdString(
 
 #define SUICIDE(signal) ::exit(1);
 
+namespace
+{
+  static std::string ADD = "add";
+  static std::string LINK = "link";
+  static std::string addtag = elle::sprintf("--%s ", ADD);
+  static std::string linktag = elle::sprintf("--%s ", LINK);
+}
 namespace
 {
   static std::unique_ptr<infinit::fist::log::Selector> logger;
@@ -141,6 +151,73 @@ gap_state()
 #endif
 }
 
+Fist::CommandLine::CommandLine(std::vector<std::string> const& files_,
+                               bool link)
+  : files(files_)
+  , link(link)
+{}
+
+QList<QUrl>
+Fist::CommandLine::urls() const
+{
+  QList<QUrl> urls;
+  for (auto const& file: this->files)
+  {
+    urls.append(QUrl::fromLocalFile(QDir::toNativeSeparators(QString::fromUtf8(file.c_str()))));
+    // urls.append(QUrl::fromLocalFile(QDir::toNativeSeparators(QString::fromStdString(file))));
+    // urls.append(QUrl::fromLocalFile(QDir::toNativeSeparators(QString::fromLatin1(file.c_str()))));
+    // urls.append(QUrl::fromLocalFile(QDir::toNativeSeparators(QString::fromAscii(file.c_str()))));
+    // urls.append(QUrl::fromLocalFile(QDir::toNativeSeparators(QString::fromLocal8Bit(file.c_str()))));
+  }
+  return urls;
+}
+
+void
+Fist::_parse_options(int argc, char** argv)
+{
+  ELLE_LOG("parse options");
+  this->_command_line.reset();
+  using namespace boost::program_options;
+  options_description options("Allowed options");
+  options.add_options()
+    ("help,h", "print help")
+    (LINK.c_str(),
+     value<std::vector<std::string>>()->multitoken(),
+     "generate a link for one or multiple file(s)")
+    (ADD.c_str(),
+     value<std::vector<std::string>>()->multitoken(),
+     "add file(s)")
+    ;
+  variables_map vm;
+  try
+  {
+    store(parse_command_line(argc, argv, options), vm);
+    notify(vm);
+  }
+  catch (invalid_command_line_syntax const& e)
+  {
+  }
+  catch (...)
+  {
+  }
+
+  if (vm.count("help"))
+  {
+    std::cout << "Usage: " << argv[0] << " [options]" << std::endl;
+    std::cout << std::endl;
+    std::cout << options;
+    std::cout << std::endl;
+    std::cout << "Infinit " INFINIT_VERSION
+      " Copyright (c) 2013 infinit.io All rights reserved." << std::endl;
+    exit(0); // XXX: use Exit exception
+  }
+
+  if (vm.count(LINK))
+    this->_command_line.reset(new CommandLine(vm[LINK].as<std::vector<std::string>>(), true));
+  else if (vm.count(ADD))
+    this->_command_line.reset(new CommandLine(vm[ADD].as<std::vector<std::string>>(), false));
+}
+
 Fist::Fist(int argc, char** argv):
   _prologue(new Fist::Prologue()),
   _state(nullptr),
@@ -153,21 +230,23 @@ Fist::Fist(int argc, char** argv):
   _updater(nullptr),
   _systray(fist::icon::inactive, this),
   _login_window(nullptr),
-  _dock(nullptr)
+  _dock(nullptr),
+  _command_line(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
   g_fist = this;
+  this->_initialize_application();
   this->_systray.hide();
   this->_application->installEventFilter(this);
   connect(this->_application.get(), SIGNAL(aboutToQuit()),
           this, SLOT(about_to_quit()));
-  if (!this->_set_uniqunness_guard(argc, argv))
+  this->_parse_options(argc, argv);
+  if (!this->_set_uniqunness_guard())
     throw elle::Exception("unable to set lock");
   // We have to create a state here because crash report need a
   // state to be ran.
   this->_initialize_state();
   this->_put_lock_file();
-  this->_initialize_application();
 }
 
 bool
@@ -327,7 +406,7 @@ Fist::operator ()()
 }
 
 bool
-Fist::_set_uniqunness_guard(int argc, char** argv)
+Fist::_set_uniqunness_guard()
 {
   ELLE_TRACE_SCOPE("%s: set uniqueness guard", *this);
   auto locked = [this] () -> bool
@@ -369,17 +448,17 @@ Fist::_set_uniqunness_guard(int argc, char** argv)
     this->_other_instance->connectToServer(lock_name);
   if (this->_other_instance->waitForConnected(500))
   {
-    if (argc > 1)
+    if (this->_command_line)
     {
       std::string res;
-      res.append(argv[1]);
-      {
-        std::vector<std::string> args;
-        for (int i = 2; i < argc; ++i)
-          args.push_back(argv[i]);
-        res.append(elle::join(args.begin(), args.end(), ","));
-      }
-      ELLE_LOG("write %s", res);
+      if (this->_command_line->link)
+        res.append(elle::sprintf("--%s", LINK));
+      else
+        res.append(elle::sprintf("--%s", ADD));
+      res += " ";
+      res.append(elle::join(this->_command_line->files.begin(),
+                            this->_command_line->files.end(), ","));
+      ELLE_TRACE("write %s", res);
       this->_other_instance->write(res.c_str(), res.length() + 1);
     }
     else
@@ -485,19 +564,20 @@ Fist::logged_in()
           this->_dock.get(), SLOT(p2p(QList<QUrl> const&)));
   connect(this, SIGNAL(get_a_link(QList<QUrl> const&)),
           this->_dock.get(), SLOT(get_a_link(QList<QUrl> const&)));
-
+  this->_dock->hide();
   // Handle command line arguments.
-  if (!this->_files.isEmpty())
+  if (this->_command_line && !this->_command_line->files.empty())
   {
-    // XXX.
-    emit p2p(this->_files);
-    this->_files.clear();
+    if (this->_command_line->link)
+      emit get_a_link(this->_command_line->urls());
+    else
+      emit p2p(this->_command_line->urls());
+    this->_command_line.reset();
   }
   if (this->_updater->installer_downloaded())
   {
     this->_dock->download_ready();
   }
-  this->_dock->hide();
 }
 
 void
@@ -650,24 +730,21 @@ Fist::_kicked_out(QString const& reason)
     this->logout(true);
 }
 
-QList<QUrl>
+std::vector<std::string>
 Fist::_extact_files_from_commandline(std::string const& message)
 {
   ELLE_LOG("files '%s'", message);
   std::stringstream files(message);
   std::string temp;
-  QList<QUrl> list;
+  std::vector<std::string> list;
   while (std::getline(files, temp, ','))
-    list.append(QUrl::fromLocalFile(QString::fromStdString(temp)));
+    list.push_back(temp);
   return list;
 }
 
 void
 Fist::_read_local_socket()
 {
-  static std::string sendtag = "--send";
-  static std::string linktag = "--link";
-
   std::string message;
 
   char buff[1024];
@@ -684,9 +761,9 @@ Fist::_read_local_socket()
   bool link = false;
   {
     ELLE_LOG("message %s", message);
-    if (message.substr(0, sendtag.length()) == sendtag)
+    if (message.substr(0, addtag.length()) == addtag)
     {
-      message.erase(0, sendtag.length());
+      message.erase(0, addtag.length());
       add = true;
     }
     else if (message.substr(0, linktag.length()) == linktag)
@@ -703,14 +780,19 @@ Fist::_read_local_socket()
       return;
     }
 
-    this->_files = this->_extact_files_from_commandline(message);
-    if (!this->_files.isEmpty() && this->_dock)
+    if (link || add)
+      this->_command_line.reset(
+        new CommandLine(this->_extact_files_from_commandline(message),
+                        link));
+
+    // If the dock is present, just send the signal directly.
+    if (this->_command_line && this->_dock)
     {
-      if (link)
-        emit get_a_link(this->_files);
-      else if (add)
-        emit p2p(this->_files);
-      this->_files.clear();
+      if (this->_command_line->link)
+        emit get_a_link(this->_command_line->urls());
+      else
+        emit p2p(this->_command_line->urls());
+      this->_command_line.reset();
     }
   }
 }

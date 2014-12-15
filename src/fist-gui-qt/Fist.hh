@@ -27,6 +27,11 @@ class Fist:
 /*------------.
 | Contruction |
 `------------*/
+
+private:
+  void
+  _parse_options(int argc, char** argv);
+
 public:
   Fist(int argc, char** argv);
   Fist(QApplication&& application);
@@ -60,12 +65,12 @@ private:
 
   // Try to set a lock using QLocalServer as a guard mechanism.
   // Return false if the lock couldn't be set.
-  // Args are used to check if some special options has been passed via the
-  // command line, like "--send C:\file.txt" so we can inform the other process
-  // (if it's running) to handle the commands, if not, arguments are stored to
-  // be proceed as soon as we are logged in.
+  // _command_line is used to check if some special options has been passed via
+  // the command line, like "--send C:\file.txt" so we can inform the other
+  // process (if it's running) to handle the commands, if not, arguments are
+  // stored to be proceed as soon as we are logged in.
   bool
-  _set_uniqunness_guard(int argc, char** argv);
+  _set_uniqunness_guard();
 
   // Write a lock file in the .infinit folder.
   // This lock is used to detect if a previous instance of the app crashed.
@@ -120,7 +125,7 @@ private slots:
   _login_failed();
 
 private:
-  QList<QUrl>
+  std::vector<std::string>
   _extact_files_from_commandline(std::string const& message);
 
 private slots:
@@ -188,7 +193,19 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<fist::login::Window>, login_window);
   ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
   // Files passed through the command line.
-  ELLE_ATTRIBUTE(QList<QUrl>, files);
+  struct CommandLine
+  {
+    CommandLine(std::vector<std::string> const& files,
+                bool link);
+
+    QList<QUrl>
+    urls() const;
+
+    std::vector<std::string> files;
+    bool link;
+  };
+
+  ELLE_ATTRIBUTE(std::unique_ptr<CommandLine>, command_line);
 private:
   Q_OBJECT;
 
