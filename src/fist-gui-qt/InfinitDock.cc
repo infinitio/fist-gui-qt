@@ -200,8 +200,6 @@ InfinitDock::InfinitDock(fist::State& state,
   connect(&this->_state, SIGNAL(running_transactions_changed(size_t)),
           this, SLOT(_active_transactions_changed(size_t)));
 
-  this->hide();
-
 #ifndef FIST_PRODUCTION_BUILD
   this->_menu->addAction(_start_onboarding_action);
   this->connect(this->_start_onboarding_action, SIGNAL(triggered()),
@@ -697,8 +695,8 @@ void
 InfinitDock::get_a_link(QList<QUrl> const& list)
 {
   ELLE_LOG_SCOPE("link");
+  // Bypass the send view.
   this->_send_panel->mode(fist::Mode::link);
-  // FIX.
   this->_send_panel->file_adder()->clear();
   this->_add_files(list);
   this->_send_panel->send();
