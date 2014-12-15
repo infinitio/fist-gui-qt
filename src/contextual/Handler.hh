@@ -29,7 +29,7 @@ namespace fist
       enum class CommandId
       {
         get_a_link = 0,
-        send,
+        send = 1,
         null,
       };
 
@@ -80,7 +80,8 @@ namespace fist
       struct MenuItem
       {
         CommandId internal_id;
-        PWSTR menu_text;
+        PWSTR menu_textw;
+        PSTR menu_text;
         PCSTR verb;
         PCSTR help;
         PCSTR name;
@@ -94,6 +95,12 @@ namespace fist
       typedef std::vector<std::string> Files;
       ELLE_ATTRIBUTE_R(Commands, commands);
       ELLE_ATTRIBUTE_R(HANDLE, icon);
+      ELLE_ATTRIBUTE_R(HANDLE, icon0);
+      ELLE_ATTRIBUTE_R(HANDLE, icon1);
+      ELLE_ATTRIBUTE_R(HANDLE, icon2);
+      ELLE_ATTRIBUTE_R(HANDLE, icon3);
+      ELLE_ATTRIBUTE_R(HANDLE, icon4);
+      ELLE_ATTRIBUTE_R(HANDLE, icon5);
       ELLE_ATTRIBUTE_R(Files, files);
 
       CommandId

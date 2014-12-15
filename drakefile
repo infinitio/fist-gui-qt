@@ -277,51 +277,90 @@ def configure(cxx_toolkit = None,
   build << application
 
   if cxx_toolkit.os == drake.os.windows:
+    # Here is the trick.
+
+    for version, toolkit in [
+        ('32', drake.cxx.GccToolkit(compiler = os.getenv('CXX', 'i686-w64-mingw32-g++'))),
+        ('64', drake.cxx.GccToolkit(compiler = os.getenv('CXX', 'x86_64-w64-mingw32-g++')))
+      ]:
+
+      cxx_config.define("_WIN32_WINNT=0x0600")
+
+      resource = drake.cxx.ResourceFile('src/contextual/resources.rc')
+      resource.dependency_add(drake.Node('resources/contextual/infinit.bmp'))
+      resource.dependency_add(drake.Node('resources/contextual/infinit.ico'))
+
+      minimal_elle_sources = drake.nodes(
+        '../elle/elle/src/elle/Backtrace.cc',
+        '../elle/elle/src/elle/Exception.cc',
+        '../elle/elle/src/elle/Printable.cc',
+        '../elle/elle/src/elle/assert.cc',
+        '../elle/elle/src/elle/finally.cc',
+        '../elle/elle/src/elle/log/Logger.cc',
+        '../elle/elle/src/elle/log/Send.cc',
+        '../elle/elle/src/elle/log/TextLogger.cc',
+        '../elle/elle/src/elle/os/environ.cc',
+        '../elle/elle/src/elle/os/exceptions.cc',
+        '../elle/elle/src/elle/system/Process.cc',
+        '../elle/elle/src/elle/system/getpid.cc',
+      )
+      minimal_elle_sources = drake.copy(minimal_elle_sources,
+                                        'mini_elle_%s' % version,
+                                        strip_prefix = True)
+
+      shell_extension_sources = drake.nodes(
+        'src/contextual/helpers.cc',
+        'src/contextual/Handler.cc',
+        'src/contextual/HandlerFactory.cc',
+        'src/contextual/Server.cc',
+        'src/contextual/bitmap.cpp',
+      ) + [resource]
+
+      shell_extension_sources = drake.copy(shell_extension_sources,
+                                           'shellex_%s' % version,
+                                           strip_prefix = True)
+
+      dll_cxx_config = drake.cxx.Config(cxx_config)
+      minimal_elle = drake.cxx.StaticLib(
+        'lib/minelle%s' % version,
+        minimal_elle_sources,
+        toolkit,
+        dll_cxx_config)
+
+      shell_extension = shell_extension_sources + drake.nodes(
+        # Icon.
+        'src/contextual/resources.hh',
+
+        # Rename some symboles.
+        'src/contextual/libcontextual.def'
+      )
+
+      shellextension = drake.cxx.DynLib(
+        'lib/contextual%s' % version,
+        shell_extension + [minimal_elle],
+        toolkit,
+        dll_cxx_config,
+        strip = True)
+      dynamic_libraries.append(shellextension)
+      build << shellextension
+
+    for name in [
+        "string_conversion",
+        "GUID",
+      ]:
+      test << drake.cxx.Executable(
+        'tests/contextual/%s.cc' % name,
+        [
+          drake.node('tests/contextual/%s.cc' % name),
+          # windows_helpers,
+        ],
+        cxx_toolkit,
+        cxx_config)
+
     helpers = drake.nodes(
       'src/contextual/helpers.hh',
       'src/contextual/helpers.cc',
     )
-
-    dll_cxx_config = drake.cxx.Config(cxx_config);
-    dll_cxx_config.define('UNICODE')
-    dll_cxx_config.define('_UNICODE')
-    dll_cxx_config.define('_WIN32_WINNT=0x0600')
-    dll_cxx_config.flag('-Wl,-enable-stdcall-fixup')
-
-    windows_helpers = drake.cxx.StaticLib(
-      'lib/windows_helpers',
-      helpers,
-      cxx_toolkit,
-      dll_cxx_config)
-
-    resource = drake.cxx.ResourceFile('src/contextual/resources.rc')
-    resource.dependency_add(drake.Node('resources/contextual/infinit.bmp'))
-
-    shell_extension = drake.nodes(
-      'src/contextual/helpers.hh',
-      'src/contextual/helpers.cc',
-      'src/contextual/Handler.cc',
-      'src/contextual/Handler.hh',
-      'src/contextual/HandlerFactory.cc',
-      'src/contextual/HandlerFactory.hh',
-      'src/contextual/Server.cc',
-      'src/contextual/stdafx.hh',
-
-      # Icon.
-      'src/contextual/resources.hh',
-
-      # Rename some symboles.
-      'src/contextual/libcontextual.def'
-    ) + [resource]
-
-
-    shellextension = drake.cxx.DynLib(
-      'lib/contextual',
-      shell_extension + [elle],
-      cxx_toolkit,
-      dll_cxx_config)
-    dynamic_libraries.append(shellextension)
-    build << shellextension
 
     ## ------------ ##
     ## Osslsigncode ##
@@ -416,7 +455,6 @@ def configure(cxx_toolkit = None,
         installer_resources + dynamic_libraries)) + nsis_plugins + nsis_includes
     signed_app = Signer(application,
                         installer_resources_folder / 'Infinit.exe').target
-    print(nsis_folder)
     installer_resources += [signed_app]
     content = {
         'company': 'Infinit.io',

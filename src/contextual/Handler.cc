@@ -6,11 +6,10 @@
 
 #include <ios>
 
-#include <boost/filesystem/path.hpp>
-
 #include <elle/log.hh>
 #include <elle/system/Process.hh>
 #include <elle/container/map.hh>
+#include <elle/finally.hh>
 #include <elle/container/vector.hh>
 
 #include <contextual/Handler.hh>
@@ -18,14 +17,52 @@
 #include <contextual/resources.hh>
 #include <contextual/stdafx.h>
 
+#include <contextual/bitmap.h>
+
 ELLE_LOG_COMPONENT("fist.contextual.Handler");
 
 UINT g_DllLockCounter = 0;
+
+#include <uxtheme.h>
 
 namespace fist
 {
   namespace contextual
   {
+    static
+    std::string const&
+    infinit_install_directory()
+    {
+      static std::unique_ptr<std::string> install_dir;
+      if (install_dir == nullptr)
+      {
+        install_dir.reset(new std::string);
+        HKEY hKey;
+        if (RegOpenKeyExA(
+              HKEY_LOCAL_MACHINE,
+              "SOFTWARE\\Infinit.io\\Infinit",
+              0,
+              KEY_QUERY_VALUE ,
+              &hKey) == ERROR_SUCCESS)
+        fist::windows::GetStringRegKey(hKey, "Install_Dir", *install_dir, "");
+        else if (RegOpenKeyExA(
+                   HKEY_LOCAL_MACHINE,
+                   "SOFTWARE\\Infinit.io\\Infinit",
+                   0,
+                   KEY_QUERY_VALUE | KEY_WOW64_32KEY,
+                   &hKey) == ERROR_SUCCESS)
+          fist::windows::GetStringRegKey(hKey, "Install_Dir", *install_dir, "");
+        else if (RegOpenKeyExA(
+                   HKEY_LOCAL_MACHINE,
+                   "SOFTWARE\\Infinit.io\\Infinit",
+                   0,
+                   KEY_QUERY_VALUE | KEY_WOW64_64KEY,
+                   &hKey) == ERROR_SUCCESS)
+          fist::windows::GetStringRegKey(hKey, "Install_Dir", *install_dir, "");
+      }
+      return *install_dir;
+    }
+
     Handler::Handler()
       : _count(1)
       , _commands(
@@ -35,6 +72,7 @@ namespace fist
             {
               CommandId::get_a_link,
               L"&Copy Infinit link",
+              "&Copy Infinit link",
               "GetALink",
               "Copy Infinit link",
               "GetALink",
@@ -48,6 +86,7 @@ namespace fist
             {
               CommandId::send,
               L"&Send with Infinit",
+              "&Send with Infinit",
               "SendWithInfinit",
               "Send with Infinit",
               "SendWithInfinit",
@@ -57,17 +96,30 @@ namespace fist
             }
           },
       })
-      , _icon(::LoadImage(
-                g_DllInstance,
-                MAKEINTRESOURCE(INFINIT_CONTEXTUAL_BICON),
-                IMAGE_BITMAP,
-                0,
-                0,
-                LR_DEFAULTSIZE | LR_LOADTRANSPARENT))
+      , _icon(LoadImage(g_DllInstance, MAKEINTRESOURCE(100),
+                        IMAGE_BITMAP, 16, 16, LR_SHARED | LR_LOADTRANSPARENT))
       , _files()
     {
       ELLE_TRACE_SCOPE("%s: creation", *this);
       InterlockedIncrement(&g_DllLockCounter);
+
+      // The default icon has transparency issue. The bitmap manipulation code
+      // has been taken from NotePad++,
+      HICON hicon = (HICON) LoadImage(
+        g_DllInstance, MAKEINTRESOURCE(101),
+        IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+      elle::SafeFinally delete_hicon([&] { DestroyIcon(hicon); });
+      HBITMAP icon = NULL;
+      if (InitTheming())
+      {
+        icon = IconToBitmapPARGB32(hicon, 16, 16);
+        DeinitTheming();
+      }
+      if (icon)
+      {
+        DeleteObject(this->_icon);
+        this->_icon = icon;
+      }
     }
 
     Handler::~Handler()
@@ -167,13 +219,14 @@ namespace fist
           wchar_t file[MAX_PATH];
           for (UINT i = 0; i < nFiles; ++i)
           {
-            if (DragQueryFile(hDrop, i, file, MAX_PATH) != 0)
+            if (DragQueryFileW(hDrop, i, file, MAX_PATH) != 0)
             {
               this->_files.push_back(
-                elle::sprintf("\"%s\"",
-                              fist::windows::to_narrow(
-                                std::wstring(file),
-                                fist::windows::CodePage::Specifier::Windows)));
+                elle::sprintf(
+                  "\"%s\"",
+                  fist::windows::to_narrow(
+                    std::wstring(file),
+                    fist::windows::CodePage::Specifier::UTF8)));
             }
           }
 
@@ -303,26 +356,23 @@ namespace fist
       if (commandId == CommandId::null)
         return E_FAIL;
 
-      std::string install_dir;
+      std::string const& install_dir = infinit_install_directory();
       {
-        HKEY hKey;
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Infinit.io\\Infinit", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-          fist::windows::GetStringRegKey(hKey, "Install_Dir", install_dir, "");
+        if (install_dir.empty())
+          return E_FAIL;
       }
-      boost::filesystem::path install(install_dir);
-      auto exe = install / "Infinit.exe";
-      ELLE_DEBUG("executable path: %s", exe.string());
+      std::string exe = install_dir + "\\Infinit.exe";
+      ELLE_DEBUG("executable path: %s", exe);
       auto run = [&] (std::vector<std::string> args)
       {
         ELLE_TRACE("run %s", args);
-        args.insert(args.begin(), exe.string());
+        args.insert(args.begin(), exe);
         elle::system::Process p{args};
-        // p.wait();
       };
       switch(commandId)
       {
         case CommandId::send:
-          this->_files.insert(this->_files.begin(), "--send");
+          this->_files.insert(this->_files.begin(), "--add");
           run(this->_files);
           break;
         case CommandId::get_a_link:
@@ -353,19 +403,22 @@ namespace fist
       if ((uFlags & 0x000F) != CMF_NORMAL &&
           (uFlags & CMF_VERBSONLY) == 0 && (uFlags & CMF_EXPLORE) == 0)
         return MAKE_HRESULT(SEVERITY_SUCCESS, 0, indexMenu);
-
+      if (infinit_install_directory().empty())
+        return E_FAIL;
       for (auto command_pair: this->_commands)
       {
         auto& command = command_pair.second;
         UINT index = static_cast<UINT>(command.internal_id);
         ELLE_TRACE("add %s to the contextual menu", command);
         MENUITEMINFO mii = { sizeof(mii) };
+        mii.cbSize = sizeof(mii);
         mii.fMask = MIIM_BITMAP | MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_STATE;
         mii.wID = idCmdFirst + index;
         mii.fType = MFT_STRING;
         mii.dwTypeData = command.menu_text;
         mii.fState = MFS_ENABLED;
         mii.hbmpItem = static_cast<HBITMAP>(this->_icon);
+
         ELLE_DEBUG("insert %s", mii)
           if (!InsertMenuItem(hmenu, indexMenu + index, TRUE, &mii))
             ELLE_ERR("fail at inserting command on the contextual")
