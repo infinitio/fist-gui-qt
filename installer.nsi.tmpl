@@ -71,44 +71,56 @@ UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
 ; Don Tommaso's technique to avoid code duplication between installer and
-;  uninstaller
+; uninstaller
 !macro INSTALL_UNINSTALL_SWITCH un
   ;----------------------------------------------------------------------------
   ; Kill running application if any.
   ; XXX: Should be move in util and take executable as parameter.
   ;!include nsProcess.nsh
-  Function ${'${un}'}KillRunningProcess
-      ${'${nsProcess::FindProcess}'} ${executable} $R0
+  Function ${'${un}'}KillProcess
+      Pop $R1
+      ${'${nsProcess::FindProcess}'} $R1 $R0
       StrCmp $R0 0 0 end
 
-      ${'${nsProcess::CloseProcess}'} ${executable} $R0
+      ${'${nsProcess::KillProcess}'} $R1 $R0
+      ; ${'${nsProcess::CloseProcess}'} $R1 $R0
       IfSilent end
       StrCmp $R0 0 end 0      ; Success
       StrCmp $R0 603 end 0    ; Not running
 
+
       end:
         ${'${nsProcess::Unload}'}
+  FunctionEnd
+
+  Function ${'${un}'}KillRunningProcess
+      Push ${executable}
+      Call ${'${un}'}KillProcess
   FunctionEnd
 
   ;----------------------------------------------------------------------------
   ; Delete all the dll.
   ; If deletion failed, kill the explorer, and retry to delete.
   Function ${'${un}'}DeleteDll
+    IfFileExists "$INSTDIR\lib\libcontextual.dll" 0 libcontextual.dllend
+    Delete /REBOOTOK "$INSTDIR\lib\libcontextual.dll"
+    IfFileExists "$INSTDIR\lib\libcontextual.dll" kill_explorer_and_relaunch 0
+    libcontextual.dllend:
     % for lib in libraries:
-      IfFileExists "$INSTDIR\${lib}" 0 ${lib}end
-      UnregDll "$INSTDIR\${lib}"
-      Delete "$INSTDIR\${lib}"
-      IfErrors kill_explorer_and_relaunch
-      IfFileExists "$INSTDIR\${lib}" kill_explorer_and_relaunch 0
+      IfFileExists "$INSTDIR\lib\${lib}" 0 ${lib}end
+      Delete /REBOOTOK "$INSTDIR\lib\${lib}"
+      IfFileExists "$INSTDIR\lib\${lib}" kill_explorer_and_relaunch 0
       ${lib}end:
     % endfor
     Goto finalize
     kill_explorer_and_relaunch:
-      ${'${nsProcess::KillProcess}'} explorer.exe $R0
+      Push "explorer.exe"
+      Call ${'${un}'}KillProcess
+      Sleep 500
       Call ${'${un}'}DeleteDll
       Goto end
     finalize:
-      ${'${nsProcess::FindProcess}'} explorer.exe $R0
+      ${'${nsProcess::FindProcess}'} "explorer.exe" $R0
       IntCmp $R0 0 end relaunch
     relaunch:
       Exec "$WINDIR\explorer.exe"
@@ -120,10 +132,17 @@ UninstallIcon "${resources_folder}/${icon}"
 ;------------------------------------------------------------------------------
 ; Replace all the dll.
 Function ReplaceDll
+    SetOutPath $INSTDIR\lib
     Call DeleteDll
+    ${'${If}'} ${'${RunningX64}'}
+      File "/oname=libcontextual.dll" "${resources_folder}/libcontextual64.dll"
+    ${'${Else}'}
+      File "/oname=libcontextual.dll" "${resources_folder}/libcontextual32.dll"
+    ${'${Endif}'}
+
     % for lib in libraries:
-      File "${resources_folder}/${lib}"
     % endfor
+    SetOutPath $INSTDIR
     ${'${nsProcess::Unload}'}
 FunctionEnd
 
@@ -139,32 +158,34 @@ FunctionEnd
 ;------------------------------------------------------------------------------
 ; Get the contextual menu GUID of the shell extension.
 Function RegisterContextual
-    ; SetRegView 32
-    ReadRegStr $R0 HKCR "*\shellex\ContextMenuHandlers\InfinitContextualShellExtension" ""
-    ;already_registered
-    StrCmp $R0 "" todo todo
-    todo:
+    ${'${If}'} ${'${RunningX64}'}
+        SetRegView 64
+    ${'${Else}'}
+        SetRegView 32
+    ${'${Endif}'}
+    ReadRegStr $R0 HKCR "AllFileSystemObjects\shellex\ContextMenuHandlers\Infinit" ""
+    StrCmp $R0 "" write_registery write_registery
+    write_registery:
       WriteRegStr HKCR "AllFileSystemObjects\shellex\ContextMenuHandlers\Infinit" "" "{256EF94C-697D-4986-B99B-9D3B15D79B49}"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "" "InfinitContextualShellExtension"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\AppId" "" "{256EF94C-697D-4986-B99B-9D3B15D79B49}"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\AppId\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "DllSurrogate" ""
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InprocServer32" "ThreadingModel" "Apartment"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InprocServer32" "Class" "fist.contextual.Handler"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InprocServer32" "CodeBase" "${'${company_install}'}\${product_name}\libcontextual.dll"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "" "${'${company_install}'}\${product_name}\libcontextual.dll"
-      WriteRegStr HKLM "Software\Classes\AppId\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "" ""
-      goto end
-    already_registered:
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "" "InfinitContextualMenuHandler"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "ThreadingModel" "Apartment"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "" "${'${company_install}'}\${product_name}\lib\libcontextual.dll"
     end:
 FunctionEnd
 
 ;------------------------------------------------------------------------------
 ; Get the contextual menu GUID of the shell extension.
 Function un.RegisterContextual
-    DeleteRegKey HKCR "*\shellex\ContextMenuHandlers\InfinitContextualShellExtension"
+    ${'${If}'} ${'${RunningX64}'}
+        SetRegView 64
+    ${'${Else}'}
+        SetRegView 32
+    ${'${Endif}'}
+
+    DeleteRegKey HKCR "*\shellex\ContextMenuHandlers\Infinit\"
     DeleteRegKey HKCR "AllFileSystemObjects\shellex\ContextMenuHandlers\Infinit"
+    DeleteRegKey HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32"
     DeleteRegKey HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}"
-    DeleteRegKey HKLM "Software\Classes\AppId\{256EF94C-697D-4986-B99B-9D3B15D79B49}"
 FunctionEnd
 
 ;------------------------------------------------------------------------------
@@ -301,7 +322,6 @@ FunctionEnd
 ;------------------------------------------------------------------------------
 
 Section "Install ${product_name}"
-
   ;; Registers.
   WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
@@ -309,7 +329,6 @@ Section "Install ${product_name}"
   WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
 
   SetOutPath $INSTDIR
-
   ;; Executable and libraries.
   File "${resources_folder}\${executable}"
   Call ReplaceDll
@@ -327,7 +346,6 @@ Section "Install ${product_name}"
 
   ;; Uninstaller.
   WriteUninstaller "${'${uninstaller}'}"
-
 SectionEnd
 
 
@@ -355,18 +373,20 @@ SectionEnd
 
 Section "un.install"
   Call un.KillRunningProcess
+  Call un.RegisterContextual
+
   ;; Registers
   DeleteRegKey HKLM "${'${uninstkey}'}"
   DeleteRegKey HKLM "${'${regkey}'}"
 
   ;; Start menu
-  Delete "${'${startmenu}'}\${product_name}.lnk"
-  Delete "${'${startmenu}'}\Release Notes.lnk"
-  Delete "${'${startmenu}'}\Documentation.lnk"
-  Delete "${'${startmenu}'}\Uninstall.lnk"
-  Delete "${'${startmenu}'}\WebSite.lnk"
-  RMDir "${'${startmenu}'}"
-  RMDir "${'${company_startmenu}'}"
+  Delete /REBOOTOK "${'${startmenu}'}\${product_name}.lnk"
+  Delete /REBOOTOK "${'${startmenu}'}\Release Notes.lnk"
+  Delete /REBOOTOK "${'${startmenu}'}\Documentation.lnk"
+  Delete /REBOOTOK "${'${startmenu}'}\Uninstall.lnk"
+  Delete /REBOOTOK "${'${startmenu}'}\WebSite.lnk"
+  RMDir /r "${'${startmenu}'}"
+  RMDir /r "${'${company_startmenu}'}"
 
   ;; Documentation.
   Delete "$INSTDIR\${license}"
@@ -376,15 +396,13 @@ Section "un.install"
   Delete "$INSTDIR\${onboarding_file}"
 
   ;; Executable and libraries.
-  Delete "$INSTDIR\${executable}"
-  % for lib in libraries:
-    Delete "$INSTDIR\${lib}"
-  % endfor
+  Delete /REBOOTOK "$INSTDIR\${executable}"
+  Call un.DeleteDll
 
   ;; Uninstaller.
-  Delete "$INSTDIR\${'${uninstaller}'}"
+  Delete /REBOOTOK "$INSTDIR\${'${uninstaller}'}"
 
   ;; Install dir.
-  RMDir "$INSTDIR"
-  RMDir "${'${company_install}'}"
+  RMDir /REBOOTOK /r "$INSTDIR"
+  RMDir /REBOOTOK /r "${'${company_install}'}"
 SectionEnd
