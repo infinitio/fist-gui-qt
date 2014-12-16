@@ -112,11 +112,9 @@ InfinitDock::InfinitDock(fist::State& state,
             SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
     connect(this->_systray.inner(), SIGNAL(messageClicked()),
             this, SLOT(_systray_message_clicked()));
+    connect(this->_menu, SIGNAL(aboutToHide()), this, SLOT(setFocus()));
   }
-
-
   this->_transaction_panel.reset(new MainPanel(this->_state));
-
   this->_register_panel(this->_transaction_panel.get());
   this->_register_panel(this->_send_panel.get());
 
