@@ -49,18 +49,18 @@ Panel::minimumSizeHint() const
 }
 
 void
-Panel::on_show()
+Panel::showEvent(QShowEvent* event)
 {
   emit set_background_color(Qt::white);
   emit shown();
-  this->_on_show();
+  Super::showEvent(event);
 }
 
 void
-Panel::on_hide()
+Panel::hideEvent(QHideEvent* event)
 {
   emit set_background_color(view::background);
-  this->_on_hide();
+  Super::hideEvent(event);
 }
 
 Footer*

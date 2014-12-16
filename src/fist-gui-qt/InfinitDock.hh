@@ -141,11 +141,7 @@ public slots:
   _back_from_send_view();
 
 private:
-  void _switch_view(Panel* target);
-
-private slots:
-  void
-  _activate_new_panel();
+  void _switch_view(Panel* target, bool show = true);
 
 /*-----------.
 | Visibility |
@@ -189,7 +185,6 @@ private:
 
   ELLE_ATTRIBUTE(std::unique_ptr<MainPanel>, transaction_panel);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::sendview::Panel>, send_panel);
-  Panel* _next_panel;
 
 /*-----.
 | Menu |
