@@ -141,12 +141,15 @@ namespace fist
     private:
       std::unordered_map<uint32_t, std::unique_ptr<model::User>> _user_models;
 
+
+    private:
       void
-      _on_show() override;
+      showEvent(QShowEvent*) override;
 
       void
-      _on_hide() override;
+      hideEvent(QHideEvent*) override;
 
+    private:
       void
       focusInEvent(QFocusEvent* event) override;
 

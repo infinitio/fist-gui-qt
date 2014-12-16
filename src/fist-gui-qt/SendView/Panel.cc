@@ -238,8 +238,9 @@ namespace fist
   /*------------.
   | Show & Hide |
   `------------*/
+
     void
-    Panel::_on_show()
+    Panel::showEvent(QShowEvent* event)
     {
       ELLE_TRACE_SCOPE("%s: show", *this);
       emit shown();
@@ -247,15 +248,19 @@ namespace fist
       this->_tabs->activate_first();
       this->_users->clear_search();
       this->_users->setFocus();
+
+      Super::showEvent(event);
     }
 
     void
-    Panel::_on_hide()
+    Panel::hideEvent(QHideEvent* event)
     {
       ELLE_TRACE_SCOPE("%s: hide", *this);
       this->_users->clear();
       this->_file_adder->clear();
       this->_message->clear();
+
+      Super::hideEvent(event);
     }
 
   /*-------.

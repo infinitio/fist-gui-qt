@@ -86,9 +86,10 @@ MainPanel::keyPressEvent(QKeyEvent* event)
 }
 
 void
-MainPanel::_on_show()
+MainPanel::showEvent(QShowEvent* event)
 {
   this->_tabs->show();
+  Super::showEvent(event);
 }
 
 /*-------.

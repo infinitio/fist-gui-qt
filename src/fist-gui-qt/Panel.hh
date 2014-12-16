@@ -36,11 +36,12 @@ private:
   _on_hide() {};
 
 public:
-  void
-  on_show();
 
   void
-  on_hide();
+  showEvent(QShowEvent* event) override;
+
+  void
+  hideEvent(QHideEvent* event) override;
 
 Q_SIGNALS:
   void

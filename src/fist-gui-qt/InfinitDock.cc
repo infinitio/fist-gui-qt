@@ -83,7 +83,6 @@ InfinitDock::InfinitDock(fist::State& state,
   , _state(state)
   , _transaction_panel(nullptr)
   , _send_panel(new fist::sendview::Panel(this->_state))
-  , _next_panel(nullptr)
   , _menu(new QMenu(this))
   , _logo(":/menu-bar/fire@2x")
   , _systray(systray)
@@ -430,7 +429,7 @@ InfinitDock::_show_transactions_view()
 }
 
 void
-InfinitDock::_switch_view(Panel* panel)
+InfinitDock::_switch_view(Panel* panel, bool show)
 {
   ELLE_ASSERT(panel != nullptr);
 
@@ -439,35 +438,22 @@ InfinitDock::_switch_view(Panel* panel)
   if (panel == this->centralWidget())
   {
     ELLE_DEBUG("%s was already active", *panel);
+    panel->show();
     return;
   }
-
-  this->_next_panel = panel;
   if (this->centralWidget() != nullptr)
   {
     ELLE_DEBUG("hide %s", *this->centralWidget());
     Panel* current_panel = static_cast<Panel*>(this->centralWidget());
-    current_panel->on_hide();
     current_panel->hide();
-  }
-
-  this->_activate_new_panel();
-}
-
-void
-InfinitDock::_activate_new_panel()
-{
-  Panel* current_panel = static_cast<Panel*>(this->centralWidget());
-  if (current_panel != nullptr)
-  {
     this->centralWidget()->setParent(0);
   }
-
-  this->setCentralWidget(this->_next_panel);
-  this->_next_panel->show();
-  this->_next_panel->on_show();
-
-  this->_next_panel = nullptr;
+  this->setCentralWidget(panel);
+  if (show)
+  {
+    panel->show();
+    this->show();
+  }
   // XXX: Dirty, but Qt is in trouble to calculate the size of hidden widget.
   // So every time a new panel is shown, make sure that the size matches the
   // content.
@@ -479,7 +465,7 @@ InfinitDock::_activate_new_panel()
 void
 InfinitDock::_back_from_send_view()
 {
-  this->_show_transactions_view();
+  this->_switch_view(this->_transaction_panel.get(), false);
   this->hide();
 }
 
@@ -502,6 +488,12 @@ InfinitDock::showEvent(QShowEvent* event)
 {
   ELLE_LOG_SCOPE("%s: show dock", *this);
 
+  if (this->centralWidget())
+  {
+    Panel* current_panel = static_cast<Panel*>(this->centralWidget());
+    if (current_panel)
+      current_panel->show();
+  }
   this->updateGeometry();
   this->update();
   this->adjustSize();
@@ -667,7 +659,7 @@ InfinitDock::pick_files()
      for (auto const& file: selected)
       list.append(QUrl::fromLocalFile(file));
     this->_add_files(list);
-    this->_send_panel->show();
+    this->_show_send_view();
   }
 }
 

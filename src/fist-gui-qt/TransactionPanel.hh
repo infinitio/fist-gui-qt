@@ -26,13 +26,15 @@ class MainPanel
   : public Panel
   , public fist::ModeSelector
 {
+  typedef Panel Super;
+
 public:
   MainPanel(fist::State& state,
             QWidget* parent = nullptr);
 
 public:
   void
-  _on_show() override;
+  showEvent(QShowEvent* event) override;
 
 private:
   fist::State& _state;
