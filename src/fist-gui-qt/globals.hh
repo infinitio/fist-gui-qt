@@ -168,7 +168,7 @@ namespace view
 
       static
       QString const
-      placeholder("Fullname");
+      placeholder("Full Name");
 
       static
       QSize const
