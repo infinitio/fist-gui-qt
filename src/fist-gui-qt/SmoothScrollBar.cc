@@ -41,8 +41,9 @@ SmoothScrollBar::setMaximum(int const& height)
   {
     if (height < this->_maximum)
     {
+      auto diff = (double) height / (double) this->_maximum;
       this->_maximum = height;
-      this->_scroll_to(0, 165);
+      this->_scroll_to(this->_value_target * diff, 50);
     }
     else
       this->_maximum = height;
