@@ -150,12 +150,6 @@ FunctionEnd
 !insertmacro INSTALL_UNINSTALL_SWITCH "un."
 
 ;------------------------------------------------------------------------------
-; Create a GUID (Globally unique identifier).
-Function CreateGUID
-  System::Call 'ole32::CoCreateGuid(g .s)'
-FunctionEnd
-
-;------------------------------------------------------------------------------
 ; Get the contextual menu GUID of the shell extension.
 Function RegisterContextual
     ${'${If}'} ${'${RunningX64}'}
@@ -321,7 +315,66 @@ FunctionEnd
 ; Install section
 ;------------------------------------------------------------------------------
 
+Function Trim
+  Exch $R1 ; Original string
+  Push $R2
+  Loop:
+    StrCpy $R2 "$R1" 1
+    StrCmp "$R2" "{" TrimLeft
+    StrCmp "$R2" "$\r" TrimLeft
+    StrCmp "$R2" "$\n" TrimLeft
+    StrCmp "$R2" "$\t" TrimLeft
+    GoTo Loop2
+   TrimLeft:
+     StrCpy $R1 "$R1" "" 1
+     Goto Loop
+
+   Loop2:
+    StrCpy $R2 "$R1" 1 -1
+    StrCmp "$R2" "}" TrimRight
+    StrCmp "$R2" "$\r" TrimRight
+    StrCmp "$R2" "$\n" TrimRight
+    StrCmp "$R2" "$\t" TrimRight
+    GoTo Done
+TrimRight:
+    StrCpy $R1 "$R1" -1
+    Goto Loop2
+Done:
+    Pop $R2
+    Exch $R1
+FunctionEnd
+
+!define Trim "!insertmacro Trim"
+ !macro Trim ResultVar String
+  Push "${'${String}'}"
+  Call Trim
+  Pop "${'${ResultVar}'}"
+!macroend
+
+Function CreateGUID
+  System::Call 'ole32::CoCreateGuid(g .s)'
+FunctionEnd
+
+!macro _CreateGUID _RetVar
+    Call CreateGUID
+    !if ${'${_RetVar}'} != s
+        Pop $5
+        ${'${Trim}'} ${'${_RetVar}'} $5
+    !endif
+!macroend
+!define CreateGUID `!insertmacro _CreateGUID`
+
 Section "Install ${product_name}"
+  IfFileExists "$PROFILE\.infinit\device.uuid" skip 0
+  CreateDirectory "$PROFILE\.infinit"
+  ClearErrors
+  ${'${CreateGUID}'} $1
+  FileOpen $0 "$PROFILE\.infinit\device.uuid" w
+  IfErrors skip
+  FileWrite $0 $1
+  FileClose $0
+
+  skip:
   ;; Registers.
   WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
@@ -403,6 +456,7 @@ Section "un.install"
   Delete /REBOOTOK "$INSTDIR\${'${uninstaller}'}"
 
   ;; Install dir.
+  RMDir /REBOOTOK /r "$PROFILE\.infinit"
   RMDir /REBOOTOK /r "$INSTDIR"
   RMDir /REBOOTOK /r "${'${company_install}'}"
 SectionEnd
