@@ -94,6 +94,11 @@ public:
   void setMaximumHeight(int value);
   void setMaximumWidth(int value);
 
+  void
+  showEvent(QShowEvent*) override;
+
+  void
+  hideEvent(QHideEvent*) override;
 
 Q_SIGNALS:
   void onHeightHintChanged();

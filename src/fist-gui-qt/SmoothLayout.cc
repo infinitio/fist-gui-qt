@@ -308,6 +308,20 @@ SmoothLayout::setMaximumWidth(int value)
   }
 }
 
+void
+SmoothLayout::showEvent(QShowEvent* event)
+{
+  this->updateGeometry();
+  Super::showEvent(event);
+}
+
+void
+SmoothLayout::hideEvent(QHideEvent* event)
+{
+  this->updateGeometry();
+  Super::hideEvent(event);
+}
+
 /*----------.
 | Printable |
 `----------*/
