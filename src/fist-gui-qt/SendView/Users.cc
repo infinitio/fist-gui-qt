@@ -212,7 +212,7 @@ namespace fist
 
       if (this->_users->widgets().isEmpty() && !local)
       {
-        if (!email_checker.exactMatch(this->text()))
+        if (!this->text().isEmpty() && !email_checker.exactMatch(this->text()))
         {
           this->_users->add_widget(
             std::make_shared<TextListItem>(
