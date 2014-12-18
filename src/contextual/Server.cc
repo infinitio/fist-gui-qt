@@ -29,12 +29,14 @@ static
 void
 initialize_logger()
 {
+#ifndef ELLE_LOG_DISABLE
   if (elle::os::inenv("INFINIT_LOG_FILE"))
   {
     auto* stream = new std::ofstream{elle::os::getenv("INFINIT_LOG_FILE"), std::fstream::app | std::fstream::out};
     std::unique_ptr<elle::log::Logger> f(new elle::log::TextLogger(*stream, "TRACE", true, true, true, true, false));
     elle::log::logger(std::move(f));
   }
+#endif
 }
 
 extern "C"

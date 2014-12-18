@@ -285,6 +285,7 @@ def configure(cxx_toolkit = None,
       ]:
 
       cxx_config.define("_WIN32_WINNT=0x0600")
+      cxx_config.define("ELLE_LOG_DISABLE")
 
       resource = drake.cxx.ResourceFile('src/contextual/resources.rc')
       resource.dependency_add(drake.Node('resources/contextual/infinit.bmp'))
@@ -296,9 +297,6 @@ def configure(cxx_toolkit = None,
         '../elle/elle/src/elle/Printable.cc',
         '../elle/elle/src/elle/assert.cc',
         '../elle/elle/src/elle/finally.cc',
-        '../elle/elle/src/elle/log/Logger.cc',
-        '../elle/elle/src/elle/log/Send.cc',
-        '../elle/elle/src/elle/log/TextLogger.cc',
         '../elle/elle/src/elle/os/environ.cc',
         '../elle/elle/src/elle/os/exceptions.cc',
         '../elle/elle/src/elle/system/Process.cc',
