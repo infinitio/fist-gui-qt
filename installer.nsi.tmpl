@@ -367,18 +367,40 @@ FunctionEnd
 !macroend
 !define CreateGUID `!insertmacro _CreateGUID`
 
+var timestamp
+var uuid
 Section "Install ${product_name}"
   IfFileExists "$PROFILE\.infinit\device.uuid" skip 0
-  CreateDirectory "$PROFILE\.infinit"
-  ClearErrors
-  ${'${CreateGUID}'} $1
-  FileOpen $0 "$PROFILE\.infinit\device.uuid" w
-  IfErrors skip
-  FileWrite $0 $1
-  FileClose $0
+    ;; Create .infinit directory and add device.uuid inside.
+    CreateDirectory "$PROFILE\.infinit"
+    ClearErrors
+    ${'${CreateGUID}'} $uuid
+    FileOpen $0 "$PROFILE\.infinit\device.uuid" w
+    IfErrors skip
+    FileWrite $0 $uuid
+    FileClose $0
+
+    ;; Generate a timestamp.
+    ClearErrors
+    system::call *(&i16,l)i.s
+    system::call 'kernel32::GetLocalTime(isr0)'
+    IntOp $1 $0 + 16
+    system::call 'kernel32::SystemTimeToFileTime(ir0,ir1)'
+    system::call *$1(l.r1)
+    system::free $0
+    system::Int64Op $1 / 10000000
+    Pop $1
+    system::Int64Op $1 - 11644473600
+    Pop $5
+    StrCpy $timestamp $5
+
+    ;; Send metrics.
+    StrCpy $3 "{$\"event$\":$\"installer/begin$\",$\"os$\":$\"Windows$\",$\"os_version$\":$\"unknown$\",$\"device_id$\":$\"$uuid$\",$\"user$\":$\"unknown$\",$\"timestamp$\":$Timestamp}"
+    inetc::post $3 /HEADER "Content-Type:application/json" "http://metrics.9.0.api.production.infinit.io/users" "$PROFILE\.infinit\installer_metric.begin" /END
 
   skip:
   ;; Registers.
+  ClearErrors
   WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
   WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
@@ -391,6 +413,7 @@ Section "Install ${product_name}"
 
   Call RegisterContextual
   ;; Documentation.
+  SetOutPath $INSTDIR ; for working directory
   File "${resources_folder}\${license}"
   File "${resources_folder}\${release_notes}"
   File "${resources_folder}\${documentation}"
@@ -402,6 +425,11 @@ Section "Install ${product_name}"
 
   ;; Uninstaller.
   WriteUninstaller "${'${uninstaller}'}"
+
+  StrCmp $timestamp "" end 0
+    StrCpy $3 "{$\"event$\":$\"installer/end$\",$\"os_version$\":$\"unknown$\",$\"os$\":$\"Windows$\",$\"device_id$\":$\"$uuid$\",$\"user$\":$\"unknown$\",$\"timestamp$\":$timestamp}"
+    inetc::post $3 /HEADER "Content-Type:application/json" "http://metrics.9.0.api.production.infinit.io/users" "$PROFILE\.infinit\installer_metric.end" /END
+  end:
 SectionEnd
 
 

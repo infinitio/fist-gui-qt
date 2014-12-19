@@ -428,7 +428,10 @@ def configure(cxx_toolkit = None,
                                 'NSIS/utils.nsh',
                                 'NSIS/UAC.nsh',
                                 'NSIS/UACHelper.nsh')
-    nsis_plugins = drake.nodes('NSIS/nsProcess.dll', 'NSIS/UAC.dll')
+    nsis_plugins = drake.nodes('NSIS/nsProcess.dll',
+                               'NSIS/UAC.dll',
+                               'NSIS/inetc.dll',
+                               'NSIS/inetc64.dll')
 
     # Installer.
     installer_resources = drake.nodes(
