@@ -309,7 +309,7 @@ namespace view
     {
       static
       QSize const
-      size(login::size.width() - 80, 32);
+      size(login::size.width() - 80, 38);
 
       static
       fist::style::Text const
