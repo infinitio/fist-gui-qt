@@ -13,6 +13,7 @@
 ;------------------------------------------------------------------------------
 Var AutoUpdate
 Var PreviousInstallDir
+Var _has_been_killed
 
 ;------------------------------------------------------------------------------
 ; Includes
@@ -114,6 +115,8 @@ UninstallIcon "${resources_folder}/${icon}"
     % endfor
     Goto finalize
     kill_explorer_and_relaunch:
+      StrCmp $_has_been_killed "" 0 end
+      StrCpy $_has_been_killed "killed"
       Push "explorer.exe"
       Call ${'${un}'}KillProcess
       Sleep 500
