@@ -33,6 +33,9 @@ ELLE_LOG_COMPONENT("infinit.FIST.login.Window");
 
 #ifndef INFINIT_WINDOWS
 // # define VIDEO
+#endif
+
+#ifdef VIDEO
 static Phonon::VideoPlayer* player;
 #endif
 
@@ -220,7 +223,7 @@ namespace fist
         auto* widget = player->videoWidget();
         widget->setScaleMode(Phonon::VideoWidget::ScaleAndCrop);
         widget->setAspectRatio(Phonon::VideoWidget::AspectRatioWidget);
-        // widget->setFixedSize(400, 470);
+        widget->setFixedSize(400, 470);
         this->_video = widget;
 #else
         auto* widget = new QLabel(this);
@@ -230,7 +233,7 @@ namespace fist
         this->updateGeometry();
         this->_video = widget;
 #endif
-        widget->setFixedSize(400, 470);
+        // widget->setFixedSize(400, 470);
         widget->show();
         widget->installEventFilter(this);
       }
@@ -245,15 +248,8 @@ namespace fist
       layout->setSizeConstraint(QLayout::SetFixedSize);
       layout->setSpacing(5);
       layout->setContentsMargins(55, 5, 55, 0);
-      {
-        auto hlayout = new QHBoxLayout();
-        hlayout->setSizeConstraint(QLayout::SetFixedSize);
-        hlayout->setContentsMargins(7, 0, 7, 0);
-        hlayout->addWidget(this->_version_field, 0, Qt::AlignCenter);
-        hlayout->addStretch();
-        layout->addLayout(hlayout);
-      }
-      layout->addSpacing(10);
+      layout->addWidget(this->_version_field, 0, Qt::AlignCenter);
+      layout->addSpacing(55);
       layout->addWidget(logo, 0, Qt::AlignCenter);
       layout->addSpacing(20);
       layout->addStretch();
@@ -279,11 +275,11 @@ namespace fist
       // layout->addStretch();
       layout->addSpacing(25);
       layout->addWidget(this->_login_button, 0, Qt::AlignCenter);
-      layout->addSpacing(25);
+      layout->addSpacing(65);
       glayout->addLayout(layout);
       {
         auto layout = new QVBoxLayout;
-        layout->setContentsMargins(2, 2, 2, 2); // 15, 15, 15, 15);
+        layout->setContentsMargins(0, 2, 2, 2); // 15, 15, 15, 15);
         layout->addWidget(this->_video);
         glayout->addLayout(layout);
       }
