@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QHBoxLayout>
 #include <QByteArray>
 #include <QPixmap>
@@ -332,6 +333,8 @@ namespace fist
       }
 
       this->updateGeometry();
+      this->move(QApplication::desktop()->screen()->rect().center() -
+                 this->rect().center());
     }
 
     Window::~Window()
