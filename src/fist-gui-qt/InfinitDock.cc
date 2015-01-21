@@ -686,7 +686,8 @@ InfinitDock::_pick_files()
      for (auto const& file: selected)
       list.append(QUrl::fromLocalFile(file));
     this->_add_files(list);
-    this->_show_send_view();
+    if (this->centralWidget() != this->_send_panel.get())
+      this->_show_send_view();
   }
 }
 
