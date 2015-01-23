@@ -520,8 +520,8 @@ namespace fist
       {
         emit version_rejected();
       }
-      static auto fill_error_field = [&] (std::string const& error_message,
-                                          std::string const& sub_message = "")
+      auto fill_error_field = [&] (std::string const& error_message,
+                                   std::string const& sub_message = "")
         {
           ELLE_WARN("%s", error_message);
           this->set_message(error_message.c_str(), sub_message.c_str());
@@ -704,8 +704,8 @@ namespace fist
 
     void
     Window::set_message(QString const& message,
-                             QString const& tooltip,
-                             bool critical)
+                        QString const& tooltip,
+                        bool critical)
     {
       ELLE_TRACE_SCOPE("%s: set message (%s)", *this, message);
       if (critical)
