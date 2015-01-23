@@ -659,16 +659,11 @@ namespace fist
         this->_register_future = QtConcurrent::run(
           [=] {
             // Will explode if the state is destroyed.
-            std::string hash{
-              gap_hash_password(
-                this->_state.state(),
-                email.toStdString().c_str(),
-                pw.toStdString().c_str())};
             return gap_register(
               this->_state.state(),
               fullname.toStdString().c_str(),
               email.toStdString().c_str(),
-              hash.c_str());
+              pw.toStdString().c_str());
           });
       }
       this->_register_watcher.setFuture(this->_register_future);
@@ -697,12 +692,9 @@ namespace fist
         emit this->login_attempt();
         this->_login_future = QtConcurrent::run(
           [=] {
-            // Will explode if the state is destroyed.
-            char* hash = gap_hash_password(
-              this->_state.state(), email.toStdString().c_str(), pw.toStdString().c_str());
-
-            elle::SafeFinally free_hash([&] { gap_hash_free(hash); });
-            return gap_login(this->_state.state(), email.toStdString().c_str(), hash);
+            return gap_login(this->_state.state(),
+                             email.toStdString().c_str(),
+                             pw.toStdString().c_str());
           });
       }
       this->_login_watcher.setFuture(this->_login_future);
