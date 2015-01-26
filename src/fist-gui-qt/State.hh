@@ -32,7 +32,7 @@ namespace fist
     public QObject
   {
   public:
-    State(gap_State* state);
+    State();
     virtual
     ~State();
     // Handle gap destruction automatically.
@@ -151,6 +151,12 @@ namespace fist
     _on_results_ready();
 
   public:
+    QString
+    download_folder() const;
+
+    void
+    download_folder(QString const&);
+
     /*-------------.
     | Transactions |
     `-------------*/
@@ -184,7 +190,6 @@ namespace fist
 
     void
     on_link_updated_callback(surface::gap::LinkTransaction const& tr);
-
 
     static
     void

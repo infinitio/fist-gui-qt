@@ -1,16 +1,20 @@
-# include <vector>
+#include <vector>
+#ifdef INFINIT_WINDOWS
+# include <winsock2.h>
+# include <shlobj.h>
+#endif
+#include <QDesktopServices>
+#include <QtConcurrentRun>
+#include <QTimer>
+#include <QUrl>
+#include <QVector>
 
-# include <QDesktopServices>
-# include <QtConcurrentRun>
-# include <QTimer>
-# include <QUrl>
-# include <QVector>
+#include <elle/log.hh>
 
-# include <elle/log.hh>
-
-# include <fist-gui-qt/model/User.hh>
-# include <fist-gui-qt/State.hh>
-# include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/model/User.hh>
+#include <fist-gui-qt/State.hh>
+#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/Settings.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.State");
 
@@ -31,8 +35,8 @@ namespace fist
     gap_free(state);
   }
 
-  State::State(gap_State* state)
-    : _state(state)
+  State::State()
+    : _state()
     , _users()
     , _search_future()
     , _search_watcher()
@@ -44,6 +48,17 @@ namespace fist
     , _active_links()
     , _poll_timer(new QTimer)
   {
+    QString _download_folder = fist::settings()["State"].get("download_folder", "").toString();
+    auto array = _download_folder.toUtf8();
+    std::string download_folder(array.constData());
+  this->_state.reset(gap_new(
+#ifdef FIST_PRODUCTION_BUILD
+    true,
+#else
+    false,
+#endif
+      download_folder));
+
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
     // Merge Transaction callback & recipient changed callback when new
@@ -339,6 +354,21 @@ namespace fist
     emit results_ready();
   }
 
+  QString
+  State::download_folder() const
+  {
+    return QString::fromUtf8(gap_get_output_dir(this->state()).c_str());
+  }
+
+  void
+  State::download_folder(QString const& folder)
+  {
+    auto array = folder.toUtf8();
+    std::string _folder(array.constData());
+    gap_set_output_dir(this->state(), _folder, true);
+    fist::settings()["State"].set("download_folder", folder);
+  }
+
   void
   State::transaction_callback(uint32_t id, gap_TransactionStatus status)
   {
@@ -570,9 +600,7 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     QDesktopServices::openUrl(
-      QUrl::fromLocalFile(
-        QString::fromStdString(
-          gap_get_output_dir(this->state()))));
+      QUrl::fromLocalFile(this->download_folder()));
   }
 
   void
