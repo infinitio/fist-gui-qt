@@ -93,6 +93,10 @@ private slots:
   void _on_avatar_updated();
   void _on_status_updated();
 
+private slots:
+  void
+  _update_peer();
+
 private:
   ELLE_ATTRIBUTE_R(Model const&, transaction);
   ELLE_ATTRIBUTE_R(AvatarWidget*, peer_avatar);

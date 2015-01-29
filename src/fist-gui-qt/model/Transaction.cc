@@ -57,6 +57,21 @@ namespace fist
     }
 
     void
+    Transaction::on_peer_changed() const
+    {
+      auto peer_id = this->_is_sender
+        ? gap_transaction_recipient_id(this->_state.state(), this->id())
+        : gap_transaction_sender_id(this->_state.state(), this->id());
+
+      if (this->peer_id() != peer_id)
+      {
+        this->_peer_id = peer_id;
+        this->_avatar = QPixmap{};
+        emit peer_changed();
+      }
+    }
+
+    void
     Transaction::update() const
     {
       this->_concerns_device = gap_transaction_concern_device(this->_state.state(), this->id(), false);

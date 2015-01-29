@@ -46,21 +46,26 @@ namespace fist
   {
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
-    ELLE_DEBUG("transaction updated callback")
+    // Merge Transaction callback & recipient changed callback when new
+    // notification system is up.
+    ELLE_DEBUG("connect transaction updated callback")
       gap_transaction_callback(this->state(), State::transaction_callback);
-    ELLE_DEBUG("link updated callback")
+    ELLE_DEBUG("connect transaction recipient changed callback");
+      gap_transaction_recipient_changed_callback(
+        this->state(), State::transaction_recipient_changed_callback);
+    ELLE_DEBUG("connect link updated callback")
       gap_link_callback(
         this->state(),
         std::bind(
           &State::on_link_updated_callback, this, std::placeholders::_1));
-    ELLE_DEBUG("user status updated callback")
+    ELLE_DEBUG("connect user status updated callback")
       gap_user_status_callback(this->state(), State::user_status_callback);
-    ELLE_DEBUG("avatar updated callback")
+    ELLE_DEBUG("connect avatar updated callback")
       gap_avatar_available_callback(
         this->state(), State::avatar_available_callback);
-    ELLE_DEBUG("connection callback")
+    ELLE_DEBUG("connect connection callback")
       gap_connection_callback(this->state(), State::connection_callback);
-    ELLE_DEBUG("swagger deleted callback")
+    ELLE_DEBUG("connect swagger deleted callback")
       gap_deleted_swagger_callback(
         this->state(), State::swagger_deleted_callback);
 
@@ -340,6 +345,40 @@ namespace fist
     ELLE_ASSERT(id != gap_null());
     ELLE_TRACE_SCOPE("transaction %s updated with status %s", id, status);
     g_state->on_transaction_callback(id, status, false);
+  }
+
+  void
+  State::transaction_recipient_changed_callback(
+    uint32_t transaction_id, uint32_t recipient_id)
+  {
+    g_state->on_transaction_recipient_changed(transaction_id, recipient_id);
+  }
+
+  void
+  State::on_transaction_recipient_changed(uint32_t transaction_id,
+                                          uint32_t recipient_id)
+  {
+    ELLE_TRACE_SCOPE("%s: peer changed for %s changed to %s",
+                     *this, transaction_id, recipient_id);
+    ELLE_ASSERT(transaction_id != gap_null());
+    ELLE_ASSERT(recipient_id != gap_null());
+    ELLE_ASSERT(gap_is_p2p_transaction(this->state(), transaction_id));
+    auto it = this->_transactions.get<0>().find(transaction_id);
+    if (it != this->_transactions.get<0>().end())
+    {
+      struct UpdateTransaction
+      {
+        UpdateTransaction()
+        {}
+
+        void
+        operator()(model::Transaction& model)
+        {
+          model.on_peer_changed();
+        }
+      };
+      this->_transactions.modify(it, UpdateTransaction());
+    }
   }
 
   void

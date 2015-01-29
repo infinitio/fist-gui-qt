@@ -185,6 +185,15 @@ namespace fist
     void
     on_link_updated_callback(surface::gap::LinkTransaction const& tr);
 
+
+    static
+    void
+    transaction_recipient_changed_callback(
+      uint32_t transaction_id, uint32_t recipient_id);
+
+    void
+    on_transaction_recipient_changed(uint32_t transaction_id, uint32_t recipient_id);
+
     model::Transaction const&
     transaction(uint32_t id);
 

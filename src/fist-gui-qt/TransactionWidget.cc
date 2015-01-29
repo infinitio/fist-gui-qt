@@ -40,6 +40,9 @@ TransactionWidget::TransactionWidget(Model const& model):
           this, SLOT(apply_update()));
   connect(&this->_transaction, SIGNAL(peer_status_updated()),
           this, SLOT(apply_update()));
+  connect(&this->_transaction, SIGNAL(peer_changed()),
+          this, SLOT(_update_peer()));
+
 
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
@@ -237,6 +240,13 @@ TransactionWidget::_on_avatar_updated()
 {
   this->_peer_avatar->setPicture(this->_transaction.avatar());
   this->repaint();
+}
+
+void
+TransactionWidget::_update_peer()
+{
+  this->_peer_fullname->setText(this->_transaction.peer_fullname());
+  this->_on_avatar_updated();
 }
 
 void

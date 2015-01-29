@@ -32,6 +32,9 @@ namespace fist
       Transaction(Transaction const&) = default;
 
       void
+      on_peer_changed() const;
+
+      void
       update() const;
 
       model::User const&
@@ -110,6 +113,9 @@ namespace fist
 
       void
       peer_status_updated() const;
+
+      void
+      peer_changed() const;
 
     public:
       bool
