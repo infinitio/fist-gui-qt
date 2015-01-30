@@ -7,7 +7,6 @@
 
 #include <elle/assert.hh>
 #include <elle/finally.hh>
-#include <elle/container/vector.hh>
 #include <elle/container/set.hh>
 #include <elle/log.hh>
 

@@ -10,7 +10,6 @@
 #include <elle/system/Process.hh>
 #include <elle/container/map.hh>
 #include <elle/finally.hh>
-#include <elle/container/vector.hh>
 
 #include <contextual/Handler.hh>
 #include <contextual/helpers.hh>
