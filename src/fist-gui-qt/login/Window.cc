@@ -649,21 +649,25 @@ namespace fist
       this->_message_field->clear();
       if (!this->_test_fields(true))
         return;
-      QString email = this->_email_field->text();
-      QString pw = this->_password_field->text();
-      QString fullname = this->_fullname_field->text();
+      auto email_array = this->_email_field->text().toUtf8();
+      std::string email(email_array.constData());
+      auto pw_array = this->_pw_field->text().toUtf8();
+      std::string pw(pw_array.constData());
+      auto fullname_array = this->_fullname_field->text().toUtf8();
+      std::string fullname(fullname_array.constData());
       register_failed_guard.abort();
       ELLE_TRACE("every check passed")
       {
+
         emit this->register_attempt();
         this->_register_future = QtConcurrent::run(
           [=] {
             // Will explode if the state is destroyed.
             return gap_register(
               this->_state.state(),
-              fullname.toStdString().c_str(),
-              email.toStdString().c_str(),
-              pw.toStdString().c_str());
+              fullname.c_str(),
+              email.c_str(),
+              pw.c_str());
           });
       }
       this->_register_watcher.setFuture(this->_register_future);
@@ -684,8 +688,10 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: login attempt", *this);
       if (!this->_test_fields())
         return;
-      QString email = this->_email_field->text();
-      QString pw = this->_password_field->text();
+      auto email_array = this->_email_field->text().toUtf8();
+      std::string email(email_array.constData());
+      auto pw_array = this->_pw_field->text().toUtf8();
+      std::string pw(pw_array.constData());
       login_failed_guard.abort();
       ELLE_TRACE("every check passed")
       {
@@ -693,8 +699,8 @@ namespace fist
         this->_login_future = QtConcurrent::run(
           [=] {
             return gap_login(this->_state.state(),
-                             email.toStdString().c_str(),
-                             pw.toStdString().c_str());
+                             email.c_str(),
+                             pw.c_str());
           });
       }
       this->_login_watcher.setFuture(this->_login_future);
