@@ -651,7 +651,7 @@ namespace fist
         return;
       auto email_array = this->_email_field->text().toUtf8();
       std::string email(email_array.constData());
-      auto pw_array = this->_pw_field->text().toUtf8();
+      auto pw_array = this->_password_field->text().toUtf8();
       std::string pw(pw_array.constData());
       auto fullname_array = this->_fullname_field->text().toUtf8();
       std::string fullname(fullname_array.constData());
@@ -690,7 +690,7 @@ namespace fist
         return;
       auto email_array = this->_email_field->text().toUtf8();
       std::string email(email_array.constData());
-      auto pw_array = this->_pw_field->text().toUtf8();
+      auto pw_array = this->_password_field->text().toUtf8();
       std::string pw(pw_array.constData());
       login_failed_guard.abort();
       ELLE_TRACE("every check passed")
