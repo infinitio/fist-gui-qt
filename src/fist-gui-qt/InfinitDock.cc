@@ -630,8 +630,6 @@ InfinitDock::enterEvent(QEvent* event)
 {
   if (this->centralWidget() != nullptr)
     ELLE_DEBUG("%s currently active", *this->centralWidget());
-  // if (this->centralWidget() == this->_send_panel)
-  //   this->setFocus();
 }
 
 void

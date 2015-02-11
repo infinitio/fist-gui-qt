@@ -477,18 +477,18 @@ Fist::_set_uniqunness_guard()
 void
 Fist::_put_lock_file()
 {
-  // Now that we ensured that we are the only one instance running, let check if
-  // our lock file or our crash witness is present. If it's the case, that means
+  // Now that we ensured that we are the only instance running, check if our
+  // lock file or our crash witness is present. If it's the case, that means
   // previous session hasn't been clean properly.
   // There are many case:
   // - crash witness is present and lock is present:
   //     This means that the previous session crashed (see list of monitored
   //     signals.)
   // - crash witness is *not* present and lock is present:
-  //     The previous session hasn't been quit correc tly but it's not due to a
+  //     The previous session hasn't been quit correctly but it's not due to a
   //     crash. There are no real consequences but it's important to get a
   //     metric on it.
-  // - crash witness is presnet and lock is *not* present:
+  // - crash witness is present and lock is *not* present:
   //     That's weird, it shouldn't happen but the user may have remove the lock
   //     so let's consider it as a crash.
   // - None of the files are present:
