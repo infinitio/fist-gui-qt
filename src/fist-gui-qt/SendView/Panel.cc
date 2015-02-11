@@ -279,11 +279,16 @@ namespace fist
     Panel::hideEvent(QHideEvent* event)
     {
       ELLE_TRACE_SCOPE("%s: hide", *this);
+      this->clear();
+      Super::hideEvent(event);
+    }
+
+    void
+    Panel::clear()
+    {
       this->_users->clear();
       this->_file_adder->clear();
       this->_message->clear();
-
-      Super::hideEvent(event);
     }
 
   /*-------.

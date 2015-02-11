@@ -99,6 +99,9 @@ namespace fist
       void
       link_mode();
 
+      void
+      clear();
+
     public slots:
       void
       send();
