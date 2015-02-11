@@ -89,6 +89,8 @@ InfinitDock::InfinitDock(fist::State& state,
   , _systray_menu(new QMenu(this))
   , _show(new QAction(tr("&Show dock"), this))
   , _send_files(new QAction(tr("&Send files..."), this))
+  , _query_changing_download_folder(new IconButton(QPixmap(":/link/edit")))
+  , _download_folder(new QLabel(this->_state.download_folder(), this))
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
   , _logout(new QAction(tr("&Logout"), this))
   , _quit(new QAction(tr("&Quit"), this))
@@ -153,10 +155,33 @@ InfinitDock::InfinitDock(fist::State& state,
   // XXX: Specialize a QWidgetAction to add a better visual and for example,
   // to copy the version in the user clipboard on click.
   QWidgetAction* version = new QWidgetAction(this);
-  auto* v = new QLabel(QString(INFINIT_VERSION));
+  auto* v = new QLabel(QString("      " INFINIT_VERSION));
   view::version_style(*v);
   version->setDefaultWidget(v);
+  this->_menu->setMaximumWidth(210);
   this->_menu->addAction(version);
+  this->_menu->addSeparator();
+  QWidgetAction* change_download_folder = new QWidgetAction(this);
+  {
+    QWidget* download_folder_cell = new QWidget(this);
+    QVBoxLayout* vlayout = new QVBoxLayout(download_folder_cell);
+    vlayout->setContentsMargins(5, 0, 5, 0);
+    auto* title = new QLabel("Download folder:", this);
+    view::download_folder_title_style(*title);
+    vlayout->addWidget(title);
+    QHBoxLayout* layout = new QHBoxLayout();
+    vlayout->addLayout(layout);
+    layout->setContentsMargins(5, 0, 5, 0);
+    layout->addWidget(this->_query_changing_download_folder);
+    view::download_folder_style(*this->_download_folder);
+    layout->addWidget(this->_download_folder);
+    download_folder_cell->setLayout(layout);
+    change_download_folder->setDefaultWidget(download_folder_cell);
+    connect(this->_query_changing_download_folder, SIGNAL(released()),
+            this, SLOT(_change_download_folder()));
+    this->_download_folder->setToolTip(this->_download_folder->text());
+  }
+  this->_menu->addAction(change_download_folder);
   this->_menu->addSeparator();
   this->_menu->addAction(_report_a_problem);
   this->_menu->addSeparator();
@@ -298,6 +323,22 @@ InfinitDock::_systray_message_clicked()
       emit this->update_application();
     }
     this->_last_message.reset();
+  }
+}
+
+void
+InfinitDock::_change_download_folder()
+{
+  ENSURE_ONE_AT_A_TIME();
+  this->setFocus();
+  QString selected = QFileDialog::getExistingDirectory(
+    this,
+    tr("Select a directory"));
+  if (!selected.isEmpty())
+  {
+    this->_state.download_folder(selected);
+    this->_download_folder->setText(selected);
+    this->_download_folder->setToolTip(this->_download_folder->text());
   }
 }
 

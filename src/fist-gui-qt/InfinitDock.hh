@@ -6,6 +6,7 @@
 # include <QFileDialog>
 # include <QFocusEvent>
 # include <QMainWindow>
+# include <QLabel>
 # include <QSystemTrayIcon>
 # include <QTimer>
 # include <QWidget>
@@ -89,6 +90,8 @@ private slots:
   void
   _active_transactions_changed(size_t);
 
+  void
+  _change_download_folder();
 
 /*-------.
 | Update |
@@ -249,6 +252,8 @@ private:
   QMenu* _systray_menu;
   QAction* _show;
   QAction* _send_files;
+  QPushButton* _query_changing_download_folder;
+  QLabel* _download_folder;
   QAction* _report_a_problem;
   QAction* _logout;
   QAction* _quit;

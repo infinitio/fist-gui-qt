@@ -104,6 +104,14 @@ namespace view
   fist::style::Text const
   version_style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
 
+  static
+  fist::style::Text const
+  download_folder_title_style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignLeft);
+
+  static
+  fist::style::Text const
+  download_folder_style(QFont(Font, 9), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
+
   namespace tab
   {
     static
