@@ -506,7 +506,8 @@ InfinitDock::_switch_view(Panel* panel, bool show)
 void
 InfinitDock::_back_from_send_view()
 {
-  this->_switch_view(this->_transaction_panel.get(), false);
+  if (this->_transaction_panel.get() != this->centralWidget())
+    this->_switch_view(this->_transaction_panel.get(), false);
   this->hide();
 }
 
