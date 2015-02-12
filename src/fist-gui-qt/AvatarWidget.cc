@@ -16,7 +16,6 @@ static int const progress_offset = -1;
 static int const badge_size = 16;
 static int const badge_border_size = 0;
 static int const total_size = 2 * progress_size + 2 * progress_offset + picture_size;
-static int const progress_angle_gap = (picture_size * M_PI - badge_size) / 360;
 
 static int const progress_hue = 200;
 static int const progress_saturation = 175;
@@ -209,61 +208,7 @@ AvatarWidget::paintEvent(QPaintEvent*)
     pen.setCapStyle(Qt::RoundCap);
     painter.setPen(pen);
     painter.drawArc(progress_region,
-                    (badge_angle - progress_angle_gap / 2) * 16,
-                    -this->_smooth_progress * (360 + progress_angle_gap) * 16);
-  }
-  // Transaction count badge
-  if (this->_transaction_count > 0)
-  {
-    QRectF border_region(-(badge_size + 2 * badge_border_size) / 2.,
-                         -(badge_size + 2 * badge_border_size) / 2.,
-                         badge_size + 2 * badge_border_size,
-                         badge_size + 2 * badge_border_size);
-    QRectF badge_region(-badge_size / 2.,
-                        -badge_size / 2.,
-                        badge_size,
-                        badge_size);
-    painter.save();
-    painter.rotate(-badge_angle);
-    painter.translate(QPointF(picture_size / 2. + shadow_width, 0));
-    painter.rotate(badge_angle);
-    // Background
-    {
-      painter.setBrush(Qt::white);
-      painter.setPen(Qt::NoPen);
-      painter.drawEllipse(border_region);
-    }
-    // Badge.
-    {
-      QPointF focal(-badge_size / 2., -badge_size / 2.);
-      QRadialGradient gradient(QPoint(0, 0), badge_size, focal);
-      QColor const progress_color_dark(
-        QColor::fromHsv(progress_hue,
-                        progress_saturation * 1.4,
-                        progress_value * 0.6));
-      gradient.setColorAt(0, progress_color);
-      gradient.setColorAt(1, progress_color);
-      painter.setBrush(gradient);
-      painter.setPen(Qt::NoPen);
-      painter.drawEllipse(badge_region);
-    }
-    // Border.
-    {
-      painter.setBrush(Qt::NoBrush);
-      painter.setPen(border_pen);
-      painter.drawEllipse(border_region);
-      painter.drawEllipse(badge_region);
-    }
-    // Count.
-    {
-      QFont font("Lucida Grande");
-      font.setBold(true);
-      font.setPixelSize(badge_size / 1.5);
-      painter.setFont(font);
-      painter.setPen(Qt::white);
-      painter.drawText(badge_region, Qt::AlignCenter,
-                       QString::number(this->transactionCount()));
-      painter.restore();
-    }
+                    badge_angle * 16,
+                    -this->_smooth_progress * 360 * 16);
   }
 }
