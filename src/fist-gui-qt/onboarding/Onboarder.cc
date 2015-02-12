@@ -156,8 +156,8 @@ namespace fist
     {
       this->_set_tooltip(
         this->_dock->send_panel().users()->search_field(),
-        "Search for a friend using\n"
-        "his fullname or nickname.",
+        "Search for a friend using his\n"
+        "fullname, email address or nickname.",
         Qt::AlignLeft);
     }
 
