@@ -87,8 +87,7 @@ namespace fist
       connect(this, SIGNAL(drag_left()), this->_file_adder, SLOT(on_left()));
       // Sent.
       connect(this, SIGNAL(sent()), this, SIGNAL(switch_signal()));
-      connect(this, SIGNAL(sent()), this, SLOT(clear()));
-      connect(this, SIGNAL(sent()), this->_file_adder, SLOT(clear()));
+      connect(this, SIGNAL(sent()), this, SLOT(hide()));
       // Tabs.
       connect(this->_link_tab, SIGNAL(activated()), this, SLOT(link_mode()));
       connect(this->_transaction_tab, SIGNAL(activated()),
