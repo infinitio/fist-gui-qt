@@ -155,14 +155,10 @@ InfinitDock::InfinitDock(fist::State& state,
     this, SIGNAL(avatar_available(uint32_t)),
     this->_send_panel.get(), SLOT(avatar_available(uint32_t)));
 
-  // XXX: Specialize a QWidgetAction to add a better visual and for example,
-  // to copy the version in the user clipboard on click.
-  QWidgetAction* version = new QWidgetAction(this);
-  auto* v = new QLabel(QString("      " INFINIT_VERSION));
-  view::version_style(*v);
-  version->setDefaultWidget(v);
   this->_menu->setMaximumWidth(210);
-  this->_menu->addAction(version);
+  auto* v2 = this->_menu->addAction(QString("v" INFINIT_VERSION));
+  v2->setDisabled(true);
+  v2->setFont(view::version_style.font());
   this->_menu->addSeparator();
   QWidgetAction* change_download_folder = new QWidgetAction(this);
   {
