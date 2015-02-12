@@ -148,6 +148,9 @@ InfinitDock::InfinitDock(fist::State& state,
             this, SLOT(_pick_files_from_sendview()));
   }
 
+  connect(&this->_state, SIGNAL(new_download_folder_needed()),
+          this, SLOT(_change_download_folder()));
+
   connect(
     this, SIGNAL(avatar_available(uint32_t)),
     this->_send_panel.get(), SLOT(avatar_available(uint32_t)));
@@ -334,7 +337,7 @@ InfinitDock::_change_download_folder()
   this->_menu->hide();
   QString selected = QFileDialog::getExistingDirectory(
     this,
-    tr("Select a directory"));
+    tr("Select a download folder"));
   if (!selected.isEmpty())
   {
     this->_state.download_folder(selected);

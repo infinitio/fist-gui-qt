@@ -7,6 +7,7 @@
 #include <QtConcurrentRun>
 #include <QTimer>
 #include <QUrl>
+#include <QDir>
 #include <QVector>
 
 #include <elle/log.hh>
@@ -567,6 +568,9 @@ namespace fist
   State::on_transaction_accepted(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());
+    QDir download_folder = QDir::fromNativeSeparators(this->download_folder());
+    if (!download_folder.exists())
+      emit new_download_folder_needed();
     gap_accept_transaction(this->state(), id);
     this->on_transaction_callback(id, gap_transaction_connecting, true);
   }

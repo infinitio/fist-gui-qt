@@ -79,6 +79,8 @@ namespace fist
     internet_issue(QString const&);
     void
     kicked_out(QString const&);
+    void
+    new_download_folder_needed();
 
   public:
     /*------.
