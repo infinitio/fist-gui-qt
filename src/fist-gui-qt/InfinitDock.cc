@@ -330,7 +330,8 @@ void
 InfinitDock::_change_download_folder()
 {
   ENSURE_ONE_AT_A_TIME();
-  this->setFocus();
+  this->_menu->clearFocus();
+  this->_menu->hide();
   QString selected = QFileDialog::getExistingDirectory(
     this,
     tr("Select a directory"));
