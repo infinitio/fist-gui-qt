@@ -43,8 +43,10 @@ namespace fist
     void
     Onboarder::receive_file(QString const& file)
     {
+      auto array = file.toUtf8();
+      std::string _file(array.constData());
       this->_transactions[gap_onboarding_receive_transaction(
-          this->_dock->_state.state(), file.toStdString().c_str(), 6)] = nullptr;
+          this->_dock->_state.state(), _file.c_str(), 6)] = nullptr;
     }
 
     void
