@@ -11,7 +11,7 @@
 static QString Arial("Arial");
 static QString Lucida("LucidaGrande");
 static QString Montserrat("Montserrat");
-static QString Font(Arial);
+static QString DefaultFont(Arial);
 
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
@@ -38,6 +38,20 @@ static QString Font(Arial);
 
 namespace fist
 {
+  class Font
+  {
+    // font.setPixelSize(8);
+    Font(QString const& family,
+         int pointSize):
+      inner(family, pointSize)
+    {
+      inner.setPixelSize(pointSize);
+    }
+    operator QFont& () { return inner; }
+    operator QFont const& () const { return inner; }
+    QFont inner;
+  };
+
   namespace style
   {
     // TextStyle provides a friendly api to set Widget font and color.
@@ -102,21 +116,21 @@ namespace view
 
   static
   fist::style::Text const
-  version_style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+  version_style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
 
   static
   fist::style::Text const
-  download_folder_title_style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignLeft);
+  download_folder_title_style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignLeft);
 
   static
   fist::style::Text const
-  download_folder_style(QFont(Font, 9), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
+  download_folder_style(fist::Font(DefaultFont, 9), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
 
   namespace tab
   {
     static
     fist::style::Text const
-    style(QFont(Montserrat, 10), QColor(0x8B, 0x8B, 0x83));
+    style(fist::Font(Montserrat, 10), QColor(0x8B, 0x8B, 0x83));
 
     static
     QColor
@@ -124,7 +138,7 @@ namespace view
 
     static
     fist::style::Text const
-    hover_style(QFont(Montserrat, 10), QColor(0x51, 0x51, 0x49));
+    hover_style(fist::Font(Montserrat, 10), QColor(0x51, 0x51, 0x49));
 
     static
     QColor
@@ -132,21 +146,21 @@ namespace view
 
     static
     fist::style::Text const
-    selected_style(QFont(Montserrat, 10), QColor(0x2B, 0xBE, 0xBD));
+    selected_style(fist::Font(Montserrat, 10), QColor(0x2B, 0xBE, 0xBD));
 
     namespace counter
     {
       static
       fist::style::Text const
-      style(QFont(Montserrat, 7), tab::style.color(), Qt::AlignTop);
+      style(fist::Font(Montserrat, 7), tab::style.color(), Qt::AlignTop);
 
       static
       fist::style::Text const
-      hover_style(QFont(Montserrat, 7), tab::hover_style.color(), Qt::AlignTop);
+      hover_style(fist::Font(Montserrat, 7), tab::hover_style.color(), Qt::AlignTop);
 
       static
       fist::style::Text const
-      selected_style(QFont(Montserrat, 7), tab::selected_style.color(), Qt::AlignTop);
+      selected_style(fist::Font(Montserrat, 7), tab::selected_style.color(), Qt::AlignTop);
     }
 
   }
@@ -155,7 +169,7 @@ namespace view
   {
     static
     fist::style::Text const
-    style(QFont(Font, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
+    style(fist::Font(DefaultFont, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
   }
 
   namespace login
@@ -172,7 +186,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
+      style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
 
       static
       QString const
@@ -187,7 +201,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x58, 0x58, 0x58), Qt::AlignCenter);
+      style(fist::Font(DefaultFont, 10), QColor(0x58, 0x58, 0x58), Qt::AlignCenter);
 
       static
       QString const
@@ -202,7 +216,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10, QFont::Bold), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
+      style(fist::Font(DefaultFont, 10, Font::Bold), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
 
       static
       QString const
@@ -221,7 +235,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
+      style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
 
       static
       QString const
@@ -236,7 +250,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 11), QColor(0x33, 0x33, 0x33));
+      style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
 
       static
       QString const
@@ -251,18 +265,18 @@ namespace view
     {
       static
       fist::style::Text const
-      error_style(QFont(Font, 10.5), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
+      error_style(fist::Font(DefaultFont, 10.5), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
 
       static
       fist::style::Text const
-      warning_style(QFont(Font, 10.5), QColor(0x88, 0x88, 0x88), Qt::AlignCenter);
+      warning_style(fist::Font(DefaultFont, 10.5), QColor(0x88, 0x88, 0x88), Qt::AlignCenter);
     }
 
     namespace links
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0x3D, 0x91, 0xD4));
+      style(fist::Font(DefaultFont, 9), QColor(0x3D, 0x91, 0xD4));
 
       static
       Qt::TextInteractionFlags const
@@ -310,7 +324,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 8.5), QColor(0x88, 0x88, 0x88));
+      style(fist::Font(DefaultFont, 8.5), QColor(0x88, 0x88, 0x88));
     }
 
     namespace login_button
@@ -321,7 +335,7 @@ namespace view
 
       static
       fist::style::Text const
-      style(QFont(Font, 11, QFont::Bold), Qt::white);
+      style(fist::Font(DefaultFont, 11, Font::Bold), Qt::white);
 
       static
       QString const
@@ -339,32 +353,32 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     namespace file
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9.5), QColor(0x25, 0x25, 0x25));
+      style(fist::Font(DefaultFont, 9.5), QColor(0x25, 0x25, 0x25));
 
       static
       fist::style::Text const
-      failed_style(QFont(Font, 9.5), QColor(0xD3, 0x15, 0x15));
+      failed_style(fist::Font(DefaultFont, 9.5), QColor(0xD3, 0x15, 0x15));
     }
 
     namespace status
     {
       static
       fist::style::Text const
-      style(QFont(Font, 8.5), QColor(0xA8, 0xA8, 0xA8));
+      style(fist::Font(DefaultFont, 8.5), QColor(0xA8, 0xA8, 0xA8));
     }
 
     namespace counter
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
+      style(fist::Font(DefaultFont, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
 
     }
   }
@@ -375,7 +389,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     static
@@ -386,25 +400,25 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 10), QColor(0x25, 0x25, 0x25));
+      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25));
     }
 
     namespace files
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9.5), QColor(0xA8, 0xA8, 0xA8));
+      style(fist::Font(DefaultFont, 9.5), QColor(0xA8, 0xA8, 0xA8));
 
       static
       fist::style::Text const
-      hover_style(QFont(Font, 9), QColor(0x3D, 0x91, 0xD4));
+      hover_style(fist::Font(DefaultFont, 9), QColor(0x3D, 0x91, 0xD4));
     }
 
     namespace date
     {
       static
       fist::style::Text const
-      style(QFont(Font, 8), QColor(0xA8, 0xA8, 0xA8));
+      style(fist::Font(DefaultFont, 8), QColor(0xA8, 0xA8, 0xA8));
     }
   }
 
@@ -416,14 +430,14 @@ namespace view
       {
         static
         fist::style::Text const
-        style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       namespace size
       {
         static
         fist::style::Text const
-        style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
       }
 
       static
@@ -435,11 +449,11 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+      style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
 
       static
       fist::style::Text const
-      hover_style(QFont(Font, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
+      hover_style(fist::Font(DefaultFont, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
 
       static
       QColor const
@@ -458,7 +472,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+      style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
       QString const
@@ -469,7 +483,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(QFont(Font, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+      style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
       static
       QString const
@@ -479,7 +493,7 @@ namespace view
       {
         static
         fist::style::Text const
-        style(QFont(Font, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
+        style(fist::Font(DefaultFont, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
 
       }
     }
@@ -490,14 +504,14 @@ namespace view
       {
         static
         fist::style::Text const
-        style(QFont(Font, 9), QColor(0x25, 0x25, 0x25));
+        style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25));
       }
 
       namespace handle
       {
         static
         fist::style::Text const
-        style(QFont(Font, 8), QColor(0xC4, 0xC4, 0xC4));
+        style(fist::Font(DefaultFont, 8), QColor(0xC4, 0xC4, 0xC4));
       }
     }
 

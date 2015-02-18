@@ -260,6 +260,9 @@ namespace fist
   private:
     void
     _compute_active_links();
+  public:
+    QString
+    facebook_app_id() const;
 
   private:
     Q_OBJECT;
