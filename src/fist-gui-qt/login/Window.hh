@@ -31,6 +31,11 @@ namespace fist
 {
   namespace login
   {
+    namespace facebook
+    {
+      class ConnectWindow;
+    }
+
     class Window:
       public RoundShadowWidget
     {
@@ -80,6 +85,11 @@ namespace fist
     public slots:
       void
       try_auto_login();
+
+    public:
+      static
+      void
+      logged_out();
 
     Q_SIGNALS:
       void
@@ -142,12 +152,16 @@ namespace fist
 
       ELLE_ATTRIBUTE(QLabel*, version_field);
       ELLE_ATTRIBUTE(QPushButton*, login_button);
+      ELLE_ATTRIBUTE(QPushButton*, facebook_button);
 
       ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
       ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
       ELLE_ATTRIBUTE(QFuture<gap_Status>, register_future);
       ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, register_watcher);
       ELLE_ATTRIBUTE(QWidget*, video);
+
+      ELLE_ATTRIBUTE(std::unique_ptr<facebook::ConnectWindow>, facebook_window);
+      ELLE_ATTRIBUTE(bool, facebook_connect_attempt);
     public:
       void
       closeEvent(QCloseEvent* event) override;
@@ -195,6 +209,16 @@ namespace fist
     private:
       void
       print(std::ostream& stream) const override;
+
+    private slots:
+      void
+      fb(QString const& code);
+
+      void
+      facebook_connect_failed(QString const& code);
+
+      void
+      launch_facebook_connect();
 
     private:
       Q_OBJECT

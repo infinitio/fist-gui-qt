@@ -643,4 +643,11 @@ namespace fist
 
     return *this->_links.get<0>().find(id);
   }
+
+  QString
+  State::facebook_app_id() const
+  {
+    auto id = QString::fromStdString(gap_facebook_app_id());
+    return id;
+  }
 }
