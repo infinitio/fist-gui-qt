@@ -1,18 +1,19 @@
 #include <QApplication>
-#include <QDesktopWidget>
-#include <QHBoxLayout>
 #include <QByteArray>
+#include <QDesktopWidget>
+#include <QFuture>
+#include <QHBoxLayout>
 #include <QPixmap>
 #include <QRegExp>
 #include <QSettings>
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
-#include <QFuture>
 #include <QtConcurrentRun>
 
 #include <elle/Buffer.hh>
 #include <elle/finally.hh>
+#include <elle/os/environ.hh>
 #include <elle/serialize/extract.hh>
 #include <elle/serialize/insert.hh>
 #include <elle/log.hh>
@@ -24,6 +25,7 @@
 #include <version.hh>
 
 #include <fist-gui-qt/login/Window.hh>
+#include <fist-gui-qt/login/FacebookConnectWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/icons.hh>
@@ -44,6 +46,8 @@ namespace fist
 {
   namespace login
   {
+
+
     static QRegExp email_checker(regexp::email, Qt::CaseInsensitive);
 
     static
@@ -95,9 +99,9 @@ namespace fist
     }
 
     Window::Window(fist::State& state,
-                     fist::gui::systray::Icon& systray,
-                     bool fill_email_and_password_fields,
-                     bool previous_session_crashed):
+                   fist::gui::systray::Icon& systray,
+                   bool fill_email_and_password_fields,
+                   bool previous_session_crashed):
       RoundShadowWidget(
         0, 0, Qt::Window | Qt::WindowCloseButtonHint |
               Qt::WindowMinimizeButtonHint |
@@ -117,9 +121,11 @@ namespace fist
       _switch_mode(new QLabel(this)),
       _version_field(new QLabel(this)),
       _login_button(new QPushButton(this)),
+      _facebook_button(new QPushButton(this)),
       _login_future(),
       _login_watcher(),
-      _video(nullptr)
+      _video(nullptr),
+      _facebook_window(nullptr)
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
@@ -207,13 +213,35 @@ namespace fist
         this->_login_button->setFixedSize(view::login::login_button::size);
         view::login::login_button::style(*this->_login_button);
         this->_login_button->setStyleSheet(
+          QString::fromStdString(elle::sprintf(
           "QPushButton {"
           "  background-color: rgb(248, 93, 91);"
           "  color: white;"
-          "  font: bold 14px;"
+          "  font: bold 13px;"
           "  border-radius: 2px;"
-          "} "
-          );
+          "  width: %spx;"
+          "  height: %spx;"
+          "} ",
+          view::login::login_button::size.width(),
+          view::login::login_button::size.height())));
+      }
+      // FacebookButton.
+      {
+        this->_facebook_button->setText("FACEBOOK");
+        this->_facebook_button->setStyleSheet(
+          QString::fromStdString(elle::sprintf(
+            "QPushButton {"
+            "  background-color: rgb(59, 89, 152);"
+            "  border-radius:2px ;"
+            "  color: white;"
+            "  font: bold 13px;"
+            "  width: %spx;"
+            "  height: %spx;"
+            "} ",
+            view::login::login_button::size.width(),
+            view::login::login_button::size.height())));
+        connect(this->_facebook_button, SIGNAL(released()),
+                this, SLOT(launch_facebook_connect()));
       }
       // Video Logo
       {
@@ -276,6 +304,8 @@ namespace fist
       // layout->addStretch();
       layout->addSpacing(25);
       layout->addWidget(this->_login_button, 0, Qt::AlignCenter);
+      layout->addSpacing(10);
+      layout->addWidget(this->_facebook_button, 0, Qt::AlignCenter);
       layout->addSpacing(65);
       glayout->addLayout(layout);
       {
@@ -508,10 +538,18 @@ namespace fist
       if (status == gap_ok || status == gap_already_logged_in)
       {
         emit logged_in();
-        auto email = this->_email_field->text();
-        auto password = this->_password_field->text();
-        fist::settings()["Login"].set("email", email);
-        this->_save_password(email, password);
+        if (this->_facebook_connect_attempt)
+        {
+          this->_facebook_connect_attempt = false;
+          fist::settings()["Login"].set("facebook", 1);
+        }
+        else
+        {
+          auto email = this->_email_field->text();
+          auto password = this->_password_field->text();
+          fist::settings()["Login"].set("email", email);
+          this->_save_password(email, password);
+        }
         return;
       }
       ELLE_TRACE("login failed");
@@ -572,7 +610,12 @@ namespace fist
     Window::try_auto_login()
     {
       ELLE_TRACE_SCOPE("%s: try auto login", *this);
-      if (!this->_password_field->text().isEmpty())
+      if (fist::settings()["Login"].exists("facebook"))
+      {
+        this->hide();
+        this->launch_facebook_connect();
+      }
+      else if (!this->_password_field->text().isEmpty())
       {
         this->hide();
         this->_login();
@@ -753,6 +796,29 @@ namespace fist
     }
 
     void
+    Window::launch_facebook_connect()
+    {
+      this->_facebook_window.reset(
+        new facebook::ConnectWindow(this->_state.facebook_app_id(), this));
+      this->_facebook_window->setWindowModality(Qt::WindowModal);
+      connect(this->_facebook_window.get(), SIGNAL(success(QString const&)),
+              this, SLOT(fb(QString const&)));
+      connect(this->_facebook_window.get(), SIGNAL(failure(QString const&)),
+              this, SLOT(facebook_connect_failed(QString const&)));
+      this->_facebook_window->show();
+    }
+
+    void
+    Window::logged_out()
+    {
+      fist::settings()["Login"].remove("facebook");
+      fist::settings()["Login"].remove("password");
+      std::unique_ptr<facebook::ConnectWindow> f(
+        new facebook::ConnectWindow("", nullptr, false));
+      f->cookies()->clear();
+    }
+
+    void
     Window::download_ready()
     {
       ELLE_TRACE_SCOPE("%s: download ready", *this);
@@ -834,5 +900,32 @@ namespace fist
       this->_systray.show();
     }
 
+    void
+    Window::fb(QString const& token)
+    {
+      this->_facebook_connect_attempt = true;
+      elle::SafeFinally unlock_login([&] {
+          this->_enable(); this->_password_field->setFocus();
+          this->_facebook_connect_attempt = false;
+        });
+      this->_disable();
+      emit this->login_attempt();
+      this->_login_future = QtConcurrent::run(
+        [=] {
+          auto email = elle::os::getenv("FACEBOOK_PREFERRED_EMAIL", "");
+          return gap_facebook_connect(this->_state.state(),
+                                      token.toStdString(),
+                                      email);
+        });
+      unlock_login.abort();
+      this->_login_watcher.setFuture(this->_login_future);
+    }
+
+    void
+    Window::facebook_connect_failed(QString const& error)
+    {
+      this->show();
+      this->set_message(error, error, true);
+    }
   }
 }

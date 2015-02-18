@@ -83,6 +83,9 @@ def configure(cxx_toolkit = None,
   qt_cxx_config += qt.config_gui
   qt_cxx_config += qt.config_phonon
   qt_cxx_config += qt.config_network
+  if cxx_toolkit.os != drake.os.windows:
+    qt_cxx_config += qt.config_webkit
+
   # Windows specific libraries.
   # XXX: Maybe some clean could be made.
   if cxx_toolkit.os == drake.os.windows:
@@ -154,8 +157,13 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/ListItem.hh",
       "src/fist-gui-qt/ListWidget.cc",
       "src/fist-gui-qt/ListWidget.hh",
+
+      # Login.
       "src/fist-gui-qt/login/Window.cc",
       "src/fist-gui-qt/login/Window.hh",
+      "src/fist-gui-qt/login/FacebookConnectWindow.hh",
+      "src/fist-gui-qt/login/FacebookConnectWindow.cc",
+
       "src/fist-gui-qt/Panel.cc",
       "src/fist-gui-qt/Panel.hh",
       "src/fist-gui-qt/RoundButton.cc",
@@ -456,6 +464,7 @@ def configure(cxx_toolkit = None,
         installer_resources + dynamic_libraries)) + nsis_plugins + nsis_includes
     signed_app = Signer(application,
                         installer_resources_folder / 'Infinit.exe').target
+    signed_app.dependency_add(osslsigncode)
     installer_resources += [signed_app]
     content = {
         'company': 'Infinit.io',

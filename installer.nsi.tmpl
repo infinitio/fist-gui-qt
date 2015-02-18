@@ -188,6 +188,11 @@ FunctionEnd
 ;------------------------------------------------------------------------------
 
 Function .onInit
+  ${'${If}'} ${AtLeastWinVista}
+  ${'${Else}'}
+    MessageBox mb_iconstop "Infinit is not currently compatible with your version of Windows.\nYou need Windows Vista or any subsequent version of Windows."
+    Abort
+  ${'${Endif}'}
   Call KillRunningProcess
   Call CheckArchitecture
 
