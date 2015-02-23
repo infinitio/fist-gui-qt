@@ -54,7 +54,7 @@ Updater::Updater(QUrl const& version_file_url,
   , _version_file_url(version_file_url)
   , _updater_url()
   , _installer_folder(
-    QDir::toNativeSeparators(QString::fromStdString(common::infinit::home())))
+    QDir::toNativeSeparators(QString::fromStdString(common::infinit::infinit_default_home())))
   , _installer(
     new QFile(QDir::toNativeSeparators(
                 this->_installer_folder.path() +

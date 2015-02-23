@@ -808,7 +808,7 @@ InfinitDock::report_a_problem()
 
     if (!logfile.empty())
     {
-      boost::filesystem::path home(common::infinit::home());
+      boost::filesystem::path home(common::infinit::infinit_default_home());
       boost::filesystem::path copied_log = home / "current_state.log";
       boost::system::error_code erc;
       boost::filesystem::copy(logfile, copied_log , erc);

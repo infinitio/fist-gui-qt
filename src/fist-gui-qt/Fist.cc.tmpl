@@ -58,8 +58,9 @@ ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 // is to add a global pointer to the dock and makes it emit the signal.
 Fist* g_fist = nullptr;
 
+
 static QFile crash_witness(QString::fromStdString(
-  elle::os::path::join(common::infinit::home(), "crashed")));
+  elle::os::path::join(common::infinit::infinit_default_home(), "crashed")));
 
 #define SUICIDE(signal) ::exit(1);
 
@@ -214,7 +215,7 @@ Fist::Fist(int argc, char** argv):
   _previous_session_crashed(false),
   _filelock(
     QString::fromStdString(
-      elle::os::path::join(common::infinit::home(), "lock"))),
+      elle::os::path::join(common::infinit::infinit_default_home(), "lock"))),
   _application(new QApplication(argc, argv)),
   _updater(nullptr),
   _systray(fist::icon::inactive, this),
