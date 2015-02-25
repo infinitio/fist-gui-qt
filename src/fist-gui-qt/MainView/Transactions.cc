@@ -34,7 +34,7 @@ namespace fist
       {
         this->_transaction_list->add_widget(
           std::make_shared<TextListItem>(
-            "You haven't sent or received any files yet", 70, this));
+            "You haven't sent or received\nany files yet", 70, this));
         return;
       }
 
