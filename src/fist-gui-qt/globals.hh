@@ -40,12 +40,13 @@ namespace fist
 {
   class Font
   {
-    // font.setPixelSize(8);
+  public:
     Font(QString const& family,
-         int pointSize):
-      inner(family, pointSize)
+         int pointSize,
+         int weight = -1):
+      inner(family, pointSize, weight)
     {
-      inner.setPixelSize(pointSize);
+      inner.setPixelSize(pointSize * 1.4);
     }
     operator QFont& () { return inner; }
     operator QFont const& () const { return inner; }
@@ -216,7 +217,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 10, Font::Bold), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
+      style(fist::Font(DefaultFont, 10, QFont::Bold), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
 
       static
       QString const
@@ -335,7 +336,7 @@ namespace view
 
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 11, Font::Bold), Qt::white);
+      style(fist::Font(DefaultFont, 11, QFont::Bold), Qt::white);
 
       static
       QString const
