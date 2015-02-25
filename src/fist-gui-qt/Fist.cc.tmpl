@@ -289,7 +289,7 @@ Fist::_initialize_application()
 
   QDir::setCurrent(QDesktopServices::storageLocation(QDesktopServices::DesktopLocation));
   QFont arial("Arial", 11);
-  arial.setPixelSize(11);
+  arial.setPixelSize(11 * 1.4);
   arial.setStyleStrategy(QFont::PreferAntialias);
   this->_application->setFont(arial);
 
