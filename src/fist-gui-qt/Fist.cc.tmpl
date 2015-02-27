@@ -121,7 +121,7 @@ class Fist::Prologue
     {
       logger.reset(
         new infinit::fist::log::CircularSelector(
-          elle::os::path::join(common::infinit::home(), "state%s.log"),
+          elle::os::path::join(common::infinit::infinit_default_home(), "state%s.log"),
           4));
 
       elle::os::setenv("INFINIT_LOG_FILE",
