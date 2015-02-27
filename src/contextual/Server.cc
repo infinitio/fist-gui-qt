@@ -8,7 +8,6 @@
 #include <elle/os/environ.hh>
 #include <elle/log/TextLogger.hh>
 
-#include <common/common.hh>
 #include <contextual/Handler.hh>
 #include <contextual/helpers.hh>
 #include <contextual/HandlerFactory.hh>
