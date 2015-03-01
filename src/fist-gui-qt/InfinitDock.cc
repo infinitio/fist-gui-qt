@@ -792,51 +792,15 @@ InfinitDock::report_a_problem()
   if (ok)
   {
     ELLE_DEBUG("user message: %s", text);
-
-    auto log_file_picker = [] () -> std::string
-    {
-      for (std::string var: {"INFINIT_LOG_FILE", "ELLE_LOG_FILE"})
-      {
-        if (elle::os::inenv(var))
-          return elle::os::getenv(var);
-      }
-      return "";
-    };
-
-    auto logfile = log_file_picker();
-    ELLE_TRACE("file to report: %s", logfile);
-
-    if (!logfile.empty())
-    {
-      boost::filesystem::path home(common::infinit::infinit_default_home());
-      boost::filesystem::path copied_log = home / "current_state.log";
-      boost::system::error_code erc;
-      boost::filesystem::copy(logfile, copied_log , erc);
-      if (erc)
-      {
-        ELLE_TRACE("error while copying %s: %s", logfile, copied_log);
-      }
-      elle::SafeFinally cleanup{
-        [&] {
-          boost::system::error_code erc;
-          boost::filesystem::remove(copied_log, erc);
-          if (erc)
-            ELLE_WARN("removing copied file %s failed: %s", copied_log, erc);
-        }};
-      auto array = text.toUtf8();
-      std::string std_text(array.constData());
-      ELLE_DEBUG("user message as std::string: %s", std_text);
-      gap_send_user_report(
-        this->_state.state(),
-        gap_self_email(this->_state.state()),
-        std_text.c_str(),
-        copied_log.string().c_str());
-      ELLE_DEBUG("report sent");
-    }
-    else
-    {
-      ELLE_WARN("Fist: No log file to send");
-    }
+    auto array = text.toUtf8();
+    std::string std_text(array.constData());
+    ELLE_DEBUG("user message (%s)", std_text);
+    gap_send_user_report(
+      this->_state.state(),
+      gap_self_email(this->_state.state()),
+      std_text.c_str(),
+      "");
+    ELLE_DEBUG("report sent");
   }
 
   this->setFocus();
