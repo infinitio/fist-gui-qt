@@ -58,7 +58,8 @@ namespace fist
 #else
     false,
 #endif
-      download_folder));
+    "",
+    download_folder));
 
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
