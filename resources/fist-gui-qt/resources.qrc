@@ -168,7 +168,7 @@
 
     <!-- login -->
 
-    <file alias="login/preboarding">../slices/windows/view_login/preboarding.gif</file>
+    <file alias="login/preboarding">../gifs/windows/send-contact.gif</file>
     <file alias="login/close">../slices/mac/view_login/login-icon-close.png</file>
     <file alias="login/close@2x">../slices/mac/view_login/login-icon-close@2x.png</file>
     <file alias="login/close-hover">../slices/mac/view_login/login-icon-close-hover.png</file>
