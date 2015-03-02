@@ -230,7 +230,7 @@ namespace fist
         auto* widget = new QLabel(this);
         widget->setMovie(new QMovie(":/login/preboarding"));
         widget->movie()->start();
-        widget->setScaledContents(true);
+        // widget->setScaledContents(true);
         this->updateGeometry();
         this->_video = widget;
 #endif
@@ -280,7 +280,7 @@ namespace fist
       glayout->addLayout(layout);
       {
         auto layout = new QVBoxLayout;
-        layout->setContentsMargins(0, 2, 2, 2); // 15, 15, 15, 15);
+        layout->setContentsMargins(0, 2, 55, 2); // 15, 15, 15, 15);
         layout->addWidget(this->_video);
         glayout->addLayout(layout);
       }
