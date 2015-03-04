@@ -12,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPalette>
+#include <QDir>
 #include <QFile>
 #include <QPixmap>
 #include <QPropertyAnimation>
@@ -161,12 +162,7 @@ namespace fist
       {
         qint64 size = 0;
         for (auto const& file: this->_files.keys())
-        {
-          if (file.isLocalFile())
-          {
-            size += QFile(file.toLocalFile()).size();
-          }
-        }
+          size += this->_files[file]->size;
         this->_text->setText(
           QString::fromStdString(
             elle::sprintf("%s file%s (%s)",

@@ -28,14 +28,19 @@ Q_SIGNALS:
   void
   remove(QUrl const&);
 
+
 private:
   QHBoxLayout* _layout;
   QUrl _path;
   QFile _file;
   QLabel* _name;
   QLabel* _icon;
+public:
+  quint64 size;
+private:
   QLabel* _size;
   IconButton* _remove;
+
 
 public:
   Q_OBJECT;

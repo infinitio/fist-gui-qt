@@ -1,5 +1,6 @@
 #include <QDir>
 #include <QHBoxLayout>
+#include <QtCore>
 
 #include <elle/log.hh>
 
@@ -9,6 +10,34 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.FileItem");
 
+static
+quint64
+compute_size(QFileInfo const& info)
+{
+  quint64 sizex = 0;
+  if (info.isDir())
+  {
+    QDir dir{info.filePath()};
+    QFileInfoList list = dir.entryInfoList(
+      QDir::Files | QDir::Dirs |  QDir::Hidden | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    QtConcurrent::blockingFilter(
+      list,
+      [&sizex] (QFileInfo const& fileInfo) -> bool
+      {
+        if(fileInfo.isDir())
+          sizex += compute_size(fileInfo);
+        else
+          sizex += fileInfo.size();
+        return false;
+      });
+  }
+  if (info.isFile())
+  {
+    sizex += info.size();
+  }
+  return sizex;
+}
+
 FileItem::FileItem(QUrl const& path):
   ListItem(nullptr, view::send::file::background, false),
   _layout(new QHBoxLayout(this)),
@@ -16,7 +45,8 @@ FileItem::FileItem(QUrl const& path):
   _file(path.toLocalFile()),
   _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last())),
   _icon(new QLabel),
-  _size(new QLabel(readable_size(this->_file.size()))),
+  size(compute_size(QFileInfo(path.toLocalFile()))),
+  _size(new QLabel(readable_size(this->size))),
   _remove(new IconButton(QPixmap(":/send/delete"), // Remove.
                          false,
                          [this]

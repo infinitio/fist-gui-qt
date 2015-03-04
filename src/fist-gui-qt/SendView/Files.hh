@@ -122,7 +122,7 @@ namespace fist
       ELLE_ATTRIBUTE_R(QLabel*, text);
       ELLE_ATTRIBUTE_R(fist::TwoStateIconButton*, expanser);
       ELLE_ATTRIBUTE_R(IconButton*, add_file);
-      typedef QHash<QUrl, std::shared_ptr<ListItem>> List;
+      typedef QHash<QUrl, std::shared_ptr<FileItem>> List;
       ELLE_ATTRIBUTE_R(List, files);
       ELLE_ATTRIBUTE(HorizontalSeparator*, separator);
       ELLE_ATTRIBUTE_R(ListWidget*, list);
