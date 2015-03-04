@@ -21,8 +21,9 @@ namespace fist
       , _is_sender(
         gap_self_id(this->_state.state()) ==
         gap_transaction_sender_id(this->_state.state(), this->id()))
-      , _is_sender_device(this->_is_sender &&
-                          gap_transaction_sender_device_id(this->_state.state(), this->id()) == gap_self_device_id(this->_state.state()))
+      , _is_sender_device(
+        this->_is_sender &&
+        gap_transaction_sender_device_id(this->_state.state(), this->id()) == gap_self_device_id(this->_state.state()))
       , _is_recipient(
         gap_self_id(this->_state.state()) ==
         gap_transaction_recipient_id(this->_state.state(), this->id()))
@@ -86,9 +87,9 @@ namespace fist
         .arg(this->is_sender() ? "sender" : "recipient")
         .arg(this->_concerns_device ? "concerns" : "doesn't concern")
         .arg(gap_transaction_sender_id(this->_state.state(), this->id()))
-        .arg(gap_transaction_sender_device_id(this->_state.state(), this->id()))
+        .arg(QString::fromStdString(gap_transaction_sender_device_id(this->_state.state(), this->id())))
         .arg(gap_transaction_recipient_id(this->_state.state(), this->id()))
-        .arg(gap_transaction_recipient_device_id(this->_state.state(), this->id()));
+        .arg(QString::fromStdString(gap_transaction_recipient_device_id(this->_state.state(), this->id())));
       this->_tooltip.append(this->files_tooltip());
 #endif
     }
