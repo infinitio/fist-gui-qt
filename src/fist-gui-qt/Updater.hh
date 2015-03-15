@@ -21,7 +21,8 @@ class Updater:
   public elle::Printable
 {
 public:
-  Updater(QUrl const& version_url =
+  Updater(QString const& home,
+          QUrl const& version_url =
             QString("http://www.download.infinit.io/windows/32/update.xml"),
           QObject* parent = nullptr);
 

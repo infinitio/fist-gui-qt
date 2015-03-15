@@ -60,7 +60,7 @@ Fist* g_fist = nullptr;
 
 
 static QFile crash_witness(QString::fromStdString(
-  elle::os::path::join(common::infinit::infinit_default_home(), "crashed")));
+  elle::os::path::join(common::infinit::default_home(), "crashed")));
 
 #define SUICIDE(signal) ::exit(1);
 
@@ -121,7 +121,7 @@ class Fist::Prologue
     {
       logger.reset(
         new infinit::fist::log::CircularSelector(
-          elle::os::path::join(common::infinit::infinit_default_home(), "state%s.log"),
+          elle::os::path::join(common::infinit::default_home(), "state%s.log"),
           4));
 
       elle::os::setenv("INFINIT_LOG_FILE",
@@ -211,7 +211,7 @@ Fist::Fist(int argc, char** argv):
   _previous_session_crashed(false),
   _filelock(
     QString::fromStdString(
-      elle::os::path::join(common::infinit::infinit_default_home(), "lock"))),
+      elle::os::path::join(common::infinit::default_home(), "lock"))),
   _application(new QApplication(argc, argv)),
   _updater(nullptr),
   _systray(fist::icon::inactive, this),
@@ -377,7 +377,9 @@ Fist::operator ()()
   auto update_url = elle::os::getenv(
     "FIST_UPDATE_FILE",
     "http://download.infinit.io/windows/${architecture}/update.xml");
-  this->_updater.reset(new Updater(QString::fromStdString(update_url), this));
+  this->_updater.reset(
+    new Updater(QString::fromStdString(common::infinit::default_home()),
+                QString::fromStdString(update_url), this));
   // Handle quit from updater.
   connect(this->_updater.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
