@@ -16,74 +16,79 @@ namespace fist
 {
   namespace model
   {
+    static
+    surface::gap::User
+    id_to_user(fist::State& state,
+               uint32_t id)
+    {
+      surface::gap::User user;
+      auto res = gap_user_by_id(state.state(), id, user);
+      if (res != gap_ok); // XXX
+      return user;
+    }
+
     User::User(fist::State& state,
                uint32_t id)
-      : Super(state, id)
-      , _fullname()
-      , _handle()
-      , _deleted(gap_user_deleted(this->_state.state(), this->id()))
+      : User(state, id_to_user(state, id))
+    {}
+
+    User::User(fist::State& state,
+               surface::gap::User const& user)
+      : Super(state, user.id)
+      , _user(user)
       , _avatar()
-      , _transactions()
       , _default_avatar(true)
       , _new_avatar(true)
     {
-      ELLE_TRACE_SCOPE("%s: create user model", *this);
     }
 
-    QString const&
+    QString
     User::fullname() const
     {
-      if (this->_fullname.isNull())
-      {
-        this->_fullname = QString::fromUtf8(
-          gap_user_fullname(this->_state.state(), this->id()));
-
-        ELLE_DEBUG("%s: fetched 'fullname': %s", *this, this->_fullname);
-      }
-      return this->_fullname;
+      return QString::fromUtf8(this->_user.fullname.c_str());
     }
 
-    QString const&
+    QString
     User::handle() const
     {
-      if (this->_handle.isNull())
-      {
-        this->_handle =
-          QString::fromUtf8(gap_user_handle(this->_state.state(), this->id()));
+      return QString::fromUtf8(this->_user.handle.c_str());
+    }
 
-        ELLE_DEBUG("%s: fetched 'handle': %s", *this, this->_handle);
-      }
-
-      return this->_handle;
+    void
+    User::deleted(bool deleted)
+    {
+      this->_user.deleted = deleted;
     }
 
     bool
     User::deleted()
     {
-      return this->_deleted;
+      return this->_user.deleted;
     }
 
-    User::Transactions const&
-    User::transactions() const
+    bool
+    User::swagger() const
     {
-      ELLE_TRACE_SCOPE("%s: get transactions", *this);
+      return this->_user.swagger;
+    }
 
-      if (this->_transactions.empty())
-      {
-        uint32_t* trs = gap_transactions(this->_state.state());
+    void
+    User::swagger(bool)
+    {
+      this->_user.swagger = true;
+    }
 
-        for (uint32_t v = 0; trs[v] != gap_null(); v += 1)
-          if (this->id() == gap_transaction_sender_id(
-                this->_state.state(), trs[v]) ||
-              this->id() == gap_transaction_recipient_id(
-                this->_state.state(), trs[v]))
-            this->_transactions.emplace(new Transaction(this->_state, trs[v]));
+    void
+    User::status(bool status)
+    {
+      this->_user.status = status;
+      emit status_updated();
+    }
 
-        gap_transactions_free(trs);
-        ELLE_DEBUG("fetched 'transactions': %s", this->_transactions);
-      }
-
-      return this->_transactions;
+    bool
+    User::status() const
+    {
+      return this->_user.status;
     }
 
     bool
@@ -96,6 +101,7 @@ namespace fist
     User::avatar_available()
     {
       this->_new_avatar = true;
+      emit avatar_updated();
     }
 
     QPixmap const&
@@ -103,37 +109,39 @@ namespace fist
     {
       if (this->_avatar.isNull() || this->_default_avatar == true)
       {
-        /// Get user icon data.
-        void* data = nullptr;
-        size_t len = 0;
-
-        auto res = gap_avatar(this->_state.state(), this->id(), &data, &len);
-
-        if (res == gap_ok)
+        if (this->_new_avatar)
         {
-          if (len > 0) // An avatar is avalaible. If not, keep the default.
+          /// Get user icon data.
+          void* data = nullptr;
+          size_t len = 0;
+
+          auto res = gap_avatar(this->_state.state(), this->id(), &data, &len);
+
+          if (res == gap_ok)
           {
-            ELLE_DEBUG("%s: get avatar data", *this);
-            QByteArray raw((char *) data, len);
-            QBuffer buff(&raw);
-            QImageReader reader;
-            reader.setDecideFormatFromContent(true);
-            reader.setDevice(&buff);
-            this->_avatar =  QPixmap::fromImageReader(&reader);
+            if (len > 0) // An avatar is avalaible. If not, keep the default.
+            {
+              ELLE_DEBUG("%s: get avatar data", *this);
+              QByteArray raw((char *) data, len);
+              QBuffer buff(&raw);
+              QImageReader reader;
+              reader.setDecideFormatFromContent(true);
+              reader.setDevice(&buff);
+              this->_avatar =  QPixmap::fromImageReader(&reader);
+            }
+            else if(this->_avatar.isNull())
+            {
+              this->_avatar = QPixmap(QString(":/avatar_default"));
+            }
+            this->_default_avatar = false;
           }
           else if(this->_avatar.isNull())
           {
+            ELLE_DEBUG("%s: avatar not available yet", *this);
             this->_avatar = QPixmap(QString(":/avatar_default"));
           }
-          this->_default_avatar = false;
-        }
-        else if(this->_avatar.isNull())
-        {
-          ELLE_DEBUG("%s: avatar not available yet", *this);
-          this->_avatar = QPixmap(QString(":/avatar_default"));
         }
       }
-
       this->_new_avatar = false;
       return this->_avatar;
     }
@@ -141,9 +149,7 @@ namespace fist
     void
     User::print(std::ostream& stream) const
     {
-      stream << "User(" << this->id() << ")";
-      if (!this->_fullname.isNull())
-        stream << " " << this->fullname();
+      stream << "User(" << this->id() << ", " << this->_user.fullname << ")";
     }
   }
 }

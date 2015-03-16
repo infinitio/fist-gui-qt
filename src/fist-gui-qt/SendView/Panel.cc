@@ -192,7 +192,7 @@ namespace fist
           if (id == gap_null())
           {
             ELLE_TRACE_SCOPE("send files to %s", recipient);
-            gap_send_files_by_email(
+            gap_send_files(
               this->_state.state(), recipient.toStdString(), files, message);
           }
           else if (recipients.find(id) == recipients.end())

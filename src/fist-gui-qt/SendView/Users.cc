@@ -80,7 +80,7 @@ namespace fist
       connect(this->_search_field, SIGNAL(down_pressed()), this->_users, SLOT(setFocus()));
       this->setContentsMargins(0, 0, 0, 0);
       this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
-      connect(&this->_state, SIGNAL(results_ready()),
+      connect(&this->_state, SIGNAL(search_results_ready()),
               this, SLOT(_set_users()));
       {
         this->_users->setMaxRows(3);

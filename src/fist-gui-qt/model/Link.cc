@@ -16,24 +16,37 @@ namespace fist
 {
   namespace model
   {
-    Link::Link(fist::State& state,
-               uint32_t id)
-      : Super(state, id)
-      , _link(gap_link_transaction_by_id(this->_state.state(), this->id()))
-      , _mtime()
-      , _final(false)
+    static
+    surface::gap::LinkTransaction
+    link_transaction(fist::State& state,
+                     uint32_t id)
     {
-      this->_final = this->is_finished();
+      surface::gap::LinkTransaction link;
+      auto res = gap_link_transaction_by_id(state.state(), id, link);
+      if (res != gap_ok); // XXX
+      return link;
+    }
+
+    Link::Link(fist::State& state, uint32_t id)
+      : Link(state, link_transaction(state, id))
+    {}
+
+    Link::Link(fist::State& state,
+               surface::gap::LinkTransaction const& transaction)
+      : Super(state, transaction.id)
+      , _link(transaction)
+      , _mtime(QDateTime::fromTime_t(transaction.mtime))
+    {
     }
 
     void
-    Link::update()
+    Link::link(surface::gap::LinkTransaction const& new_link)
     {
       ELLE_TRACE_SCOPE("%s: update", *this);
       surface::gap::LinkTransaction old = this->_link;
-      this->_link = gap_link_transaction_by_id(this->_state.state(), this->id());
-      this->_link.status = old.status;
+      this->_link = new_link;
       ELLE_DEBUG("%s -> %s", old, this->_link);
+      this->_mtime = QDateTime::fromTime_t(this->_link.mtime);
       emit status_updated();
       if (old.click_count != this->click_count())
         emit click_count_updated();
@@ -56,13 +69,6 @@ namespace fist
     Link::name() const
     {
       return QString::fromUtf8(this->_link.name.c_str());
-    }
-
-    QDateTime const&
-    Link::mtime() const
-    {
-      this->_mtime.setTime_t(this->_link.mtime);
-      return this->_mtime;
     }
 
     uint32_t
@@ -107,17 +113,9 @@ namespace fist
     bool
     Link::is_finished() const
     {
-      if (this->_final)
-        return true;
       if (this->unavailable() || (gap_transaction_finished == this->status()))
-      {
-        this->_final = true;
-      }
-      else if (gap_transaction_is_final(this->_state.state(), this->id()))
-      {
-        this->_final = true;
-      }
-      return this->_final;
+        return true;
+      return false;
     }
 
     void

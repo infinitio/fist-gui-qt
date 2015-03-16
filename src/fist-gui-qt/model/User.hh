@@ -11,9 +11,10 @@
 # include <QPixmap>
 # include <QVariant>
 
-# include <fist-gui-qt/model/Transaction.hh>
 # include <fist-gui-qt/model/Model.hh>
 # include <fist-gui-qt/fwd.hh>
+
+# include <surface/gap/User.hh>
 
 namespace fist
 {
@@ -27,33 +28,42 @@ namespace fist
       : public Model
     {
       typedef Model Super;
-      typedef std::unordered_set<std::unique_ptr<Transaction>> Transactions;
-
     public:
       User(fist::State& state,
-                uint32_t id);
+           uint32_t id);
+      User(fist::State& state,
+           surface::gap::User const& user);
       virtual
       ~User() = default;
 
       User(User const&) = default;
 
-      QString const&
+      QString
       fullname() const;
 
-      QString const&
+      QString
       handle() const;
+
+      void
+      deleted(bool status);
 
       bool
       deleted();
 
+      void
+      status(bool status);
+
       bool
-      user_status();
+      status() const;
+
+      bool
+      swagger() const;
+
+      void
+      swagger(bool);
 
       QPixmap const&
       avatar() const;
-
-      Transactions const&
-      transactions() const;
 
       bool
       new_avatar() const;
@@ -64,17 +74,17 @@ namespace fist
     private:
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
-      ELLE_ATTRIBUTE_P(QString, fullname, mutable);
-      ELLE_ATTRIBUTE_P(QString, handle, mutable);
-      ELLE_ATTRIBUTE_RW(bool, deleted);
+      ELLE_ATTRIBUTE_RX(surface::gap::User, user);
       ELLE_ATTRIBUTE_P(QPixmap, avatar, mutable);
-      ELLE_ATTRIBUTE_P(Transactions, transactions, mutable);
       ELLE_ATTRIBUTE_P(bool, default_avatar, mutable);
       ELLE_ATTRIBUTE_P(bool, new_avatar, mutable);
 
     signals:
       void
       avatar_updated() const;
+
+      void
+      status_updated();
 
     private:
       /*----------.

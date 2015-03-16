@@ -56,7 +56,6 @@ onboarded_sending_complete("sending_complete");
 // Attaching a static method works but make signal emission impossible.
 // The only 'good' way I found, while there is only one instance of InfinitDock
 // is to add a global pointer to the dock and makes it emit the signal.
-InfinitDock* g_dock = nullptr;
 
 class InfinitDock::Prologue
 {
@@ -65,10 +64,6 @@ class InfinitDock::Prologue
   Prologue(gap_State* state)
   {
     ELLE_TRACE_SCOPE("ininitialize Prologue");
-
-    // Register gap callback.
-    gap_user_status_callback(state, InfinitDock::user_status_cb);
-    gap_avatar_available_callback(state, InfinitDock::avatar_available_cb);
   }
 };
 
@@ -99,7 +94,6 @@ InfinitDock::InfinitDock(fist::State& state,
   , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
 #endif
 {
-  g_dock = this;
   this->_systray.set_icon(fist::icon::normal);
   this->_systray.show();
   // System Tray.
@@ -151,10 +145,6 @@ InfinitDock::InfinitDock(fist::State& state,
   connect(&this->_state, SIGNAL(new_download_folder_needed()),
           this, SLOT(_change_download_folder()));
 
-  connect(
-    this, SIGNAL(avatar_available(uint32_t)),
-    this->_send_panel.get(), SLOT(avatar_available(uint32_t)));
-
   this->_menu->setMaximumWidth(210);
   auto* v2 = this->_menu->addAction(QString("v" INFINIT_VERSION));
   v2->setDisabled(true);
@@ -186,10 +176,6 @@ InfinitDock::InfinitDock(fist::State& state,
   this->_menu->addSeparator();
   this->_menu->addAction(_logout);
   this->_menu->addAction(_quit);
-
-  // Register gap callback.
-  gap_user_status_callback(_state.state(), InfinitDock::user_status_cb);
-  gap_avatar_available_callback(_state.state(), InfinitDock::avatar_available_cb);
 
   this->_show_transactions_view();
 
@@ -245,26 +231,6 @@ InfinitDock::_on_logout()
   this->setCentralWidget(nullptr);
   this->_send_panel.reset();
   this->_transaction_panel.reset();
-}
-
-/*----------------.
-| State Callbacks |
-`----------------*/
-void
-InfinitDock::user_status_cb(uint32_t id,
-                            gap_UserStatus const status)
-{
-  ELLE_TRACE_SCOPE("Dock: User (%s) status changed to %s", id, status);
-
-  g_dock->user_status_changed(id, status);
-}
-
-void
-InfinitDock::avatar_available_cb(uint32_t id)
-{
-  ELLE_TRACE_SCOPE("Dock: Avatar available for user %s", id);
-
-  g_dock->avatar_available(id);
 }
 
 /*------------.
@@ -799,7 +765,7 @@ InfinitDock::report_a_problem()
       this->_state.state(),
       gap_self_email(this->_state.state()),
       std_text.c_str(),
-      "");
+      std::vector<std::string>{});
     ELLE_DEBUG("report sent");
   }
 

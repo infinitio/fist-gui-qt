@@ -14,84 +14,85 @@ namespace fist
 {
   namespace model
   {
+    static
+    surface::gap::PeerTransaction
+    peer_transaction(fist::State& state,
+                     uint32_t id)
+    {
+      surface::gap::PeerTransaction transaction;
+      auto res = gap_peer_transaction_by_id(state.state(), id, transaction);
+      if (res != gap_ok); // XXX
+      return transaction;
+    }
+
     Transaction::Transaction(fist::State& state,
                              uint32_t id)
-      : Model(state, id)
-      , _concerns_device(gap_transaction_concern_device(this->_state.state(), this->id(), false))
-      , _is_sender(
-        gap_self_id(this->_state.state()) ==
-        gap_transaction_sender_id(this->_state.state(), this->id()))
-      , _is_sender_device(
-        this->_is_sender &&
-        gap_transaction_sender_device_id(this->_state.state(), this->id()) == gap_self_device_id(this->_state.state()))
-      , _is_recipient(
-        gap_self_id(this->_state.state()) ==
-        gap_transaction_recipient_id(this->_state.state(), this->id()))
-      , _is_recipient_device(false)
-      , _status(gap_transaction_status(this->_state.state(), this->id()))
-      , _peer_fullname((char const*) nullptr)
-      , _peer_id(
-        this->_is_sender
-        ? gap_transaction_recipient_id(this->_state.state(), this->id())
-        : gap_transaction_sender_id(this->_state.state(), this->id()))
-      , _files()
-      , _mtime()
-      , _final(false)
-      , _avatar()
-      , _default_avatar(true)
-      , _new_avatar(true)
+      : Transaction(state, peer_transaction(state, id))
+    {}
+
+    Transaction::Transaction(fist::State& state,
+                             surface::gap::PeerTransaction const& transaction)
+      : Super(state, transaction.id)
+      , _transaction(transaction)
+      , _mtime(QDateTime::fromTime_t(transaction.mtime))
     {
-      this->_final = this->is_final();
-      ELLE_TRACE_SCOPE("%s: create transaction model", *this);
-      this->update();
-      if (this->is_sender())
-        ELLE_DEBUG("as sender");
-      if (this->is_recipient())
-        ELLE_DEBUG("as recipient");
-      ELLE_DEBUG("status %s", this->_status);
+      ELLE_DEBUG_SCOPE("%s: construction", *this);
+    }
+
+    void
+    Transaction::transaction(surface::gap::PeerTransaction const& transaction)
+    {
+      surface::gap::PeerTransaction old = this->_transaction;
+      this->_transaction = transaction;
+      this->_mtime = QDateTime::fromTime_t(this->_transaction.mtime);
+      emit status_updated();
+    }
+
+    bool
+    Transaction::is_sender() const
+    {
+      return this->_transaction.sender_id == this->_state.me().id();
+    }
+
+    bool
+    Transaction::is_recipient() const
+    {
+      return this->_transaction.recipient_id == this->_state.me().id();
+    }
+
+    bool
+    Transaction::is_sender_device() const
+    {
+      return this->is_sender() &&
+        this->_transaction.sender_device_id == this->_state.device();
+    }
+
+    bool
+    Transaction::is_recipient_device() const
+    {
+      return this->is_recipient() &&
+        this->_transaction.recipient_device_id == this->_state.device();
+    }
+
+    bool
+    Transaction::concerns_device() const
+    {
+      return this->is_sender_device() || this->is_recipient_device();
     }
 
     model::User const&
     Transaction::peer() const
     {
-      return this->_state.user(this->peer_id());
+      return this->_state.user(
+        this->is_sender()
+        ? this->_transaction.recipient_id
+        : this->_transaction.sender_id);
     }
 
     void
     Transaction::on_peer_changed() const
     {
-      auto peer_id = this->_is_sender
-        ? gap_transaction_recipient_id(this->_state.state(), this->id())
-        : gap_transaction_sender_id(this->_state.state(), this->id());
-
-      if (this->peer_id() != peer_id)
-      {
-        this->_peer_id = peer_id;
-        this->_avatar = QPixmap{};
-        emit peer_changed();
-      }
-    }
-
-    void
-    Transaction::update() const
-    {
-      this->_concerns_device = gap_transaction_concern_device(this->_state.state(), this->id(), false);
-      this->_is_recipient = gap_self_id(this->_state.state()) == gap_transaction_recipient_id(this->_state.state(), this->id());
-      this->_is_recipient_device = this->_is_recipient &&
-        gap_transaction_recipient_device_id(this->_state.state(), this->id()) == gap_self_device_id(this->_state.state());
-
-#ifndef FIST_PRODUCTION_BUILD
-      this->_tooltip = QString("id: %1, status: %2, (%3) (%4 device)\nsender: %5 (%6)\nrecipient %7 (%8)\n")
-        .arg(this->id())
-        .arg(this->status())
-        .arg(this->is_sender() ? "sender" : "recipient")
-        .arg(this->_concerns_device ? "concerns" : "doesn't concern")
-        .arg(gap_transaction_sender_id(this->_state.state(), this->id()))
-        .arg(QString::fromStdString(gap_transaction_sender_device_id(this->_state.state(), this->id())))
-        .arg(gap_transaction_recipient_id(this->_state.state(), this->id()))
-        .arg(QString::fromStdString(gap_transaction_recipient_device_id(this->_state.state(), this->id())));
-      this->_tooltip.append(this->files_tooltip());
-#endif
+      emit peer_changed();
     }
 
     QString
@@ -117,18 +118,13 @@ namespace fist
     bool
     Transaction::running() const
     {
-      return (this->status() == gap_transaction_transferring ||
-              this->status() == gap_transaction_connecting);
+      return !this->is_final();
     }
 
     bool
     Transaction::is_final() const
     {
-      if (this->_final)
-        return true;
-
-      static QVector<gap_TransactionStatus> final_states =
-        {
+      static QVector<gap_TransactionStatus> sender_final_states = {
           gap_transaction_finished,
           gap_transaction_failed,
           gap_transaction_canceled,
@@ -137,27 +133,17 @@ namespace fist
           gap_transaction_cloud_buffered,
         };
 
-      if (final_states.contains(this->status()))
-      {
-        this->_final = true;
-      }
-      else if (gap_transaction_is_final(this->_state.state(), this->id()))
-      {
-        this->_final = true;
-      }
-      return this->_final;
-    }
+      static QVector<gap_TransactionStatus> recipient_final_states = {
+          gap_transaction_finished,
+          gap_transaction_failed,
+          gap_transaction_canceled,
+          gap_transaction_rejected,
+          gap_transaction_deleted,
+        };
 
-    QString const&
-    Transaction::peer_fullname() const
-    {
-      return this->peer().fullname();
-    }
-
-    gap_UserStatus
-    Transaction::peer_connection_status() const
-    {
-      return gap_user_status(this->_state.state(), this->peer_id());
+      return this->is_sender()
+        ? sender_final_states.contains(this->status())
+        : recipient_final_states.contains(this->status());
     }
 
     float
@@ -169,90 +155,18 @@ namespace fist
     QVector<QString> const&
     Transaction::files() const
     {
-      if (this->_files.empty())
+      if (this->_files.isEmpty())
       {
-        char** files = gap_transaction_files(this->_state.state(), this->id());
-        char** copyied = files;
-        while (*copyied != nullptr)
-        {
-          this->_files.push_back(QString::fromUtf8(*copyied));
-          ++copyied;
-        }
-        ::free((void*) files);
-
-        ELLE_DEBUG("%s: fetched 'files': %s", *this, this->_files);
+        for (auto const& file: this->_transaction.file_names)
+          this->_files.append(QString::fromUtf8(file.c_str()));
       }
-
       return this->_files;
     }
 
     gap_TransactionStatus
     Transaction::status() const
     {
-      return this->_status;
-    }
-
-    void
-    Transaction::status(gap_TransactionStatus status)
-    {
-      this->_status = status;
-    }
-
-    QDateTime const&
-    Transaction::mtime() const
-    {
-      this->_mtime.setTime_t(gap_transaction_mtime(this->_state.state(), this->id()));
-      return this->_mtime;
-    }
-
-    bool
-    Transaction::new_avatar() const
-    {
-      return this->_new_avatar;
-    }
-
-    void
-    Transaction::avatar_available() const
-    {
-      this->avatar();
-    }
-
-    QPixmap const&
-    Transaction::avatar() const
-    {
-      if (this->_avatar.isNull() || this->_default_avatar == true)
-      {
-        /// Get user icon data.
-        void* data = nullptr;
-        size_t len = 0;
-
-        if (gap_ok == gap_avatar(this->_state.state(), this->peer_id(), &data, &len))
-        {
-          if (len > 0) // An avatar is avalaible. If not, keep the default.
-          {
-            ELLE_DEBUG("%s: get avatar data", *this);
-            QByteArray raw((char *) data, len);
-            QBuffer buff(&raw);
-            QImageReader reader;
-            reader.setDecideFormatFromContent(true);
-            reader.setDevice(&buff);
-            this->_avatar =  QPixmap::fromImageReader(&reader);
-          }
-          else if(this->_avatar.isNull())
-          {
-            this->_avatar = QPixmap(QString(":/avatar_default"));
-          }
-          this->_default_avatar = false;
-        }
-        else if(this->_avatar.isNull())
-        {
-          ELLE_DEBUG("%s: avatar not available yet", *this);
-          this->_avatar = QPixmap(QString(":/avatar_default"));
-        }
-      }
-
-      this->_new_avatar = false;
-      return this->_avatar;
+      return this->_transaction.status;
     }
 
     bool
@@ -270,13 +184,7 @@ namespace fist
     void
     Transaction::print(std::ostream& stream) const
     {
-      stream << "Transaction(" << this->id() << ", " << this->status() << ")";
-      if (this->_is_sender)
-      {
-        stream << " "
-               << (this->is_sender() ? "to" : "from")
-               << " " << this->peer_fullname();
-      }
+      stream << "Transaction(" << this->_transaction << ")";
     }
   }
 }

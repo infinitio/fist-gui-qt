@@ -63,17 +63,6 @@ private slots:
   void
   _on_logout();
 
-/*----------------.
-| State callbacks |
-`----------------*/
-public:
-  static void user_status_cb(uint32_t id, gap_UserStatus const status);
-  static void avatar_available_cb(uint32_t id);
-
-Q_SIGNALS:
-  void avatar_available(uint32_t id);
-  void user_status_changed(uint32_t, gap_UserStatus);
-
 /*------------.
 | System Tray |
 `------------*/

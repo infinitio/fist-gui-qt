@@ -25,17 +25,15 @@ namespace fist
     public:
       Link(fist::State& state,
            uint32_t id);
+      Link(fist::State& state,
+           surface::gap::LinkTransaction const& transaction);
       virtual
       ~Link() = default;
 
     private:
-      ELLE_ATTRIBUTE_P(surface::gap::LinkTransaction, link, mutable);
-      ELLE_ATTRIBUTE_P(QDateTime, mtime, mutable);
-      ELLE_ATTRIBUTE_P(bool, final, mutable);
-
-    public:
-      void
-      update();
+      ELLE_ATTRIBUTE_Rw(surface::gap::LinkTransaction, link);
+      // Cache the mtime.
+      ELLE_ATTRIBUTE_R(QDateTime, mtime);
 
     public:
       QUrl
@@ -43,9 +41,6 @@ namespace fist
 
       QString
       name() const;
-
-      QDateTime const&
-      mtime() const;
 
       uint32_t
       click_count() const;

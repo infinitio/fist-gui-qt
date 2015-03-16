@@ -28,6 +28,10 @@ public:
   virtual
   ~TransactionWidget();
 
+private:
+  void
+  _connect_peer();
+
 /*-----------.
 | Properties |
 `-----------*/
@@ -94,6 +98,8 @@ private slots:
   void _on_status_updated();
 
 private slots:
+  void
+  _update_peer_status();
   void
   _update_peer();
 

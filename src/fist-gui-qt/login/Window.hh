@@ -69,10 +69,10 @@ namespace fist
       // implementation, but I rather split both behavior, so each one use it's
       // QFuture and QFuture watcher, signals, and slots.
       void
-      _login_attempt();
+      _login_attempt(gap_Status);
 
       void
-      _register_attempt();
+      _register_attempt(gap_Status);
 
       void
       _internet_issue(QString const&);
@@ -143,10 +143,6 @@ namespace fist
       ELLE_ATTRIBUTE(QLabel*, version_field);
       ELLE_ATTRIBUTE(QPushButton*, login_button);
 
-      ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
-      ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
-      ELLE_ATTRIBUTE(QFuture<gap_Status>, register_future);
-      ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, register_watcher);
       ELLE_ATTRIBUTE(QWidget*, video);
     public:
       void

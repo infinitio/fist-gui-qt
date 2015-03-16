@@ -3,6 +3,9 @@
 # include <winsock2.h>
 # include <shlobj.h>
 #endif
+
+#include <functional>
+
 #include <QDesktopServices>
 #include <QtConcurrentRun>
 #include <QTimer>
@@ -38,6 +41,10 @@ namespace fist
 
   State::State()
     : _state()
+    , _login_future()
+    , _login_watcher()
+    , _register_future()
+    , _register_watcher()
     , _users()
     , _search_future()
     , _search_watcher()
@@ -61,33 +68,59 @@ namespace fist
     "",
     download_folder));
 
+    connect(&this->_login_watcher, SIGNAL(finished()),
+            this, SLOT(_on_login_result_ready()));
+    connect(&this->_register_watcher, SIGNAL(finished()),
+            this, SLOT(_on_register_result_ready()));
+
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
-    // Merge Transaction callback & recipient changed callback when new
-    // notification system is up.
-    ELLE_DEBUG("connect transaction updated callback")
-      gap_transaction_callback(this->state(), State::transaction_callback);
-    ELLE_DEBUG("connect transaction recipient changed callback");
-      gap_transaction_recipient_changed_callback(
-        this->state(), State::transaction_recipient_changed_callback);
-    ELLE_DEBUG("connect link updated callback")
-      gap_link_callback(
-        this->state(),
-        std::bind(
-          &State::on_link_updated_callback, this, std::placeholders::_1));
-    ELLE_DEBUG("connect user status updated callback")
-      gap_user_status_callback(this->state(), State::user_status_callback);
-    ELLE_DEBUG("connect avatar updated callback")
-      gap_avatar_available_callback(
-        this->state(), State::avatar_available_callback);
-    ELLE_DEBUG("connect connection callback")
-      gap_connection_callback(this->state(), State::connection_callback);
-    ELLE_DEBUG("connect swagger deleted callback")
-      gap_deleted_swagger_callback(
-        this->state(), State::swagger_deleted_callback);
 
+    // Callbacks.
+    gap_update_user_callback(
+      this->state(),
+      [this] (surface::gap::User const& user)
+      {
+        this->State::on_user_updated(user);
+      });
+    gap_deleted_swagger_callback(
+      this->state(),
+      [this] (uint32_t id)
+      {
+        this->on_swagger_deleted(id);
+      });
+    gap_user_status_callback(
+      this->state(),
+      [this] (uint32_t id, bool status)
+      {
+        this->on_user_status_changed(id, status);
+      });
+    gap_avatar_available_callback(
+      this->state(),
+      [this] (uint32_t id)
+      {
+        this->on_avatar_available(id);
+      });
+    gap_connection_callback(
+      this->state(),
+      [this] (bool status, bool retrying, std::string const& message)
+      {
+        this->on_connection_changed(status, retrying, message);
+      });
+    gap_peer_transaction_callback(
+      this->state(),
+      [this] (surface::gap::PeerTransaction const& transaction)
+      {
+        this->on_peer_transaction_updated(transaction);
+      });
+    gap_link_callback(
+      this->state(),
+      [this] (surface::gap::LinkTransaction const& transaction)
+      {
+        this->on_link_updated(transaction);
+      });
     connect(&this->_search_watcher, SIGNAL(finished()),
-            this, SLOT(_on_results_ready()));
+            this, SLOT(_on_search_results_ready()));
 
     ELLE_DEBUG("start the update loop")
     {
@@ -107,17 +140,49 @@ namespace fist
   }
 
   void
-  State::connection_callback(bool status,
-                             bool still_retrying,
-                             std::string const& reason)
+  State::login(std::string const& email,
+               std::string const& password)
   {
-    g_state->on_connection_callback(status, still_retrying, reason);
+    this->_login_future = QtConcurrent::run(
+      [=] {
+        auto res = gap_login(this->state(), email, password);
+        if (res == gap_ok)
+          this->_me = gap_self_id(this->state());
+        return res;
+      });
+    this->_login_watcher.setFuture(this->_login_future);
   }
 
   void
-  State::on_connection_callback(bool status,
-                                bool still_retrying,
-                                std::string last_error)
+  State::_on_login_result_ready()
+  {
+    emit login_result(this->_login_future.result());
+  }
+
+  void
+  State::register_(std::string const& fullname,
+                   std::string const& email,
+                   std::string const& password)
+  {
+    this->_register_future = QtConcurrent::run(
+      [=] {
+        // Will explode if the state is destroyed.
+        return gap_register(this->state(), fullname, email, password);
+      });
+    this->_register_watcher.setFuture(this->_register_future);
+  }
+
+  void
+  State::_on_register_result_ready()
+  {
+    emit register_result(this->_register_future.result());
+  }
+
+  void
+  State::on_connection_changed(
+    bool status,
+    bool still_retrying,
+    std::string last_error)
   {
     ELLE_TRACE_SCOPE("connection callback: %sconnected will%s retry",
                      status ? "" : "dis",
@@ -135,37 +200,44 @@ namespace fist
   {
     ELLE_TRACE("load swaggers")
     {
-      uint32_t* swaggers = gap_swaggers(this->state());
-      for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
+      std::vector<surface::gap::User> users;
+      gap_Status res = gap_swaggers(this->state(), users);
+      if (res != gap_ok)
+        ELLE_ERR("getting swaggers failed %s", res);
+      for (auto const& user: users)
       {
-        this->user(swaggers[i]);
-        ELLE_DEBUG("user: %s", *this->_users[swaggers[i]]);
+        this->_users[user.id].reset(new model::User(*this, user));
+        ELLE_DEBUG("user: %s", *this->_users[user.id]);
       }
-      gap_swaggers_free(swaggers);
     }
 
     ELLE_TRACE("load transactions")
     {
-      uint32_t* trs = gap_transactions(this->state());
-      for (uint32_t i = 0; trs[i] != gap_null(); ++i)
+      std::vector<surface::gap::PeerTransaction> transactions;
+      gap_Status res = gap_peer_transactions(this->state(), transactions);
+      if (res != gap_ok)
+        ELLE_ERR("getting transactions failed %s", res);
+      for (auto const& transaction: transactions)
       {
-        this->_transactions.emplace(*this, trs[i]);
-        ELLE_DEBUG("transaction: %s",
-                   *this->_transactions.get<0>().find(trs[i]));
+        this->_transactions.emplace(*this, transaction);
+        ELLE_TRACE("transaction: %s",
+                   *this->_transactions.get<0>().find(transaction.id));
       }
-      gap_transactions_free(trs);
       this->_compute_active_transactions();
     }
 
     ELLE_TRACE("load links")
     {
-      auto const& links = gap_link_transactions(this->state());
+      std::vector<surface::gap::LinkTransaction> links;
+      gap_Status res = gap_link_transactions(this->state(), links);
+      if (res != gap_ok)
+        ELLE_ERR("getting transactions failed %s", res);
       for (auto const& link: links)
       {
         if (link.status != gap_transaction_canceled &&
             link.status != gap_transaction_failed &&
             link.status != gap_transaction_deleted)
-          this->_links.emplace(*this, link.id);
+          this->_links.emplace(*this, link);
         else
           ELLE_DEBUG("ignore %s", link);
       }
@@ -190,29 +262,20 @@ namespace fist
       ELLE_ERR("poll failed: %s", res);
   }
 
-  void
-  State::avatar_available_callback(uint32_t id)
+  model::User const&
+  State::me()
   {
-    g_state->on_avatar_available_callback(id);
+    return this->user(this->_me);
   }
 
   void
-  State::on_avatar_available_callback(uint32_t id)
+  State::on_avatar_available(uint32_t id)
   {
     ELLE_TRACE_SCOPE("%s: avatar available for id %s", *this, id);
     if (this->_users.find(id) == this->_users.end())
       this->_users[id].reset(new model::User(*this, id));
     ELLE_DEBUG("update %s avatar", *this->_users[id])
       this->_users[id]->avatar_updated();
-    for (model::Transaction const& model: this->_transactions.get<0>())
-      if (model.peer_id() == id)
-        model.avatar_updated();
-  }
-
-  void
-  State::swagger_deleted_callback(uint32_t id)
-  {
-    g_state->on_swagger_deleted(id);
   }
 
   void
@@ -224,35 +287,30 @@ namespace fist
   }
 
   void
-  State::user_status_callback(uint32_t id, gap_UserStatus status)
+  State::on_user_updated(surface::gap::User const& user)
   {
-    g_state->on_user_status_callback(id, status);
+    ELLE_TRACE_SCOPE("%s: peer %s updated", *this, user);
+    if (this->_users.find(user.id) == this->_users.end())
+      this->_users[user.id].reset(new model::User(*this, user));
   }
 
   void
-  State::on_user_status_callback(uint32_t id, gap_UserStatus status)
+  State::on_user_status_changed(uint32_t id, bool status)
   {
-    ELLE_TRACE_SCOPE("%s: peer %s status updated to %s", *this, id, status);
-    this->user(id).avatar_updated();
-    for (model::Transaction const& model: this->_transactions.get<0>())
-      if (model.peer_id() == id)
-        model.peer_status_updated();
+    if (this->_users.find(id) == this->_users.end())
+      this->_users[id].reset(new model::User(*this, id));
+    this->_users[id]->status(status);
   }
 
   State::Users
-  State::swaggers()
+  State::swaggers(std::function<bool (model::User const&)> filter)
   {
-    uint32_t* swaggers = gap_swaggers(this->state());
-
     State::Users res;
-    for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
+    for (auto const& user: this->_users)
     {
-      auto& u = this->user(swaggers[i]);
-      if (!u.deleted())
-        res.push_back(this->user(swaggers[i]).id());
+      if (user.second->swagger() && filter(*(user.second)))
+        res.push_back(user.first);
     }
-    gap_swaggers_free(swaggers);
-
     return res;
   }
 
@@ -260,20 +318,12 @@ namespace fist
   State::Users
   State::swaggers(QString const& filter)
   {
-    uint32_t* swaggers = gap_swaggers(this->state());
-
-    State::Users res;
-    for (uint32_t i = 0; swaggers[i] != gap_null(); ++i)
-    {
-      auto const& user = this->user(swaggers[i]);
-      if (!user.deleted())
-        if (user.fullname().toLower().contains(filter.toLower()) ||
-            user.handle().toLower().contains(filter.toLower()))
-          res.push_back(user.id());
-    }
-    gap_swaggers_free(swaggers);
-
-    return res;
+    return this->swaggers(
+      [&filter] (model::User const& user) -> bool
+      {
+        return (user.fullname().toLower().contains(filter.toLower()) ||
+                user.handle().toLower().contains(filter.toLower()));
+      });
   }
 
   State::Users
@@ -288,11 +338,27 @@ namespace fist
         this->_search_future = QtConcurrent::run(
           [&,filter] {
             std::string text = filter.toStdString();
+            std::vector<uint32_t> users;
             if (filter.count('@') == 1 && email_checker.exactMatch(filter))
-              return std::vector<uint32_t>{
-                gap_user_by_email(this->state(), text.c_str())};
+            {
+              surface::gap::User u;
+              auto res = gap_user_by_email(this->state(), text.c_str(), u);
+              if (res == gap_ok)
+                users.push_back(u.id);
+              else
+                ELLE_WARN("user by email failed: %s", res);
+            }
             else
-              return gap_users_search(this->state(), text.c_str());
+            {
+              std::vector<surface::gap::User> _users;
+              auto res = gap_users_search(this->state(), text.c_str(), _users);
+              if (res == gap_ok)
+                for (auto const& user: _users)
+                  users.push_back(user.id);
+              else
+                ELLE_WARN("user search failed: %s", res);
+            }
+            return users;
           });
       this->_search_watcher.setFuture(this->_search_future);
     }
@@ -302,7 +368,18 @@ namespace fist
   uint32_t
   State::user_id(std::string const& email)
   {
-    return gap_user_by_email(this->state(), email.c_str());
+    surface::gap::User u;
+    auto res = gap_user_by_email(this->state(), email.c_str(), u);
+    if (res == gap_ok)
+    {
+      if (this->_users.find(u.id) == this->_users.end())
+        this->_users[u.id].reset(new model::User(*this, u));
+      return u.id;
+    }
+    else
+      ELLE_WARN("user by email failed: %s", res);
+    return gap_null();
+
   }
 
   // Cancel the search operation.
@@ -320,6 +397,7 @@ namespace fist
   model::User const&
   State::user(uint32_t user_id)
   {
+    ELLE_ASSERT(user_id != gap_null());
     if (this->_users.find(user_id) == this->_users.end())
       this->_users[user_id].reset(new model::User(*this, user_id));
     return *this->_users[user_id];
@@ -340,7 +418,7 @@ namespace fist
   }
 
   void
-  State::_on_results_ready()
+  State::_on_search_results_ready()
   {
     ELLE_TRACE_SCOPE("%s: results ready", *this);
     this->_last_results.clear();
@@ -353,7 +431,7 @@ namespace fist
     {
       ELLE_DEBUG("future empty");
     }
-    emit results_ready();
+    emit search_results_ready();
   }
 
   QString
@@ -372,146 +450,70 @@ namespace fist
   }
 
   void
-  State::transaction_callback(uint32_t id, gap_TransactionStatus status)
+  State::on_peer_transaction_updated(surface::gap::PeerTransaction const& tr)
   {
+    ELLE_TRACE_SCOPE("%s: transaction notification %s", *this, tr);
+    auto id = tr.id;
     ELLE_ASSERT(id != gap_null());
-    ELLE_TRACE_SCOPE("transaction %s updated with status %s", id, status);
-    g_state->on_transaction_callback(id, status, false);
-  }
-
-  void
-  State::transaction_recipient_changed_callback(
-    uint32_t transaction_id, uint32_t recipient_id)
-  {
-    g_state->on_transaction_recipient_changed(transaction_id, recipient_id);
-  }
-
-  void
-  State::on_transaction_recipient_changed(uint32_t transaction_id,
-                                          uint32_t recipient_id)
-  {
-    ELLE_TRACE_SCOPE("%s: peer changed for %s changed to %s",
-                     *this, transaction_id, recipient_id);
-    ELLE_ASSERT(transaction_id != gap_null());
-    ELLE_ASSERT(recipient_id != gap_null());
-    ELLE_ASSERT(gap_is_p2p_transaction(this->state(), transaction_id));
-    auto it = this->_transactions.get<0>().find(transaction_id);
-    if (it != this->_transactions.get<0>().end())
+    auto it = this->_transactions.get<0>().find(id);
+    if (it == this->_transactions.get<0>().end())
     {
-      struct UpdateTransaction
-      {
-        UpdateTransaction()
-        {}
-
-        void
-        operator()(model::Transaction& model)
-        {
-          model.on_peer_changed();
-        }
-      };
-      this->_transactions.modify(it, UpdateTransaction());
+      this->_transactions.emplace(*this, tr);
+      emit new_transaction(id);
+      it = this->_transactions.get<0>().find(id);
     }
+    struct UpdateStatus
+    {
+      UpdateStatus(surface::gap::PeerTransaction const& transaction):
+        _transaction(transaction)
+      {}
+
+      void
+      operator()(model::Transaction& model)
+      {
+        model.transaction(this->_transaction);
+      }
+
+      ELLE_ATTRIBUTE(surface::gap::PeerTransaction, transaction)
+    };
+    this->_transactions.modify(it, UpdateStatus(tr));
   }
 
   void
-  State::on_transaction_callback(uint32_t id,
-                                 gap_TransactionStatus status,
-                                 bool manual)
+  State::on_link_updated(surface::gap::LinkTransaction const& link)
   {
-    ELLE_TRACE_SCOPE("%s: transaction notification (%s) with status %s",
-                     *this, id, status);
+    ELLE_TRACE_SCOPE("%s: link notification %s", *this, link);
+    auto id = link.id;
     ELLE_ASSERT(id != gap_null());
-    if (!gap_is_link_transaction(this->state(), id))
+    auto it = this->_links.get<0>().find(id);
+    if (it == this->_links.get<0>().end())
     {
-      auto it = this->_transactions.get<0>().find(id);
-      if (it == this->_transactions.get<0>().end())
-      {
-        if (manual)
-          return;
-
-        this->_transactions.emplace(*this, id);
-        emit new_transaction(id);
-        it = this->_transactions.get<0>().find(id);
-      }
-      else if (it->status() == status)
-      {
+      auto status = link.status;
+      if (status == gap_transaction_canceled ||
+          status == gap_transaction_failed ||
+          status == gap_transaction_deleted)
         return;
-      }
-
-      struct UpdateStatus
-      {
-        UpdateStatus(gap_TransactionStatus status):
-          _status(status)
-        {}
-
-        void
-        operator()(model::Transaction& model)
-        {
-          model.status(this->_status);
-          model.update();
-        }
-
-        ELLE_ATTRIBUTE(gap_TransactionStatus, status);
-      };
-      this->_transactions.modify(it, UpdateStatus(status));
-      this->_transactions.get<0>().find(id)->status_updated();
-      emit transaction_updated(id);
-      this->_compute_active_transactions();
+      ELLE_TRACE("insert new link to the map");
+      this->_links.emplace(*this, link);
+      emit new_link(id);
+      it = this->_links.get<0>().find(id);
     }
-    else
+
+    struct UpdateLink
     {
-      auto it = this->_links.get<0>().find(id);
-      if (it == this->_links.get<0>().end())
-      {
-        if (manual)
-          return;
+      UpdateLink(surface::gap::LinkTransaction const& link)
+        : _link(link)
+      {}
 
-        if (status == gap_transaction_canceled ||
-            status == gap_transaction_failed ||
-            status == gap_transaction_deleted)
-          return;
-        ELLE_TRACE("insert new link to the map");
-        this->_links.emplace(*this, id);
-        emit new_link(id);
-        it = this->_links.get<0>().find(id);
+      void
+      operator()(model::Link& model)
+      {
+        model.link(this->_link);
       }
 
-      bool update = false;
-      struct UpdateLink
-      {
-        UpdateLink(gap_TransactionStatus status,
-                   bool& update)
-          : status(status)
-          , update(update)
-        {}
-
-        void
-        operator()(model::Link& model)
-        {
-          if (this->status > model._link.status)
-          {
-            update = true;
-            model._link.status = this->status;
-          }
-          model.update();
-        }
-
-        gap_TransactionStatus status;
-        bool& update;
-      };
-
-      this->_links.modify(it, UpdateLink(status, update));
-      ELLE_DEBUG("update link")
-        emit link_updated(id);
-      if (update)
-        this->_compute_active_links();
-    }
-  }
-
-  void
-  State::on_link_updated_callback(surface::gap::LinkTransaction const& tr)
-  {
-    this->on_transaction_callback(tr.id, tr.status);
+      ELLE_ATTRIBUTE(surface::gap::LinkTransaction, link);
+    };
+    this->_links.modify(it, UpdateLink(link));
   }
 
   model::Transaction const&
@@ -565,6 +567,26 @@ namespace fist
     }
   }
 
+  surface::gap::PeerTransaction
+  State::_force_transaction_status(uint32_t id, gap_TransactionStatus status) const
+  {
+    auto it = this->_transactions.get<0>().find(id);
+    ELLE_ASSERT(it != this->_transactions.get<0>().end());
+    surface::gap::PeerTransaction tr = it->_transaction;
+    tr.status = status;
+    return tr;
+  }
+
+  surface::gap::LinkTransaction
+  State::_force_link_status(uint32_t id, gap_TransactionStatus status) const
+  {
+    auto it = this->_links.get<0>().find(id);
+    ELLE_ASSERT(it != this->_links.get<0>().end());
+    surface::gap::LinkTransaction link = it->_link;
+    link.status = status;
+    return link;
+  }
+
   void
   State::on_transaction_accepted(uint32_t id)
   {
@@ -572,40 +594,46 @@ namespace fist
     QDir download_folder = QDir::fromNativeSeparators(this->download_folder());
     if (!download_folder.exists())
       emit new_download_folder_needed();
-    gap_accept_transaction(this->state(), id);
-    this->on_transaction_callback(id, gap_transaction_connecting, true);
+    else
+    {
+      this->on_peer_transaction_updated(
+        this->_force_transaction_status(id, gap_transaction_connecting));
+      gap_accept_transaction(this->state(), id);
+    }
   }
 
   void
   State::on_transaction_rejected(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());
+    this->on_peer_transaction_updated(
+      this->_force_transaction_status(id, gap_transaction_rejected));
     gap_reject_transaction(this->state(), id);
-    this->on_transaction_callback(id, gap_transaction_rejected, true);
   }
 
   void
   State::on_transaction_canceled(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());
+    this->on_peer_transaction_updated(
+      this->_force_transaction_status(id, gap_transaction_canceled));
     gap_cancel_transaction(this->state(), id);
-    this->on_transaction_callback(id, gap_transaction_canceled, true);
   }
 
   void
   State::on_transaction_deleted(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());
+    this->on_link_updated(
+      this->_force_link_status(id, gap_transaction_deleted));;
     gap_delete_transaction(this->state(), id);
-    this->on_transaction_callback(id, gap_transaction_deleted, true);
   }
 
   void
   State::open_file(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());
-    QDesktopServices::openUrl(
-      QUrl::fromLocalFile(this->download_folder()));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(this->download_folder()));
   }
 
   void

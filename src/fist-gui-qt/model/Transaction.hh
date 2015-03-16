@@ -11,7 +11,7 @@
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/model/Model.hh>
 # include <surface/gap/gap.hh>
-
+# include <surface/gap/PeerTransaction.hh>
 
 namespace fist
 {
@@ -26,31 +26,45 @@ namespace fist
       typedef gap_TransactionStatus Status;
     public:
       Transaction(fist::State& state,
-                    uint32_t id);
+                  uint32_t id);
+      Transaction(fist::State& state,
+                  surface::gap::PeerTransaction const& transaction);
       virtual
       ~Transaction() = default;
       Transaction(Transaction const&) = default;
 
-      void
-      on_peer_changed() const;
+      bool
+      is_sender() const;
 
-      void
-      update() const;
+      bool
+      is_recipient() const;
+
+      bool
+      is_sender_device() const;
+
+      bool
+      is_recipient_device() const;
+
+      bool
+      concerns_device() const;
 
       model::User const&
       peer() const;
 
+      void
+      on_peer_changed() const;
+
+      QString
+      files_tooltip() const;
+
       bool
-      is_final() const;
+      acceptable() const;
 
       bool
       running() const;
 
-      QString const&
-      peer_fullname() const;
-
-      gap_UserStatus
-      peer_connection_status() const;
+      bool
+      is_final() const;
 
       float
       progress() const;
@@ -58,41 +72,18 @@ namespace fist
       QVector<QString> const&
       files() const;
 
-      QString
-      files_tooltip() const;
-
-      QDateTime const&
-      mtime() const;
-
-      // XXX: Avatar fetching duplicated from User.
-      QPixmap const&
-      avatar() const;
-
-      bool
-      new_avatar() const;
+      gap_TransactionStatus
+      status() const;
 
       void
-      avatar_available() const;
+      status(gap_TransactionStatus status);
 
     private:
-      // Every attributes are marked as mutable in order to allow lazy
-      // evaluation.
-      ELLE_ATTRIBUTE_RP(bool, concerns_device, mutable);
-      ELLE_ATTRIBUTE_RP(bool, is_sender, mutable);
-      ELLE_ATTRIBUTE_RP(bool, is_sender_device, mutable);
-      ELLE_ATTRIBUTE_RP(bool, is_recipient, mutable);
-      ELLE_ATTRIBUTE_RP(bool, is_recipient_device, mutable);
-      ELLE_ATTRIBUTE_rw(Status, status);
-      ELLE_ATTRIBUTE_P(QString, peer_fullname, mutable);
-      ELLE_ATTRIBUTE_RP(uint32_t, peer_id, mutable);
+      ELLE_ATTRIBUTE_Rw(surface::gap::PeerTransaction, transaction);
+      // Cache the files as a QVector<Qstring>.
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);
-      ELLE_ATTRIBUTE_P(QDateTime, mtime, mutable);
-      ELLE_ATTRIBUTE_P(bool, final, mutable);
-
-      // XXX/ Should be there.
-      ELLE_ATTRIBUTE_P(QPixmap, avatar, mutable);
-      ELLE_ATTRIBUTE_P(bool, default_avatar, mutable);
-      ELLE_ATTRIBUTE_P(bool, new_avatar, mutable);
+      // Cache the mtime.
+      ELLE_ATTRIBUTE_R(QDateTime, mtime);
 
   /*-------------.
   | Orderability |
@@ -106,20 +97,11 @@ namespace fist
 
     signals:
       void
-      avatar_updated() const;
-
-      void
-      status_updated() const;
-
-      void
-      peer_status_updated() const;
+      status_updated();
 
       void
       peer_changed() const;
 
-    public:
-      bool
-      acceptable() const;
 
     private:
   /*----------.

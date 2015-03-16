@@ -67,7 +67,7 @@ namespace fist
             new Message(
               "Incoming!",
               QString("%1 wants to send %2 to you.")
-              .arg(transaction.peer_fullname())
+              .arg(transaction.peer().fullname())
               .arg((transaction.files().size() == 1)
                    ? transaction.files()[0]
                    : QString("%1 files").arg(transaction.files().size())))));
@@ -129,7 +129,7 @@ namespace fist
               SystrayMessageCarrier(new Message(
                 "Shenanigans!",
                 QString("%1 declined your transfer.")
-                .arg(transaction.peer_fullname()),
+                .arg(transaction.peer().fullname()),
                 QSystemTrayIcon::Warning)));
           }
           break;
@@ -139,7 +139,7 @@ namespace fist
             SystrayMessageCarrier(new Message(
               "Nuts!",
               QString("Your transfer with %1 was cancelled.")
-              .arg(transaction.peer_fullname()))));
+              .arg(transaction.peer().fullname()))));
           break;
         case gap_transaction_failed:
           if (transaction.is_sender())
@@ -150,7 +150,7 @@ namespace fist
                 .arg((transaction.files().size() == 1)
                      ? transaction.files()[0]
                      : QString("your %1 files").arg(transaction.files().size()))
-                .arg(transaction.peer_fullname()),
+                .arg(transaction.peer().fullname()),
                 QSystemTrayIcon::Warning)));
           else
             emit systray_message(
@@ -161,7 +161,7 @@ namespace fist
                   .arg((transaction.files().size() == 1)
                        ? transaction.files()[0]
                        : QString("%1 files").arg(transaction.files().size()))
-                  .arg(transaction.peer_fullname()),
+                  .arg(transaction.peer().fullname()),
                   QSystemTrayIcon::Warning)));
           break;
         case gap_transaction_finished:
@@ -170,7 +170,7 @@ namespace fist
               SystrayMessageCarrier(new Message(
                 "Success!",
                 QString("%1 received %2.")
-                .arg(transaction.peer_fullname())
+                .arg(transaction.peer().fullname())
                 .arg((transaction.files().size() == 1)
                      ? transaction.files()[0]
                      : QString("your %1 files").arg(transaction.files().size())))));
@@ -182,7 +182,7 @@ namespace fist
                 .arg((transaction.files().size() == 1)
                      ? transaction.files()[0]
                      : QString("%1 files").arg(transaction.files().size()))
-                .arg(transaction.peer_fullname()))));
+                .arg(transaction.peer().fullname()))));
           break;
         default:
           break;

@@ -8,8 +8,6 @@
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
-#include <QFuture>
-#include <QtConcurrentRun>
 
 #include <elle/Buffer.hh>
 #include <elle/finally.hh>
@@ -117,8 +115,6 @@ namespace fist
       _switch_mode(new QLabel(this)),
       _version_field(new QLabel(this)),
       _login_button(new QPushButton(this)),
-      _login_future(),
-      _login_watcher(),
       _video(nullptr)
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
@@ -288,12 +284,12 @@ namespace fist
       this->setCentralWidget(central_widget);
       connect(this->_login_button, SIGNAL(clicked()),
               this, SLOT(_perform_login_or_register()));
-      connect(&this->_login_watcher, SIGNAL(finished()),
-              this, SLOT(_login_attempt()));
+      connect(&this->_state, SIGNAL(login_result(gap_Status)),
+              this, SLOT(_login_attempt(gap_Status)));
       connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
       connect(this, SIGNAL(login_failed()), SLOT(show()));
-      connect(&this->_register_watcher, SIGNAL(finished()),
-              this, SLOT(_register_attempt()));
+      connect(&this->_state, SIGNAL(register_result(gap_Status)),
+              this, SLOT(_register_attempt(gap_Status)));
       connect(&this->_state, SIGNAL(internet_issue(QString const&)),
               this, SLOT(_internet_issue(QString const&)));
       this->update();
@@ -447,13 +443,12 @@ namespace fist
     }
 
     void
-    Window::_register_attempt()
+    Window::_register_attempt(gap_Status status)
     {
       ELLE_TRACE_SCOPE("%s: attempt to register", *this);
       this->mode(Mode::Register);
       elle::SafeFinally unlock_register([&] {
           this->_enable(); this->_password_field->setFocus(); });
-      auto status = this->_register_future.result();
       if (status == gap_ok)
       {
         auto email = this->_email_field->text();
@@ -498,13 +493,12 @@ namespace fist
     }
 
     void
-    Window::_login_attempt()
+    Window::_login_attempt(gap_Status status)
     {
       this->mode(Mode::Login);
       ELLE_TRACE_SCOPE("%s: attempt to login", *this);
       elle::SafeFinally unlock_login([&] {
           this->_enable(); this->_password_field->setFocus(); });
-      auto status = this->_login_future.result();
       if (status == gap_ok || status == gap_already_logged_in)
       {
         emit logged_in();
@@ -658,19 +652,9 @@ namespace fist
       register_failed_guard.abort();
       ELLE_TRACE("every check passed")
       {
-
         emit this->register_attempt();
-        this->_register_future = QtConcurrent::run(
-          [=] {
-            // Will explode if the state is destroyed.
-            return gap_register(
-              this->_state.state(),
-              fullname.c_str(),
-              email.c_str(),
-              pw.c_str());
-          });
+        this->_state.register_(fullname, email, pw);
       }
-      this->_register_watcher.setFuture(this->_register_future);
       unlock_register.abort();
       this->mode(Mode::Loading);
     }
@@ -696,14 +680,8 @@ namespace fist
       ELLE_TRACE("every check passed")
       {
         emit this->login_attempt();
-        this->_login_future = QtConcurrent::run(
-          [=] {
-            return gap_login(this->_state.state(),
-                             email.c_str(),
-                             pw.c_str());
-          });
+        this->_state.login(email, pw);
       }
-      this->_login_watcher.setFuture(this->_login_future);
       unlock_login.abort();
       this->mode(Mode::Loading);
     }

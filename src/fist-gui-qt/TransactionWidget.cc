@@ -14,6 +14,7 @@
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/TransactionWindow.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
@@ -21,7 +22,7 @@ ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 TransactionWidget::TransactionWidget(Model const& model):
   ListItem(nullptr, view::background, false),
   _transaction(model),
-  _peer_avatar(new AvatarWidget(this->_transaction.avatar())),
+  _peer_avatar(new AvatarWidget(this->_transaction.peer().avatar())),
   _peer_status(new QLabel),
   _layout(nullptr),
   _filename(new QLabel(this)),
@@ -34,15 +35,11 @@ TransactionWidget::TransactionWidget(Model const& model):
   _info_area(new QWidget),
   _progress_timer(nullptr)
 {
-  connect(&this->_transaction, SIGNAL(avatar_updated()),
-          this, SLOT(_on_avatar_updated()));
   connect(&this->_transaction, SIGNAL(status_updated()),
-          this, SLOT(apply_update()));
-  connect(&this->_transaction, SIGNAL(peer_status_updated()),
           this, SLOT(apply_update()));
   connect(&this->_transaction, SIGNAL(peer_changed()),
           this, SLOT(_update_peer()));
-
+  this->_connect_peer();
 
   ELLE_TRACE_SCOPE("%s: contruction", *this);
 
@@ -54,8 +51,6 @@ TransactionWidget::TransactionWidget(Model const& model):
           this, SLOT(reject()));
   connect(this->_cancel_button, SIGNAL(released()),
           this, SLOT(cancel()));
-
-  this->_peer_avatar = new AvatarWidget(this->_transaction.avatar());
 
   auto layout = new QHBoxLayout(this);
   // XXX: should but 13, 13, 13, 13 but avatar widget size is strange.
@@ -73,7 +68,7 @@ TransactionWidget::TransactionWidget(Model const& model):
     texts->addStretch();
     auto user_and_status = new QHBoxLayout;
     texts->addLayout(user_and_status);
-    auto username = new QLabel(this->_transaction.peer_fullname());
+    auto username = new QLabel(this->_transaction.peer().fullname());
     {
       view::transaction::peer::style(*username);
       username->setMaximumWidth(150);
@@ -157,10 +152,21 @@ TransactionWidget::~TransactionWidget()
   }
 }
 
+void
+TransactionWidget::_connect_peer()
+{
+  connect(&this->_transaction.peer(), SIGNAL(avatar_updated()),
+          this, SLOT(_on_avatar_updated()));
+  connect(&this->_transaction.peer(), SIGNAL(status_updated()),
+          this, SLOT(_update_peer_status()));
+}
+
 bool
 TransactionWidget::eventFilter(QObject *obj, QEvent *event)
 {
-  if (!dynamic_cast<QWidget*>(obj))
+  static QList<int> events{
+    QEvent::Enter, QEvent::Leave, QEvent::MouseButtonPress};
+  if (!dynamic_cast<QWidget*>(obj) || !events.contains(event->type()))
     return Super::eventFilter(obj, event);
 
   if (obj == this->_filename)
@@ -238,15 +244,27 @@ TransactionWidget::trigger()
 void
 TransactionWidget::_on_avatar_updated()
 {
-  this->_peer_avatar->setPicture(this->_transaction.avatar());
+  this->_peer_avatar->setPicture(this->_transaction.peer().avatar());
   this->repaint();
 }
 
 void
 TransactionWidget::_update_peer()
 {
-  this->_peer_fullname->setText(this->_transaction.peer_fullname());
+  this->_connect_peer();
+  this->_peer_fullname->setText(this->_transaction.peer().fullname());
   this->_on_avatar_updated();
+}
+
+void
+TransactionWidget::_update_peer_status()
+{
+ ELLE_DEBUG("peer is %sconnected",
+             this->_transaction.peer().status() ? "" : "dis");
+  if (this->_transaction.peer().status())
+    this->_peer_status->show();
+  else
+    this->_peer_status->hide();
 }
 
 void
@@ -256,13 +274,6 @@ TransactionWidget::apply_update()
   this->_info_area->show();
   this->_cancel_button->hide();
   this->_accept_reject_area->hide();
-
-  ELLE_DEBUG("peer is %sconnected",
-             this->_transaction.peer_connection_status() ? "" : "dis");
-  if (this->_transaction.peer_connection_status())
-    this->_peer_status->show();
-  else
-    this->_peer_status->hide();
 
   if (this->_transaction.acceptable())
   {
@@ -469,7 +480,7 @@ TransactionWidget::_on_status_updated()
   }
   this->update_mtime();
   if (this->_peer_fullname->text().isEmpty())
-    this->_peer_fullname->setText(this->_transaction.peer_fullname());
+    this->_peer_fullname->setText(this->_transaction.peer().fullname());
 }
 
 void
