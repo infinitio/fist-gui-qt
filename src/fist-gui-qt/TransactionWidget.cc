@@ -444,6 +444,10 @@ TransactionWidget::_on_status_updated()
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
             QString(":/conversation/bufferised"), false, "Cloud Buffered");
+        // XXX: Change icon.
+        case gap_transaction_paused:
+          return StatusUpdater(
+            QString(":/loading"), true, "Paused");
         case gap_transaction_failed:
           return StatusUpdater(QString(":/conversation/error"), false, "Failed");
         case gap_transaction_canceled:
