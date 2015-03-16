@@ -132,9 +132,6 @@ public Q_SLOTS:
 Q_SIGNALS:
   void
   resized();
-public Q_SLOTS:
-  void
-  reload();
 
 private Q_SLOTS:
   void

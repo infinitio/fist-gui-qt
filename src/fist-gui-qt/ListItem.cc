@@ -63,13 +63,6 @@ ListItem::leaveEvent(QEvent*)
 }
 
 void
-ListItem::reload()
-{
-  this->_update();
-  this->update();
-}
-
-void
 ListItem::_update()
 {
 }

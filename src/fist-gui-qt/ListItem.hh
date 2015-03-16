@@ -29,8 +29,6 @@ public:
   leaveEvent(QEvent* e) override;
 
 public:
-  void
-  reload();
 
   virtual
   void

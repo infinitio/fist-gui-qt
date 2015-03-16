@@ -334,17 +334,6 @@ ListWidget::resizeEvent(QResizeEvent*)
   this->_layout();
 }
 
-void
-ListWidget::reload()
-{
-  for (auto const& widget: this->_widgets)
-  {
-    widget->reload();
-  }
-
-  this->update();
-}
-
 /*---------.
 | Painting |
 `---------*/
