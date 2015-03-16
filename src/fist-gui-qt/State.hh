@@ -63,6 +63,10 @@ namespace fist
     void
     login(std::string const& email,
           std::string const& password);
+
+    void
+    facebook_connect(std::string const& token);
+
   private slots:
     void
     _on_login_result_ready();
@@ -276,6 +280,9 @@ namespace fist
   private:
     void
     _compute_active_links();
+  public:
+    QString
+    facebook_app_id() const;
 
   private:
     Q_OBJECT;

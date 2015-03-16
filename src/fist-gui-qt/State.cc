@@ -14,6 +14,7 @@
 #include <QVector>
 
 #include <elle/log.hh>
+#include <elle/os/environ.hh>
 
 #include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/State.hh>
@@ -146,6 +147,20 @@ namespace fist
     this->_login_future = QtConcurrent::run(
       [=] {
         auto res = gap_login(this->state(), email, password);
+        if (res == gap_ok)
+          this->_me = gap_self_id(this->state());
+        return res;
+      });
+    this->_login_watcher.setFuture(this->_login_future);
+  }
+
+  void
+  State::facebook_connect(std::string const& token)
+  {
+    this->_login_future = QtConcurrent::run(
+      [=] {
+        auto email = elle::os::getenv("FACEBOOK_PREFERRED_EMAIL", "");
+        auto res = gap_facebook_connect(this->state(), token, email);
         if (res == gap_ok)
           this->_me = gap_self_id(this->state());
         return res;
@@ -670,5 +685,12 @@ namespace fist
     }
 
     return *this->_links.get<0>().find(id);
+  }
+
+  QString
+  State::facebook_app_id() const
+  {
+    auto id = QString::fromStdString(gap_facebook_app_id());
+    return id;
   }
 }
