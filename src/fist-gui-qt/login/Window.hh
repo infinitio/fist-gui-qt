@@ -31,11 +31,6 @@ namespace fist
 {
   namespace login
   {
-    namespace facebook
-    {
-      class ConnectWindow;
-    }
-
     class Window:
       public RoundShadowWidget
     {

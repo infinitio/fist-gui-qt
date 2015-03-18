@@ -7,6 +7,11 @@ namespace fist
   {
     class Window;
     class Footer;
+    namespace facebook
+    {
+      class ConnectWindow;
+      class EmailAddressPrompt;
+    }
 
     enum class Mode
     {

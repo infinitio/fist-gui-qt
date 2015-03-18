@@ -1,7 +1,3 @@
-#include "FacebookConnectWindow.hh"
-
-#define REDIRECT_URI "https://www.facebook.com/connect/login_success.html"
-
 #include <QMainWindow>
 #include <QWebView>
 #include <QUrl>
@@ -9,7 +5,11 @@
 
 #include <elle/log.hh>
 
+#include <fist-gui-qt/login/facebook/ConnectWindow.hh>
+
 ELLE_LOG_COMPONENT("FIST.login.FacebookConnect");
+
+#define REDIRECT_URI "https://www.facebook.com/connect/login_success.html"
 
 QT_BEGIN_NAMESPACE
 QDataStream&

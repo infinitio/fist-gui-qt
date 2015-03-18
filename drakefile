@@ -161,8 +161,8 @@ def configure(cxx_toolkit = None,
       # Login.
       "src/fist-gui-qt/login/Window.cc",
       "src/fist-gui-qt/login/Window.hh",
-      "src/fist-gui-qt/login/FacebookConnectWindow.hh",
-      "src/fist-gui-qt/login/FacebookConnectWindow.cc",
+      "src/fist-gui-qt/login/facebook/ConnectWindow.hh",
+      "src/fist-gui-qt/login/facebook/ConnectWindow.cc",
 
       "src/fist-gui-qt/Panel.cc",
       "src/fist-gui-qt/Panel.hh",

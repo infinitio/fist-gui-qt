@@ -26,12 +26,12 @@
 #include <surface/gap/gap.hh>
 #include <version.hh>
 
-#include <fist-gui-qt/login/Window.hh>
-#include <fist-gui-qt/login/ui.hh>
-#include <fist-gui-qt/login/FacebookConnectWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/icons.hh>
+#include <fist-gui-qt/login/Window.hh>
+#include <fist-gui-qt/login/facebook/ConnectWindow.hh>
+#include <fist-gui-qt/login/ui.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/regexp.hh>
 
@@ -124,7 +124,8 @@ namespace fist
       _login_button(new QPushButton(this)),
       _facebook_button(new QPushButton(this)),
       _video(nullptr),
-      _facebook_window(nullptr)
+      _facebook_window(nullptr),
+      _facebook_connect_attempt(false)
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
@@ -306,7 +307,7 @@ namespace fist
           layout->addLayout(hlayout);
         }
       }
-      layout->addSpacing(25);
+      layout->addSpacing(35);
       layout->addWidget(this->_facebook_button, 0, Qt::AlignCenter);
       layout->addSpacing(5);
       layout->addWidget(this->_separator, 0, Qt::AlignCenter);
@@ -315,9 +316,10 @@ namespace fist
       layout->addWidget(this->_email_field, 0, Qt::AlignCenter);
       layout->addWidget(this->_password_field, 0,  Qt::AlignCenter);
       layout->addWidget(this->_login_button, 0, Qt::AlignCenter);
+      layout->addSpacing(10);
       layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
       layout->addStretch();
-      layout->addSpacing(20);
+      layout->addSpacing(10);
       glayout->addLayout(layout);
       {
         auto layout = new QVBoxLayout;
@@ -562,6 +564,10 @@ namespace fist
         emit logged_in();
         if (this->_facebook_connect_attempt)
         {
+          if (fist::settings()["Login"].exists("facebook"))
+            emit logged_in();
+          else
+            emit registered();
           fist::settings()["Login"].set("facebook", 1);
         }
         else
