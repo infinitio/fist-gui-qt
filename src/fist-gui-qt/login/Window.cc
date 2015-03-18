@@ -30,10 +30,10 @@
 #include <fist-gui-qt/login/ui.hh>
 #include <fist-gui-qt/login/FacebookConnectWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
-#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/utils.hh>
-#include <fist-gui-qt/Settings.hh>
+#include <fist-gui-qt/regexp.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.login.Window");
 
@@ -49,8 +49,6 @@ namespace fist
 {
   namespace login
   {
-    static QRegExp email_checker(regexp::email, Qt::CaseInsensitive);
-
     static
     infinit::cryptography::SecretKey
     secret_key(QString const& email)
@@ -668,7 +666,7 @@ namespace fist
         return false;
       }
       if (this->_email_field->text().isEmpty() ||
-          !email_checker.exactMatch(this->_email_field->text()))
+          !regexp::email::checker.exactMatch(this->_email_field->text()))
       {
         ELLE_DEBUG("invalid email field");
         if (this->_email_field->text().isEmpty())
@@ -867,7 +865,7 @@ namespace fist
         this->_fullname_field->setFocus();
       }
       else if (this->_email_field->text().isEmpty() ||
-          !email_checker.exactMatch(this->_email_field->text()))
+          !regexp::email::checker.exactMatch(this->_email_field->text()))
       {
         ELLE_DEBUG("focus email field");
         this->_email_field->setFocus();

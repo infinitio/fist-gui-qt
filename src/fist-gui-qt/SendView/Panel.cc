@@ -25,6 +25,7 @@
 #include <fist-gui-qt/SendView/Users.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/regexp.hh>
 #include <fist-gui-qt/utils.hh>
 
 /*-------------.
@@ -32,12 +33,6 @@
 `-------------*/
 
 ELLE_LOG_COMPONENT("infinit.FIST.SendView.Panel");
-
-namespace
-{
-  static const QRegExp email_checker(regexp::email,
-                                     Qt::CaseInsensitive);
-}
 
 namespace fist
 {
@@ -185,7 +180,7 @@ namespace fist
       else
       {
         auto recipients = this->_users->recipients();
-        if (email_checker.exactMatch(this->_users->text()))
+        if (regexp::email::checker.exactMatch(this->_users->text()))
         {
           QString recipient = this->_users->text();
           uint32_t id = this->_state.user_id(recipient.toStdString());

@@ -16,22 +16,16 @@
 #include <elle/log.hh>
 #include <elle/os/environ.hh>
 
-#include <fist-gui-qt/model/User.hh>
+#include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/State.hh>
 #include <fist-gui-qt/globals.hh>
-#include <fist-gui-qt/Settings.hh>
+#include <fist-gui-qt/model/User.hh>
+#include <fist-gui-qt/regexp.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.State");
 
 namespace fist
 {
-
-  namespace
-  {
-    static const QRegExp email_checker(regexp::email,
-                                       Qt::CaseInsensitive);
-  }
-
   static State* g_state = nullptr;
 
   void
@@ -357,7 +351,7 @@ namespace fist
           [&,filter] {
             std::string text = filter.toStdString();
             std::vector<uint32_t> users;
-            if (filter.count('@') == 1 && email_checker.exactMatch(filter))
+            if (filter.count('@') == 1 && regexp::email::checker.exactMatch(filter))
             {
               surface::gap::User u;
               auto res = gap_user_by_email(this->state(), text.c_str(), u);

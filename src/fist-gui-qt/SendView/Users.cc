@@ -11,15 +11,11 @@
 #include <fist-gui-qt/SearchResultWidget.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/regexp.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.SendView.Users");
 
 static int const margin = 7;
-
-namespace
-{
-  static const QRegExp email_checker(regexp::email, Qt::CaseInsensitive);
-}
 
 namespace fist
 {
@@ -158,7 +154,7 @@ namespace fist
     Users::peer_valid() const
     {
       return !this->_recipients.empty() ||
-        email_checker.exactMatch(this->text());
+        regexp::email::checker.exactMatch(this->text());
     }
 
     void
@@ -212,7 +208,8 @@ namespace fist
 
       if (this->_users->widgets().isEmpty() && !local)
       {
-        if (!this->text().isEmpty() && !email_checker.exactMatch(this->text()))
+        if (!this->text().isEmpty() &&
+            !regexp::email::checker.exactMatch(this->text()))
         {
           this->_users->add_widget(
             std::make_shared<TextListItem>(
