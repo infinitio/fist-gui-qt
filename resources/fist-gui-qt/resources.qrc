@@ -167,7 +167,8 @@
     <file alias="link/cancel@2x">../slices/mac/view_link/link-icon-cancel@2x.png</file>
 
     <!-- login -->
-
+    <file alias="login/facebook">../slices/windows/view_login/icon-facebook-white.png</file>
+    <file alias="login/facebook@2x">../slices/windows/view_login/icon-facebook-white@2x.png</file>
     <file alias="login/preboarding">../gifs/windows/send-contact.gif</file>
     <file alias="login/close">../slices/mac/view_login/login-icon-close.png</file>
     <file alias="login/close@2x">../slices/mac/view_login/login-icon-close@2x.png</file>

@@ -182,7 +182,10 @@ namespace fist
     this->_register_future = QtConcurrent::run(
       [=] {
         // Will explode if the state is destroyed.
-        return gap_register(this->state(), fullname, email, password);
+        auto res = gap_register(this->state(), fullname, email, password);
+        if (res == gap_ok)
+          this->_me = gap_self_id(this->state());
+        return res;
       });
     this->_register_watcher.setFuture(this->_register_future);
   }

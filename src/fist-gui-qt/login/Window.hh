@@ -133,23 +133,28 @@ namespace fist
       void
       focusInEvent(QFocusEvent* event) override;
 
+      void
+      paintEvent(QPaintEvent*) override;
+
     private:
       ELLE_ATTRIBUTE(bool, previous_session_crashed);
       ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
       ELLE_ATTRIBUTE_Rw(Mode, mode);
+      ELLE_ATTRIBUTE(QLabel*, signup_tabber);
+      ELLE_ATTRIBUTE(QLabel*, login_tabber);
+      // Can be forgot password or help depending on the view.
+      QWidget const*
+      active() const;
+      ELLE_ATTRIBUTE(QLabel*, separator);
       ELLE_ATTRIBUTE(QMovie*, loading_icon);
       ELLE_ATTRIBUTE(QLabel*, loading);
-      ELLE_ATTRIBUTE(QLabel*, info);
       ELLE_ATTRIBUTE(QLineEdit*, fullname_field);
       ELLE_ATTRIBUTE(QLineEdit*, email_field);
       ELLE_ATTRIBUTE(QLineEdit*, password_field);
       ELLE_ATTRIBUTE(QLabel*, message_field);
 
-      // Can be forgot password or help depending on the view.
       ELLE_ATTRIBUTE(QLabel*, help_link);
-      // Can be need or already have an account, depending on the view.
-      ELLE_ATTRIBUTE(QLabel*, switch_mode);
-
+      ELLE_ATTRIBUTE(QLabel*, forgot_password_link);
       ELLE_ATTRIBUTE(QLabel*, version_field);
       ELLE_ATTRIBUTE(QPushButton*, login_button);
       ELLE_ATTRIBUTE(QPushButton*, facebook_button);
@@ -190,6 +195,9 @@ namespace fist
       QString
       _saved_password(QString const& email) const;
 
+    private:
+      void
+      _update_geometry();
   /*-----------.
   | Visibility |
   `-----------*/

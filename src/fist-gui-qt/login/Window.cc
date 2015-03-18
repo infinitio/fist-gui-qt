@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <QApplication>
 #include <QByteArray>
 #include <QDesktopWidget>
@@ -9,6 +11,8 @@
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
+#include <QPainter>
+#include <QBrush>
 
 #include <elle/Buffer.hh>
 #include <elle/finally.hh>
@@ -23,6 +27,7 @@
 #include <version.hh>
 
 #include <fist-gui-qt/login/Window.hh>
+#include <fist-gui-qt/login/ui.hh>
 #include <fist-gui-qt/login/FacebookConnectWindow.hh>
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/globals.hh>
@@ -44,8 +49,6 @@ namespace fist
 {
   namespace login
   {
-
-
     static QRegExp email_checker(regexp::email, Qt::CaseInsensitive);
 
     static
@@ -108,15 +111,17 @@ namespace fist
       _previous_session_crashed(previous_session_crashed),
       _systray(systray),
       _mode(Mode::None),
+      _signup_tabber(new QLabel(view::mode::signup::text, this)),
+      _login_tabber(new QLabel(view::mode::login::text, this)),
+      _separator(new QLabel(view::separator::text, this)),
       _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this)),
       _loading(new QLabel(this)),
-      _info(new QLabel(view::login::info::login_text, this)),
       _fullname_field(new QLineEdit(this)),
       _email_field(new QLineEdit(this)),
       _password_field(new QLineEdit(this)),
       _message_field(new QLabel(this)),
-      _help_link(new QLabel(view::login::links::forgot_password::text, this)),
-      _switch_mode(new QLabel(this)),
+      _help_link(new QLabel(view::links::help::text, this)),
+      _forgot_password_link(new QLabel(view::links::forgot_password::text, this->_password_field)),
       _version_field(new QLabel(this)),
       _login_button(new QPushButton(this)),
       _facebook_button(new QPushButton(this)),
@@ -125,32 +130,40 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
-      this->resize(view::login::size);
+      this->resize(view::size);
       {
         auto saved_email = fist::settings()["Login"].get("email", "").toString();
-        // Info
+        // Help
+        {
+          this->_help_link->adjustSize();
+        }
+        // Loading.
         {
           this->_loading->setMovie(this->_loading_icon);
           this->_loading->movie()->start();
           this->_loading->hide();
         }
-        // Info
+        // Mode.
         {
-          this->_info->setFixedSize(view::login::info::size);
-          view::login::info::style(*this->_info);
+          view::mode::default_style(*this->_signup_tabber);
+          view::mode::default_style(*this->_login_tabber);
+        }
+        // Separator.
+        {
+          view::separator::style(*this->_separator);
         }
         // Fullname field.
         {
-          this->_fullname_field->setPlaceholderText(view::login::fullname::placeholder);
-          this->_fullname_field->setFixedSize(view::login::fullname::size);
-          view::login::fullname::style(*this->_fullname_field);
+          this->_fullname_field->setPlaceholderText(view::fullname::placeholder);
+          this->_fullname_field->setFixedSize(view::fullname::size);
+          view::fullname::style(*this->_fullname_field);
           this->_fullname_field->setTextMargins(12, 0, 12, 0);
         }
         // Email field.
         {
-          this->_email_field->setPlaceholderText(view::login::email::placeholder);
-          this->_email_field->setFixedSize(view::login::email::size);
-          view::login::email::style(*this->_email_field);
+          this->_email_field->setPlaceholderText(view::email::placeholder);
+          this->_email_field->setFixedSize(view::email::size);
+          view::email::style(*this->_email_field);
           this->_email_field->setTextMargins(12, 0, 12, 0);
 
           if (fill_email_and_password_fields && !saved_email.isEmpty())
@@ -158,15 +171,17 @@ namespace fist
         }
         // Password field.
         {
-          this->_password_field->setPlaceholderText(view::login::password::placeholder);
-          this->_password_field->setFixedSize(view::login::password::size);
-          view::login::password::style(*this->_password_field);
+          this->_password_field->setPlaceholderText(view::password::placeholder);
+          this->_password_field->setFixedSize(view::password::size);
+          view::password::style(*this->_password_field);
           this->_password_field->setTextMargins(12, 0, 12, 0);
           this->_password_field->setEchoMode(QLineEdit::Password);
           if (fill_email_and_password_fields && !saved_email.isEmpty())
           {
             this->_password_field->setText(this->_saved_password(saved_email));
           }
+
+          this->_forgot_password_link->setText(view::links::forgot_password::text);
         }
       }
       if (!this->_email_field->text().isEmpty())
@@ -179,63 +194,67 @@ namespace fist
       }
       // Message field.
       {
-        view::login::message::error_style(*this->_message_field);
+        view::message::error_style(*this->_message_field);
         this->_message_field->setWordWrap(true);
         this->_message_field->setFixedWidth(this->width() - 10);
       }
       // Create account.
       {
-        view::login::links::style(*this->_switch_mode);
-        this->_switch_mode->installEventFilter(this);
-        this->_switch_mode->setSizePolicy(
+        this->_login_tabber->installEventFilter(this);
+        this->_login_tabber->setSizePolicy(
+          QSizePolicy::Minimum, QSizePolicy::Maximum);
+        this->_signup_tabber->installEventFilter(this);
+        this->_signup_tabber->setSizePolicy(
           QSizePolicy::Minimum, QSizePolicy::Maximum);
       }
-      // Forgotten password.
+      // Help.
       {
-        view::login::links::style(*this->_help_link);
-        this->_help_link->setTextInteractionFlags(
-          view::login::links::interration_flags);
-        this->_help_link->setSizePolicy(
-          QSizePolicy::Minimum, QSizePolicy::Maximum);
-        this->_help_link->setOpenExternalLinks(true);
+        for (auto& link: {this->_help_link, this->_forgot_password_link})
+        {
+          view::links::style(*link);
+          link->setTextInteractionFlags(view::links::interration_flags);
+          link->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+          link->setOpenExternalLinks(true);
+        }
       }
       // Version.
       {
-        view::login::version::style(*this->_version_field);
+        view::version::style(*this->_version_field);
         this->_version_field->hide();
       }
       // LoginButton.
       {
-        this->_login_button->setFixedSize(view::login::login_button::size);
-        view::login::login_button::style(*this->_login_button);
+        this->_login_button->setFixedSize(view::login_button::size);
+        view::login_button::style(*this->_login_button);
         this->_login_button->setStyleSheet(
           QString::fromStdString(elle::sprintf(
           "QPushButton {"
           "  background-color: rgb(248, 93, 91);"
           "  color: white;"
           "  font: bold 13px;"
-          "  border-radius: 2px;"
+          "  border-radius: 3px;"
           "  width: %spx;"
           "  height: %spx;"
           "} ",
-          view::login::login_button::size.width(),
-          view::login::login_button::size.height())));
+          view::login_button::size.width(),
+          view::login_button::size.height())));
       }
       // FacebookButton.
       {
-        this->_facebook_button->setText("FACEBOOK");
+        this->_facebook_button->setIcon(QIcon(":/login/facebook"));
+        this->_facebook_button->setText("SIGNIN WITH FACEBOOK");
         this->_facebook_button->setStyleSheet(
           QString::fromStdString(elle::sprintf(
             "QPushButton {"
-            "  background-color: rgb(59, 89, 152);"
-            "  border-radius:2px ;"
+            "  background-color: rgb(77, 117, 210);"
+            "  border-radius: 3px;"
             "  color: white;"
             "  font: bold 13px;"
             "  width: %spx;"
             "  height: %spx;"
             "} ",
-            view::login::login_button::size.width(),
-            view::login::login_button::size.height())));
+            view::login_button::size.width(),
+            view::login_button::size.height())));
         connect(this->_facebook_button, SIGNAL(released()),
                 this, SLOT(launch_facebook_connect()));
       }
@@ -255,8 +274,8 @@ namespace fist
         widget->setMovie(new QMovie(":/login/preboarding"));
         widget->movie()->start();
         // widget->setScaledContents(true);
-        this->updateGeometry();
         this->_video = widget;
+        this->_update_geometry();
 #endif
         // widget->setFixedSize(400, 470);
         widget->show();
@@ -267,46 +286,45 @@ namespace fist
         // central_widget->setFixedWidth(this->width());
       }
       auto glayout = new QHBoxLayout(central_widget);
-      glayout->setContentsMargins(0, 0, 0, 0); // 5, 5, 5, 5);
+      glayout->setContentsMargins(0, 0, 0, 0);
       glayout->setSpacing(0);
       auto layout = new QVBoxLayout;
       layout->setSizeConstraint(QLayout::SetFixedSize);
       layout->setSpacing(5);
-      layout->setContentsMargins(55, 5, 55, 0);
-      layout->addWidget(this->_version_field, 0, Qt::AlignCenter);
-      layout->addSpacing(55);
-      layout->addWidget(logo, 0, Qt::AlignCenter);
-      layout->addSpacing(20);
-      layout->addStretch();
-      layout->addWidget(this->_loading, 0, Qt::AlignCenter);
-      layout->addStretch();
-      layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
-      layout->addStretch();
-      layout->addSpacing(15);
-      layout->addWidget(this->_info, 0, Qt::AlignCenter);
+      layout->setContentsMargins(40, 0, 40, 0);
+      {
+        layout->addSpacing(15);
+        layout->addWidget(logo, 0, Qt::AlignCenter);
+        layout->addSpacing(10);
+        {
+          auto hlayout = new QHBoxLayout();
+          hlayout->addStretch();
+          hlayout->addWidget(this->_signup_tabber);
+          hlayout->addSpacing(15);
+          hlayout->addWidget(this->_loading);
+          hlayout->addSpacing(15);
+          hlayout->addWidget(this->_login_tabber);
+          hlayout->addStretch();
+          layout->addLayout(hlayout);
+        }
+      }
+      layout->addSpacing(25);
+      layout->addWidget(this->_facebook_button, 0, Qt::AlignCenter);
+      layout->addSpacing(5);
+      layout->addWidget(this->_separator, 0, Qt::AlignCenter);
+      layout->addSpacing(5);
       layout->addWidget(this->_fullname_field, 0, Qt::AlignCenter);
       layout->addWidget(this->_email_field, 0, Qt::AlignCenter);
       layout->addWidget(this->_password_field, 0,  Qt::AlignCenter);
-      layout->addSpacing(1);
-      {
-        auto hlayout = new QHBoxLayout();
-        hlayout->addSpacing(40);
-        hlayout->addWidget(this->_switch_mode, 0, Qt::AlignRight);
-        hlayout->addStretch();
-        hlayout->addWidget(this->_help_link, 0, Qt::AlignLeft);
-        hlayout->addSpacing(40);
-        layout->addLayout(hlayout, Qt::AlignCenter);
-      }
-      // layout->addStretch();
-      layout->addSpacing(25);
       layout->addWidget(this->_login_button, 0, Qt::AlignCenter);
-      layout->addSpacing(10);
-      layout->addWidget(this->_facebook_button, 0, Qt::AlignCenter);
-      layout->addSpacing(65);
+      layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
+      layout->addStretch();
+      layout->addSpacing(20);
       glayout->addLayout(layout);
       {
         auto layout = new QVBoxLayout;
-        layout->setContentsMargins(0, 2, 55, 2); // 15, 15, 15, 15);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
         layout->addWidget(this->_video);
         glayout->addLayout(layout);
       }
@@ -358,9 +376,21 @@ namespace fist
         }
       }
 
-      this->updateGeometry();
+      this->_update_geometry();
       this->move(QApplication::desktop()->screen()->rect().center() -
                  this->rect().center());
+    }
+
+    void
+    Window::_update_geometry()
+    {
+      this->updateGeometry();
+      this->_forgot_password_link->move(
+        this->_password_field->width() - this->_forgot_password_link->width() - 5,
+        this->_password_field->height() / 2 - this->_forgot_password_link->height() / 2);
+      this->_password_field->setTextMargins(12, 0, 5 + this->_forgot_password_link->width(), 0);
+      ELLE_ASSERT(this->_video != nullptr);
+      this->_help_link->move(QPoint{this->_video->x() - this->_help_link->width() - 5, 5});
     }
 
     Window::~Window()
@@ -381,26 +411,22 @@ namespace fist
       switch (mode)
       {
         case Mode::Register:
-          this->_switch_mode->setText(
-            view::login::links::already_have_an_account::text);
           this->_help_link->setText(
-            view::login::links::help::text);
-          this->_info->setText(
-            view::login::info::register_text);
-          this->_login_button->setText(view::login::login_button::register_text);
+            view::links::help::text);
+          view::mode::selected_style(*this->_signup_tabber);
+          view::mode::default_style(*this->_login_tabber);
+          this->_login_button->setText(view::login_button::register_text);
           this->_fullname_field->show();
-          this->_login_button->setFocus();
+          this->_fullname_field->setFocus();
+          this->_forgot_password_link->hide();
           break;
         case Mode::Login:
-          this->_switch_mode->setText(
-            view::login::links::need_an_account::text);
-          this->_help_link->setText(
-            view::login::links::forgot_password::text);
-          this->_info->setText(
-            view::login::info::login_text);
-          this->_login_button->setText(view::login::login_button::login_text);
+          view::mode::selected_style(*this->_login_tabber);
+          view::mode::default_style(*this->_signup_tabber);
+          this->_login_button->setText(view::login_button::login_text);
           this->_fullname_field->hide();
           this->_email_field->setFocus();
+          this->_forgot_password_link->show();
           break;
         case Mode::Loading:
           this->_loading->show();
@@ -408,6 +434,8 @@ namespace fist
         default:
           ;
       }
+      this->_update_geometry();
+      this->repaint();
     }
 
     void
@@ -434,16 +462,17 @@ namespace fist
           !dynamic_cast<QLayout*>(obj))
         return Super::eventFilter(obj, event);
 
-      if (obj == this->_switch_mode)
+      if (obj == this->_login_tabber)
       {
-        if (event->type() == QEvent::MouseButtonRelease)
-        {
-          ELLE_TRACE("change mode");
-          if (this->_mode == Mode::Login)
-            this->mode(Mode::Register);
-          else if (this->_mode == Mode::Register)
-            this->mode(Mode::Login);
-        }
+        if (event->type() == QEvent::MouseButtonRelease &&
+            this->_mode == Mode::Register)
+          this->mode(Mode::Login);
+      }
+      else if (obj == this->_signup_tabber)
+      {
+        if (event->type() == QEvent::MouseButtonRelease &&
+            this->_mode == Mode::Login)
+          this->mode(Mode::Register);
       }
       else if (obj == this->_video)
       {
@@ -528,13 +557,13 @@ namespace fist
       this->mode(Mode::Login);
       ELLE_TRACE_SCOPE("%s: attempt to login", *this);
       elle::SafeFinally unlock_login([&] {
+          this->_facebook_connect_attempt = false;
           this->_enable(); this->_password_field->setFocus(); });
       if (status == gap_ok || status == gap_already_logged_in)
       {
         emit logged_in();
         if (this->_facebook_connect_attempt)
         {
-          this->_facebook_connect_attempt = false;
           fist::settings()["Login"].set("facebook", 1);
         }
         else
@@ -583,7 +612,6 @@ namespace fist
     Window::_enable()
     {
       this->_login_button->setDisabled(false);
-      this->_switch_mode->setDisabled(false);
       this->_email_field->setDisabled(false);
       this->_password_field->setDisabled(false);
       this->_fullname_field->setDisabled(false);
@@ -592,7 +620,6 @@ namespace fist
     void
     Window::_disable(bool disable_fullname)
     {
-      this->_switch_mode->setDisabled(true);
       this->_login_button->setDisabled(true);
       this->_email_field->setDisabled(true);
       this->_password_field->setDisabled(true);
@@ -736,9 +763,9 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: set message (%s)", *this, message);
       if (critical)
-        view::login::message::error_style(*this->_message_field);
+        view::message::error_style(*this->_message_field);
       else
-        view::login::message::warning_style(*this->_message_field);
+        view::message::warning_style(*this->_message_field);
       this->_message_field->setText(message);
       this->_message_field->setToolTip(tooltip);
     }
@@ -750,7 +777,7 @@ namespace fist
       this->_version_field->setText(
         QString::fromStdString(
           elle::sprintf("v%s", INFINIT_VERSION)));
-      this->_version_field->show();
+      // this->_version_field->show();
       this->update();
     }
 
@@ -814,6 +841,18 @@ namespace fist
         emit this->_login_button->click();
     }
 
+    QWidget const*
+    Window::active() const
+    {
+      if (this->_mode == Mode::Register)
+        return this->_signup_tabber;
+      else if (this->_mode == Mode::Login)
+        return this->_login_tabber;
+      else if (this->_mode == Mode::Loading)
+        return this->_loading;
+      elle::unreachable();
+    }
+
     void
     Window::focusInEvent(QFocusEvent* event)
     {
@@ -862,6 +901,54 @@ namespace fist
       Super::closeEvent(event);
 
       emit quit_request();
+    }
+
+    void
+    Window::paintEvent(QPaintEvent*)
+    {
+      static int arrow_width = 12;
+      static int arrow_height = 6;
+      QPainter painter(this);
+      // Background.
+      {
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(0xFE, 0xFE, 0xFE));
+        auto const& g = this->active()->geometry();
+        qreal top_height = this->active()->y() + g.height() + arrow_height + 7;
+        qreal arrow_center = this->active()->x() + g.width() / 2;
+        qreal right_border = this->_video->geometry().x();
+        painter.drawRect(0, 0, this->width(), this->height());
+        painter.setBrush(QColor(0xF8, 0xF8, 0xF8));
+        painter.setPen(Qt::NoPen);
+        QPolygonF lines;
+        lines.append({0, top_height});
+        lines.append({arrow_center - arrow_width / 2, top_height});
+        lines.append({arrow_center, top_height - arrow_height});
+        lines.append({arrow_center + arrow_width / 2, top_height});
+        lines.append({right_border, top_height});
+        QPolygonF p(lines);
+        p.append({right_border, 0});
+        p.append({(qreal) this->width(), 0});
+        p.append({(qreal) this->width(), (qreal) this->height()});
+        p.append({0, (qreal) this->height()});
+        painter.drawPolygon(p);
+        // Arrow.
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(QColor(0xE0, 0xE0, 0xE0));
+        painter.drawPolyline(lines);
+      }
+      // Seprator.
+      {
+        auto left_limit = this->_facebook_button->x();
+        auto right_limit =
+          this->_facebook_button->x() + this->_facebook_button->width();
+        auto y = this->_separator->y() + this->_separator->height() / 2;
+        painter.setPen(view::separator::style.color());
+        painter.drawLine(left_limit, y, this->_separator->x() - 8, y);
+        painter.drawLine(
+          this->_separator->x() + this->_separator->width() + 8, y,
+          right_limit, y);
+      }
     }
 
     void

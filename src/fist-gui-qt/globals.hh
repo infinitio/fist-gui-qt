@@ -127,6 +127,42 @@ namespace view
   fist::style::Text const
   download_folder_style(fist::Font(DefaultFont, 9), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
 
+  namespace links
+  {
+    namespace no_links
+    {
+      static
+      fist::style::Text const
+      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+    }
+
+    namespace file
+    {
+      static
+      fist::style::Text const
+      style(fist::Font(DefaultFont, 9.5), QColor(0x25, 0x25, 0x25));
+
+      static
+      fist::style::Text const
+      failed_style(fist::Font(DefaultFont, 9.5), QColor(0xD3, 0x15, 0x15));
+    }
+
+    namespace status
+    {
+      static
+      fist::style::Text const
+      style(fist::Font(DefaultFont, 8.5), QColor(0xA8, 0xA8, 0xA8));
+    }
+
+    namespace counter
+    {
+      static
+      fist::style::Text const
+      style(fist::Font(DefaultFont, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
+
+    }
+  }
+
   namespace tab
   {
     static
@@ -171,217 +207,6 @@ namespace view
     static
     fist::style::Text const
     style(fist::Font(DefaultFont, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
-  }
-
-  namespace login
-  {
-    static
-    QSize const
-    size(340, 400);
-
-    static
-    Qt::WindowFlags const
-    flags = Qt::FramelessWindowHint;
-
-    namespace fullname
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
-
-      static
-      QString const
-      placeholder("Full Name");
-
-      static
-      QSize const
-      size(login::size.width() - 80, 38);
-    }
-
-    namespace tagline
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 10), QColor(0x58, 0x58, 0x58), Qt::AlignCenter);
-
-      static
-      QString const
-      text("The smartest way to send your files");
-
-      static
-      QSize const
-      size(login::size.width() - 20, 38);
-    }
-
-    namespace info
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 10, QFont::Bold), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
-
-      static
-      QString const
-      login_text("LOGIN");
-
-      static
-      QString const
-      register_text("CREATE YOUR ACCOUNT");
-
-      static
-      QSize const
-      size(login::size.width() - 114, 20);
-    }
-
-    namespace email
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
-
-      static
-      QString const
-      placeholder("Email");
-
-      static
-      QSize const
-      size(login::size.width() - 80, 38);
-    }
-
-    namespace password
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
-
-      static
-      QString const
-      placeholder("Password");
-
-      static
-      QSize const
-      size(login::size.width() - 80, 38);
-    }
-
-    namespace message
-    {
-      static
-      fist::style::Text const
-      error_style(fist::Font(DefaultFont, 10.5), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
-
-      static
-      fist::style::Text const
-      warning_style(fist::Font(DefaultFont, 10.5), QColor(0x88, 0x88, 0x88), Qt::AlignCenter);
-    }
-
-    namespace links
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 9), QColor(0x3D, 0x91, 0xD4));
-
-      static
-      Qt::TextInteractionFlags const
-      interration_flags(
-        Qt::TextSelectableByMouse |
-        Qt::LinksAccessibleByMouse |
-        Qt::LinksAccessibleByKeyboard);
-
-      namespace forgot_password
-      {
-        static
-        QString const
-        text("<a style=\"text-decoration: none; color: #489FCE;\" "
-             "href=\"https://infinit.io/forgot_password?utm_source=app&utm_medium=windows&utm_campaign=forgot_password\">"
-             "Forgot password?</a>");
-      }
-
-      namespace help
-      {
-        static
-        QString const
-        text("<a style=\"text-decoration: none; color: #489FCE;\" "
-             "href=\"https://infinit.io/faq?utm_source=app&utm_medium=windows&utm_campaign=help\">"
-             "Help!</a>");
-      }
-
-      namespace need_an_account
-      {
-        static
-        QString const
-        text("<a style=\"text-decoration: none; color: #489FCE;\">"
-             "Need an account?</a>");
-      }
-
-      namespace already_have_an_account
-      {
-        static
-        QString const
-        text("<a style=\"text-decoration: none; color: #489FCE;\">"
-             "Already have an account?</a>");
-      }
-    }
-
-    namespace version
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 8.5), QColor(0x88, 0x88, 0x88));
-    }
-
-    namespace login_button
-    {
-      static
-      QSize const
-      size(login::size.width() - 80, 38);
-
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 11, QFont::Bold), Qt::white);
-
-      static
-      QString const
-      login_text("LOGIN");
-
-      static
-      QString const
-      register_text("REGISTER");
-    }
-  }
-
-  namespace links
-  {
-    namespace no_links
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
-    }
-
-    namespace file
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 9.5), QColor(0x25, 0x25, 0x25));
-
-      static
-      fist::style::Text const
-      failed_style(fist::Font(DefaultFont, 9.5), QColor(0xD3, 0x15, 0x15));
-    }
-
-    namespace status
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 8.5), QColor(0xA8, 0xA8, 0xA8));
-    }
-
-    namespace counter
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
-
-    }
   }
 
   namespace transaction
