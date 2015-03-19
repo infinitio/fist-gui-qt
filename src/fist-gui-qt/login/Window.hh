@@ -52,6 +52,9 @@ namespace fist
       bool
       _test_fields(bool test_fullname = false);
 
+      bool
+      _test_email_field(bool register_ = false);
+
     private slots:
       void
       _reduce();
@@ -134,10 +137,13 @@ namespace fist
       void
       paintEvent(QPaintEvent*) override;
 
+      void
+      mode(Mode mode,
+           bool clear_message = true);
     private:
       ELLE_ATTRIBUTE(bool, previous_session_crashed);
       ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
-      ELLE_ATTRIBUTE_Rw(Mode, mode);
+      ELLE_ATTRIBUTE_R(Mode, mode);
       ELLE_ATTRIBUTE(QLabel*, signup_tabber);
       ELLE_ATTRIBUTE(QLabel*, login_tabber);
       // Can be forgot password or help depending on the view.
@@ -146,6 +152,7 @@ namespace fist
       ELLE_ATTRIBUTE(QLabel*, separator);
       ELLE_ATTRIBUTE(QMovie*, loading_icon);
       ELLE_ATTRIBUTE(QLabel*, loading);
+      ELLE_ATTRIBUTE(QWidget*, facebook_email_info);
       ELLE_ATTRIBUTE(QLineEdit*, fullname_field);
       ELLE_ATTRIBUTE(QLineEdit*, email_field);
       ELLE_ATTRIBUTE(QLineEdit*, password_field);
@@ -181,7 +188,10 @@ namespace fist
       _enable();
 
       void
-      _disable(bool disable_fullname = false);
+      _disable();
+
+      void
+      _set_enabled(bool val);
 
     private:
       // Save the password into user settings.
@@ -215,6 +225,9 @@ namespace fist
     private slots:
       void
       fb(QString const& code);
+
+      void
+      _ask_for_facebook_email();
 
       void
       facebook_connect_failed(QString const& code);

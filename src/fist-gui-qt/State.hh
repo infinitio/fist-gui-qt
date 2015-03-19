@@ -65,7 +65,8 @@ namespace fist
           std::string const& password);
 
     void
-    facebook_connect(std::string const& token);
+    facebook_connect(std::string const& token,
+                     std::string const& email = "");
 
   private slots:
     void

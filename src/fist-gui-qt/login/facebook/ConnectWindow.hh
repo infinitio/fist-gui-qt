@@ -64,6 +64,7 @@ namespace fist
 
       private:
         ELLE_ATTRIBUTE(QString, app_id);
+        ELLE_ATTRIBUTE_R(QString, token);
         ELLE_ATTRIBUTE_X(Cookies*, cookies);
       private:
         Q_OBJECT;

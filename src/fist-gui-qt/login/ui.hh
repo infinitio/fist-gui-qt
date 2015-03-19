@@ -43,6 +43,32 @@ namespace fist
         }
       }
 
+      namespace facebook_email
+      {
+        namespace title
+        {
+          static
+          fist::style::Text const
+          style(fist::Font(DefaultFont, 12, QFont::Bold),
+                QColor(0x51, 0x51, 0x49));
+
+          static
+          QString const
+          text("One last thing...");
+        }
+
+        namespace subtitle
+        {
+          static
+          fist::style::Text const
+          style(fist::Font(DefaultFont, 8), QColor(0xA7, 0xA7, 0xA7));
+
+          static
+          QString const
+          text("Enter your email address to create your account.");
+        }
+      }
+
       namespace separator
       {
         static
@@ -64,7 +90,7 @@ namespace fist
 
           static
           QSize const
-          size(view::size.width() - 160, 38);
+          size(view::size.width() - 140, 38);
         }
       }
 
@@ -183,7 +209,7 @@ namespace fist
       {
         static
         QSize const
-        size(view::size.width() - 160, 38);
+        size(view::size.width() - 140, 38);
 
         static
         fist::style::Text const

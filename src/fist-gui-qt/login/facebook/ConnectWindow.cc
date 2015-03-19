@@ -100,6 +100,7 @@ namespace fist
                                    bool load)
         : QMainWindow(parent)
         , _app_id(app_id)
+        , _token()
         , _cookies{new Cookies{this}}
       {
         auto* web_view = new QWebView(this);
@@ -140,6 +141,7 @@ namespace fist
           {
             auto access_token =
               requested_url.allQueryItemValues("access_token")[0];
+            this->_token = access_token;
             emit success(access_token);
           }
           else

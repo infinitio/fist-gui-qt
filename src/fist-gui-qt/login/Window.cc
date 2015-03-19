@@ -114,6 +114,7 @@ namespace fist
       _separator(new QLabel(view::separator::text, this)),
       _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this)),
       _loading(new QLabel(this)),
+      _facebook_email_info(new QWidget(this)),
       _fullname_field(new QLineEdit(this)),
       _email_field(new QLineEdit(this)),
       _password_field(new QLineEdit(this)),
@@ -150,6 +151,19 @@ namespace fist
         // Separator.
         {
           view::separator::style(*this->_separator);
+        }
+        // facebook_email_info.
+        {
+          this->_facebook_email_info->setFixedWidth(view::password::size.width());
+          QVBoxLayout* ll = new QVBoxLayout(this->_facebook_email_info);
+          auto* title = new QLabel(view::facebook_email::title::text, this);
+          view::facebook_email::title::style(*title);
+          ll->addWidget(title);
+
+          auto* subtitle =
+            new QLabel(view::facebook_email::subtitle::text, this);
+          view::facebook_email::subtitle::style(*subtitle);
+          ll->addWidget(subtitle);
         }
         // Fullname field.
         {
@@ -312,6 +326,7 @@ namespace fist
       layout->addSpacing(5);
       layout->addWidget(this->_separator, 0, Qt::AlignCenter);
       layout->addSpacing(5);
+      layout->addWidget(this->_facebook_email_info, 0, Qt::AlignCenter);
       layout->addWidget(this->_fullname_field, 0, Qt::AlignCenter);
       layout->addWidget(this->_email_field, 0, Qt::AlignCenter);
       layout->addWidget(this->_password_field, 0,  Qt::AlignCenter);
@@ -402,15 +417,26 @@ namespace fist
     }
 
     void
-    Window::mode(fist::login::Mode mode)
+    Window::mode(fist::login::Mode mode,
+                 bool clear_message)
     {
       ELLE_TRACE_SCOPE("Set mode %s", mode);
       this->_mode = mode;
-      this->_message_field->clear();
+      if (clear_message)
+        this->_message_field->clear();
       this->_loading->hide();
+      auto show = [this] {
+        this->_separator->show();
+        this->_facebook_button->show();
+        this->_email_field->show();
+        this->_password_field->show();
+        this->_fullname_field->show();
+      };
       switch (mode)
       {
         case Mode::Register:
+          show();
+          this->_facebook_email_info->hide();
           this->_help_link->setText(
             view::links::help::text);
           view::mode::selected_style(*this->_signup_tabber);
@@ -421,6 +447,8 @@ namespace fist
           this->_forgot_password_link->hide();
           break;
         case Mode::Login:
+          show();
+          this->_facebook_email_info->hide();
           view::mode::selected_style(*this->_login_tabber);
           view::mode::default_style(*this->_signup_tabber);
           this->_login_button->setText(view::login_button::login_text);
@@ -609,29 +637,51 @@ namespace fist
         ERR(gap_email_password_dont_match, "Wrong email/password");
         ERR(gap_deprecated, "Your version is no longer supported");
         ERR(gap_email_not_confirmed, "You need to confirm your email\nCheck your inbox");
+        ERR(gap_email_already_registered, "This email has already been taken");
         default:
           fill_error_field(elle::sprintf("Internal error (%s)", status));
       }
 #undef ERR
+      if (this->_facebook_connect_attempt)
+        this->_ask_for_facebook_email();
+    }
+
+
+    void
+    Window::_ask_for_facebook_email()
+    {
+      this->mode(Mode::Register, false);
+      this->_facebook_email_info->show();
+      this->_facebook_button->hide();
+      this->_separator->hide();
+      this->_fullname_field->hide();
+      this->_password_field->hide();
+      this->_update_geometry();
+      this->repaint();
+    }
+
+    void
+    Window::_set_enabled(bool val)
+    {
+      this->_login_button->setDisabled(!val);
+      this->_email_field->setDisabled(!val);
+      this->_password_field->setDisabled(!val);
+      this->_fullname_field->setDisabled(!val);
+      this->_facebook_button->setDisabled(!val);
+      this->_login_tabber->setDisabled(!val);
+      this->_signup_tabber->setDisabled(!val);
     }
 
     void
     Window::_enable()
     {
-      this->_login_button->setDisabled(false);
-      this->_email_field->setDisabled(false);
-      this->_password_field->setDisabled(false);
-      this->_fullname_field->setDisabled(false);
+      this->_set_enabled(true);
     }
 
     void
-    Window::_disable(bool disable_fullname)
+    Window::_disable()
     {
-      this->_login_button->setDisabled(true);
-      this->_email_field->setDisabled(true);
-      this->_password_field->setDisabled(true);
-      if (disable_fullname)
-        this->_fullname_field->setDisabled(true);
+      this->_set_enabled(false);
     }
 
     void
@@ -662,6 +712,31 @@ namespace fist
     }
 
     bool
+    Window::_test_email_field(bool register_)
+    {
+      if (this->_email_field->text().isEmpty() ||
+          !regexp::email::checker.exactMatch(this->_email_field->text()))
+      {
+        ELLE_DEBUG("invalid email field");
+        if (this->_email_field->text().isEmpty())
+        {
+          this->set_message(
+            register_
+            ? "You must choose an email address"
+            : "You must enter your email address",
+            "We need your email, sorry");
+        }
+        else
+          this->set_message("This email address seems invalid",
+                            "We need your email, sorry");
+        this->_email_field->setDisabled(false);
+        this->_email_field->setFocus();
+        return false;
+      }
+      return true;
+    }
+
+    bool
     Window::_test_fields(bool register_)
     {
       bool test_fullname = register_;
@@ -674,6 +749,8 @@ namespace fist
         this->_fullname_field->setFocus();
         return false;
       }
+      if (!this->_test_email_field())
+        return false;
       if (this->_email_field->text().isEmpty() ||
           !regexp::email::checker.exactMatch(this->_email_field->text()))
       {
@@ -715,9 +792,18 @@ namespace fist
           this->_enable();
           // this->_footer->mode(Mode::Register);
         });
-      this->_disable(true);
+      this->_disable();
       elle::SafeFinally register_failed_guard([&] { emit this->register_failed(); });
       this->_message_field->clear();
+      if (this->_facebook_email_info->isVisible())
+      {
+        if (!this->_test_email_field())
+          return;
+        else
+          this->fb(this->_facebook_window->token());
+        return;
+      }
+
       if (!this->_test_fields(true))
         return;
       auto email_array = this->_email_field->text().toUtf8();
@@ -946,15 +1032,18 @@ namespace fist
       }
       // Seprator.
       {
-        auto left_limit = this->_facebook_button->x();
-        auto right_limit =
-          this->_facebook_button->x() + this->_facebook_button->width();
-        auto y = this->_separator->y() + this->_separator->height() / 2;
-        painter.setPen(view::separator::style.color());
-        painter.drawLine(left_limit, y, this->_separator->x() - 8, y);
-        painter.drawLine(
-          this->_separator->x() + this->_separator->width() + 8, y,
-          right_limit, y);
+        if (this->_separator->isVisible())
+        {
+          auto left_limit = this->_facebook_button->x();
+          auto right_limit =
+            this->_facebook_button->x() + this->_facebook_button->width();
+          auto y = this->_separator->y() + this->_separator->height() / 2;
+          painter.setPen(view::separator::style.color());
+          painter.drawLine(left_limit, y, this->_separator->x() - 8, y);
+          painter.drawLine(
+            this->_separator->x() + this->_separator->width() + 8, y,
+            right_limit, y);
+        }
       }
     }
 
@@ -982,9 +1071,12 @@ namespace fist
         });
       this->_disable();
       {
+        auto email = this->_email_field->text();
         emit this->login_attempt();
-        this->_state.facebook_connect(token.toStdString());
+        this->_state.facebook_connect(token.toStdString(),
+                                      email.toStdString());
       }
+      this->mode(Mode::Loading);
       unlock_login.abort();
     }
 

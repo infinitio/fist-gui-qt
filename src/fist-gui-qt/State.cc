@@ -153,12 +153,18 @@ namespace fist
   }
 
   void
-  State::facebook_connect(std::string const& token)
+  State::facebook_connect(std::string const& token,
+                          std::string const& email_)
   {
     this->_login_future = QtConcurrent::run(
       [=] {
-        auto email = elle::os::getenv("FACEBOOK_PREFERRED_EMAIL", "");
-        auto res = gap_facebook_connect(this->state(), token, email);
+        auto email = elle::os::getenv("FACEBOOK_PREFERRED_EMAIL", email_);
+        auto optional_email = [&] {
+          if (email.empty())
+            return boost::optional<std::string>{};
+          return boost::optional<std::string>{email};
+        };
+        auto res = gap_facebook_connect(this->state(), token, optional_email());
         if (res == gap_ok)
           this->_me = gap_self_id(this->state());
         return res;
