@@ -64,6 +64,10 @@
     <file alias="logo">../slices/mac/icon/icon_128x128.png</file>
     <file alias="logo@2x">../slices/mac/icon/icon_128x128@2x.png</file>
 
+    <!-- code -->
+    <file alias="code/left">../slices/windows/view_code/illustration-code-left.png</file>
+    <file alias="code/right">../slices/windows/view_code/illustration-code-right.png</file>
+
     <!-- conversation -->
     <file alias="conversation/accept">../slices/mac/view_conversation/conversation-icon-accept.png</file>
     <file alias="conversation/accept@2x">../slices/mac/view_conversation/conversation-icon-accept@2x.png</file>

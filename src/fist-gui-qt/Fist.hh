@@ -116,6 +116,10 @@ private slots:
   void
   logged_in();
 
+  // Spawn the dock when the register is successful.
+  void
+  registered();
+
   // Behavior when trying to login.
   void
   _logging_in();

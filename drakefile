@@ -269,6 +269,11 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/MainView/Links.cc",
       "src/fist-gui-qt/MainView/LinkWidget.cc",
       "src/fist-gui-qt/MainView/LinkWidget.hh",
+
+      "src/fist-gui-qt/GhostCode/Panel.cc",
+      "src/fist-gui-qt/GhostCode/Panel.hh",
+      "src/fist-gui-qt/GhostCode/Footer.cc",
+      "src/fist-gui-qt/GhostCode/Footer.hh",
     )
 
   build = drake.Rule('build')

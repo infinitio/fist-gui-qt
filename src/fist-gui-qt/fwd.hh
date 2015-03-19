@@ -49,6 +49,11 @@ namespace fist
     class Users;
   }
 
+  namespace ghost_code
+  {
+    class Panel;
+  }
+
   enum class Mode
   {
     p2p,

@@ -113,6 +113,26 @@ namespace fist
     new_download_folder_needed();
 
   public:
+    /*-----------.
+    | Ghost code |
+    `-----------*/
+    void
+    use_ghost_code(std::string const& fullname);
+
+    void
+    cancel_ghost_code();
+  private slots:
+    void
+    _on_ghost_code_result_ready();
+  signals:
+    void
+    ghost_code_result(gap_Status);
+
+  private:
+    ELLE_ATTRIBUTE(QFuture<gap_Status>, ghost_code_future);
+    ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, ghost_code_watcher);
+
+  public:
     /*------.
     | Users |
     `------*/

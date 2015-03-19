@@ -91,6 +91,9 @@ namespace fist
       logged_in();
 
       void
+      registered();
+
+      void
       quit_request();
 
       void

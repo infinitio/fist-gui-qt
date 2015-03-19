@@ -357,6 +357,8 @@ Fist::_initialize_login_window(bool prefill_fields)
   // Login.
   connect(this->_login_window.get(), SIGNAL(logged_in()),
           this, SLOT(logged_in()));
+  connect(this->_login_window.get(), SIGNAL(registered()),
+          this, SLOT(registered()));
   this->_login_window->setFocus();
 }
 
@@ -529,6 +531,13 @@ Fist::_put_lock_file()
     this->_filelock.open(QIODevice::WriteOnly);
     this->_filelock.setPermissions(QFile::ReadOwner);
   }
+}
+
+void
+Fist::registered()
+{
+  this->logged_in();
+  this->_dock->_show_ghost_code_view();
 }
 
 void

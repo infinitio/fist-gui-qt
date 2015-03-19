@@ -121,6 +121,9 @@ public slots:
   _show_send_view();
 
   void
+  _show_ghost_code_view();
+
+  void
   _show_user_view(uint32_t sender_id);
 
   void
@@ -177,6 +180,7 @@ private:
 
   ELLE_ATTRIBUTE(std::unique_ptr<MainPanel>, transaction_panel);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::sendview::Panel>, send_panel);
+  ELLE_ATTRIBUTE(std::unique_ptr<fist::ghost_code::Panel>, ghost_code_panel);
 
 /*-----.
 | Menu |

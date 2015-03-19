@@ -513,8 +513,9 @@ namespace fist
         auto email = this->_email_field->text();
         auto password = this->_password_field->text();
         fist::settings()["Login"].set("email", email);
+        fist::settings()["Login"].remove("facebook");
         this->_save_password(email, password);
-        emit logged_in();
+        emit registered();
         return;
       }
       ELLE_TRACE("register failed");
@@ -561,7 +562,6 @@ namespace fist
           this->_enable(); this->_password_field->setFocus(); });
       if (status == gap_ok || status == gap_already_logged_in)
       {
-        emit logged_in();
         if (this->_facebook_connect_attempt)
         {
           if (fist::settings()["Login"].exists("facebook"))
@@ -569,12 +569,15 @@ namespace fist
           else
             emit registered();
           fist::settings()["Login"].set("facebook", 1);
+          fist::settings()["Login"].remove("email");
         }
         else
         {
+          emit logged_in();
           auto email = this->_email_field->text();
           auto password = this->_password_field->text();
           fist::settings()["Login"].set("email", email);
+          fist::settings()["Login"].remove("facebook");
           this->_save_password(email, password);
         }
         return;

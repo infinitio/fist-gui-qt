@@ -40,6 +40,8 @@ namespace fist
     , _login_watcher()
     , _register_future()
     , _register_watcher()
+    , _ghost_code_future()
+    , _ghost_code_watcher()
     , _users()
     , _search_future()
     , _search_watcher()
@@ -67,6 +69,8 @@ namespace fist
             this, SLOT(_on_login_result_ready()));
     connect(&this->_register_watcher, SIGNAL(finished()),
             this, SLOT(_on_register_result_ready()));
+    connect(&this->_ghost_code_watcher, SIGNAL(finished()),
+            this, SLOT(_on_ghost_code_result_ready()));
 
     ELLE_TRACE_SCOPE("%s: construction", *this);
     g_state = this;
@@ -205,6 +209,22 @@ namespace fist
       emit internet_issue("trying to connect");
     else
       emit kicked_out(QString::fromStdString(last_error));
+  }
+
+  void
+  State::use_ghost_code(std::string const& code)
+  {
+    this->_ghost_code_future = QtConcurrent::run(
+      [=] {
+        return gap_use_ghost_code(this->state(), code);
+      });
+    this->_ghost_code_watcher.setFuture(this->_ghost_code_future);
+  }
+
+  void
+  State::_on_ghost_code_result_ready()
+  {
+    emit ghost_code_result(this->_ghost_code_future.result());
   }
 
   void
