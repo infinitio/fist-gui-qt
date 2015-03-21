@@ -267,6 +267,20 @@
     <file alias="mimetypes/video">../mimetypes/video.png</file>
     <file alias="mimetypes/video@2x">../mimetypes/video@2x.png</file>
 
+    <!-- os icons -->
+    <file alias="os/windows">../slices/mac/view_send/icon-device-windows-avatar.png</file>
+    <file alias="os/windows@2x">../slices/mac/view_send/icon-device-windows-avatar@2x.png</file>
+    <file alias="os/mac">../slices/mac/view_send/icon-device-mac-avatar.png</file>
+    <file alias="os/mac@2x">../slices/mac/view_send/icon-device-mac-avatar@2x.png</file>
+    <file alias="os/ios">../slices/mac/view_send/icon-device-ios-avatar.png</file>
+    <file alias="os/ios@2x">../slices/mac/view_send/icon-device-ios-avatar@2x.png</file>
+    <file alias="os/android">../slices/mac/view_send/icon-device-android-avatar.png</file>
+    <file alias="os/android@2x">../slices/mac/view_send/icon-device-android-avatar@2x.png</file>
+    <file alias="os/linux">../slices/mac/view_send/icon-device-default-avatar.png</file>
+    <file alias="os/linux@2x">../slices/mac/view_send/icon-device-default-avatar@2x.png</file>
+    <file alias="os/unknown">../slices/mac/view_send/icon-device-default-avatar.png</file>
+    <file alias="os/unknown@2x">../slices/mac/view_send/icon-device-default-avatar@2x.png</file>
+
     <!-- Fonts -->
     <file alias="font/LucidaGrande">../fonts/LucidaGrande.ttc</file>
     <file alias="font/Montserrat-bold">../fonts/Montserrat-Bold.ttf</file>

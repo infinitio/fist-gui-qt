@@ -5,7 +5,8 @@ ListItem::ListItem(QWidget* parent,
                    bool clickable):
   QWidget(parent),
   _background(background_color),
-  _clickable(clickable)
+  _clickable(clickable),
+  _darker_next_separator(false)
 {
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 

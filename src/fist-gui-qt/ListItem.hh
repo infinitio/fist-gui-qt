@@ -49,6 +49,7 @@ public:
 
   ELLE_ATTRIBUTE(QColor, background);
   ELLE_ATTRIBUTE(bool, clickable);
+  ELLE_ATTRIBUTE_RW(bool, darker_next_separator);
 
   /*----------.
   | Printable |

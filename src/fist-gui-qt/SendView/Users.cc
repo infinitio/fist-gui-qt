@@ -1,14 +1,18 @@
 #include <vector>
 
+#include <boost/functional/hash.hpp>
+
 #include <QPainter>
 #include <QHBoxLayout>
+#include <QScrollArea>
 
 #include <elle/log.hh>
 #include <elle/finally.hh>
 
 #include <fist-gui-qt/SendView/Users.hh>
 #include <fist-gui-qt/model/User.hh>
-#include <fist-gui-qt/SearchResultWidget.hh>
+#include <fist-gui-qt/SendView/SearchResultWidget.hh>
+#include <fist-gui-qt/SendView/OwnDeviceSearchResult.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/regexp.hh>
@@ -16,6 +20,24 @@
 ELLE_LOG_COMPONENT("infinit.FIST.SendView.Users");
 
 static int const margin = 7;
+
+namespace std
+{
+  std::size_t
+  hash<fist::sendview::Recipient>::operator()(
+    fist::sendview::Recipient const& recipient) const
+  {
+    // XXX: The id is definitely not unique.
+    auto id = recipient.id();
+    auto k = recipient.device_uuid()
+      ? std::hash<std::string>()(recipient.device_uuid().get())
+      : 0;
+    size_t seed = 0;
+    boost::hash_combine(seed, id);
+    boost::hash_combine(seed, k);
+    return seed;
+  }
+}
 
 namespace fist
 {
@@ -72,6 +94,7 @@ namespace fist
       , _users(new ListWidget(
                  this, ListWidget::Separator({QColor(0xF4, 0xF4, 0xF4)}, 10, 10)))
     {
+      this->_search_field->installEventFilter(this);
       connect(this->_search_field, SIGNAL(up_pressed()), this->_users, SLOT(setFocus()));
       connect(this->_search_field, SIGNAL(down_pressed()), this->_users, SLOT(setFocus()));
       this->setContentsMargins(0, 0, 0, 0);
@@ -79,7 +102,7 @@ namespace fist
       connect(&this->_state, SIGNAL(search_results_ready()),
               this, SLOT(_set_users()));
       {
-        this->_users->setMaxRows(3);
+        this->_users->setMaxRows(8);
       }
       {
         this->set_icon(this->_magnifier);
@@ -124,10 +147,24 @@ namespace fist
         connect(&this->_search_delay, SIGNAL(timeout()),
                 this, SLOT(delay_expired()));
       }
-
-      this->text_changed("");
     }
 
+    bool
+    Users::eventFilter(QObject *obj, QEvent *event)
+    {
+      if (obj == this->_search_field)
+      {
+        if (event->type() == QEvent::FocusIn)
+        {
+          emit search_field_focused();
+        }
+        else if (event->type() == QEvent::FocusOut)
+        {
+          emit search_field_unfocused();
+        }
+      }
+      return Super::eventFilter(obj, event);
+    }
     void
     Users::clear_search()
     {
@@ -174,36 +211,79 @@ namespace fist
     void
     Users::_set_users()
     {
-      ELLE_TRACE_SCOPE("got result from future");
+      ELLE_LOG_SCOPE("got result from future");
       elle::SafeFinally restore_magnifier(
         [&] { this->set_icon(this->_magnifier); });
       this->set_users(this->_state.results(), false);
     }
 
     void
+    Users::_add_search_result(model::User const& model)
+    {
+      bool picked = this->_recipients.find(model.id()) != this->_recipients.end();
+      ELLE_LOG("add search result: %s", model);
+      auto widget = std::make_shared<SearchResultWidget>(model, picked, this);
+      if (model.id() == this->_state.my_id())
+        widget->darker_next_separator(true);
+      connect(widget.get(),
+              SIGNAL(selected(uint32_t)),
+              this,
+              SLOT(_add_peer(uint32_t)));
+      connect(widget.get(),
+              SIGNAL(unselected(uint32_t)),
+              this,
+              SLOT(_remove_peer(uint32_t)));
+      this->_users->add_widget(widget, ListWidget::Position::Bottom);
+      // local ? ListWidget::Position::Top : ListWidget::Position::Bottom);
+      this->_results[model.id()] = widget;
+    }
+
+    void
+    Users::_add_device_search_result(model::User const& me)
+    {
+      auto last = me.devices().size() - 1;
+      unsigned int i = 0;
+      for (auto const& device: me.devices())
+      {
+        if (device.id() != QString::fromStdString(this->_state.device()))
+        {
+          ++i;
+          auto widget = std::make_shared<OwnDeviceSearchResult>(me, device, this);
+          connect(widget.get(),
+                  SIGNAL(selected_device(uint32_t, QString const&)),
+                  this,
+                  SLOT(_add_device(uint32_t, QString const&)));
+          connect(widget.get(),
+                  SIGNAL(unselected_device(uint32_t, QString const&)),
+                  this,
+                  SLOT(_remove_device(uint32_t, QString const&)));
+          if (i == last)
+            widget->darker_next_separator(true);
+          this->_users->add_widget(widget, ListWidget::Position::Bottom);
+        }
+      }
+    }
+
+    void
     Users::set_users(UserList const& users, bool local)
     {
-      ELLE_TRACE_SCOPE("%s: set users", *this);
+      if (this->_search_field->text().isEmpty())
+      {
+        auto const& me = this->_state.me();
+        if (me.devices().size() > 1)
+          this->_add_device_search_result(me);
+        else
+          this->_add_search_result(me);
+      }
+
       for (auto id: users)
       {
+        if (id == this->_state.me().id())
+          continue;
         auto const& model = this->_state.user(id);
         ELLE_DEBUG("-- %s", model);
         if (this->_results.find(model.id()) == this->_results.end())
-        {
-          bool picked = this->_recipients.find(model.id()) != this->_recipients.end();
-          auto widget = std::make_shared<SearchResultWidget>(model, picked, this);
-          connect(widget.get(),
-                  SIGNAL(selected(uint32_t)),
-                  this,
-                  SLOT(_add_peer(uint32_t)));
-          connect(widget.get(),
-                  SIGNAL(unselected(uint32_t)),
-                  this,
-                  SLOT(_remove_peer(uint32_t)));
-          this->_users->add_widget(widget, ListWidget::Position::Bottom);
-          // local ? ListWidget::Position::Top : ListWidget::Position::Bottom);
-          this->_results[model.id()] = widget;
-        }
+          this->_add_search_result(model);
       }
 
       if (this->_users->widgets().isEmpty() && !local)
@@ -268,12 +348,29 @@ namespace fist
           return -1;
         }
       }();
-      emit send_metric(UIMetrics_UnselectPeer,
-                       {
-                         { "filter", this->text().toStdString() },
-                         { "index", std::to_string(index) },
-                       });
+      emit send_metric(
+        UIMetrics_UnselectPeer,
+        {
+          { "filter", this->text().toStdString() },
+          { "index", std::to_string(index) },
+        });
       this->_recipients.erase(uid);
+    }
+
+    void
+    Users::_add_device(uint32_t uid,
+                       QString const& device_name)
+    {
+      ELLE_ASSERT_EQ(uid, this->_state.my_id());
+      this->_recipients.insert(Recipient{uid, device_name});
+    }
+
+    void
+    Users::_remove_device(uint32_t uid,
+                          QString const& device_name)
+    {
+      ELLE_ASSERT_EQ(uid, this->_state.my_id());
+      this->_recipients.erase(Recipient{uid, device_name});
     }
 
     void

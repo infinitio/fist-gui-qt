@@ -24,14 +24,6 @@ namespace fist
       ~IconProvider() = default;
 
     public:
-      QPixmap const&
-      icon(QString const& filename);
-
-      void
-      add_icon(QString const& extension,
-               QPixmap const& pixmap);
-
-    public:
       enum class Type{
         archive,
         cat,
@@ -45,12 +37,27 @@ namespace fist
         unknown,
         video,
         document,
+        windows,
+        linux,
+        macosx,
+        ios,
+        android,
+        unknown_os,
       };
+
+    public:
+      QPixmap const&
+      icon(QString const& filename);
+
+      void
+      add_icon(QString const& extension,
+               QPixmap const& pixmap);
+
 
       typedef std::map<Type, QPixmap> TypeIcon;
       typedef std::unordered_map<std::string, Type> TypeTranslator;
       typedef std::unordered_map<std::string, QPixmap> UserDefinedIcons;
-      ELLE_ATTRIBUTE(TypeIcon, icons);
+      ELLE_ATTRIBUTE_R(TypeIcon, icons);
       ELLE_ATTRIBUTE(TypeTranslator, translator);
       ELLE_ATTRIBUTE(UserDefinedIcons, user_icons);
     };

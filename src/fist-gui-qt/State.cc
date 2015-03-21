@@ -21,6 +21,7 @@
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/regexp.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.State");
 
@@ -146,7 +147,7 @@ namespace fist
       [=] {
         auto res = gap_login(this->state(), email, password);
         if (res == gap_ok)
-          this->_me = gap_self_id(this->state());
+          this->_my_id = gap_self_id(this->state());
         return res;
       });
     this->_login_watcher.setFuture(this->_login_future);
@@ -166,7 +167,7 @@ namespace fist
         };
         auto res = gap_facebook_connect(this->state(), token, optional_email());
         if (res == gap_ok)
-          this->_me = gap_self_id(this->state());
+          this->_my_id = gap_self_id(this->state());
         return res;
       });
     this->_login_watcher.setFuture(this->_login_future);
@@ -188,7 +189,7 @@ namespace fist
         // Will explode if the state is destroyed.
         auto res = gap_register(this->state(), fullname, email, password);
         if (res == gap_ok)
-          this->_me = gap_self_id(this->state());
+          this->_my_id = gap_self_id(this->state());
         return res;
       });
     this->_register_watcher.setFuture(this->_register_future);
@@ -236,6 +237,7 @@ namespace fist
   void
   State::on_logged_in()
   {
+    this->_device = gap_self_device_id(this->state());
     ELLE_TRACE("load swaggers")
     {
       std::vector<surface::gap::User> users;
@@ -303,7 +305,7 @@ namespace fist
   model::User const&
   State::me()
   {
-    return this->user(this->_me);
+    return this->user(this->_my_id);
   }
 
   void
@@ -330,6 +332,8 @@ namespace fist
     ELLE_TRACE_SCOPE("%s: peer %s updated", *this, user);
     if (this->_users.find(user.id) == this->_users.end())
       this->_users[user.id].reset(new model::User(*this, user));
+    else
+      this->_users.at(user.id)->model(user);
   }
 
   void
@@ -388,13 +392,16 @@ namespace fist
             }
             else
             {
-              std::vector<surface::gap::User> _users;
-              auto res = gap_users_search(this->state(), text.c_str(), _users);
-              if (res == gap_ok)
-                for (auto const& user: _users)
-                  users.push_back(user.id);
-              else
-                ELLE_WARN("user search failed: %s", res);
+              if (elle::os::inenv("FIST_SEARCH_IN_META"))
+              {
+                std::vector<surface::gap::User> _users;
+                auto res = gap_users_search(this->state(), text.c_str(), _users);
+                if (res == gap_ok)
+                  for (auto const& user: _users)
+                    users.push_back(user.id);
+                else
+                  ELLE_WARN("user search failed: %s", res);
+              }
             }
             return users;
           });
@@ -464,12 +471,12 @@ namespace fist
     if (future.constBegin() != future.constEnd())
     {
       this->_last_results = this->_search_watcher.result();
+      emit search_results_ready();
     }
     else
     {
       ELLE_DEBUG("future empty");
     }
-    emit search_results_ready();
   }
 
   QString

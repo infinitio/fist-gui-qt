@@ -138,7 +138,7 @@ namespace fist
     | Users |
     `------*/
     // Me.
-    ELLE_ATTRIBUTE(uint32_t, me);
+    ELLE_ATTRIBUTE_R(uint32_t, my_id);
     ELLE_ATTRIBUTE_R(std::string, device);
     model::User const&
     me();

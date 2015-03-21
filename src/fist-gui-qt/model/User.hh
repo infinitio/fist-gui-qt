@@ -12,6 +12,7 @@
 # include <QVariant>
 
 # include <fist-gui-qt/model/Model.hh>
+# include <fist-gui-qt/model/Device.hh>
 # include <fist-gui-qt/fwd.hh>
 
 # include <surface/gap/User.hh>
@@ -37,6 +38,10 @@ namespace fist
       ~User() = default;
 
       User(User const&) = default;
+
+      /// Return true if it's the current user.
+      bool
+      me() const;
 
       QString
       fullname() const;
@@ -74,10 +79,12 @@ namespace fist
     private:
       // Every attributes are marked as mutable in order to allow lazy
       // evaluation.
-      ELLE_ATTRIBUTE_RX(surface::gap::User, user);
+      ELLE_ATTRIBUTE_Rw(surface::gap::User, model);
       ELLE_ATTRIBUTE_P(QPixmap, avatar, mutable);
       ELLE_ATTRIBUTE_P(bool, default_avatar, mutable);
       ELLE_ATTRIBUTE_P(bool, new_avatar, mutable);
+      typedef std::vector<model::Device> Devices;
+      ELLE_ATTRIBUTE_RX(Devices, devices);
 
     signals:
       void

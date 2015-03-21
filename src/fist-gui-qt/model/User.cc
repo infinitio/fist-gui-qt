@@ -35,60 +35,89 @@ namespace fist
     User::User(fist::State& state,
                surface::gap::User const& user)
       : Super(state, user.id)
-      , _user(user)
+      , _model(user)
       , _avatar()
       , _default_avatar(true)
       , _new_avatar(true)
     {
+      if (this->id() == this->_state.my_id())
+      {
+        std::vector<surface::gap::Device> devices;
+        auto res = gap_devices(this->_state.state(), devices);
+        if (res != gap_ok)
+          ELLE_WARN("%s: fetching devices failed", *this);
+        else
+          for (auto const& device: devices)
+            ELLE_LOG("add device: %s", device)
+              this->_devices.emplace_back(device);
+      }
+    }
+
+    void
+    User::model(surface::gap::User const& user)
+    {
+      auto status = this->_model.status;
+      this->_model = user;
+      if (status != this->_model.status)
+        emit status_updated();
+    }
+
+    bool
+    User::me() const
+    {
+      return this->id() == this->_state.me().id();
     }
 
     QString
     User::fullname() const
     {
-      return QString::fromUtf8(this->_user.fullname.c_str());
+      return QString::fromUtf8(this->_model.fullname.c_str());
     }
 
     QString
     User::handle() const
     {
-      return QString::fromUtf8(this->_user.handle.c_str());
+      return QString::fromUtf8(this->_model.handle.c_str());
     }
 
     void
     User::deleted(bool deleted)
     {
-      this->_user.deleted = deleted;
+      this->_model.deleted = deleted;
     }
 
     bool
     User::deleted()
     {
-      return this->_user.deleted;
+      return this->_model.deleted;
     }
 
     bool
     User::swagger() const
     {
-      return this->_user.swagger;
+      return this->_model.swagger;
     }
 
     void
     User::swagger(bool)
     {
-      this->_user.swagger = true;
+      this->_model.swagger = true;
     }
 
     void
     User::status(bool status)
     {
-      this->_user.status = status;
-      emit status_updated();
+      if (status != this->_model.status)
+      {
+        this->_model.status = status;
+        emit status_updated();
+      }
     }
 
     bool
     User::status() const
     {
-      return this->_user.status;
+      return this->_model.status;
     }
 
     bool
@@ -149,7 +178,7 @@ namespace fist
     void
     User::print(std::ostream& stream) const
     {
-      stream << "User(" << this->id() << ", " << this->_user.fullname << ")";
+      stream << "User(" << this->id() << ", " << this->_model.fullname << ")";
     }
   }
 }

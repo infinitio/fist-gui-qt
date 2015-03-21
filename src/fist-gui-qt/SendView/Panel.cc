@@ -19,7 +19,6 @@
 #include <fist-gui-qt/IconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/ListWidget.hh>
-#include <fist-gui-qt/SearchResultWidget.hh>
 #include <fist-gui-qt/SendView/Files.hh>
 #include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/SendView/Users.hh>
@@ -92,6 +91,8 @@ namespace fist
               &this->_state, SLOT(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)));
 
       this->setAcceptDrops(true);
+
+      this->setMaximumHeight(640);
     }
 
     void
@@ -195,10 +196,12 @@ namespace fist
         }
         for (auto const& recipient: recipients)
         {
-          if (recipient != gap_null())
+          if (recipient.id() != gap_null())
           {
+            if (recipient.id() != this->_state.my_id())
+              ELLE_ASSERT(!recipient.device_uuid());
             gap_send_files(
-              this->_state.state(), recipient, files, message);
+              this->_state.state(), recipient, files, message, recipient.device_uuid());
           }
         }
       }
@@ -264,7 +267,7 @@ namespace fist
       this->update();
       this->_tabs->activate_first();
       this->_users->clear_search();
-      this->_users->setFocus();
+      this->_users->setFocus(Qt::ActiveWindowFocusReason);
 
       Super::showEvent(event);
     }

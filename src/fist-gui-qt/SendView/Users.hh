@@ -42,6 +42,48 @@ namespace fist
       Q_OBJECT;
     };
 
+    class Recipient
+    {
+      ELLE_ATTRIBUTE_R(uint32_t, id);
+      ELLE_ATTRIBUTE_R(boost::optional<std::string>, device_uuid);
+
+    public:
+      Recipient(uint32_t id,
+                QString const& device_name = "")
+        : _id(id)
+        , _device_uuid(device_name.isEmpty()
+                       ? boost::optional<std::string>{}
+                       : boost::optional<std::string>{device_name.toStdString()})
+      {}
+
+      operator uint32_t() const
+      {
+        return this->id();
+      }
+
+      bool
+      operator == (uint32_t id) const
+      {
+        return this->id() == id;
+      }
+    };
+  }
+}
+
+namespace std
+{
+  template<>
+  struct hash<fist::sendview::Recipient>
+  {
+    size_t
+    operator ()(fist::sendview::Recipient const& recipient) const;
+  };
+}
+
+namespace fist
+{
+  namespace sendview
+  {
     class Users:
       public QWidget
     {
@@ -69,7 +111,7 @@ namespace fist
       // Resutls.
       typedef std::unordered_map<uint32_t, std::shared_ptr<SearchResultWidget>> Results;
       ELLE_ATTRIBUTE(Results, results);
-      typedef std::unordered_set<uint32_t> Recipients;
+      typedef std::unordered_set<Recipient> Recipients;
       ELLE_ATTRIBUTE_R(Recipients, recipients);
       ELLE_ATTRIBUTE(HorizontalSeparator*, separator);
       ELLE_ATTRIBUTE(ListWidget*, users);
@@ -107,6 +149,12 @@ namespace fist
 
     Q_SIGNALS:
       void
+      search_field_focused();
+
+      void
+      search_field_unfocused();
+
+      void
       up_pressed();
 
       void
@@ -127,6 +175,14 @@ namespace fist
       void
       send_metric(UIMetricsType,
                   std::unordered_map<std::string, std::string> const&);
+
+
+    private:
+      void
+      _add_search_result(model::User const& model);
+
+      void
+      _add_device_search_result(model::User const& me);
 
     private slots:
       void
@@ -153,10 +209,20 @@ namespace fist
       void
       _remove_peer(uint32_t);
 
+      void
+      _add_device(uint32_t, QString const&);
+
+      void
+      _remove_device(uint32_t, QString const&);
+
     private:
       QTimer _search_delay;
 
-/*-------.
+    private:
+      bool
+      eventFilter(QObject *obj, QEvent *event) override;
+
+  /*-------.
   | Layout |
   `-------*/
     public:

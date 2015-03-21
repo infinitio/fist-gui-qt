@@ -21,7 +21,6 @@ class SearchField;
 class TransactionList;
 class MainPanel;
 class TransactionWidget;
-class SearchResultWidget;
 class HorizontalSeparator;
 
 namespace fist
@@ -47,6 +46,7 @@ namespace fist
     class Footer;
     class Files;
     class Users;
+    class SearchResultWidget;
   }
 
   namespace ghost_code

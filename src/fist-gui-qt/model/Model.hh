@@ -30,8 +30,8 @@ namespace fist
 
     private:
       /*----------.
-        | Printable |
-        `----------*/
+      | Printable |
+      `----------*/
       void
       print(std::ostream& stream) const override;
 
