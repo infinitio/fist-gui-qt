@@ -245,6 +245,9 @@
     <file alias="send/hide-files">../slices/windows/view_send/send-icon-hide-files.png</file>
     <file alias="send/hide-files@2x">../slices/windows/view_send/send-icon-hide-files@2x.png</file>
 
+    <file alias="send/no-results">../slices/mac/view_send/send-illustration-no-results.png</file>
+    <file alias="send/no-results@2x">../slices/mac/view_send/send-illustration-no-results@2x.png</file>
+
     <!-- File icons -->
     <file alias="mimetypes/archive">../mimetypes/archive.png</file>
     <file alias="mimetypes/archive@2x">../mimetypes/archive@2x.png</file>

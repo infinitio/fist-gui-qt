@@ -46,7 +46,7 @@ namespace fist
       , _file_adder(new Files(this))
       , _transaction_tab(
         this->_tabs->add_tab(
-          "SEND TO USER",
+          "SEND TO SOMEONE",
           {
             this->_users,
             this->_message,

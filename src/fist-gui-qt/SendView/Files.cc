@@ -2,7 +2,7 @@
 #include <fist-gui-qt/TwoStateIconButton.hh>
 #include <fist-gui-qt/ListWidget.hh>
 #include <fist-gui-qt/HorizontalSeparator.hh>
-#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/SendView/ui.hh>
 
 #include <fist-gui-qt/utils.hh>
 
@@ -28,7 +28,7 @@ namespace fist
       : Super(parent)
       , _foo(new QWidget(this))
       , _attach(new IconButton(QPixmap(":/send/files")))
-      , _text(new QLabel(view::send::file_adder::text))
+      , _text(new QLabel(view::file_adder::text))
       , _expanser(
         new fist::TwoStateIconButton(QPixmap(":/send/show-files@2x"),
                                      QPixmap(":/send/hide-files@2x"),
@@ -43,8 +43,8 @@ namespace fist
     {
       this->_growing_area->expand();
       {
-        this->_pulse_animation->setStartValue(view::send::file_adder::pulse);
-        this->_pulse_animation->setEndValue(view::send::file_adder::background);
+        this->_pulse_animation->setStartValue(view::file_adder::pulse);
+        this->_pulse_animation->setEndValue(view::file_adder::background);
         this->_pulse_animation->setDuration(200);
       }
       this->setContentsMargins(0, 0, 0, 0);
@@ -52,7 +52,7 @@ namespace fist
       {
         QPalette palette = this->palette();
         {
-          palette.setColor(QPalette::Window, view::send::file_adder::background);
+          palette.setColor(QPalette::Window, view::file_adder::background);
         }
         this->setPalette(palette);
         this->setAutoFillBackground(true);
@@ -61,13 +61,13 @@ namespace fist
       {
         this->_list->setMaxRows(3);
         auto palette = this->_list->palette();
-        palette.setColor(QPalette::Window, view::send::file_adder::background);
+        palette.setColor(QPalette::Window, view::file_adder::background);
         this->_list->setPalette(palette);
         this->_list->setAutoFillBackground(true);
       }
       // Text.
       {
-        view::send::file_adder::style(*this->_text);
+        view::file_adder::style(*this->_text);
       }
 
       auto* vlayout = new QVBoxLayout(this);
@@ -205,7 +205,7 @@ namespace fist
       if (this->_files.isEmpty())
       {
         this->_attach->set_pixmap(QPixmap(":/send/files-hover"));
-        view::send::file_adder::hover_style(*this->_text);
+        view::file_adder::hover_style(*this->_text);
         this->setCursor(QCursor(Qt::PointingHandCursor));
       }
       else
@@ -222,7 +222,7 @@ namespace fist
       if (this->_files.isEmpty())
       {
         this->_attach->set_pixmap(QPixmap(":/send/files"));
-        view::send::file_adder::style(*this->_text);
+        view::file_adder::style(*this->_text);
         this->setCursor(QCursor(Qt::ArrowCursor));
       }
       else
@@ -248,7 +248,7 @@ namespace fist
             emit file_dropped(url);
           }
       emit dropped();
-      view::send::file_adder::style(*this->_text);
+      view::file_adder::style(*this->_text);
     }
 
     void

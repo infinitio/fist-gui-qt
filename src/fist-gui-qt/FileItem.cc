@@ -5,7 +5,7 @@
 #include <elle/log.hh>
 
 #include <fist-gui-qt/FileItem.hh>
-#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/SendView/ui.hh>
 #include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.FileItem");
@@ -39,7 +39,7 @@ compute_size(QFileInfo const& info)
 }
 
 FileItem::FileItem(QUrl const& path):
-  ListItem(nullptr, view::send::file::background, false),
+  ListItem(nullptr, fist::sendview::view::file::background, false),
   _layout(new QHBoxLayout(this)),
   _path(path),
   _file(path.toLocalFile()),
@@ -61,13 +61,13 @@ FileItem::FileItem(QUrl const& path):
   this->_layout->setContentsMargins(0, 0, 0, 0);
   // Name.
   {
-    view::send::file::name::style(*this->_name);
+    fist::sendview::view::file::name::style(*this->_name);
     this->_name->setToolTip(this->_name->text());
   }
 
-  // Size.
+// Size.
   {
-    view::send::file::size::style(*this->_size);
+    fist::sendview::view::file::size::style(*this->_size);
   }
 
   QFileIconProvider icon_provider;

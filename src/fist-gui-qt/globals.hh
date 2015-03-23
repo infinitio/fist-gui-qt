@@ -162,7 +162,7 @@ namespace view
   {
     static
     fist::style::Text const
-    style(fist::Font(Montserrat, 10), QColor(0x8B, 0x8B, 0x83));
+    style(fist::Font(Montserrat, 9), QColor(0x8B, 0x8B, 0x83));
 
     static
     QColor
@@ -170,7 +170,7 @@ namespace view
 
     static
     fist::style::Text const
-    hover_style(fist::Font(Montserrat, 10), QColor(0x51, 0x51, 0x49));
+    hover_style(fist::Font(Montserrat, 9), QColor(0x51, 0x51, 0x49));
 
     static
     QColor
@@ -178,7 +178,7 @@ namespace view
 
     static
     fist::style::Text const
-    selected_style(fist::Font(Montserrat, 10), QColor(0x2B, 0xBE, 0xBD));
+    selected_style(fist::Font(Montserrat, 9), QColor(0x2B, 0xBE, 0xBD));
 
     namespace counter
     {
@@ -241,101 +241,6 @@ namespace view
       fist::style::Text const
       style(fist::Font(DefaultFont, 8), QColor(0xA8, 0xA8, 0xA8));
     }
-  }
-
-  namespace send
-  {
-    namespace file
-    {
-      namespace name
-      {
-        static
-        fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
-      }
-
-      namespace size
-      {
-        static
-        fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
-      }
-
-      static
-      QColor const
-      background(0xF8, 0xF8, 0xF8);
-    }
-
-    namespace file_adder
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
-
-      static
-      fist::style::Text const
-      hover_style(fist::Font(DefaultFont, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
-
-      static
-      QColor const
-      background(0xF8, 0xF8, 0xF8);
-
-      static
-      QColor const
-      pulse(0xBC, 0xD2, 0xD6, 0x77);
-
-      static
-      QString const
-      text("Add files...");
-    }
-
-    namespace search_field
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
-
-      static
-      QString const
-      text("Search or select a user...");
-    }
-
-    namespace message
-    {
-      static
-      fist::style::Text const
-      style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
-
-      static
-      QString const
-      text("Optional message...");
-
-      namespace remaining_characters
-      {
-        static
-        fist::style::Text const
-        style(fist::Font(DefaultFont, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
-
-      }
-    }
-
-    namespace user
-    {
-      namespace fullname
-      {
-        static
-        fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25));
-      }
-
-      namespace handle
-      {
-        static
-        fist::style::Text const
-        style(fist::Font(DefaultFont, 8), QColor(0xC4, 0xC4, 0xC4));
-      }
-    }
-
   }
 }
 

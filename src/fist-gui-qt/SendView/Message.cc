@@ -2,7 +2,7 @@
 
 #include <fist-gui-qt/SendView/Message.hh>
 #include <fist-gui-qt/HorizontalSeparator.hh>
-#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/SendView/ui.hh>
 
  namespace fist
 {
@@ -23,14 +23,14 @@
       }
       {
         this->_message->setMaxLength(100);
-        view::send::message::style(*this->_message);
+        view::message::style(*this->_message);
         this->_message->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
         this->_message->setFrame(false);
         this->_message->setPlaceholderText("Optional message...");
         this->_message->setFixedHeight(QPixmap(":/send/note").height());
       }
       {
-        view::send::message::remaining_characters::style(this->_remaining_characters);
+        view::message::remaining_characters::style(this->_remaining_characters);
         connect(this->_message, SIGNAL(textChanged(QString const&)),
                 this, SLOT(_update_remaining_characters(QString const&)));
       }

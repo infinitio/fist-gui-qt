@@ -9,12 +9,13 @@
 #include <elle/log.hh>
 #include <elle/finally.hh>
 
-#include <fist-gui-qt/SendView/Users.hh>
-#include <fist-gui-qt/model/User.hh>
-#include <fist-gui-qt/SendView/SearchResultWidget.hh>
 #include <fist-gui-qt/SendView/OwnDeviceSearchResult.hh>
+#include <fist-gui-qt/SendView/SearchResultWidget.hh>
+#include <fist-gui-qt/SendView/NoSearchResultWidget.hh>
+#include <fist-gui-qt/SendView/Users.hh>
+#include <fist-gui-qt/SendView/ui.hh>
 #include <fist-gui-qt/TextListItem.hh>
-#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/regexp.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.SendView.Users");
@@ -90,7 +91,7 @@ namespace fist
       , _search_field(new SearchField(this))
       , _results()
       , _recipients()
-      , _separator(new HorizontalSeparator(this, 10))
+      , _separator(new HorizontalSeparator(this, 0))
       , _users(new ListWidget(
                  this, ListWidget::Separator({QColor(0xF4, 0xF4, 0xF4)}, 10, 10)))
     {
@@ -125,9 +126,9 @@ namespace fist
         // Search field.
         {
           this->_search_field->setFrame(false);
-          view::send::search_field::style(*this->_search_field);
+          view::search_field::style(*this->_search_field);
           this->_search_field->setContentsMargins(margin, 0, margin, 0);
-          this->_search_field->setPlaceholderText(view::send::search_field::text);
+          this->_search_field->setPlaceholderText(view::search_field::text);
           this->_search_field->setFixedHeight(this->height());
           this->_search_field->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
           connect(this->_search_field, SIGNAL(textChanged(QString const&)),
@@ -286,14 +287,13 @@ namespace fist
           this->_add_search_result(model);
       }
 
-      if (this->_users->widgets().isEmpty() && !local)
+      if (this->_users->widgets().isEmpty())
       {
         if (!this->text().isEmpty() &&
             !regexp::email::checker.exactMatch(this->text()))
         {
           this->_users->add_widget(
-            std::make_shared<TextListItem>(
-              "<b>No result</b><br />Send to an email address instead", 60, this),
+            std::make_shared<NoSearchResultWidget>(this),
             ListWidget::Position::Top);
         }
         else
@@ -435,12 +435,7 @@ namespace fist
     Users::text_changed(QString const& text)
     {
       this->clear_results();
-
-      if (text.isEmpty())
-        this->set_users(this->_state.swaggers(), true);
-      else
-        this->set_users(this->_state.swaggers(text), true);
-
+      this->set_users(this->_state.swaggers(text), true);
       if (!text.isEmpty())
         this->_search_delay.start(300);
       else
