@@ -88,8 +88,6 @@ UninstallIcon "${resources_folder}/${icon}"
       IfSilent end
       StrCmp $R0 0 end 0      ; Success
       StrCmp $R0 603 end 0    ; Not running
-
-
       end:
         ${'${nsProcess::Unload}'}
   FunctionEnd
@@ -100,19 +98,13 @@ UninstallIcon "${resources_folder}/${icon}"
   FunctionEnd
 
   ;----------------------------------------------------------------------------
-  ; Delete all the dll.
+  ; Delete the contextual dll.
   ; If deletion failed, kill the explorer, and retry to delete.
-  Function ${'${un}'}DeleteDll
+  Function ${'${un}'}DeleteContextualDll
     IfFileExists "$INSTDIR\lib\libcontextual.dll" 0 libcontextual.dllend
-    Delete /REBOOTOK "$INSTDIR\lib\libcontextual.dll"
+    Delete "$INSTDIR\lib\libcontextual.dll"
     IfFileExists "$INSTDIR\lib\libcontextual.dll" kill_explorer_and_relaunch 0
     libcontextual.dllend:
-    % for lib in libraries:
-      IfFileExists "$INSTDIR\lib\${lib}" 0 ${lib}end
-      Delete /REBOOTOK "$INSTDIR\lib\${lib}"
-      IfFileExists "$INSTDIR\lib\${lib}" kill_explorer_and_relaunch 0
-      ${lib}end:
-    % endfor
     Goto finalize
     kill_explorer_and_relaunch:
       StrCmp $_has_been_killed "" 0 end
@@ -120,7 +112,7 @@ UninstallIcon "${resources_folder}/${icon}"
       Push "explorer.exe"
       Call ${'${un}'}KillProcess
       Sleep 500
-      Call ${'${un}'}DeleteDll
+      Call ${'${un}'}DeleteContextualDll
       Goto end
     finalize:
       ${'${nsProcess::FindProcess}'} "explorer.exe" $R0
@@ -130,23 +122,46 @@ UninstallIcon "${resources_folder}/${icon}"
     end:
       ${'${nsProcess::Unload}'}
   FunctionEnd
+
+  ;----------------------------------------------------------------------------
+  ; Delete all the dll.
+  Function ${'${un}'}DeleteDlls
+    % for lib in libraries:
+      IfFileExists "$INSTDIR\${lib}" 0 ${lib}end
+      Delete /REBOOTOK "$INSTDIR\${lib}"
+      ${lib}end:
+    % endfor
+    % for lib in images_plugins:
+      IfFileExists "$INSTDIR\imageformats\${lib}" 0 ${lib}end
+      Delete /REBOOTOK "$INSTDIR\imageformats\${lib}"
+      ${lib}end:
+    % endfor
+  FunctionEnd
 !macroend
 
 ;------------------------------------------------------------------------------
-; Replace all the dll.
-Function ReplaceDll
+; Replace contextual dll.
+Function ReplaceContextualDll
     SetOutPath $INSTDIR\lib
-    Call DeleteDll
+    Call DeleteContextualDll
     ${'${If}'} ${'${RunningX64}'}
       File "/oname=libcontextual.dll" "${resources_folder}/libcontextual64.dll"
     ${'${Else}'}
       File "/oname=libcontextual.dll" "${resources_folder}/libcontextual32.dll"
     ${'${Endif}'}
+    SetOutPath $INSTDIR
+FunctionEnd
 
+Function InstallDlls
+    SetOutPath $INSTDIR
     % for lib in libraries:
+      File "${resources_folder}/${lib}"
+    % endfor
+    SetOutPath $INSTDIR\imageformats
+    % for lib in images_plugins:
+      File "${resources_folder}/${lib}"
     % endfor
     SetOutPath $INSTDIR
-    ${'${nsProcess::Unload}'}
 FunctionEnd
 
 !insertmacro INSTALL_UNINSTALL_SWITCH ""
@@ -188,7 +203,7 @@ FunctionEnd
 ;------------------------------------------------------------------------------
 
 Function .onInit
-  ${'${If}'} ${AtLeastWinVista}
+  ${'${If}'} ${'${AtLeastWinVista}'}
   ${'${Else}'}
     MessageBox mb_iconstop "Infinit is not currently compatible with your version of Windows.\nYou need Windows Vista or any subsequent version of Windows."
     Abort
@@ -232,6 +247,7 @@ UAC_Success:
   Call KillRunningProcess
   ;; Look for autoupdate.
   Call ParseCommandline
+
 
   ${'${If}'} $AutoUpdate == 1
     SetAutoClose true
@@ -414,7 +430,8 @@ Section "Install ${product_name}"
   SetOutPath $INSTDIR
   ;; Executable and libraries.
   File "${resources_folder}\${executable}"
-  Call ReplaceDll
+  Call InstallDlls
+  Call ReplaceContextualDll
 
   Call RegisterContextual
   ;; Documentation.
@@ -486,7 +503,8 @@ Section "un.install"
 
   ;; Executable and libraries.
   Delete /REBOOTOK "$INSTDIR\${executable}"
-  Call un.DeleteDll
+  Call un.DeleteContextualDll
+  Call un.DeleteDlls
 
   ;; Uninstaller.
   Delete /REBOOTOK "$INSTDIR\${'${uninstaller}'}"
