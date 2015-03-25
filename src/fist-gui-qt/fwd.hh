@@ -47,6 +47,9 @@ namespace fist
     class Files;
     class Users;
     class SearchResultWidget;
+    class FileAdder;
+    class EmptyFileAdder;
+    class NonEmptyFileAdder;
   }
 
   namespace ghost_code

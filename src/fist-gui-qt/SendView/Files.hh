@@ -1,5 +1,5 @@
-#ifndef ADDFILEITEM_HH
-# define ADDFILEITEM_HH
+#ifndef FIST_GUI_QT_SEND_VIEW_ADDFILEITEM_HH
+# define FIST_GUI_QT_SEND_VIEW_ADDFILEITEM_HH
 
 # include <memory>
 
@@ -46,35 +46,6 @@ namespace fist
       // int
       // widthHint() const override;
 
-    public:
-      Q_PROPERTY(QColor pulseColor
-                 READ pulseColor
-                 WRITE setPulseColor);
-      Q_PROPERTY_R(QColor, pulse_color, pulseColor);
-
-      void
-      setPulseColor(QColor const& color);
-
-    public slots:
-      void
-      on_entered();
-
-      void
-      on_left();
-
-      void
-      dropEvent(QDropEvent*) override;
-
-    signals:
-      void
-      clicked();
-
-      void
-      file_dropped(QUrl const&);
-
-      void
-      dropped();
-
     public slots:
       void
       add_file(QUrl const& file);
@@ -84,11 +55,11 @@ namespace fist
 
       void
       remove_file(QUrl const& path);
+    private:
+      void
+      _install_file_adder(FileAdder* adder);
 
     public slots:
-      void
-      pulse();
-
       void
       clear();
 
@@ -96,33 +67,23 @@ namespace fist
       void
       _update_message();
 
-    private:
-      void
-      mouseReleaseEvent(QMouseEvent* event) override;
-
-      void
-      enterEvent(QEvent* event) override;
-
-      void
-      leaveEvent(QEvent* event) override;
-
-    private:
-      bool
-      eventFilter(QObject *obj, QEvent *event) override;
-
     signals:
       void
       file_added();
 
       void
       file_removed();
+
+      void
+      clicked();
+
+      void
+      dropped();
+
     private:
-      ELLE_ATTRIBUTE(QWidget*, foo);
-      ELLE_ATTRIBUTE_R(IconButton*, attach);
-      ELLE_ATTRIBUTE_R(QLabel*, text);
-      ELLE_ATTRIBUTE_R(fist::TwoStateIconButton*, expanser);
-      ELLE_ATTRIBUTE_R(IconButton*, add_file);
       typedef QHash<QUrl, std::shared_ptr<FileItem>> List;
+      ELLE_ATTRIBUTE_RX(EmptyFileAdder*, empty_adder);
+      ELLE_ATTRIBUTE_RX(NonEmptyFileAdder*, non_empty_adder);
       ELLE_ATTRIBUTE_R(List, files);
       ELLE_ATTRIBUTE(HorizontalSeparator*, separator);
       ELLE_ATTRIBUTE_R(ListWidget*, list);

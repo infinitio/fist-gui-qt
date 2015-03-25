@@ -92,8 +92,10 @@ namespace fist
       , _results()
       , _recipients()
       , _separator(new HorizontalSeparator(this, 0))
-      , _users(new ListWidget(
-                 this, ListWidget::Separator({QColor(0xF4, 0xF4, 0xF4)}, 10, 10)))
+      , _users(
+        new ListWidget(
+          this, ListWidget::Separator({QColor(0xFE, 0xFE, 0xFE)}, 45, 15),
+          QColor{0xFE, 0xFE, 0xFE}))
     {
       this->_search_field->installEventFilter(this);
       connect(this->_search_field, SIGNAL(up_pressed()), this->_users, SLOT(setFocus()));
@@ -103,7 +105,7 @@ namespace fist
       connect(&this->_state, SIGNAL(search_results_ready()),
               this, SLOT(_set_users()));
       {
-        this->_users->setMaxRows(8);
+        this->_users->setMaxRows(4);
       }
       {
         this->set_icon(this->_magnifier);
@@ -156,20 +158,18 @@ namespace fist
       if (obj == this->_search_field)
       {
         if (event->type() == QEvent::FocusIn)
-        {
           emit search_field_focused();
-        }
         else if (event->type() == QEvent::FocusOut)
-        {
           emit search_field_unfocused();
-        }
       }
       return Super::eventFilter(obj, event);
     }
+
     void
     Users::clear_search()
     {
-      this->_search_field->setText("");
+      if (!this->_search_field->text().isEmpty())
+        this->_search_field->setText("");
       this->text_changed("");
     }
 
@@ -177,7 +177,7 @@ namespace fist
     Users::clear()
     {
       this->_recipients.clear();
-      this->_search_field->clear();
+      this->clear_search();
       this->clear_results();
     }
 
@@ -207,6 +207,7 @@ namespace fist
         std::advance(it, this->_results.size() - 1);
         it->second->trigger();
       }
+      this->clear_search();
     }
 
     void
@@ -428,6 +429,7 @@ namespace fist
     void
     Users::showEvent(QShowEvent* event)
     {
+      this->_search_field->setText("");
       this->_search_field->setFocus();
     }
 
@@ -435,7 +437,10 @@ namespace fist
     Users::text_changed(QString const& text)
     {
       this->clear_results();
-      this->set_users(this->_state.swaggers(text), true);
+      if (text.isEmpty())
+        this->set_users(this->_state.swaggers(), true);
+      else
+        this->set_users(this->_state.swaggers(text), true);
       if (!text.isEmpty())
         this->_search_delay.start(300);
       else

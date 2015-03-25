@@ -248,6 +248,9 @@
     <file alias="send/no-results">../slices/mac/view_send/send-illustration-no-results.png</file>
     <file alias="send/no-results@2x">../slices/mac/view_send/send-illustration-no-results@2x.png</file>
 
+    <file alias="send/drop-files">../slices/windows/view_send/icons-drop-send.png</file>
+    <file alias="send/drop-files@2x">../slices/windows/view_send/icons-drop-send@2x.png</file>
+
     <!-- File icons -->
     <file alias="mimetypes/archive">../mimetypes/archive.png</file>
     <file alias="mimetypes/archive@2x">../mimetypes/archive@2x.png</file>

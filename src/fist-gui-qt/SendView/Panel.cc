@@ -64,21 +64,14 @@ namespace fist
       // File adder.
       connect(this->_file_adder, SIGNAL(clicked()),
               this, SIGNAL(choose_files()));
-      connect(this->_file_adder->attach(), SIGNAL(released()),
-              this, SIGNAL(choose_files()));
-      connect(this->_file_adder->add_file(), SIGNAL(released()),
-              this, SIGNAL(choose_files()));
-      connect(this->_file_adder, SIGNAL(dropped()), this, SLOT(_dropped()));
+      connect(this->_file_adder, SIGNAL(dropped()),
+              this, SLOT(_dropped()));
       // Footer.
       connect(this->footer()->send(), SIGNAL(clicked()), this, SLOT(_send()));
       connect(this->footer()->back(), SIGNAL(clicked()),
               this, SIGNAL(canceled()));
       // Cancel.
       connect(this, SIGNAL(canceled()), this, SIGNAL(switch_signal()));
-      // Drag & Drop.
-      connect(this, SIGNAL(drag_entered()),
-              this->_file_adder, SLOT(on_entered()));
-      connect(this, SIGNAL(drag_left()), this->_file_adder, SLOT(on_left()));
       // Sent.
       connect(this, SIGNAL(sent()), this, SIGNAL(switch_signal()));
       connect(this, SIGNAL(sent()), this, SLOT(hide()));
@@ -92,7 +85,7 @@ namespace fist
 
       this->setAcceptDrops(true);
 
-      this->setMaximumHeight(640);
+      this->setMaximumHeight(500);
     }
 
     void
@@ -142,7 +135,6 @@ namespace fist
       if (this->_file_adder->files().empty())
       {
         ELLE_DEBUG("file list is empty");
-        this->_file_adder->pulse();
       }
 
       return !this->_file_adder->files().empty();
@@ -252,7 +244,7 @@ namespace fist
       else if (event->key() == Qt::Key_Left)
         this->_tabs->activate_previous();
       else if (event->key() == Qt::Key_F)
-        this->_file_adder->add_file()->click();
+        emit choose_files();
     }
 
   /*------------.
@@ -268,7 +260,7 @@ namespace fist
       this->_tabs->activate_first();
       this->_users->clear_search();
       this->_users->setFocus(Qt::ActiveWindowFocusReason);
-
+      this->updateGeometry();
       Super::showEvent(event);
     }
 

@@ -126,6 +126,31 @@ namespace fist
         }
       }
 
+      namespace add_files
+      {
+        namespace title
+        {
+          static
+          QString const
+          text("DROP FILES HERE");
+
+          static
+          fist::style::Text const
+          style(fist::Font(DefaultFont, 9, QFont::Bold), QColor(0x51, 0x51, 0x49));
+        }
+
+        namespace subtitle
+        {
+          static
+          QString const
+          text("or click to add files...");
+
+          static
+          fist::style::Text const
+          style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3));
+        }
+      }
+
     }
   }
 }

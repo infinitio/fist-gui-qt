@@ -268,6 +268,8 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/SendView/SearchResultWidget.hh",
       "src/fist-gui-qt/SendView/OwnDeviceSearchResult.cc",
       "src/fist-gui-qt/SendView/OwnDeviceSearchResult.hh",
+      "src/fist-gui-qt/SendView/FileAdder.cc",
+      "src/fist-gui-qt/SendView/FileAdder.hh",
 
       "src/fist-gui-qt/MainView/Transactions.cc",
       "src/fist-gui-qt/MainView/Transactions.hh",
