@@ -357,16 +357,13 @@ namespace fist
               this, SLOT(_internet_issue(QString const&)));
       this->update();
 
-      if (this->_email_field->text().isEmpty())
+      if (this->_email_field->text().isEmpty() && !fist::settings()["Login"].exists("facebook"))
       {
         this->mode(Mode::Register);
         this->show();
       }
       else
       {
-#ifdef VIDEO
-        player->pause();
-#endif
         this->mode(Mode::Login);
         if (!this->_previous_session_crashed)
         {
@@ -1065,6 +1062,7 @@ namespace fist
     Window::fb(QString const& token)
     {
       this->_facebook_connect_attempt = true;
+      this->show();
       elle::SafeFinally unlock_login([&] {
           this->_enable(); this->_password_field->setFocus();
           this->_facebook_connect_attempt = false;
