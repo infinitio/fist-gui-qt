@@ -315,7 +315,7 @@ namespace fist
     if (this->_users.find(id) == this->_users.end())
       this->_users[id].reset(new model::User(*this, id));
     ELLE_DEBUG("update %s avatar", *this->_users[id])
-      this->_users[id]->avatar_updated();
+      this->_users[id]->avatar_available();
   }
 
   void

@@ -31,7 +31,8 @@ namespace fist
                   23)),
       _layout(new QHBoxLayout(this))
     {
-      connect(&this->_model, SIGNAL(avatar_updated()), this, SLOT(_on_avatar_updated()));
+      connect(&this->_model, SIGNAL(avatar_updated()),
+              this, SLOT(_on_avatar_updated()));
       ELLE_TRACE_SCOPE("%s: contruction", *this);
 
       this->_layout->setSpacing(4);
