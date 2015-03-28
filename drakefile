@@ -167,7 +167,6 @@ def configure(cxx_toolkit = None,
     Qt_config.lib_path_runtime('Qt/lib')
     qt_rules = drake.Rule('Qt')
     qt_rules << Qt_libs
-    dynamic_libraries += Qt_libs
     qt_cxx_config += Qt_config
     qt = drake.cxx.qt.Qt(
       cxx_toolkit = cxx_toolkit,
@@ -181,8 +180,9 @@ def configure(cxx_toolkit = None,
   qt_cxx_config += qt.config()
   for l in ['core', 'gui', 'network', 'webkit']:
     qt_cxx_config += getattr(qt, 'config_' + l)(static = False)
-    lib = getattr(qt, l + '_dynamic')
-    qt_cxx_config.library_add(copy_lib(lib))
+    lib = copy_lib(getattr(qt, l + '_dynamic'))
+    qt_cxx_config.library_add(lib)
+    dynamic_libraries += [lib]
   qt_cxx_config += boost_filesystem
   qt_cxx_config += boost_system
   qt_cxx_config += boost_program_options
