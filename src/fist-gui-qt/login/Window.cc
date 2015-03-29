@@ -255,7 +255,7 @@ namespace fist
       // FacebookButton.
       {
         this->_facebook_button->setIcon(QIcon(":/login/facebook"));
-        this->_facebook_button->setText("SIGNIN WITH FACEBOOK");
+        this->_facebook_button->setText("SIGN IN WITH FACEBOOK");
         this->_facebook_button->setStyleSheet(
           QString::fromStdString(elle::sprintf(
             "QPushButton {"
@@ -301,12 +301,17 @@ namespace fist
       auto glayout = new QHBoxLayout(central_widget);
       glayout->setContentsMargins(0, 0, 0, 0);
       glayout->setSpacing(0);
+      auto mlayout = new QVBoxLayout;
+      mlayout->setSizeConstraint(QLayout::SetFixedSize);
+      mlayout->setSpacing(0);
+      mlayout->setContentsMargins(0, 0, 0, 0);
+      mlayout->addWidget(this->_help_link, 0, Qt::AlignRight);
       auto layout = new QVBoxLayout;
-      layout->setSizeConstraint(QLayout::SetFixedSize);
+      mlayout->addLayout(layout);
       layout->setSpacing(5);
       layout->setContentsMargins(40, 0, 40, 0);
       {
-        layout->addSpacing(15);
+        layout->addSpacing(5);
         layout->addWidget(logo, 0, Qt::AlignCenter);
         layout->addSpacing(10);
         {
@@ -335,7 +340,7 @@ namespace fist
       layout->addWidget(this->_message_field, 0, Qt::AlignCenter);
       layout->addStretch();
       layout->addSpacing(10);
-      glayout->addLayout(layout);
+      glayout->addLayout(mlayout);
       {
         auto layout = new QVBoxLayout;
         layout->setContentsMargins(0, 0, 0, 0);
@@ -403,7 +408,7 @@ namespace fist
         this->_password_field->height() / 2 - this->_forgot_password_link->height() / 2);
       this->_password_field->setTextMargins(12, 0, 5 + this->_forgot_password_link->width(), 0);
       ELLE_ASSERT(this->_video != nullptr);
-      this->_help_link->move(QPoint{this->_video->x() - this->_help_link->width() - 5, 5});
+      // this->_help_link->move(QPoint{this->_video->x() - this->_help_link->width() - 5, 5});
     }
 
     Window::~Window()
@@ -910,6 +915,7 @@ namespace fist
     {
       this->_facebook_window.reset(
         new facebook::ConnectWindow(this->_state.facebook_app_id(), this));
+      this->show();
       this->_facebook_window->setWindowModality(Qt::WindowModal);
       connect(this->_facebook_window.get(), SIGNAL(success(QString const&)),
               this, SLOT(fb(QString const&)));

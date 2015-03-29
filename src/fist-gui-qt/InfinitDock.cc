@@ -177,7 +177,7 @@ InfinitDock::InfinitDock(fist::State& state,
   this->_menu->addAction(change_download_folder);
   this->_menu->addSeparator();
   {
-    auto* action = new QAction("enter code", this);
+    auto* action = new QAction("Enter a code", this);
     connect(action, SIGNAL(triggered()), this, SLOT(_show_ghost_code_view()));
     this->_menu->addAction(action);
   }
