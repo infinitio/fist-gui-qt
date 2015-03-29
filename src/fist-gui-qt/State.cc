@@ -350,7 +350,7 @@ namespace fist
     State::Users res;
     for (auto const& user: this->_users)
     {
-      if (user.second->swagger() && filter(*(user.second)))
+      if (!user.second->deleted() && user.second->swagger() && filter(*(user.second)))
         res.push_back(user.first);
     }
     return res;
@@ -385,7 +385,7 @@ namespace fist
             {
               surface::gap::User u;
               auto res = gap_user_by_email(this->state(), text.c_str(), u);
-              if (res == gap_ok)
+              if (res == gap_ok && !u.deleted)
                 users.push_back(u.id);
               else
                 ELLE_WARN("user by email failed: %s", res);

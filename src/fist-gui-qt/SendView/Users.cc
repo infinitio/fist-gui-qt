@@ -168,9 +168,11 @@ namespace fist
     void
     Users::clear_search()
     {
-      if (!this->_search_field->text().isEmpty())
+      if (!this->_search_field->text().isEmpty() || this->_results.empty())
+      {
         this->_search_field->setText("");
-      this->text_changed("");
+        this->text_changed("");
+      }
     }
 
     void
@@ -206,8 +208,13 @@ namespace fist
         auto it = this->_results.begin();
         std::advance(it, this->_results.size() - 1);
         it->second->trigger();
+
+        if (!this->text().isEmpty() &&
+            !regexp::email::checker.exactMatch(this->text()))
+        {
+          this->clear_search();
+        }
       }
-      this->clear_search();
     }
 
     void
@@ -280,7 +287,7 @@ namespace fist
 
       for (auto id: users)
       {
-        if (id == this->_state.me().id())
+        if (this->_search_field->text().isEmpty() && id == this->_state.me().id())
           continue;
         auto const& model = this->_state.user(id);
         ELLE_DEBUG("-- %s", model);
@@ -429,7 +436,7 @@ namespace fist
     void
     Users::showEvent(QShowEvent* event)
     {
-      this->_search_field->setText("");
+      // this->_search_field->setText("");
       this->_search_field->setFocus();
     }
 
