@@ -220,7 +220,7 @@ namespace fist
     void
     Users::_set_users()
     {
-      ELLE_LOG_SCOPE("got result from future");
+      ELLE_TRACE_SCOPE("got result from future");
       elle::SafeFinally restore_magnifier(
         [&] { this->set_icon(this->_magnifier); });
       this->set_users(this->_state.results(), false);
@@ -230,7 +230,7 @@ namespace fist
     Users::_add_search_result(model::User const& model)
     {
       bool picked = this->_recipients.find(model.id()) != this->_recipients.end();
-      ELLE_LOG("add search result: %s", model);
+      ELLE_DEBUG("add search result: %s", model);
       auto widget = std::make_shared<SearchResultWidget>(model, picked, this);
       if (model.id() == this->_state.my_id())
         widget->darker_next_separator(true);
