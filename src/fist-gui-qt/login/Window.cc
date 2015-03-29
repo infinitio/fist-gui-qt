@@ -350,6 +350,7 @@ namespace fist
       connect(&this->_state, SIGNAL(login_result(gap_Status)),
               this, SLOT(_login_attempt(gap_Status)));
       connect(this, SIGNAL(logged_in()), &this->_state, SLOT(on_logged_in()));
+      connect(this, SIGNAL(registered()), &this->_state, SLOT(on_logged_in()));
       connect(this, SIGNAL(login_failed()), SLOT(show()));
       connect(&this->_state, SIGNAL(register_result(gap_Status)),
               this, SLOT(_register_attempt(gap_Status)));
@@ -537,8 +538,8 @@ namespace fist
       {
         auto email = this->_email_field->text();
         auto password = this->_password_field->text();
+        this->clear_credentials(false);
         fist::settings()["Login"].set("email", email);
-        fist::settings()["Login"].remove("facebook");
         this->_save_password(email, password);
         emit registered();
         return;
@@ -593,16 +594,16 @@ namespace fist
             emit logged_in();
           else
             emit registered();
+          this->clear_credentials(false);
           fist::settings()["Login"].set("facebook", 1);
-          fist::settings()["Login"].remove("email");
         }
         else
         {
           emit logged_in();
           auto email = this->_email_field->text();
           auto password = this->_password_field->text();
+          this->clear_credentials(false);
           fist::settings()["Login"].set("email", email);
-          fist::settings()["Login"].remove("facebook");
           this->_save_password(email, password);
         }
         return;
@@ -643,6 +644,20 @@ namespace fist
         this->_ask_for_facebook_email();
     }
 
+    void
+    Window::clear_credentials(bool clear_cookies)
+    {
+      ELLE_LOG("%s: clear credentials", *this);
+      fist::settings()["Login"].remove("facebook");
+      fist::settings()["Login"].remove("password");
+      fist::settings()["Login"].remove("email");
+      if (clear_cookies)
+      {
+        std::unique_ptr<facebook::ConnectWindow> f(
+          new facebook::ConnectWindow("", nullptr, false));
+        f->cookies()->clear();
+      }
+    }
 
     void
     Window::_ask_for_facebook_email()
@@ -901,16 +916,6 @@ namespace fist
       connect(this->_facebook_window.get(), SIGNAL(failure(QString const&)),
               this, SLOT(facebook_connect_failed(QString const&)));
       this->_facebook_window->show();
-    }
-
-    void
-    Window::logged_out()
-    {
-      fist::settings()["Login"].remove("facebook");
-      fist::settings()["Login"].remove("password");
-      std::unique_ptr<facebook::ConnectWindow> f(
-        new facebook::ConnectWindow("", nullptr, false));
-      f->cookies()->clear();
     }
 
     void
