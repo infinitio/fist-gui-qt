@@ -221,7 +221,7 @@ namespace fist
 
         static
         QString const
-        register_text("SIGNUP");
+        register_text("SIGN UP");
       }
     }
   }
