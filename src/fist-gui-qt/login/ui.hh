@@ -39,7 +39,7 @@ namespace fist
         {
           static
           QString const
-          text("SIGNUP");
+          text("SIGN UP");
         }
       }
 

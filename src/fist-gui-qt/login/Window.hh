@@ -84,10 +84,8 @@ namespace fist
       void
       try_auto_login();
 
-    public:
-      static
       void
-      logged_out();
+      clear_credentials(bool clear_cookies = true);
 
     Q_SIGNALS:
       void

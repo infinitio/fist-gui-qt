@@ -2,6 +2,7 @@
 # define FIST_GUI_QT_SEND_VIEW_FILEADDER_HH
 
 # include <QWidget>
+# include <QLabel>
 
 # include <elle/attribute.hh>
 

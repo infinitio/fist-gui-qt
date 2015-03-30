@@ -549,6 +549,8 @@ Fist::logged_in()
   connect(this->_dock.get(), SIGNAL(quit_request()),
           this, SLOT(quit()));
   connect(this->_dock.get(), SIGNAL(logout_request()),
+          this->_login_window.get(), SLOT(clear_credentials()));
+  connect(this->_dock.get(), SIGNAL(logout_request()),
           this, SLOT(logout()));
   connect(this->_updater.get(), SIGNAL(update_available(bool, QString const&)),
           this->_dock.get(), SLOT(update_available(bool, QString const&)));

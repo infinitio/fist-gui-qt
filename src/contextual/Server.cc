@@ -42,6 +42,13 @@ extern "C"
 __declspec(dllexport)
 HRESULT __stdcall
 DllMain(HMODULE hModule,
+        DWORD dwReason,
+        LPVOID lpReserved);
+
+extern "C"
+__declspec(dllexport)
+HRESULT __stdcall
+DllMain(HMODULE hModule,
           DWORD dwReason,
           LPVOID lpReserved)
 {
@@ -64,12 +71,24 @@ DllMain(HMODULE hModule,
 extern "C"
 __declspec(dllexport)
 HRESULT __stdcall
+DllRegisterServer(void);
+
+extern "C"
+__declspec(dllexport)
+HRESULT __stdcall
 DllRegisterServer(void)
 {
   initialize_logger();
   ELLE_TRACE_SCOPE("register server (lock: %s)", g_DllLockCounter);
   return S_OK;
 }
+
+extern "C"
+__declspec(dllexport)
+HRESULT __stdcall
+DllGetClassObject(REFCLSID rclsid,
+                  REFIID riid,
+                  void** ppv);
 
 extern "C"
 __declspec(dllexport)
@@ -103,6 +122,11 @@ DllGetClassObject(REFCLSID rclsid,
 extern "C"
 __declspec(dllexport)
 HRESULT __stdcall
+DllCanUnloadNow();
+
+extern "C"
+__declspec(dllexport)
+HRESULT __stdcall
 DllCanUnloadNow()
 {
   initialize_logger();
@@ -110,6 +134,11 @@ DllCanUnloadNow()
 
   return g_DllLockCounter > 0 ? S_FALSE : S_OK;
 }
+
+extern "C"
+__declspec(dllexport)
+HRESULT __stdcall
+DllUnregisterServer();
 
 extern "C"
 __declspec(dllexport)

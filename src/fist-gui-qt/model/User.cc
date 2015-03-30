@@ -48,7 +48,7 @@ namespace fist
           ELLE_WARN("%s: fetching devices failed", *this);
         else
           for (auto const& device: devices)
-            ELLE_LOG("add device: %s", device)
+            ELLE_TRACE("add device: %s", device)
               this->_devices.emplace_back(device);
       }
     }

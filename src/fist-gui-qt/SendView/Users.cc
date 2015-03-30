@@ -168,9 +168,11 @@ namespace fist
     void
     Users::clear_search()
     {
-      if (!this->_search_field->text().isEmpty())
+      if (!this->_search_field->text().isEmpty() || this->_results.empty())
+      {
         this->_search_field->setText("");
-      this->text_changed("");
+        this->text_changed("");
+      }
     }
 
     void
@@ -206,14 +208,19 @@ namespace fist
         auto it = this->_results.begin();
         std::advance(it, this->_results.size() - 1);
         it->second->trigger();
+
+        if (!this->text().isEmpty() &&
+            !regexp::email::checker.exactMatch(this->text()))
+        {
+          this->clear_search();
+        }
       }
-      this->clear_search();
     }
 
     void
     Users::_set_users()
     {
-      ELLE_LOG_SCOPE("got result from future");
+      ELLE_TRACE_SCOPE("got result from future");
       elle::SafeFinally restore_magnifier(
         [&] { this->set_icon(this->_magnifier); });
       this->set_users(this->_state.results(), false);
@@ -223,7 +230,7 @@ namespace fist
     Users::_add_search_result(model::User const& model)
     {
       bool picked = this->_recipients.find(model.id()) != this->_recipients.end();
-      ELLE_LOG("add search result: %s", model);
+      ELLE_DEBUG("add search result: %s", model);
       auto widget = std::make_shared<SearchResultWidget>(model, picked, this);
       if (model.id() == this->_state.my_id())
         widget->darker_next_separator(true);
@@ -280,7 +287,7 @@ namespace fist
 
       for (auto id: users)
       {
-        if (id == this->_state.me().id())
+        if (this->_search_field->text().isEmpty() && id == this->_state.me().id())
           continue;
         auto const& model = this->_state.user(id);
         ELLE_DEBUG("-- %s", model);
@@ -429,7 +436,7 @@ namespace fist
     void
     Users::showEvent(QShowEvent* event)
     {
-      this->_search_field->setText("");
+      // this->_search_field->setText("");
       this->_search_field->setFocus();
     }
 
