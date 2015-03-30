@@ -304,7 +304,7 @@ namespace fist
       auto mlayout = new QVBoxLayout;
       mlayout->setSizeConstraint(QLayout::SetFixedSize);
       mlayout->setSpacing(0);
-      mlayout->setContentsMargins(0, 0, 0, 0);
+      mlayout->setContentsMargins(0, 5, 5, 0);
       mlayout->addWidget(this->_help_link, 0, Qt::AlignRight);
       auto layout = new QVBoxLayout;
       mlayout->addLayout(layout);
