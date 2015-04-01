@@ -63,7 +63,6 @@ namespace fist
 #else
     false,
 #endif
-    "",
     download_folder));
 
     connect(&this->_login_watcher, SIGNAL(finished()),
