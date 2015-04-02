@@ -78,6 +78,8 @@ namespace fist
       void
       status(gap_TransactionStatus status);
 
+      void
+      mtime(double mtime);
     private:
       ELLE_ATTRIBUTE_Rw(surface::gap::PeerTransaction, transaction);
       // Cache the files as a QVector<Qstring>.

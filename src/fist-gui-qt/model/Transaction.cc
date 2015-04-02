@@ -34,9 +34,10 @@ namespace fist
                              surface::gap::PeerTransaction const& transaction)
       : Super(state, transaction.id)
       , _transaction(transaction)
-      , _mtime(QDateTime::fromTime_t(transaction.mtime))
+      , _mtime()
     {
       ELLE_DEBUG_SCOPE("%s: construction", *this);
+      this->mtime(transaction.mtime);
     }
 
     void
@@ -44,7 +45,7 @@ namespace fist
     {
       surface::gap::PeerTransaction old = this->_transaction;
       this->_transaction = transaction;
-      this->_mtime = QDateTime::fromTime_t(this->_transaction.mtime);
+      this->mtime(this->_transaction.mtime);
       emit status_updated();
     }
 
@@ -167,6 +168,15 @@ namespace fist
     Transaction::status() const
     {
       return this->_transaction.status;
+    }
+
+    void
+    Transaction::mtime(double time)
+    {
+      if (time > 0)
+        this->_mtime = QDateTime::fromTime_t(time);
+      else
+        this->_mtime = QDateTime::currentDateTime();
     }
 
     bool
