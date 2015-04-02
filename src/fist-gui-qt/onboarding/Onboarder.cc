@@ -38,7 +38,9 @@ namespace fist
     }
 
     Onboarder::~Onboarder()
-    {}
+    {
+      this->_tooltip.release()->deleteLater();
+    }
 
     void
     Onboarder::receive_file(QString const& file)
