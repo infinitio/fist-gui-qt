@@ -140,6 +140,8 @@ TransactionWidget::TransactionWidget(Model const& model):
 
   this->apply_update();
   this->update();
+
+  this->_update_peer_status();
 }
 
 TransactionWidget::~TransactionWidget()
