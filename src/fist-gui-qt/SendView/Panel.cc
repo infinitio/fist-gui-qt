@@ -156,8 +156,8 @@ namespace fist
       std::vector<std::string> files;
       for (int i = 0; i < this->_file_adder->files().size(); ++i)
       {
-        auto array = this->_file_adder->files().keys().at(i).toLocalFile().toUtf8();
-        files.push_back(std::string(array.constData()));
+        files.push_back(
+          QFile_to_string(this->_file_adder->files().keys().at(i));
       }
 
       auto message_array = this->_message->text().toUtf8();
