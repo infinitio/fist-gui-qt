@@ -229,10 +229,6 @@ Fist::Fist(int argc, char** argv):
   this->_parse_options(argc, argv);
   if (!this->_set_uniqunness_guard())
     throw elle::Exception("unable to set lock");
-  // We have to create a state here because crash report need a
-  // state to be ran.
-  this->_initialize_state();
-  this->_put_lock_file();
 }
 
 bool
@@ -374,9 +370,13 @@ Fist::operator ()()
       SIGINT,
       SIGTERM,
 #ifndef INFINIT_WINDOWS
-        SIGKILL,
+      SIGKILL,
 #endif
     }, try_to_quit);
+  // We have to create a state here because crash report need a
+  // state to be ran.
+  this->_initialize_state();
+  this->_put_lock_file();
 
   ELLE_TRACE_SCOPE("%s: run application", *this);
   auto update_url = elle::os::getenv(
