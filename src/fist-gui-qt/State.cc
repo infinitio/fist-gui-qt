@@ -57,13 +57,14 @@ namespace fist
     QString _download_folder = fist::settings()["State"].get("download_folder", "").toString();
     auto array = _download_folder.toUtf8();
     std::string download_folder(array.constData());
-  this->_state.reset(gap_new(
+    this->_state.reset(gap_new(
 #ifdef FIST_PRODUCTION_BUILD
-    true,
+                         true,
 #else
-    false,
+                         false,
 #endif
-    download_folder));
+                         download_folder));
+    ELLE_ASSERT(this->_state != nullptr);
 
     connect(&this->_login_watcher, SIGNAL(finished()),
             this, SLOT(_on_login_result_ready()));
