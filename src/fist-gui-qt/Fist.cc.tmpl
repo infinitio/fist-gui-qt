@@ -301,6 +301,8 @@ void
 Fist::about_to_quit()
 {
   ELLE_TRACE_SCOPE("%s: run cleaning operations", *this);
+  ELLE_DEBUG("hide systray icon")
+    this->_systray.hide();
   ELLE_DEBUG("clear lock")
   {
     this->_filelock.setPermissions(QFile::WriteOwner);
