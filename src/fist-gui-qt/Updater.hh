@@ -102,6 +102,10 @@ private Q_SLOTS:
   void
   _close_dialog();
 
+private:
+  void
+  _periodically_check_for_updates(unsigned long interval = 0); // ms.
+
 Q_SIGNALS:
   void
   quit_request();

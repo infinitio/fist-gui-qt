@@ -20,6 +20,7 @@
 #include <elle/assert.hh>
 #include <elle/format/hexadecimal.hh>
 #include <elle/os/file.hh>
+#include <elle/os/environ.hh>
 #include <elle/finally.hh>
 #include <elle/log.hh>
 #include <elle/serialize/extract.hh>
@@ -40,6 +41,8 @@
 #endif
 
 ELLE_LOG_COMPONENT("infinit.FIST.Updater");
+
+# define DEFAULT_INTERVAL 3600000
 
 void
 Updater::NetworkReplyLaterDeleter::operator () (QNetworkReply* reply) const
@@ -169,9 +172,10 @@ Updater::_handle_reply(QNetworkReply* reply)
       }
       else
       {
-        ELLE_WARN("unable to check for udpates");
+        ELLE_WARN("unable to check for updates");
       }
     }
+    this->_periodically_check_for_updates();
   }
   else if (this->_reply->isRunning())
   {
@@ -190,6 +194,33 @@ Updater::_handle_reply(QNetworkReply* reply)
     {
       this->_check_if_up_to_date(reply);
     }
+  }
+}
+
+void
+Updater::_periodically_check_for_updates(unsigned long interval_)
+{
+  if (this->_check_for_update_timer == nullptr)
+  {
+    unsigned long interval = DEFAULT_INTERVAL;
+    try
+    {
+      std::string i{elle::os::getenv("FIST_CHECK_UPDATE_INTERVAL", std::to_string(interval_))};
+      if (i != "0")
+        interval = std::stoul(i);
+    }
+    catch (std::exception const& e)
+    {
+      ELLE_WARN("unable to convert interval (%s or %s) to numeric interval: %s",
+                elle::os::getenv("FIST_CHECK_UPDATE_INTERVAL"), interval_, e);
+    }
+
+    ELLE_TRACE_SCOPE("launch update checker (check every %sms)", interval);
+    this->_check_for_update_timer = new QTimer(this);
+    this->_check_for_update_timer->setInterval(interval);
+    connect(this->_check_for_update_timer, SIGNAL(timeout()),
+            this, SLOT(check_for_updates()));
+    this->_check_for_update_timer->start();
   }
 }
 
@@ -291,16 +322,7 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
     {
       emit no_update_available();
       ELLE_LOG("no update available");
-      if (this->_check_for_update_timer == nullptr)
-      {
-        auto interval = 1000 * 60 * 60; // ms.
-        ELLE_TRACE_SCOPE("launch update checker (check every %sms)", interval);
-        this->_check_for_update_timer = new QTimer(this);
-        this->_check_for_update_timer->setInterval(interval);
-        connect(this->_check_for_update_timer, SIGNAL(timeout()),
-                this, SLOT(check_for_updates()));
-        this->_check_for_update_timer->start();
-      }
+      this->_periodically_check_for_updates();
       return;
     }
     else
