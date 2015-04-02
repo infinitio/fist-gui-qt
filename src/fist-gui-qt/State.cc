@@ -521,6 +521,7 @@ namespace fist
       ELLE_ATTRIBUTE(surface::gap::PeerTransaction, transaction)
     };
     this->_transactions.modify(it, UpdateStatus(tr));
+    this->_compute_active_transactions();
   }
 
   void
@@ -558,6 +559,7 @@ namespace fist
       ELLE_ATTRIBUTE(surface::gap::LinkTransaction, link);
     };
     this->_links.modify(it, UpdateLink(link));
+    this->_compute_active_links();
   }
 
   model::Transaction const&
