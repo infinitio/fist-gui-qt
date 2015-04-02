@@ -304,6 +304,7 @@ namespace fist
   model::User const&
   State::me()
   {
+    ELLE_ASSERT(this->_my_id != gap_null());
     return this->user(this->_my_id);
   }
 
@@ -441,7 +442,6 @@ namespace fist
   model::User const&
   State::user(uint32_t user_id)
   {
-    ELLE_ASSERT(user_id != gap_null());
     if (this->_users.find(user_id) == this->_users.end())
       this->_users[user_id].reset(new model::User(*this, user_id));
     return *this->_users[user_id];

@@ -22,8 +22,28 @@ namespace fist
                uint32_t id)
     {
       surface::gap::User user;
-      auto res = gap_user_by_id(state.state(), id, user);
-      if (res != gap_ok); // XXX
+      auto empty_user = [&user] {
+        ELLE_WARN("got an empty user id");
+        user.id = gap_null();
+        user.status = false;
+        user.fullname = "Unknown User";
+        user.handle = "Unknown User";
+        user.meta_id = ""; // Risky.
+        user.swagger = false;
+        user.deleted = true;
+        user.ghost = false;
+        user.phone_number = "";
+        user.ghost_code = "";
+        user.ghost_invitation_url = "";
+      };
+      if (id != gap_null())
+      {
+        auto res = gap_user_by_id(state.state(), id, user);
+        if (res != gap_ok)
+          empty_user();
+      }
+      else
+        empty_user();
       return user;
     }
 
@@ -136,7 +156,13 @@ namespace fist
     QPixmap const&
     User::avatar() const
     {
-      if (this->_avatar.isNull() || this->_default_avatar == true)
+      if (this->id() == gap_null() && this->_avatar.isNull())
+      {
+        ELLE_DEBUG("%s: avatar not available yet", *this);
+        this->_avatar = QPixmap(QString(":/avatar_default"));
+        this->_default_avatar = false;
+      }
+      else if (this->_avatar.isNull() || this->_default_avatar == true)
       {
         if (this->_new_avatar)
         {
