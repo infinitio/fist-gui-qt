@@ -15,6 +15,7 @@
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/gui/Tooltip.hh>
 #include <fist-gui-qt/onboarding/Onboarder.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.onboarding.Onboarder");
 
@@ -45,8 +46,7 @@ namespace fist
     void
     Onboarder::receive_file(QString const& file)
     {
-      auto array = file.toUtf8();
-      std::string _file(array.constData());
+      auto _file = QString_to_utf8_string(file);
       this->_transactions[gap_onboarding_receive_transaction(
           this->_dock->_state.state(), _file.c_str(), 6)] = nullptr;
     }

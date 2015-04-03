@@ -55,8 +55,7 @@ namespace fist
     , _poll_timer(new QTimer)
   {
     QString _download_folder = fist::settings()["State"].get("download_folder", "").toString();
-    auto array = _download_folder.toUtf8();
-    std::string download_folder(array.constData());
+    auto download_folder = QString_to_utf8_string(_download_folder);
     this->_state.reset(gap_new(
 #ifdef FIST_PRODUCTION_BUILD
                          true,
@@ -488,8 +487,7 @@ namespace fist
   void
   State::download_folder(QString const& folder)
   {
-    auto array = folder.toUtf8();
-    std::string _folder(array.constData());
+    auto _folder = QString_to_utf8_string(folder);
     gap_set_output_dir(this->state(), _folder, true);
     fist::settings()["State"].set("download_folder", folder);
   }

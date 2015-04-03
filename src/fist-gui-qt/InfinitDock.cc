@@ -778,8 +778,7 @@ InfinitDock::report_a_problem()
   if (ok)
   {
     ELLE_DEBUG("user message: %s", text);
-    auto array = text.toUtf8();
-    std::string std_text(array.constData());
+    auto std_text = QString_to_utf8_string(text);
     ELLE_DEBUG("user message (%s)", std_text);
     gap_send_user_report(
       this->_state.state(),

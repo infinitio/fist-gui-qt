@@ -160,9 +160,7 @@ namespace fist
           QFile_to_string(this->_file_adder->files().keys().at(i));
       }
 
-      auto message_array = this->_message->text().toUtf8();
-      std::string message = std::string(message_array.constData());
-
+      auto message = QString_to_utf8_string(this->_message->text());
       ELLE_DEBUG("message: %s", message);
 
       if (this->_tabs->is_active_tab(*this->_link_tab))

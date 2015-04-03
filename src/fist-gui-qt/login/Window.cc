@@ -827,12 +827,9 @@ namespace fist
 
       if (!this->_test_fields(true))
         return;
-      auto email_array = this->_email_field->text().toUtf8();
-      std::string email(email_array.constData());
-      auto pw_array = this->_password_field->text().toUtf8();
-      std::string pw(pw_array.constData());
-      auto fullname_array = this->_fullname_field->text().toUtf8();
-      std::string fullname(fullname_array.constData());
+      std::string email = QString_to_utf8_string(this->_email_field->text());
+      std::string pw = QString_to_utf8_string(this->_password_field->text());
+      std::string fullname = QString_to_utf8_string(this->_fullname_field->text());
       register_failed_guard.abort();
       ELLE_TRACE("every check passed")
       {
@@ -856,10 +853,8 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: login attempt", *this);
       if (!this->_test_fields())
         return;
-      auto email_array = this->_email_field->text().toUtf8();
-      std::string email(email_array.constData());
-      auto pw_array = this->_password_field->text().toUtf8();
-      std::string pw(pw_array.constData());
+      std::string email = QString_to_utf8_string(this->_email_field->text());
+      std::string pw = QString_to_utf8_string(this->_password_field->text());
       login_failed_guard.abort();
       ELLE_TRACE("every check passed")
       {

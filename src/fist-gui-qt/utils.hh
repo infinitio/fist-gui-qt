@@ -113,11 +113,12 @@ pretty_date(QDateTime const& date)
   return local_date.toString(format);
 }
 
+inline
 std::string
-QFile_to_string(QFile const& file)
+QString_to_utf8_string(QString const& input)
 {
-  auto array = QDir::toNativeSeparators(file.toLocalFile()).toUtf8();
-  return std::string(array.constData());
+  auto array = input.toUtf8();
+  return std::string{array.constData()};
 }
 
 #endif
