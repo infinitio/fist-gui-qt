@@ -221,6 +221,7 @@ InfinitDock::InfinitDock(fist::State& state,
   this->connect(this->_start_onboarding_action, SIGNAL(triggered()),
                 this, SLOT(_start_onboarded_reception()));
 #endif
+  this->_active_transactions_changed(0);
 }
 
 /*------------.
