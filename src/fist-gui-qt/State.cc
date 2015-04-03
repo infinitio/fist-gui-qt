@@ -7,6 +7,7 @@
 #include <functional>
 
 #include <QDesktopServices>
+#include <QHostInfo>
 #include <QtConcurrentRun>
 #include <QTimer>
 #include <QUrl>
@@ -15,6 +16,7 @@
 
 #include <elle/log.hh>
 #include <elle/os/environ.hh>
+#include <elle/system/platform.hh>
 
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/State.hh>
@@ -144,7 +146,15 @@ namespace fist
   {
     this->_login_future = QtConcurrent::run(
       [=] {
-        auto res = gap_login(this->state(), email, password);
+        auto res = gap_login(
+          this->state(),
+          email,
+          password,
+          boost::none, // Device push token.
+          boost::none, // Country code.
+          elle::system::platform::os_name(),
+          QString_to_utf8_string(QHostInfo::localHostName())
+        );
         if (res == gap_ok)
           this->_my_id = gap_self_id(this->state());
         return res;
@@ -164,7 +174,15 @@ namespace fist
             return boost::optional<std::string>{};
           return boost::optional<std::string>{email};
         };
-        auto res = gap_facebook_connect(this->state(), token, optional_email());
+        auto res = gap_facebook_connect(
+        this->state(),
+          token,
+          optional_email(),
+          boost::none, // Device push token.
+          boost::none, // Country code.
+          elle::system::platform::os_name(),
+          QString_to_utf8_string(QHostInfo::localHostName())
+          );
         if (res == gap_ok)
           this->_my_id = gap_self_id(this->state());
         return res;
@@ -186,7 +204,16 @@ namespace fist
     this->_register_future = QtConcurrent::run(
       [=] {
         // Will explode if the state is destroyed.
-        auto res = gap_register(this->state(), fullname, email, password);
+        auto res = gap_register(
+          this->state(),
+          fullname,
+          email,
+          password,
+          boost::none, // Device push token.
+          boost::none, // Country code.
+          elle::system::platform::os_name(),
+          QString_to_utf8_string(QHostInfo::localHostName())
+        );
         if (res == gap_ok)
           this->_my_id = gap_self_id(this->state());
         return res;
