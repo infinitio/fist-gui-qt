@@ -33,6 +33,13 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.SendView.Panel");
 
+static
+std::string
+QUrl_to_native_path(QUrl const& file)
+{
+  return QString_to_utf8_string(QDir::toNativeSeparators(file.toLocalFile()));
+}
+
 namespace fist
 {
   namespace sendview
@@ -157,7 +164,7 @@ namespace fist
       for (int i = 0; i < this->_file_adder->files().size(); ++i)
       {
         files.push_back(
-          QFile_to_string(this->_file_adder->files().keys().at(i));
+          QUrl_to_native_path(this->_file_adder->files().keys().at(i)));
       }
 
       auto message = QString_to_utf8_string(this->_message->text());
