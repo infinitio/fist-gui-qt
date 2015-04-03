@@ -51,6 +51,10 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
+// Brackets are reverved on Windows, making them a perfect separator to avoid
+// false positives.
+#define COMMAND_LINE_FILE_SEPARATOR '<'
+
 // XXX: This is dirty but there is no good way to emit a signal from a static
 // method. Unfortunately, gap api, which is in C, forces to attach C callbacks.
 // Attaching a static method works but make signal emission impossible.
@@ -450,7 +454,8 @@ Fist::_set_uniqunness_guard()
         res.append(elle::sprintf("--%s", ADD));
       res += " ";
       res.append(elle::join(this->_command_line->files.begin(),
-                            this->_command_line->files.end(), ","));
+                            this->_command_line->files.end(),
+                            std::string(1, COMMAND_LINE_FILE_SEPARATOR)));
       ELLE_TRACE("write %s", res);
       this->_other_instance->write(res.c_str(), res.length() + 1);
     }
@@ -739,7 +744,7 @@ Fist::_extact_files_from_commandline(std::string const& message)
   std::stringstream files(message);
   std::string temp;
   std::vector<std::string> list;
-  while (std::getline(files, temp, ','))
+  while (std::getline(files, temp, COMMAND_LINE_FILE_SEPARATOR))
     list.push_back(temp);
   return list;
 }
