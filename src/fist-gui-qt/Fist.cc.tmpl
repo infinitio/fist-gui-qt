@@ -361,6 +361,7 @@ Fist::_initialize_login_window(bool prefill_fields)
           this, SLOT(logged_in()));
   connect(this->_login_window.get(), SIGNAL(registered()),
           this, SLOT(registered()));
+  this->_login_window->init();
   this->_login_window->setFocus();
 }
 

@@ -45,7 +45,13 @@ namespace fist
              bool previous_session_crashed = false);
       ~Window();
 
+      // Perform auto login if possible.
+      // If not, show the window and focus the right field.
+      void
+      init();
+
       void keyPressEvent(QKeyEvent* event);
+
 
     private:
       // Check if the fields are filled in a proper way.

@@ -363,6 +363,14 @@ namespace fist
               this, SLOT(_internet_issue(QString const&)));
       this->update();
 
+      this->_update_geometry();
+      this->move(QApplication::desktop()->screen()->rect().center() -
+                 this->rect().center());
+    }
+
+    void
+    Window::init()
+    {
       if (this->_email_field->text().isEmpty() && !fist::settings()["Login"].exists("facebook"))
       {
         this->mode(Mode::Register);
@@ -381,22 +389,18 @@ namespace fist
           this->show();
           this->set_message(
             "<a>"
-              "Previous session crashed<br>"
-              "Feel free to contact us at "
-              "<a "
-                " style=\"text-decoration: none; color: #489FCE;\""
-                " href=\"mailto:contact@infinit.io\">"
-                  "contact@infinit.io"
-              "</a>"
+            "Previous session crashed<br>"
+            "Feel free to contact us at "
+            "<a "
+            " style=\"text-decoration: none; color: #489FCE;\""
+            " href=\"mailto:contact@infinit.io\">"
+            "contact@infinit.io"
+            "</a>"
             "</a>",
             "Previous session crashed.",
             false);
         }
       }
-
-      this->_update_geometry();
-      this->move(QApplication::desktop()->screen()->rect().center() -
-                 this->rect().center());
     }
 
     void
