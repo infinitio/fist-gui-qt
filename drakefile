@@ -373,7 +373,7 @@ def configure(cxx_toolkit = None,
 
   if cxx_toolkit.os == drake.os.windows:
     # Here is the trick.
-
+    shell_extensions = []
     for version, toolkit in [
         ('32', drake.cxx.GccToolkit(compiler = os.getenv('CXX', 'i686-w64-mingw32-g++'))),
         ('64', drake.cxx.GccToolkit(compiler = os.getenv('CXX', 'x86_64-w64-mingw32-g++')))
@@ -437,7 +437,7 @@ def configure(cxx_toolkit = None,
         toolkit,
         dll_cxx_config,
         strip = True)
-      dynamic_libraries.append(shellextension)
+      shell_extensions.append(shellextension)
       build << shellextension
 
     for name in [
@@ -555,7 +555,7 @@ def configure(cxx_toolkit = None,
       lambda x: drake.copy(x,
                            installer_resources_folder,
                            strip_prefix = True),
-      installer_resources + dynamic_libraries + Qt_images_plugins)) + nsis_plugins + nsis_includes
+      installer_resources + dynamic_libraries + Qt_images_plugins + shell_extensions)) + nsis_plugins + nsis_includes
     signed_app = Signer(application,
                         installer_resources_folder / 'Infinit.exe').target
     signed_app.dependency_add(osslsigncode)
