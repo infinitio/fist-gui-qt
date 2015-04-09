@@ -138,11 +138,19 @@ namespace fist
     | Users |
     `------*/
     // Me.
-    ELLE_ATTRIBUTE_R(uint32_t, my_id);
-    ELLE_ATTRIBUTE_R(std::string, device);
+    ELLE_ATTRIBUTE_P(uint32_t, my_id, mutable);
+  public:
+    uint32_t
+    my_id() const;
+    ELLE_ATTRIBUTE_P(std::string, device, mutable);
+  public:
+    std::string
+    device() const;
+  public:
     model::User const&
     me();
 
+  public:
     // typedef std::vector<model::User const&> Users;
     typedef std::vector<uint32_t> Users;
 

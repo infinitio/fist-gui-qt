@@ -17,6 +17,7 @@
 #include <elle/log.hh>
 #include <elle/os/environ.hh>
 #include <elle/system/platform.hh>
+#include <elle/UUID.hh>
 
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/State.hh>
@@ -45,6 +46,8 @@ namespace fist
     , _register_watcher()
     , _ghost_code_future()
     , _ghost_code_watcher()
+    , _my_id(gap_null())
+    , _device(elle::UUID().repr())
     , _users()
     , _search_future()
     , _search_watcher()
@@ -140,6 +143,23 @@ namespace fist
       this->cancel_search();
   }
 
+  uint32_t
+  State::my_id() const
+  {
+    if (this->_my_id == gap_null())
+      this->_my_id = gap_self_id(this->state());
+    return this->_my_id;
+  }
+
+  std::string
+  State::device() const
+  {
+    static const elle::UUID nil_uuid;
+    if (this->_device == nil_uuid.repr())
+      this->_device = gap_self_device_id(this->state());
+    return this->_device;
+  }
+
   void
   State::login(std::string const& email,
                std::string const& password)
@@ -155,8 +175,6 @@ namespace fist
           elle::system::platform::os_name(),
           QString_to_utf8_string(QHostInfo::localHostName())
         );
-        if (res == gap_ok)
-          this->_my_id = gap_self_id(this->state());
         return res;
       });
     this->_login_watcher.setFuture(this->_login_future);
@@ -183,8 +201,6 @@ namespace fist
           elle::system::platform::os_name(),
           QString_to_utf8_string(QHostInfo::localHostName())
           );
-        if (res == gap_ok)
-          this->_my_id = gap_self_id(this->state());
         return res;
       });
     this->_login_watcher.setFuture(this->_login_future);
@@ -214,8 +230,6 @@ namespace fist
           elle::system::platform::os_name(),
           QString_to_utf8_string(QHostInfo::localHostName())
         );
-        if (res == gap_ok)
-          this->_my_id = gap_self_id(this->state());
         return res;
       });
     this->_register_watcher.setFuture(this->_register_future);
@@ -263,7 +277,6 @@ namespace fist
   void
   State::on_logged_in()
   {
-    this->_device = gap_self_device_id(this->state());
     ELLE_TRACE("load swaggers")
     {
       std::vector<surface::gap::User> users;
@@ -331,8 +344,8 @@ namespace fist
   model::User const&
   State::me()
   {
-    ELLE_ASSERT(this->_my_id != gap_null());
-    return this->user(this->_my_id);
+    ELLE_ASSERT(this->my_id() != gap_null());
+    return this->user(this->my_id());
   }
 
   void

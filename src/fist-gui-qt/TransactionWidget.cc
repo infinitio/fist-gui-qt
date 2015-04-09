@@ -58,7 +58,6 @@ TransactionWidget::TransactionWidget(Model const& model):
   layout->setSpacing(5);
   this->_layout = layout;
   layout->addWidget(this->_peer_avatar, 0, Qt::AlignLeft);
-
   {
     auto texts = new QVBoxLayout;
     texts->setContentsMargins(5, 0, 0, 0);
@@ -80,7 +79,6 @@ TransactionWidget::TransactionWidget(Model const& model):
     this->_peer_status->setToolTip(tr("Online"));
     user_and_status->addStretch(0);
     texts->addSpacing(4);
-
     {
       this->_filename->setText(
         this->_transaction.files().size() == 1 ?
@@ -118,7 +116,6 @@ TransactionWidget::TransactionWidget(Model const& model):
   {
     auto infos = new QVBoxLayout;
     this->_accept_reject_area->setLayout(infos);
-
     infos->addStretch();
     infos->addWidget(this->_accept_button, 0, Qt::AlignCenter);
     infos->addSpacing(2);
