@@ -19,6 +19,7 @@ class IconButton:
 public:
   IconButton(QPixmap const& pixmap,
              bool shadow = false,
+             QWidget* parent = nullptr,
              Callback const& = {});
 
   Q_PROPERTY(bool shadow READ hasShadow);

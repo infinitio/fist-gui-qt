@@ -6,7 +6,9 @@ ELLE_LOG_COMPONENT("infinit.FIST.IconButton");
 
 IconButton::IconButton(QPixmap const& pixmap,
                        bool shadow,
+                       QWidget* parent,
                        Callback const& cb):
+  QPushButton(parent),
   _has_shadow(shadow),
   _cache(),
   _original(),
