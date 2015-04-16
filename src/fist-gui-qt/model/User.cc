@@ -62,14 +62,15 @@ namespace fist
     {
       if (this->id() == this->_state.my_id())
       {
-        std::vector<surface::gap::Device> devices;
+        std::vector<surface::gap::Device const*> devices;
         auto res = gap_devices(this->_state.state(), devices);
         if (res != gap_ok)
           ELLE_WARN("%s: fetching devices failed", *this);
         else
           for (auto const& device: devices)
             ELLE_TRACE("add device: %s", device)
-              this->_devices.emplace_back(device);
+              ELLE_TRACE("device id: %s", device->id)
+                this->_devices.emplace_back(*device);
       }
     }
 

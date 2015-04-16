@@ -135,10 +135,16 @@ namespace fist
 
   State::~State()
   {
-    ELLE_DEBUG_SCOPE("%s: destruction", *this);
-    g_state = nullptr;
+    ELLE_LOG_SCOPE("%s: destruction", *this);
     ELLE_DEBUG("destroy poll timer")
-      this->_poll_timer.reset();
+    {
+      if (this->_poll_timer)
+      {
+        this->_poll_timer->stop();
+        this->_poll_timer.reset();
+      }
+    }
+    g_state = nullptr;
     ELLE_DEBUG("cancel search")
       this->cancel_search();
   }
