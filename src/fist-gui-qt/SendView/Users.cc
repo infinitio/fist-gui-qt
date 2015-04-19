@@ -250,9 +250,10 @@ namespace fist
     void
     Users::_add_device_search_result(model::User const& me)
     {
-      auto last = me.devices().size() - 1;
+      auto devices = this->_state.devices();
+      auto last = devices.size() - 1;
       unsigned int i = 0;
-      for (auto const& device: me.devices())
+      for (auto const& device: devices)
       {
         if (device.id() != QString::fromStdString(this->_state.device()))
         {
@@ -276,10 +277,11 @@ namespace fist
     void
     Users::set_users(UserList const& users, bool local)
     {
+      auto devices = this->_state.devices();
       if (this->_search_field->text().isEmpty())
       {
         auto const& me = this->_state.me();
-        if (me.devices().size() > 1)
+        if (devices.size() > 1)
           this->_add_device_search_result(me);
         else
           this->_add_search_result(me);

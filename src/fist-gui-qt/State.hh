@@ -151,6 +151,10 @@ namespace fist
     me();
 
   public:
+    std::vector<model::Device>
+    devices() const;
+
+  public:
     // typedef std::vector<model::User const&> Users;
     typedef std::vector<uint32_t> Users;
 

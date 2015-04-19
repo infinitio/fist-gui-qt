@@ -7,7 +7,7 @@
 # include <elle/attribute.hh>
 # include <elle/Printable.hh>
 
-# include <surface/gap/Device.hh>
+# include <surface/gap/State.hh>
 
 # include <fist-gui-qt/gui/IconProvider.hh>
 # include <fist-gui-qt/fwd.hh>

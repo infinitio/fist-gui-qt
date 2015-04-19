@@ -1,7 +1,7 @@
 #include <fist-gui-qt/model/Device.hh>
-#include <fist-gui-qt/utils.hh>
-
+#include <fist-gui-qt/gui/IconProvider.hh>
 #include <fist-gui-qt/regexp.hh>
+#include <fist-gui-qt/utils.hh>
 
 namespace fist
 {
@@ -40,9 +40,9 @@ namespace fist
     }
 
     Device::Device(surface::gap::Device const& device)
-      : _id(QString::fromStdString(device.id))
+      : _id(QString::fromStdString(device.id.repr()))
       , _name(QString::fromStdString(device.name))
-      , _os(QString::fromStdString(device.os))
+      , _os(device.os ? QString::fromStdString(device.os.get()) : QString{})
       , _type(os_to_type(this->_os))
     {
       // Remove when devices will be named properly.

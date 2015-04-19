@@ -135,10 +135,16 @@ namespace fist
 
   State::~State()
   {
-    ELLE_DEBUG_SCOPE("%s: destruction", *this);
-    g_state = nullptr;
+    ELLE_LOG_SCOPE("%s: destruction", *this);
     ELLE_DEBUG("destroy poll timer")
-      this->_poll_timer.reset();
+    {
+      if (this->_poll_timer)
+      {
+        this->_poll_timer->stop();
+        this->_poll_timer.reset();
+      }
+    }
+    g_state = nullptr;
     ELLE_DEBUG("cancel search")
       this->cancel_search();
   }
@@ -256,6 +262,20 @@ namespace fist
       emit internet_issue("trying to connect");
     else
       emit kicked_out(QString::fromStdString(last_error));
+  }
+
+  std::vector<model::Device>
+  State::devices() const
+  {
+    std::vector<model::Device> devices;
+    std::vector<surface::gap::Device const*> _devices;
+    auto res = gap_devices(this->state(), _devices);
+    if (res != gap_ok)
+      ELLE_WARN("%s: fetching devices failed", *this);
+    else
+      for (auto const& device: _devices)
+        devices.emplace_back(*device);
+    return devices;
   }
 
   void
