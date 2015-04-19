@@ -3,42 +3,39 @@
 
 # include <elle/attribute.hh>
 
-namespace infinit
+namespace fist
 {
-  namespace fist
+  namespace log
   {
-    namespace log
+    class Selector
     {
-      class Selector
-      {
-      public:
-        Selector(std::string const& log_file);
+    public:
+      Selector(std::string const& log_file);
 
-        virtual
-        ~Selector() = default;
+      virtual
+      ~Selector() = default;
 
-        virtual
-        std::string const&
-        log_file() const;
+      virtual
+      std::string const&
+      log_file() const;
 
-        virtual
-        std::string
-        previous_log_file() const;
+      virtual
+      std::string
+      previous_log_file() const;
 
-        virtual
-        std::string
-        next_log_file() const;
+      virtual
+      std::string
+      next_log_file() const;
 
-        bool
-        remove_current_log() const;
+      bool
+      remove_current_log() const;
 
-        virtual
-        bool
-        remove_next_log() const;
+      virtual
+      bool
+      remove_next_log() const;
 
-        ELLE_ATTRIBUTE(std::string, log_file);
-      };
-    }
+      ELLE_ATTRIBUTE(std::string, log_file);
+    };
   }
 }
 

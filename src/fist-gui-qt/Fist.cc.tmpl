@@ -77,7 +77,7 @@ namespace
 }
 namespace
 {
-  static std::unique_ptr<infinit::fist::log::Selector> logger;
+  static std::unique_ptr<fist::log::Selector> logger;
   static
   void
   remove_current_log()
@@ -124,7 +124,7 @@ class Fist::Prologue
     if (!elle::os::inenv("INFINIT_LOG_FILE") && !elle::os::inenv("ELLE_LOG_FILE"))
     {
       logger.reset(
-        new infinit::fist::log::CircularSelector(
+        new fist::log::CircularSelector(
           elle::os::path::join(common::infinit::default_home(), "state%s.log"),
           4));
 
@@ -135,7 +135,7 @@ class Fist::Prologue
     else
     {
       logger.reset(
-        new infinit::fist::log::Selector(
+        new fist::log::Selector(
           elle::os::getenv("INFINIT_LOG_FILE",
                            elle::os::getenv("ELLE_LOG_FILE"))));
     }
