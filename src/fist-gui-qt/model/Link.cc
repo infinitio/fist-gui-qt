@@ -47,7 +47,12 @@ namespace fist
       this->_link = new_link;
       ELLE_DEBUG("%s -> %s", old, this->_link);
       this->_mtime = QDateTime::fromTime_t(this->_link.mtime);
-      emit status_updated();
+      if (old.status != this->status())
+      {
+        emit status_updated();
+        if (this->status() == gap_transaction_payment_required)
+          emit payment_required();
+      }
       if (old.click_count != this->click_count())
         emit click_count_updated();
       if (!old.link && !this->url().isEmpty())
@@ -106,6 +111,7 @@ namespace fist
           gap_transaction_failed,
           gap_transaction_canceled,
           gap_transaction_deleted,
+          gap_transaction_payment_required,
         };
       return final_states.contains(this->status());
     }

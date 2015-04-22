@@ -64,6 +64,9 @@ namespace fist
       void
       click_count_updated() const;
 
+      void
+      payment_required() const;
+
     private:
       /*----------.
       | Printable |

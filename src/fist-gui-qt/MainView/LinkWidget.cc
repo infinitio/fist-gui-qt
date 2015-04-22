@@ -43,6 +43,8 @@ namespace fist
               this, SLOT(_on_status_updated()));
       connect(&this->_model, SIGNAL(click_count_updated()),
               this, SLOT(_on_status_updated()));
+      connect(&this->_model, SIGNAL(payment_required()),
+              this, SLOT(hide()));
       this->_layout->setContentsMargins(12, 12, 12, 12);
       this->_layout->setSpacing(5);
       {
@@ -130,10 +132,7 @@ namespace fist
       this->_status.setText(status);
       this->_click_counter.setText(
         QString("%1").arg(this->_model.click_count()));
-
-      if (this->_model.status() == gap_transaction_failed ||
-          this->_model.status() == gap_transaction_canceled ||
-          this->_model.status() == gap_transaction_deleted)
+      if (this->_model.unavailable())
       {
         this->_text_style = view::links::file::failed_style;
       }
