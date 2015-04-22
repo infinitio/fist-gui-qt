@@ -459,6 +459,9 @@ TransactionWidget::_on_status_updated()
         case gap_transaction_on_other_device:
           return StatusUpdater(
             QString(":/loading"), true, "On another device");
+        case gap_transaction_payment_required:
+          return StatusUpdater(
+            QString(":/conversation/canceled"), false, "Quota exceeded");
       }
 
       return StatusUpdater(QString(), false, "Something wrong append");
