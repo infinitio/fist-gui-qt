@@ -45,6 +45,9 @@ namespace fist
       uint32_t
       click_count() const;
 
+      uint64_t
+      size() const;
+
       float
       progress() const;
 
