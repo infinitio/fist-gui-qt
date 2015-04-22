@@ -117,7 +117,9 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: on status updated", *this);
       this->_picture.setPixmap(gui::icon_provider().icon(this->_model.name()).scaled(42, 42));
       if (this->_model.is_finished())
-        this->_update(pretty_date(this->_model.mtime()));
+        this->_update(QString("%1 - %2").arg(
+                        readable_size(this->_model.size()),
+                        pretty_date(this->_model.mtime())));
       else
       {
         this->_update(

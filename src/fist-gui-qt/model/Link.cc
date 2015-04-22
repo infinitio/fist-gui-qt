@@ -82,6 +82,12 @@ namespace fist
       return this->_link.click_count;
     }
 
+    uint64_t
+    Link::size() const
+    {
+      return this->_link.size;
+    }
+
     float
     Link::progress() const
     {
