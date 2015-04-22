@@ -43,6 +43,7 @@ namespace fist
       ELLE_ATTRIBUTE(ListWidget*, link_list);
       typedef std::unordered_map<uint32_t, std::shared_ptr<LinkWidget>> Widgets;
       ELLE_ATTRIBUTE(Widgets, widgets);
+      ELLE_ATTRIBUTE(popup::NoMoreStorage*, no_more_storage);
     private:
       Q_OBJECT;
 

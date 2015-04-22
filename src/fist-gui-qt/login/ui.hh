@@ -158,10 +158,7 @@ namespace fist
 
         static
         Qt::TextInteractionFlags const
-        interration_flags(
-          Qt::TextSelectableByMouse |
-          Qt::LinksAccessibleByMouse |
-          Qt::LinksAccessibleByKeyboard);
+        interration_flags = ::links::interration_flags;
 
         namespace forgot_password
         {
