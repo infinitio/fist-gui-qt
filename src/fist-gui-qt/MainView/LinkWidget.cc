@@ -51,6 +51,7 @@ namespace fist
         this->_picture.setPixmap(gui::icon_provider().icon(this->_model.name()).scaled(42, 42));
         this->_layout->addWidget(&this->_picture);
       }
+      this->_layout->addSpacing(7);
       {
         auto* vlayout = new QVBoxLayout;
         vlayout->addStretch();
@@ -71,14 +72,11 @@ namespace fist
       {
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 0);
-        hlayout->setSpacing(3);
-        hlayout->addStretch();
+        hlayout->setSpacing(9);
         hlayout->addWidget(this->_go_to_website);
         this->_go_to_website->setToolTip("Open the link");
-        hlayout->addSpacing(5);
         hlayout->addWidget(this->_copy_link);
         this->_copy_link->setToolTip("Copy the link to clipboard");
-        hlayout->addSpacing(5);
         hlayout->addWidget(this->_cancel_link);
         this->_cancel_link->installEventFilter(this);
         this->_cancel_link->setToolTip("Cancel");
