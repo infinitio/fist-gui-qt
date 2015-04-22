@@ -169,10 +169,6 @@ namespace fist
       {
         this->_go_to_website->hide();
         this->_copy_link->hide();
-        QToolTip::showText(
-          this->_cancel_link->mapToGlobal(
-            QPoint(0, -this->_cancel_link->height())),
-          "Click again to cancel");
       }
       else
       {
