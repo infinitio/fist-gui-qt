@@ -27,6 +27,11 @@ namespace fist
 {
   class State;
 
+  namespace popup
+  {
+    class NoMoreStorage;
+  }
+
   namespace login
   {
     class Window;

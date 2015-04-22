@@ -352,6 +352,10 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/MainView/LinkWidget.cc",
       "src/fist-gui-qt/MainView/LinkWidget.hh",
 
+      # Popups.
+      "src/fist-gui-qt/popup/NoMoreStorage.cc",
+      "src/fist-gui-qt/popup/NoMoreStorage.hh",
+
       "src/fist-gui-qt/GhostCode/Panel.cc",
       "src/fist-gui-qt/GhostCode/Panel.hh",
       "src/fist-gui-qt/GhostCode/Footer.cc",

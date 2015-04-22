@@ -5,6 +5,7 @@
 #include <fist-gui-qt/Footer.hh>
 #include <fist-gui-qt/MainView/Links.hh>
 #include <fist-gui-qt/MainView/LinkWidget.hh>
+#include <fist-gui-qt/popup/NoMoreStorage.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
 
@@ -23,6 +24,7 @@ namespace fist
       , _state(state)
       , _link_list(new ListWidget(this, ListWidget::Separator(list::separator::colors), view::background))
       , _widgets()
+      , _no_more_storage(new popup::NoMoreStorage(this))
     {
       this->_link_list->setMaxRows(4);
       auto* layout = new QVBoxLayout(this);
@@ -39,6 +41,7 @@ namespace fist
       {
         this->add_link(model);
       }
+      this->_no_more_storage->hide();
     }
 
     void
@@ -63,6 +66,9 @@ namespace fist
         // Get rid of the "TextListItem".
         this->_link_list->clearWidgets();
       }
+
+      connect(&model, SIGNAL(payment_required()),
+              this->_no_more_storage, SLOT(show()));
 
       if (this->_widgets.find(model.id()) != this->_widgets.end())
       {

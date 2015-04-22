@@ -253,6 +253,10 @@
     <file alias="send/drop-files">../slices/windows/view_send/icons-drop-send.png</file>
     <file alias="send/drop-files@2x">../slices/windows/view_send/icons-drop-send@2x.png</file>
 
+    <!-- Monetisation popup -->
+    <file alias="monetisation/thermometer">../slices/windows/popup/icon-links-full.png</file>
+    <file alias="monetisation/thermometer@2x">../slices/windows/popup/icon-links-full@2x.png</file>
+
     <!-- File icons -->
     <file alias="mimetypes/archive">../mimetypes/archive.png</file>
     <file alias="mimetypes/archive@2x">../mimetypes/archive@2x.png</file>
