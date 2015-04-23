@@ -19,7 +19,7 @@ namespace fist
         {
           static
           QString const
-          text("You have exceeded your 1GB quota for links.");
+          text("You have reached your 1GB storage limit for links.");
 
           static
           fist::style::Text const
@@ -35,10 +35,10 @@ namespace fist
           static
           QString const
           text = QString(
-          "You can <a style=\"text-decoration: none; color: #2BBEBD;\" "
-          "href=\"%1\">"
-          "upgrade to a better plan on our website</a> or remove some "
-          "of your old links.").arg(url);
+            "You can either <a style=\"text-decoration: none; color: #2BBEBD;\""
+            "href=\"%1\">"
+            "upgrade to a premium plan</a> or remove old links to free up space")
+          .arg(url);
 
           static
           fist::style::Text const
@@ -49,7 +49,7 @@ namespace fist
         {
           static
           QString const
-          text("Question? Tweet us @infinit or send us an email at "
+          text("Questions? Tweet us @infinit or shoot us an email at "
                "contact@infinit.io.");
 
           static
@@ -77,19 +77,19 @@ namespace fist
             "}"
             );
 
-namespace cancel
-{
-  static
-  QString const
-  text("CANCEL");
-}
+          namespace cancel
+          {
+            static
+            QString const
+            text("CANCEL");
+          }
 
-namespace upgrade
-{
-  static
-  QString const
-  text("UPGRADE MY PLAN");
-}
+          namespace upgrade
+          {
+            static
+            QString const
+            text("UPGRADE MY PLAN");
+          }
         }
       }
     }
