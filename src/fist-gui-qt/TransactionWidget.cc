@@ -440,10 +440,10 @@ TransactionWidget::_on_status_updated()
           return StatusUpdater(QString(), false, "Transferring");
         case gap_transaction_finished:
           return StatusUpdater(
-            QString(":/conversation/finished"), false, "Finished");
+            QString(":/transaction/received"), false, "Finished");
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
-            QString(":/conversation/bufferised"), false, "Cloud Buffered");
+            QString(":/transaction/sent"), false, "Cloud Buffered");
         // XXX: Change icon.
         case gap_transaction_paused:
           return StatusUpdater(
@@ -457,8 +457,7 @@ TransactionWidget::_on_status_updated()
         case gap_transaction_deleted:
           return StatusUpdater(QString(":/conversation/error"), false, "Deleted");
         case gap_transaction_on_other_device:
-          return StatusUpdater(
-            QString(":/loading"), true, "On another device");
+          return StatusUpdater(QString(":/transaction/sent"), false, "On another device");
         case gap_transaction_payment_required:
           return StatusUpdater(
             QString(":/conversation/canceled"), false, "Quota exceeded");
