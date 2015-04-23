@@ -1,12 +1,18 @@
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 
+#include <elle/log.hh>
+
 #include <fist-gui-qt/popup/NoMoreStorage.hh>
 #include <fist-gui-qt/popup/ui.hh>
+
+ELLE_LOG_COMPONENT("fist.popup.NoMoreStorage");
 
 namespace fist
 {
@@ -82,6 +88,8 @@ namespace fist
         upgrade->setCursor(QCursor(Qt::PointingHandCursor));
         upgrade->setStyleSheet(view::payment::button::stylesheet.arg(
                                  "rgb(242, 94, 90)", "rgb(231, 85, 81)"));
+        connect(upgrade, SIGNAL(released()),
+                this, SLOT(_go_to_website()));
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 0);
         hlayout->addStretch();
@@ -91,6 +99,14 @@ namespace fist
       this->setCentralWidget(body);
       this->updateGeometry();
       this->setFixedWidth(550);
+    }
+
+    void
+    NoMoreStorage::_go_to_website()
+    {
+      ELLE_TRACE_SCOPE("%s: go to %s", *this, view::payment::link::url);
+      QDesktopServices::openUrl(QUrl(view::payment::link::url));
+      this->hide();
     }
 
     void
