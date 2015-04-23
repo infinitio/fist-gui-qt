@@ -11,6 +11,7 @@
 static QString Arial("Arial");
 static QString Lucida("LucidaGrande");
 static QString Montserrat("Montserrat");
+static QString SourceSans("Source Sans Pro");
 static QString DefaultFont(Arial);
 
 // This file should contain every single dimension, font, color, hint to avoid

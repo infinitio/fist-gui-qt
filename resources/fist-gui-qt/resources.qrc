@@ -297,6 +297,7 @@
     <file alias="font/LucidaGrande">../fonts/LucidaGrande.ttc</file>
     <file alias="font/Montserrat-bold">../fonts/Montserrat-Bold.ttf</file>
     <file alias="font/Montserrat">../fonts/Montserrat-Regular.ttf</file>
+    <file alias="font/SourceSans">../fonts/SourceSansPro-Regular.otf</file>
 
   </qresource>
 </RCC>

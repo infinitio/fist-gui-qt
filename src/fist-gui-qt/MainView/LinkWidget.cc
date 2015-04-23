@@ -43,8 +43,6 @@ namespace fist
               this, SLOT(_on_status_updated()));
       connect(&this->_model, SIGNAL(click_count_updated()),
               this, SLOT(_on_status_updated()));
-      connect(&this->_model, SIGNAL(payment_required()),
-              this, SLOT(hide()));
       this->_layout->setContentsMargins(12, 12, 12, 12);
       this->_layout->setSpacing(5);
       {

@@ -37,6 +37,12 @@ namespace fist
 
       void
       on_link_updated(uint32_t id);
+    private slots:
+      void
+      _payement_required();
+
+      void
+      _copy_link_to_clipboard(uint32_t id);
 
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
