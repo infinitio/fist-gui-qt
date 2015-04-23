@@ -66,7 +66,6 @@ namespace fist
       ConnectWindow::Cookies::load()
       {
         auto cookies = fist::settings()["cookies"].get("list");
-        ELLE_TRACE("foo %s", cookies.isNull());
         this->setAllCookies(qvariant_cast<QList<QNetworkCookie>>(cookies));
       }
 
@@ -79,19 +78,19 @@ namespace fist
       void
       ConnectWindow::Cookies::save()
       {
-        ELLE_TRACE("get cookies");
+        ELLE_TRACE_SCOPE("get cookies");
         QList<QNetworkCookie> cookies = this->allCookies();
-        ELLE_TRACE("number of cookies: %s", cookies.size());
+        ELLE_DEBUG("number of cookies: %s", cookies.size());
         for (int i = cookies.count() - 1; i >= 0; --i)
         {
           auto& cookie = cookies.at(i);
-          ELLE_TRACE("%s -> %s -> %s", cookie.domain(), QString(cookie.value()), QString(cookie.toRawForm()));
+          ELLE_DEBUG("%s -> %s -> %s", cookie.domain(), QString(cookie.value()), QString(cookie.toRawForm()));
           if (cookies.at(i).isSessionCookie())
             cookies.removeAt(i);
         }
-        ELLE_TRACE("number of cookies: %s", cookies.size());
+        ELLE_DEBUG("number of cookies: %s", cookies.size());
         auto variant_cookies = QVariant::fromValue<QList<QNetworkCookie>>(cookies);
-        ELLE_TRACE("is null ? %s", variant_cookies.isNull());
+        ELLE_DEBUG("is null ? %s", variant_cookies.isNull());
         fist::settings()["cookies"].set("list", variant_cookies);
       }
 
@@ -161,7 +160,7 @@ namespace fist
       void
       ConnectWindow::closeEvent(QCloseEvent *event)
       {
-        ELLE_TRACE("foo bar");
+        ELLE_TRACE_SCOPE("close window");
         emit failure("");
         QMainWindow::closeEvent(event);
       }
