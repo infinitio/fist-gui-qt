@@ -39,6 +39,18 @@ namespace fist
     {
     }
 
+    static
+    bool
+    _url_available(gap_TransactionStatus status)
+    {
+      static QVector<gap_TransactionStatus> url_available_states =
+        {
+          gap_transaction_transferring,
+          gap_transaction_finished
+        };
+      return url_available_states.contains(status);
+    }
+
     void
     Link::link(surface::gap::LinkTransaction const& new_link)
     {
@@ -50,8 +62,13 @@ namespace fist
       if (old.status != this->status())
       {
         emit status_updated();
-        if (this->status() == gap_transaction_payment_required)
+        if (this->rejected())
           emit payment_required();
+      }
+      if (!_url_available(old.status) && _url_available(this->status()))
+      {
+        if (this->_link.sender_device_id == this->_state.device())
+          emit url_available(this->id());
       }
       if (old.click_count != this->click_count())
         emit click_count_updated();
@@ -88,6 +105,12 @@ namespace fist
       return this->_link.size;
     }
 
+    bool
+    Link::rejected() const
+    {
+      return this->status() == gap_transaction_payment_required;
+    }
+
     float
     Link::progress() const
     {
@@ -117,9 +140,8 @@ namespace fist
           gap_transaction_failed,
           gap_transaction_canceled,
           gap_transaction_deleted,
-          gap_transaction_payment_required,
         };
-      return final_states.contains(this->status());
+      return final_states.contains(this->status()) || this->rejected();
     }
 
     bool

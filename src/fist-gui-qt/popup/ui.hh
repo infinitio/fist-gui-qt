@@ -23,22 +23,22 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 15), QColor(0x25, 0x25, 0x25));
+          style(fist::Font(DefaultFont, 20.5), QColor(0x51, 0x51, 0x49));
         }
 
         namespace link
         {
           static
           QString const
-          text("You can <a style=\"text-decoration: none; color: #489FCE;\" "
+          text("You can <a style=\"text-decoration: none; color: #2BBEBD;\" "
                "href=\"https://infinit.io/plan"
-               "?utm_source=app&utm_medium=windows&utm_campaign=plan\">"
+               "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan\">"
                "upgrade to a better plan on our website</a> or remove some "
                "of your old links.");
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 12), QColor(0x25, 0x25, 0x25));
+          style(fist::Font(SourceSans, 15.5), QColor(0x51, 0x51, 0x49));
         }
 
         namespace contact
@@ -50,7 +50,7 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 12), QColor(0x51, 0x51, 0x49));
+          style(fist::Font(SourceSans, 15.5), QColor(0x9D, 0x9D, 0x9D));
         }
 
         namespace button
@@ -64,8 +64,8 @@ namespace fist
             "  font: bold 13px;"
             "  border-radius: 17px;"
             "  height: 34px;"
-            "  padding-left: 10px;"
-            "  padding-right: 10px;"
+            "  padding-left: 18px;"
+            "  padding-right: 18px;"
             "}"
             "QPushButton:focused, QPushButton:hover {"
             "  color: white;"
@@ -84,7 +84,7 @@ namespace upgrade
 {
   static
   QString const
-  text("UPGRADE YOUR PLAN");
+  text("UPGRADE MY PLAN");
 }
         }
       }

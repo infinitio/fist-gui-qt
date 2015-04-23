@@ -284,7 +284,8 @@ Fist::_initialize_application()
   QFontDatabase database;
   auto luc = database.addApplicationFont(":/font/LucidaGrande");
   auto mont = database.addApplicationFont(":/font/Montserrat");
-  if (luc == -1 || mont == -1)
+  auto sourcesans = database.addApplicationFont(":/font/SourceSans");
+  if (luc == -1 || mont == -1 || sourcesans == -1)
     ELLE_WARN("%s: impossible to install fonts", *this);
 
   QDir::setCurrent(QDesktopServices::storageLocation(QDesktopServices::DesktopLocation));

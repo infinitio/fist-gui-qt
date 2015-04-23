@@ -21,12 +21,14 @@ namespace fist
         this->setPalette(palette);
         this->setAutoFillBackground(true);
       }
+      this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
       auto* body = new QWidget(this);
       auto* layout = new QGridLayout(body);
-      layout->setContentsMargins(50, 50, 50, 50);
+      layout->setContentsMargins(45, 45, 45, 35);
       layout->setVerticalSpacing(30);
       {
         auto* hlayout = new QHBoxLayout;
+        hlayout->setContentsMargins(0, 0, 0, 10);
         {
           QLabel* thermometer = new QLabel(this);
           thermometer->setPixmap(
@@ -66,7 +68,7 @@ namespace fist
           view::payment::button::cancel::text, this);
         cancel->setCursor(QCursor(Qt::PointingHandCursor));
         cancel->setStyleSheet(view::payment::button::stylesheet.arg(
-                                "rgb(157, 157, 157)", "rgb(130, 130, 130)"));
+                                "rgb(158, 158, 158)", "rgb(133, 133, 133)"));
         connect(cancel, SIGNAL(released()), this, SLOT(hide()));
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 0);
@@ -78,9 +80,8 @@ namespace fist
         auto* upgrade = new QPushButton(
           view::payment::button::upgrade::text, this);
         upgrade->setCursor(QCursor(Qt::PointingHandCursor));
-        upgrade->setStyleSheet(view::payment::button::stylesheet);
         upgrade->setStyleSheet(view::payment::button::stylesheet.arg(
-                                 "rgb(248, 93, 91)", "rgb(255, 95, 94)"));
+                                 "rgb(242, 94, 90)", "rgb(231, 85, 81)"));
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 0);
         hlayout->addStretch();
@@ -89,8 +90,7 @@ namespace fist
       }
       this->setCentralWidget(body);
       this->updateGeometry();
-
-      // this->setFixedSize(
+      this->setFixedWidth(550);
     }
 
     void

@@ -60,6 +60,9 @@ namespace fist
       bool
       is_finished() const;
 
+      bool
+      rejected() const;
+
     signals:
       void
       status_updated() const;
@@ -69,6 +72,9 @@ namespace fist
 
       void
       payment_required() const;
+
+      void
+      url_available(uint32_t id) const;
 
     private:
       /*----------.
