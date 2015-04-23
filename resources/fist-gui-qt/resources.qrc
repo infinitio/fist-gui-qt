@@ -139,6 +139,13 @@
     <file alias="conversation/back">../slices/mac/view_conversation/icon-back.png</file>
     <file alias="conversation/back@2x">../slices/mac/view_conversation/icon-back@2x.png</file>
 
+    <!-- conversation -->
+    <file alias="transaction/received">../slices/windows/view_home/icon-received.png</file>
+    <file alias="transaction/received@2x">../slices/windows/view_home/icon-received@2x.png</file>
+
+    <file alias="transaction/sent">../slices/windows/view_home/icon-sent.png</file>
+    <file alias="transaction/sent@2x">../slices/windows/view_home/icon-sent@2x.png</file>
+
     <!-- links -->
     <file alias="link/clipboard">../slices/mac/view_link/icon-clipboard.png</file>
     <file alias="link/clipboard@2x">../slices/mac/view_link/icon-clipboard@2x.png</file>
