@@ -95,8 +95,10 @@ namespace
   void
   write_crash_file(int signal)
   {
+    ELLE_TRACE("signal: %s", signal);
     crash_witness.open(QIODevice::WriteOnly);
     crash_witness.setPermissions(QFile::ReadOwner);
+    crash_witness.close();
     SUICIDE(signal);
   }
 
