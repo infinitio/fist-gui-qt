@@ -16,9 +16,16 @@ namespace fist
     public:
       NoMoreStorage(QWidget* parent);
 
+    private slots:
+      void
+      _go_to_website();
+
     private:
       void
       showEvent(QShowEvent* event) override;
+
+    private:
+      Q_OBJECT;
     };
   }
 }

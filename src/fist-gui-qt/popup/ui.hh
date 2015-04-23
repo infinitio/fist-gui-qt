@@ -30,11 +30,15 @@ namespace fist
         {
           static
           QString const
-          text("You can <a style=\"text-decoration: none; color: #2BBEBD;\" "
-               "href=\"https://infinit.io/plan"
-               "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan\">"
-               "upgrade to a better plan on our website</a> or remove some "
-               "of your old links.");
+          url("https://infinit.io/account"
+              "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan");
+          static
+          QString const
+          text = QString(
+          "You can <a style=\"text-decoration: none; color: #2BBEBD;\" "
+          "href=\"%1\">"
+          "upgrade to a better plan on our website</a> or remove some "
+          "of your old links.").arg(url);
 
           static
           fist::style::Text const
