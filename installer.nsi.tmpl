@@ -426,6 +426,9 @@ Section "Install ${product_name}"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
   WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
   WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
+  WriteRegStr HKCR "${product_name}" "" "URL: ${product_name} Protocol"
+  WriteRegStr HKCR "${product_name}" "URL Protocol" ""
+  WriteRegStr HKCR "${product_name}\shell\open\command" "" '"$INSTDIR\${executable}" "%1"'
 
   SetOutPath $INSTDIR
   ;; Executable and libraries.
@@ -484,6 +487,7 @@ Section "un.install"
   ;; Registers
   DeleteRegKey HKLM "${'${uninstkey}'}"
   DeleteRegKey HKLM "${'${regkey}'}"
+  DeleteRegKey HKCR "${product_name}"
 
   ;; Start menu
   Delete /REBOOTOK "${'${startmenu}'}\${product_name}.lnk"
