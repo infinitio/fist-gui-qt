@@ -84,7 +84,14 @@ def configure(cxx_toolkit = None,
   # Qt configuration.
   #
   qt_cxx_config = drake.cxx.Config(cxx_config)
-  if qt is None:
+  if qt is not None:
+    qt = drake.cxx.qt.Qt(
+      cxx_toolkit = cxx_toolkit,
+      prefix = qt,
+      version_effective = drake.Version(4, 8, 0),
+      prefer_shared = True,
+    )
+  else:
     openssl_lib_dirs = drake.path_build('.', absolute = True) / 'lib'
     Qt_version = drake.Version(4, 8, 6)
     Qt_short_version = (Qt_version.major, Qt_version.minor)
@@ -93,8 +100,7 @@ def configure(cxx_toolkit = None,
     Qt_prefix = drake.Path('Qt')
     Qt_build = Qt_prefix / Qt_basename
     Qt_configure = drake.node(Qt_build / 'configure')
-    # This url does not work due to Apache messing up with content-type
-    # headers:
+    # This url does not work due to Apache messing up with content-type headers:
     # Qt_url = 'http://Qt.net/%s.tar.gz' % Qt_basename
     Qt_url = 'http://download.qt-project.org/official_releases/qt/%(short_version)s/%(version)s/qt-everywhere-opensource-src-%(version)s.tar.gz' % {
       'short_version': "%s.%s" % Qt_short_version,
