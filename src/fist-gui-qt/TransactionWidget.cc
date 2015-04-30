@@ -116,6 +116,7 @@ TransactionWidget::TransactionWidget(Model const& model):
   {
     auto infos = new QVBoxLayout;
     this->_accept_reject_area->setLayout(infos);
+    infos->setContentsMargins(0, 2, 0, 2);
     infos->addStretch();
     infos->addWidget(this->_accept_button, 0, Qt::AlignCenter);
     infos->addSpacing(2);
