@@ -118,7 +118,7 @@ namespace fist
     | Ghost code |
     `-----------*/
     void
-    use_ghost_code(std::string const& fullname);
+    use_ghost_code(std::string const& code);
 
     void
     cancel_ghost_code();

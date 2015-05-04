@@ -754,7 +754,7 @@ InfinitDock::p2p(QList<QUrl> const& list)
 void
 InfinitDock::get_a_link(QList<QUrl> const& list)
 {
-  ELLE_LOG_SCOPE("link");
+  ELLE_TRACE_SCOPE("link");
   // Bypass the send view.
   this->_send_panel->mode(fist::Mode::link);
   this->_send_panel->file_adder()->clear();

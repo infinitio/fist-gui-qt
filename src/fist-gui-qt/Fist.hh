@@ -197,16 +197,22 @@ private:
   ELLE_ATTRIBUTE(std::unique_ptr<fist::login::Window>, login_window);
   ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
   // Files passed through the command line.
+  // XXX: Rework that heresy someday, use rpc to communicate between intances.
   struct CommandLine
   {
-    CommandLine(std::vector<std::string> const& files,
-                bool link);
-
+    CommandLine(std::vector<std::string> const& files = std::vector<std::string>());
     QList<QUrl>
     urls() const;
 
     std::vector<std::string> files;
     bool link;
+    bool p2p;
+
+    ELLE_ATTRIBUTE_RW(QString, code);
+
+  public:
+    void
+    parse(std::string const& instruction);
   };
 
   ELLE_ATTRIBUTE(std::unique_ptr<CommandLine>, command_line);

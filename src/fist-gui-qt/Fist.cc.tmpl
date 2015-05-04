@@ -6,6 +6,7 @@
 #endif
 
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <memory>
 #include <sstream>
@@ -72,8 +73,10 @@ namespace
 {
   static std::string ADD = "add";
   static std::string LINK = "link";
+  static std::string CODE = "invitation";
   static std::string addtag = elle::sprintf("--%s ", ADD);
   static std::string linktag = elle::sprintf("--%s ", LINK);
+  static std::string codetag = elle::sprintf("--%s ", CODE);
 }
 namespace
 {
@@ -147,10 +150,11 @@ class Fist::Prologue
   }
 };
 
-Fist::CommandLine::CommandLine(std::vector<std::string> const& files_,
-                               bool link)
+Fist::CommandLine::CommandLine(std::vector<std::string> const& files_)
   : files(files_)
-  , link(link)
+  , link(false)
+  , p2p(false)
+  , _code()
 {}
 
 QList<QUrl>
@@ -165,14 +169,35 @@ Fist::CommandLine::urls() const
 }
 
 void
+Fist::CommandLine::parse(std::string const& _scheme)
+{
+  auto scheme = QString::fromStdString(_scheme);
+  if (scheme.startsWith("infinit://"))
+  {
+    scheme = scheme.remove("infinit://");
+    if (scheme.startsWith("invitation/"))
+    {
+      ELLE_TRACE("code %s", scheme.remove("invitation/"));
+      this->_code = scheme.remove("invitation/");
+    }
+    else if (scheme == "open")
+    {
+    }
+  }
+}
+
+void
 Fist::_parse_options(int argc, char** argv)
 {
-  ELLE_LOG("parse options");
+  ELLE_TRACE("parse options");
   this->_command_line.reset();
   using namespace boost::program_options;
   options_description options("Allowed options");
   options.add_options()
     ("help,h", "print help")
+    ("scheme",
+     value<std::string>(),
+     "scheme to exexute (e.g. infinit://invitation/<code>")
     (LINK.c_str(),
      value<std::vector<std::string>>()->multitoken(),
      "generate a link for one or multiple file(s)")
@@ -180,10 +205,15 @@ Fist::_parse_options(int argc, char** argv)
      value<std::vector<std::string>>()->multitoken(),
      "add file(s)")
     ;
+
+  positional_options_description p;
+  p.add("scheme", -1);
+
   variables_map vm;
   try
   {
-    store(parse_command_line(argc, argv, options), vm);
+    store(command_line_parser(argc, argv).
+          options(options).positional(p).run(), vm);
     notify(vm);
   }
   catch (invalid_command_line_syntax const& e)
@@ -200,14 +230,27 @@ Fist::_parse_options(int argc, char** argv)
     std::cout << options;
     std::cout << std::endl;
     std::cout << "Infinit " INFINIT_VERSION
-      " Copyright (c) 2013 infinit.io All rights reserved." << std::endl;
+      " Copyright (c) 2015 infinit.io All rights reserved." << std::endl;
     exit(0); // XXX: use Exit exception
   }
 
   if (vm.count(LINK))
-    this->_command_line.reset(new CommandLine(vm[LINK].as<std::vector<std::string>>(), true));
+  {
+    this->_command_line.reset(new CommandLine(vm[LINK].as<std::vector<std::string>>()));
+    this->_command_line->link = true;
+  }
   else if (vm.count(ADD))
-    this->_command_line.reset(new CommandLine(vm[ADD].as<std::vector<std::string>>(), false));
+  {
+    this->_command_line.reset(new CommandLine(vm[ADD].as<std::vector<std::string>>()));
+    this->_command_line->p2p = true;
+  }
+  if (vm.count("scheme"))
+  {
+    if (this->_command_line == nullptr)
+      this->_command_line.reset(new CommandLine);
+    this->_command_line->parse(vm["scheme"].as<std::string>());
+  }
+  ELLE_TRACE("command_line: %s", this->_command_line.get());
 }
 
 Fist::Fist(int argc, char** argv):
@@ -451,17 +494,28 @@ Fist::_set_uniqunness_guard()
   {
     if (this->_command_line)
     {
-      std::string res;
-      if (this->_command_line->link)
-        res.append(elle::sprintf("--%s", LINK));
-      else
-        res.append(elle::sprintf("--%s", ADD));
-      res += " ";
-      res.append(elle::join(this->_command_line->files.begin(),
-                            this->_command_line->files.end(),
-                            std::string(1, COMMAND_LINE_FILE_SEPARATOR)));
-      ELLE_TRACE("write %s", res);
-      this->_other_instance->write(res.c_str(), res.length() + 1);
+      // XXX: This is broken, if both code & files are passed, it fais!
+      if (this->_command_line->link || this->_command_line->p2p)
+      {
+        std::string res;
+        if (this->_command_line->link)
+          res.append(elle::sprintf("--%s", LINK));
+        else if (this->_command_line->p2p)
+          res.append(elle::sprintf("--%s", ADD));
+        res += " ";
+        res.append(elle::join(this->_command_line->files.begin(),
+                              this->_command_line->files.end(),
+                              std::string(1, COMMAND_LINE_FILE_SEPARATOR)));
+        ELLE_TRACE("write %s", res);
+        this->_other_instance->write(res.c_str(), res.length());
+      }
+      if (!this->_command_line->code().isEmpty())
+      {
+        std::string res;
+        res.append(elle::sprintf("--%s %s", CODE, this->_command_line->code()));
+        ELLE_TRACE("write %s", res);
+        this->_other_instance->write(res.c_str(), res.length());
+      }
     }
     else
     {
@@ -548,7 +602,8 @@ void
 Fist::registered()
 {
   this->logged_in();
-  this->_dock->_show_ghost_code_view();
+  if (this->_command_line == nullptr || this->_command_line->code().isEmpty())
+    this->_dock->_show_ghost_code_view();
 }
 
 void
@@ -577,12 +632,17 @@ Fist::logged_in()
           this->_dock.get(), SLOT(get_a_link(QList<QUrl> const&)));
   this->_dock->hide();
   // Handle command line arguments.
-  if (this->_command_line && !this->_command_line->files.empty())
+  if (this->_command_line)
   {
     if (this->_command_line->link)
       emit get_a_link(this->_command_line->urls());
-    else
+    else if (this->_command_line->p2p)
       emit p2p(this->_command_line->urls());
+    if (!this->_command_line->code().isEmpty())
+    {
+      this->_state->use_ghost_code(this->_command_line->code().toStdString());
+      this->_command_line->code("");
+    }
     this->_command_line.reset();
   }
   if (this->_updater->installer_downloaded())
@@ -657,7 +717,8 @@ Fist::_new_local_socket_connection()
   }
   if (this->_lock->hasPendingConnections())
   {
-    this->_other_instance.reset(this->_lock->nextPendingConnection());
+    ELLE_DEBUG("pending connection")
+      this->_other_instance.reset(this->_lock->nextPendingConnection());
     connect(this->_other_instance.get(), SIGNAL(readyRead()),
             this, SLOT(_read_local_socket()));
   }
@@ -741,10 +802,10 @@ Fist::_kicked_out(QString const& reason)
     this->logout(true);
 }
 
+static
 std::vector<std::string>
-Fist::_extact_files_from_commandline(std::string const& message)
+extract_files_from_commandline(std::string const& message)
 {
-  ELLE_LOG("files '%s'", message);
   std::stringstream files(message);
   std::string temp;
   std::vector<std::string> list;
@@ -756,6 +817,7 @@ Fist::_extact_files_from_commandline(std::string const& message)
 void
 Fist::_read_local_socket()
 {
+  ELLE_TRACE_SCOPE("%s: read local socket", *this);
   std::string message;
 
   char buff[1024];
@@ -767,11 +829,13 @@ Fist::_read_local_socket()
     if (!this->_other_instance->bytesAvailable())
       break;
   }
+  ELLE_DEBUG("message: %s", message);
 
   bool add = false;
   bool link = false;
+  bool code = false;
   {
-    ELLE_LOG("message %s", message);
+    boost::algorithm::trim(message);
     if (message.substr(0, addtag.length()) == addtag)
     {
       message.erase(0, addtag.length());
@@ -781,6 +845,11 @@ Fist::_read_local_socket()
     {
       message.erase(0, linktag.length());
       link = true;
+    }
+    else if (message.substr(0, codetag.length()) == codetag)
+    {
+      message.erase(0, codetag.length());
+      code = true;
     }
     else
     {
@@ -792,17 +861,32 @@ Fist::_read_local_socket()
     }
 
     if (link || add)
+    {
       this->_command_line.reset(
-        new CommandLine(this->_extact_files_from_commandline(message),
-                        link));
+        new CommandLine(extract_files_from_commandline(message)));
+      if (link)
+        this->_command_line->link = true;
+      else
+        this->_command_line->p2p = true;
+    }
+
+    if (code)
+    {
+      this->_command_line.reset(new CommandLine);
+      this->_command_line->code(QString::fromStdString(message));
+      ELLE_DEBUG("code %s", this->_command_line->code());
+    }
 
     // If the dock is present, just send the signal directly.
     if (this->_command_line && this->_dock)
     {
-      if (this->_command_line->link)
+      ELLE_DEBUG("dock present");
+      if  (this->_command_line->link)
         emit get_a_link(this->_command_line->urls());
-      else
+      else if (this->_command_line->p2p)
         emit p2p(this->_command_line->urls());
+      if (code)
+        this->_state->use_ghost_code(this->_command_line->code().toStdString());
       this->_command_line.reset();
     }
   }
