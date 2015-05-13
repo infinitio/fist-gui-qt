@@ -18,9 +18,9 @@ class AvatarWidget:
   public QWidget
 {
 public:
-  AvatarWidget();
-  AvatarWidget(QString const& picture);
-  AvatarWidget(QPixmap const& avatar);
+  AvatarWidget(QWidget* parent = nullptr);
+  AvatarWidget(QString const& picture, QWidget* parent = nullptr);
+  AvatarWidget(QPixmap const& avatar, QWidget* parent = nullptr);
   virtual
   ~AvatarWidget() = default;
 

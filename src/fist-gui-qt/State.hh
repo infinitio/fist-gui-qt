@@ -4,6 +4,8 @@
 # include <functional>
 # include <vector>
 
+#include <QByteArray>
+
 # include <QDateTime>
 # include <QFuture>
 # include <QtConcurrentRun>
@@ -196,8 +198,21 @@ namespace fist
     ELLE_ATTRIBUTE_X(SearchResultWatcher, search_watcher);
     ELLE_ATTRIBUTE(Results, last_results);
 
+    // Avatars.
+    typedef std::unordered_map<uint32_t, QByteArray> Avatars;
+    ELLE_ATTRIBUTE(Avatars, avatars);
+    ELLE_ATTRIBUTE(QMutex, avatar_mutex);
+
+  public:
+    QByteArray&
+    avatar(uint32_t id);
+  private:
     void
-    on_avatar_available(uint32_t);
+    _on_avatar_available(uint32_t);
+  private slots:
+    void
+    _avatar_fetched();
+  private:
     void
     on_user_status_changed(uint32_t, bool status);
     void
@@ -317,6 +332,27 @@ namespace fist
     QString
     facebook_app_id() const;
 
+  private:
+    Q_OBJECT;
+  };
+
+  class AvatarFetcher
+    : public QThread
+  {
+  public:
+    AvatarFetcher(uint32_t id,
+      State& state)
+      : _id(id)
+      , _state(state)
+    {
+    }
+
+  private:
+    ELLE_ATTRIBUTE_R(uint32_t, id);
+    ELLE_ATTRIBUTE(State&, state);
+    ELLE_ATTRIBUTE_R(QByteArray, avatar);
+  private:
+    void run() override;
   private:
     Q_OBJECT;
   };

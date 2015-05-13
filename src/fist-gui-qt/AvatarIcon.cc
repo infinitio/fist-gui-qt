@@ -34,9 +34,12 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
   QPainter painter(&this->_pixmap);
   painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
   painter.translate(this->_border, this->_border);
-  painter.drawPixmap(QPoint(0, 0),
-                     pixmap.scaled(this->_geometry.size(),
-                                   Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+  if (!pixmap.isNull())
+  {
+    painter.drawPixmap(QPoint(0, 0),
+                       pixmap.scaled(this->_geometry.size(),
+                                     Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+  }
   painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
   painter.drawPixmap(this->_geometry, this->_mask);
 }

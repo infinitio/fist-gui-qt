@@ -14,6 +14,9 @@ namespace fist
     {
       this->_avatar->set_avatar(gui::icon_provider().icons().at(device.type()));
       this->_fullname->setText(device.name());
+
+      disconnect(&model, SIGNAL(avatar_updated()),
+                 this, SLOT(_on_avatar_updated()));
     }
 
     void

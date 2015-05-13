@@ -103,7 +103,7 @@ namespace fist
       this->state(),
       [this] (uint32_t id)
       {
-        this->on_avatar_available(id);
+        this->_on_avatar_available(id);
       });
     gap_connection_callback(
       this->state(),
@@ -370,13 +370,51 @@ namespace fist
   }
 
   void
-  State::on_avatar_available(uint32_t id)
+  State::_on_avatar_available(uint32_t id)
   {
     ELLE_TRACE_SCOPE("%s: avatar available for id %s", *this, id);
     if (this->_users.find(id) == this->_users.end())
       this->_users[id].reset(new model::User(*this, id));
-    ELLE_DEBUG("update %s avatar", *this->_users[id])
+    auto* fetcher = new AvatarFetcher(id, *this);
+    connect(fetcher, SIGNAL(finished()), this, SLOT(_avatar_fetched()));
+    fetcher->start();
+  }
+
+  void
+  State::_avatar_fetched()
+  {
+    auto* fetcher = static_cast<AvatarFetcher*>(QObject::sender());
+    elle::SafeFinally deleter([&] { fetcher->deleteLater(); });
+    auto id = fetcher->id();
+    if (this->_users.find(id) == this->_users.end())
+      this->_users[id].reset(new model::User(*this, id));
+    {
+      this->_avatar_mutex.lock();
+      elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });
+      ELLE_TRACE("got %s big avatar", fetcher->avatar().size());
+      this->_avatars[id] = fetcher->avatar();
+    }
+    ELLE_TRACE("update %s avatar", *this->_users[id])
       this->_users[id]->avatar_available();
+  }
+
+  QByteArray&
+  State::avatar(uint32_t id)
+  {
+    if (this->_users.find(id) == this->_users.end())
+      this->_users[id].reset(new model::User(*this, id));
+    {
+      this->_avatar_mutex.lock();
+      elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });
+      if (this->_avatars.find(id) == this->_avatars.end())
+      {
+        this->_avatars[id] = QByteArray();
+        auto* fetcher = new AvatarFetcher(id, *this);
+        connect(fetcher, SIGNAL(finished()), this, SLOT(_avatar_fetched()));
+        fetcher->start();
+      }
+      return this->_avatars[id];
+    }
   }
 
   void
@@ -783,5 +821,23 @@ namespace fist
   {
     auto id = QString::fromStdString(gap_facebook_app_id());
     return id;
+  }
+
+  void
+  AvatarFetcher::run()
+  {
+    /// Get user icon data.
+    void* data = nullptr;
+    size_t len = 0;
+    auto res = gap_avatar(this->_state.state(), this->id(), &data, &len);
+    if (res == gap_ok)
+    {
+      if (len > 0) // An avatar is avalaible. If not, keep the default.
+      {
+        ELLE_DEBUG("%s: get avatar data", *this);
+        QByteArray raw((char *) data, len);
+        this->_avatar = raw;
+      }
+    }
   }
 }

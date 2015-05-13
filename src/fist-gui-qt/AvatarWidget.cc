@@ -24,8 +24,9 @@ static int const progress_value = 250;
 static QColor const progress_color(
   QColor::fromHsv(progress_hue, progress_saturation, progress_value));
 
-AvatarWidget::AvatarWidget()
-  : _picture(total_size, total_size)
+AvatarWidget::AvatarWidget(QWidget* parent)
+  : QWidget(parent)
+  , _picture(total_size, total_size)
   , _transaction_count(0)
   , _progress(0)
   , _smooth_progress(0)
@@ -41,14 +42,15 @@ AvatarWidget::AvatarWidget()
   }
 }
 
-AvatarWidget::AvatarWidget(QPixmap const& pixmap):
-  AvatarWidget()
+AvatarWidget::AvatarWidget(QPixmap const& pixmap,
+                           QWidget* parent):
+  AvatarWidget(parent)
 {
   this->setPicture(pixmap);
 }
 
-AvatarWidget::AvatarWidget(QString const& picture):
-  AvatarWidget()
+AvatarWidget::AvatarWidget(QString const& picture, QWidget* parent):
+  AvatarWidget(parent)
 {
   this->setPicture(picture);
 }
@@ -117,8 +119,11 @@ AvatarWidget::setPicture(QPixmap const& avatar)
         painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         painter.setBrush(Qt::NoBrush);
         painter.setPen(Qt::NoPen);
-        auto v = avatar.scaled(picture.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        painter.drawPixmap(QPoint(0, 0), v);
+        if (!avatar.isNull())
+        {
+          auto v = avatar.scaled(picture.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+          painter.drawPixmap(QPoint(0, 0), v);
+        }
         painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
         painter.drawPixmap(QPoint(0, 0), mask);
       }
