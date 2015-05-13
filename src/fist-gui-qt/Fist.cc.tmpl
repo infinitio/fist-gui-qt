@@ -640,7 +640,8 @@ Fist::logged_in()
       emit p2p(this->_command_line->urls());
     if (!this->_command_line->code().isEmpty())
     {
-      this->_state->use_ghost_code(this->_command_line->code().toStdString());
+      this->_state->use_ghost_code(this->_command_line->code().toStdString(),
+                                   false /* manual */);
       this->_command_line->code("");
     }
     this->_command_line.reset();
@@ -886,7 +887,10 @@ Fist::_read_local_socket()
       else if (this->_command_line->p2p)
         emit p2p(this->_command_line->urls());
       if (code)
-        this->_state->use_ghost_code(this->_command_line->code().toStdString());
+      {
+        this->_state->use_ghost_code(this->_command_line->code().toStdString(),
+                                     false /* manual */);
+      }
       this->_command_line.reset();
     }
   }

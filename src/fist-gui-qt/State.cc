@@ -279,12 +279,13 @@ namespace fist
   }
 
   void
-  State::use_ghost_code(std::string const& code)
+  State::use_ghost_code(std::string const& code,
+                        bool manual)
   {
     ELLE_TRACE_SCOPE("use ghost code: %s", code);
     this->_ghost_code_future = QtConcurrent::run(
       [=] {
-        return gap_use_ghost_code(this->state(), code);
+        return gap_use_ghost_code(this->state(), code, !manual);
       });
     this->_ghost_code_watcher.setFuture(this->_ghost_code_future);
   }

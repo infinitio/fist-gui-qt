@@ -150,7 +150,8 @@ namespace fist
       this->_message->setMovie(this->_loading_icon);
       this->_message->movie()->start();
       this->_message->show();
-      this->_state.use_ghost_code(this->_field->text().toStdString());
+      this->_state.use_ghost_code(this->_field->text().toStdString(),
+                                  true /* manual */);
       this->footer()->next()->setDisabled(true);
     }
 

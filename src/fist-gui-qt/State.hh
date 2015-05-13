@@ -120,7 +120,8 @@ namespace fist
     | Ghost code |
     `-----------*/
     void
-    use_ghost_code(std::string const& code);
+    use_ghost_code(std::string const& code,
+                   bool manual);
 
     void
     cancel_ghost_code();
