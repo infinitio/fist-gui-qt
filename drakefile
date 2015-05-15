@@ -466,35 +466,48 @@ def configure(cxx_toolkit = None,
     ## Osslsigncode ##
     ## ------------ ##
     ## Osslsigncode is a tool to sign executables.
-    osslsigncode_version = drake.Version(1, 7, 1)
-    osslsigncode_basename = 'osslsigncode-%s' % osslsigncode_version
-    osslsigncode_url = \
-      'http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/%s.tar.gz' % osslsigncode_basename
-    osslsigncode_tarball = \
-      drake.node('osslsigncode/%s.tar.gz' % osslsigncode_basename)
-    osslsigncode_configure = \
-      drake.node('osslsigncode/%s/configure' % osslsigncode_basename)
     osslsigncode_prefix = drake.path_build('osslsigncode')
+    osslsigncode_configure = drake.node('osslsigncode/configure')
+    osslsigncode_autogen = drake.node('osslsigncode/autogen.sh')
+    # class OsslsigncodeConfigureChecker(drake.Builder):
+    #
+    #   def __init__(self,
+    #                osslsigncode_autogen,
+    #                osslsigncode_configure):
+    #     self.__autogen = osslsigncode_autogen
+    #     self.__configure = osslsigncode_configure
+    #     super().__init__([self.__autogen], [self.__configure])
+    #
+    #   def execute(self):
+    #     # if not self.__configure.path().exists():
+    #     #   print(self.__configure.path())
+    #     #   raise BaseException("please run %s" % self.__autogen)
+    #     return True
+    #
+    #   @property
+    #   def target(self):
+    #     return self.targets()[0]
+    #
+    # osslsigncode_configure = OsslsigncodeConfigureChecker(
+    #   osslsigncode_autogen,
+    #   osslsigncode_configure).target
+
     osslsigncode_prefix_absolute = drake.path_root() / osslsigncode_prefix
     osslsigncode = drake.node('osslsigncode/bin/osslsigncode')
-    drake.HTTPDownload(
-      osslsigncode_url,
-      osslsigncode_tarball,
-    )
-    drake.TarballExtractor(
-      osslsigncode_tarball,
-      targets = ['%s/configure' % osslsigncode_basename],
-    )
     GNUBuilder(
       cxx_toolkit,
       configure = osslsigncode_configure,
       configure_args = [
         '--prefix=%s' % osslsigncode_prefix_absolute,
-        # Use our own openssl & curl.
+        # Use our own openssl &  curl.
       ],
-      targets = [osslsigncode],
-      sources = [],
+      targets = [osslsigncode], # osslsigncode_configure
+      sources = [osslsigncode_configure,
+                 drake.node('osslsigncode/osslsigncode.c')],
     )
+
+    signer = drake.Rule('signer')
+    signer << osslsigncode
 
     class Signer(drake.Builder):
 
@@ -519,7 +532,8 @@ def configure(cxx_toolkit = None,
                 '-key', str(self.__key.path()),
                 '-t', 'http://timestamp.verisign.com/scripts/timstamp.dll',
                 '-in', str(self.__source.path()),
-                '-out', str(self.__target.path())]
+                '-out', str(self.__target.path()),
+                '-addUnauthenticatedBlob']
 
       def execute(self):
         """Run the command given at construction time."""
