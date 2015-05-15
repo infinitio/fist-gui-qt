@@ -1,0 +1,3 @@
+[submodule "osslsigncode"]
+	path = osslsigncode
+	url = https://github.com/infinitdotio/osslsigncode.git
