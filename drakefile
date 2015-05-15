@@ -506,13 +506,17 @@ def configure(cxx_toolkit = None,
         """
         self.__source = source
         self.__target = source.clone(to.canonize())
-        drake.Builder.__init__(self, [self.__source], [self.__target])
+        self.__cetificate = drake.Node('resources/authenticode.spc')
+        self.__key = drake.Node('resources/authenticode.key')
+        drake.Builder.__init__(self,
+                               [self.__source, osslsigncode],
+                               [self.__target])
 
       @property
       def command(self):
         return [str(osslsigncode.path()),
-                '-spc', str(drake.Node('fist-gui-qt/resources/authenticode.spc').path()),
-                '-key', str(drake.Node('fist-gui-qt/resources/authenticode.key').path()),
+                '-spc', str(self.__cetificate.path()),
+                '-key', str(self.__key.path()),
                 '-t', 'http://timestamp.verisign.com/scripts/timstamp.dll',
                 '-in', str(self.__source.path()),
                 '-out', str(self.__target.path())]
@@ -525,6 +529,9 @@ def configure(cxx_toolkit = None,
       @property
       def target(self):
         return self.__target
+
+      def hash(self):
+        return self.command
 
     nsis_includes = drake.nodes(
       'NSIS/nsProcess.nsh',
