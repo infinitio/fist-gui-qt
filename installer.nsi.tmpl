@@ -422,9 +422,13 @@ Section "Install ${product_name}"
   skip:
   ;; Registers.
   ClearErrors
+
+  Delete "$SMSTARTUP\${product_name}.lnk"
+  Delete "$SMSTARTUP\${product_name}"
   WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
   WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "${product_name}" "$INSTDIR\${executable}"
   WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
   WriteRegStr HKCR "${product_name}" "" "URL: ${product_name} Protocol"
   WriteRegStr HKCR "${product_name}" "URL Protocol" ""
@@ -444,9 +448,6 @@ Section "Install ${product_name}"
   File "${resources_folder}\${documentation}"
   File "${resources_folder}\${icon}"
   File "${resources_folder}\${onboarding_file}"
-
-  ;; Launch at start up.
-  CreateShortCut "$SMSTARTUP\${product_name}.lnk" "$INSTDIR\${executable}"
 
   ;; Uninstaller.
   WriteUninstaller "${'${uninstaller}'}"
