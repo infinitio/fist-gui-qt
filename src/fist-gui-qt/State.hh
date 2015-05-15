@@ -286,8 +286,12 @@ namespace fist
     void
     on_transaction_deleted(uint32_t id);
     void
+    on_transaction_pause_toggled(uint32_t id);
+    void
     open_file(uint32_t id);
   signals:
+    void
+    paused(bool);
     void
     new_transaction(uint32_t id);
     void

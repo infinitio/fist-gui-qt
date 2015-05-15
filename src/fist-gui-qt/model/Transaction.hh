@@ -86,7 +86,7 @@ namespace fist
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);
       // Cache the mtime.
       ELLE_ATTRIBUTE_R(QDateTime, mtime);
-
+      ELLE_ATTRIBUTE_RX(bool, pause);
   /*-------------.
   | Orderability |
   `-------------*/

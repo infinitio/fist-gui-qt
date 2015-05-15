@@ -85,8 +85,13 @@
     <file alias="conversation/reject-hover">../slices/mac/view_conversation/conversation-icon-reject-hover.png</file>
     <file alias="conversation/reject-hover@2x">../slices/mac/view_conversation/conversation-icon-reject-hover@2x.png</file>
 
-    <file alias="conversation/cancel">../slices/mac/view_conversation/conversation-icon-cancel.png</file>
-    <file alias="conversation/cancel@2x">../slices/mac/view_conversation/conversation-icon-cancel@2x.png</file>
+    <file alias="conversation/cancel">../slices/windows/view_home/icon-reject.png</file>
+    <file alias="conversation/cancel@2x">../slices/windows/view_home/icon-reject@2x.png</file>
+    <file alias="conversation/pause">../slices/windows/view_home/icon-pause.png</file>
+    <file alias="conversation/pause@2x">../slices/windows/view_home/icon-pause@2x.png</file>
+    <file alias="conversation/resume">../slices/windows/view_home/icon-resume.png</file>
+    <file alias="conversation/resume@2x">../slices/windows/view_home/icon-resume@2x.png</file>
+
     <file alias="conversation/cancel-hover">../slices/mac/view_conversation/conversation-icon-cancel-hover.png</file>
     <file alias="conversation/cancel-hover@2x">../slices/mac/view_conversation/conversation-icon-cancel-hover@2x.png</file>
 

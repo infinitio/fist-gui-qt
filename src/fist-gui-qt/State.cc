@@ -766,6 +766,14 @@ namespace fist
   }
 
   void
+  State::on_transaction_pause_toggled(uint32_t id)
+  {
+    ELLE_ASSERT(id != gap_null());
+    gap_toggle_transaction_pause(
+      this->state(), id, const_cast<model::Transaction&>(*this->_transactions.get<0>().find(id)).pause());
+  }
+
+  void
   State::on_transaction_deleted(uint32_t id)
   {
     ELLE_ASSERT(id != gap_null());

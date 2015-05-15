@@ -29,6 +29,7 @@ TransactionWidget::TransactionWidget(Model const& model):
   _accept_button(new IconButton(QPixmap(":/conversation/accept"))),
   _reject_button(new IconButton(QPixmap(":/conversation/reject"))),
   _accept_reject_area(new QWidget),
+  _pause_button(new IconButton(QPixmap(":/conversation/pause"))),
   _cancel_button(new IconButton(QPixmap(":/conversation/cancel"))),
   _mtime(new QLabel),
   _status(new QLabel),
@@ -51,6 +52,8 @@ TransactionWidget::TransactionWidget(Model const& model):
           this, SLOT(reject()));
   connect(this->_cancel_button, SIGNAL(released()),
           this, SLOT(cancel()));
+  connect(this->_pause_button, SIGNAL(released()),
+          this, SLOT(pause()));
 
   auto layout = new QHBoxLayout(this);
   // XXX: should but 13, 13, 13, 13 but avatar widget size is strange.
@@ -106,9 +109,10 @@ TransactionWidget::TransactionWidget(Model const& model):
     time_and_info->addLayout(status_and_cancel);
     time_and_info->addStretch();
     {
+      status_and_cancel->setSpacing(5);
       status_and_cancel->addStretch();
       status_and_cancel->addWidget(this->_status, 0, Qt::AlignVCenter | Qt::AlignRight);
-      status_and_cancel->addSpacing(3);
+      status_and_cancel->addWidget(this->_pause_button, 0, Qt::AlignVCenter | Qt::AlignRight);
       status_and_cancel->addWidget(this->_cancel_button, 0, Qt::AlignVCenter | Qt::AlignRight);
     }
     layout->addWidget(this->_info_area);
@@ -271,8 +275,10 @@ void
 TransactionWidget::apply_update()
 {
   ELLE_TRACE_SCOPE("%s: update: %s", *this, this->_transaction.status());
+  this->_status->show();
   this->_info_area->show();
   this->_cancel_button->hide();
+  this->_pause_button->hide();
   this->_accept_reject_area->hide();
 
   if (this->_transaction.acceptable())
@@ -305,8 +311,23 @@ TransactionWidget::apply_update()
      this->_info_area->hide();
   }
 
-  if (this->_transaction.status() == gap_transaction_transferring &&
-      this->_progress_timer == nullptr)
+  if (this->_transaction.running() && this->_transaction.concerns_device())
+  {
+    if (this->_transaction.pause())
+    {
+      this->_pause_button->set_pixmap(QPixmap(":/conversation/resume"));
+      this->_pause_button->setToolTip("Resume");
+    }
+    else
+    {
+      this->_pause_button->set_pixmap(QPixmap(":/conversation/pause"));
+      this->_pause_button->setToolTip("Pause");
+    }
+    this->_pause_button->show();
+    this->_status->hide();
+  }
+
+  if (this->_transaction.running() && this->_progress_timer == nullptr)
   {
     ELLE_TRACE("run progress timer");
     this->_peer_avatar->setTransactionCount(this->_transaction.files().size());
@@ -320,8 +341,7 @@ TransactionWidget::apply_update()
     connect(this, SIGNAL(onProgressChanged(float)),
             this->_peer_avatar, SLOT(setProgress(float)));
   }
-  else if (this->_transaction.status() != gap_transaction_transferring &&
-           this->_progress_timer != nullptr)
+  else if (!this->_transaction.running() && this->_progress_timer != nullptr)
   {
     ELLE_TRACE("destroy progress timer");
     setProgress(0);
@@ -372,6 +392,13 @@ TransactionWidget::cancel()
   emit transaction_canceled(this->_transaction.id());
   emit send_metric(UIMetrics_ConversationCancel,
                    std::unordered_map<std::string, std::string>());
+}
+
+void
+TransactionWidget::pause()
+{
+  ELLE_TRACE_SCOPE("%s: pause transaction", *this);
+  emit transaction_paused(this->_transaction.id());
 }
 
 /*-------.
@@ -444,10 +471,6 @@ TransactionWidget::_on_status_updated()
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
             QString(":/transaction/sent"), false, "Cloud Buffered");
-        // XXX: Change icon.
-        case gap_transaction_paused:
-          return StatusUpdater(
-            QString(":/loading"), true, "Paused");
         case gap_transaction_failed:
           return StatusUpdater(QString(":/conversation/error"), false, "Failed");
         case gap_transaction_canceled:
@@ -458,6 +481,9 @@ TransactionWidget::_on_status_updated()
           return StatusUpdater(QString(":/conversation/error"), false, "Deleted");
         case gap_transaction_on_other_device:
           return StatusUpdater(QString(":/transaction/sent"), false, "On another device");
+        case gap_transaction_paused:
+          return StatusUpdater(
+            QString(":/transaction/paused"), false, "Paused");
         case gap_transaction_payment_required:
           return StatusUpdater(
             QString(":/conversation/canceled"), false, "Quota exceeded");

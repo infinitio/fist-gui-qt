@@ -80,6 +80,8 @@ namespace fist
               &this->_state, SLOT(on_transaction_rejected(uint32_t)));
       connect(widget.get(), SIGNAL(transaction_canceled(uint32_t)),
               &this->_state, SLOT(on_transaction_canceled(uint32_t)));
+      connect(widget.get(), SIGNAL(transaction_paused(uint32_t)),
+              &this->_state, SLOT(on_transaction_pause_toggled(uint32_t)));
       connect(widget.get(), SIGNAL(open_file(uint32_t)),
               &this->_state, SLOT(open_file(uint32_t)));
       connect(widget.get(), SIGNAL(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)),

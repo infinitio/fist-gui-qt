@@ -56,6 +56,8 @@ signals:
   void
   transaction_canceled(uint32_t);
   void
+  transaction_paused(uint32_t);
+  void
   transaction_finished(uint32_t);
   void
   send_metric(UIMetricsType,
@@ -90,6 +92,7 @@ public slots:
   void accept();
   void reject();
   void cancel();
+  void pause();
   void update_progress();
   void update_mtime();
 
@@ -113,6 +116,7 @@ private:
   ELLE_ATTRIBUTE_R(IconButton*, accept_button);
   ELLE_ATTRIBUTE_R(IconButton*, reject_button);
   QWidget* _accept_reject_area;
+  ELLE_ATTRIBUTE_R(IconButton*, pause_button);
   ELLE_ATTRIBUTE_R(IconButton*, cancel_button);
   QLabel* _mtime;
   ELLE_ATTRIBUTE_R(QLabel*, status);

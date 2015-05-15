@@ -35,6 +35,7 @@ namespace fist
       : Super(state, transaction.id)
       , _transaction(transaction)
       , _mtime()
+      , _pause(false)
     {
       ELLE_DEBUG_SCOPE("%s: construction", *this);
       this->mtime(transaction.mtime);
@@ -46,6 +47,10 @@ namespace fist
       surface::gap::PeerTransaction old = this->_transaction;
       this->_transaction = transaction;
       this->mtime(this->_transaction.mtime);
+      if (this->status() == gap_transaction_paused)
+        this->_pause = true;
+      else
+        this->_pause = false;
       emit status_updated();
     }
 
@@ -126,21 +131,21 @@ namespace fist
     Transaction::is_final() const
     {
       static QVector<gap_TransactionStatus> sender_final_states = {
-          gap_transaction_finished,
-          gap_transaction_failed,
-          gap_transaction_canceled,
-          gap_transaction_rejected,
-          gap_transaction_deleted,
-          gap_transaction_cloud_buffered,
-        };
+        gap_transaction_finished,
+        gap_transaction_failed,
+        gap_transaction_canceled,
+        gap_transaction_rejected,
+        gap_transaction_deleted,
+        gap_transaction_cloud_buffered,
+      };
 
       static QVector<gap_TransactionStatus> recipient_final_states = {
-          gap_transaction_finished,
-          gap_transaction_failed,
-          gap_transaction_canceled,
-          gap_transaction_rejected,
-          gap_transaction_deleted,
-        };
+        gap_transaction_finished,
+        gap_transaction_failed,
+        gap_transaction_canceled,
+        gap_transaction_rejected,
+        gap_transaction_deleted,
+      };
 
       return this->is_sender()
         ? sender_final_states.contains(this->status())
