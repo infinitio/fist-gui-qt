@@ -209,6 +209,7 @@ private:
     bool p2p;
 
     ELLE_ATTRIBUTE_RW(QString, code);
+    ELLE_ATTRIBUTE_RW(QString, fingerprint);
 
   public:
     void

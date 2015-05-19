@@ -155,6 +155,7 @@ Fist::CommandLine::CommandLine(std::vector<std::string> const& files_)
   , link(false)
   , p2p(false)
   , _code()
+  , _fingerprint()
 {}
 
 QList<QUrl>
@@ -179,6 +180,11 @@ Fist::CommandLine::parse(std::string const& _scheme)
     {
       ELLE_TRACE("code %s", scheme.remove("invitation/"));
       this->_code = scheme.remove("invitation/");
+    }
+    else if (scheme.startsWith("fingerprint/"))
+    {
+      ELLE_TRACE("fingerprint %s", scheme.remove("fingerprint/"));
+      this->_fingerprint = scheme.remove("fingerprint/");
     }
     else if (scheme == "open")
     {
@@ -320,6 +326,13 @@ Fist::_initialize_state()
   connect(state.get(), SIGNAL(kicked_out(QString const&)),
           this, SLOT(_kicked_out(QString const&)));
   this->_state = std::move(state);
+  if (this->_command_line && !this->_command_line->fingerprint().isEmpty())
+  {
+    gap_add_fingerprint(
+      this->_state->state(),
+      QString_to_utf8_string(this->_command_line->fingerprint()));
+    this->_command_line->fingerprint("");
+  }
 }
 
 void

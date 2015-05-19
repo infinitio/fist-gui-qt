@@ -14,6 +14,7 @@
 Var AutoUpdate
 Var PreviousInstallDir
 Var _has_been_killed
+Var FingerPrint
 
 ;------------------------------------------------------------------------------
 ; Includes
@@ -208,6 +209,11 @@ Function .onInit
     MessageBox mb_iconstop "Infinit is not currently compatible with your version of Windows.\nYou need Windows Vista or any subsequent version of Windows."
     Abort
   ${'${Endif}'}
+
+  Push "INFINIT_FINGERPRINT:"
+  Call ReadCustomerData
+  Pop $FingerPrint
+
   Call KillRunningProcess
   Call CheckArchitecture
 
@@ -259,6 +265,7 @@ UAC_Success:
 FunctionEnd
 
 Function .OnInstSuccess
+  Push "$FingerPrint"
   Push "$INSTDIR\${executable}"
   Call RunExecutable
 FunctionEnd

@@ -7,11 +7,8 @@
 ;!include WinVer.nsh
 Function RunExecutable
   Pop $0
-  ${If} ${AtLeastWinVista}
-    Exec '"$WINDIR\explorer.exe" $0'
-  ${Else}
-    Exec '$0'
-  ${Endif}
+  Pop $1
+  ShellExecAsUser::ShellExecAsUser "open" "$0" 'infinit://fingerprint/$1'
 FunctionEnd
 
 ;------------------------------------------------------------------------------
@@ -68,4 +65,45 @@ Function AlreadyInstalled
     Pop $R0
 
   ${EndIf}
+FunctionEnd
+
+;------------------------------------------------------------------------------
+; Read the customer data at the end of the installer.
+Function ReadCustomerData
+  ; arguments
+  Exch $R1            ; customer data magic value
+  ; locals
+  Push $1             ; file name or (later) file handle
+  Push $2             ; current trial offset
+  Push $3             ; current trial string (which will match $R1 when customer data is found)
+  Push $4             ; length of $R1
+
+  FileOpen $1 $EXEPATH r
+
+; change 1024 here to, e.g., 2048 to scan the last 2Kb of EXE file
+  IntOp $2 0 - 1024
+  StrLen $4 $R1
+
+loop:
+  FileSeek $1 $2 END
+  FileRead $1 $3 $4
+  StrCmp $3 $R1 found
+  IntOp $2 $2 + 1
+  IntCmp $2 0 loop loop
+
+  StrCpy $R1 ""
+  goto fin
+
+found:
+  IntOp $2 $2 + $4
+  FileSeek $1 $2 END
+  FileRead $1 $3
+  StrCpy $R1 $3
+
+fin:
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Exch $R1
 FunctionEnd
