@@ -74,6 +74,12 @@ namespace fist
     }
 
     bool
+    Transaction::has_recipient_device() const
+    {
+      return !this->_transaction.recipient_device_id.empty();
+    }
+
+    bool
     Transaction::is_recipient_device() const
     {
       return this->is_recipient() &&

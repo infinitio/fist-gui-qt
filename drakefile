@@ -358,6 +358,21 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/MainView/LinkWidget.cc",
       "src/fist-gui-qt/MainView/LinkWidget.hh",
 
+      # Notifications.
+      "src/fist-gui-qt/notification/Notification.cc",
+      "src/fist-gui-qt/notification/Notification.hh",
+      "src/fist-gui-qt/notification/Center.cc",
+      "src/fist-gui-qt/notification/Center.hh",
+
+      "src/fist-gui-qt/notification/LinkReady.cc",
+      "src/fist-gui-qt/notification/LinkReady.hh",
+      "src/fist-gui-qt/notification/IncomingTransaction.cc",
+      "src/fist-gui-qt/notification/IncomingTransaction.hh",
+      "src/fist-gui-qt/notification/UpdateAvailable.cc",
+      "src/fist-gui-qt/notification/UpdateAvailable.hh",
+      "src/fist-gui-qt/notification/Minimized.cc",
+      "src/fist-gui-qt/notification/Minimized.hh",
+
       # Popups.
       "src/fist-gui-qt/popup/NoMoreStorage.cc",
       "src/fist-gui-qt/popup/NoMoreStorage.hh",

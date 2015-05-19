@@ -24,6 +24,9 @@
 
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
+#include <fist-gui-qt/notification/Center.hh>
+#include <fist-gui-qt/notification/Minimized.hh>
+#include <fist-gui-qt/notification/UpdateAvailable.hh>
 #include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/GhostCode/Panel.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
@@ -108,8 +111,6 @@ InfinitDock::InfinitDock(fist::State& state,
             SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this,
             SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
-    connect(this->_systray.inner(), SIGNAL(messageClicked()),
-            this, SLOT(_systray_message_clicked()));
     connect(this->_menu, SIGNAL(aboutToHide()), this, SLOT(setFocus()));
   }
   this->_register_panel(this->_transaction_panel.get());
@@ -222,8 +223,10 @@ InfinitDock::InfinitDock(fist::State& state,
                 this, SLOT(_start_onboarded_reception()));
 #endif
   this->_active_transactions_changed(0);
-}
 
+  connect(&fist::notification::center(), SIGNAL(notification_clicked()),
+          this, SLOT(show()));
+}
 /*------------.
 | Destruction |
 `------------*/
@@ -271,35 +274,9 @@ InfinitDock::_systray_activated(QSystemTrayIcon::ActivationReason reason)
 }
 
 void
-InfinitDock::_systray_message(fist::SystrayMessageCarrier const& message)
-{
-  this->_last_message = std::move(message.body);
-  auto const& body = *this->_last_message;
-  ELLE_TRACE_SCOPE("%s: show system tray message: %s - %s",
-                   *this, body.title(), body.body());
-  if (body.always_show() || !this->isVisible())
-    this->_systray.inner()->showMessage(
-      body.title(), body.body(), body.icon(), body.duration());
-}
-
-void
 InfinitDock::_systray_message_clicked()
 {
-  ELLE_TRACE_SCOPE("%s: message clicked", *this);
   elle::SafeFinally show([&] { this->show(); });
-  if (this->_last_message == nullptr)
-  {
-    ELLE_WARN("%s: no systray message stored", *this);
-  }
-  else
-  {
-    if (dynamic_cast<fist::UpdateAvailableMessage const*>(
-          this->_last_message.get()))
-    {
-      emit this->update_application();
-    }
-    this->_last_message.reset();
-  }
 }
 
 void
@@ -359,10 +336,8 @@ void
 InfinitDock::download_ready()
 {
   ELLE_TRACE_SCOPE("%s: an update is available", *this);
-  this->_systray_message(
-    fist::SystrayMessageCarrier(
-      new fist::UpdateAvailableMessage(
-        "Update!", "An update is available, click to automatically update")));
+  fist::notification::center().notify(
+    new fist::notification::UpdateAvailable(this));
   if (this->_update == nullptr)
   {
     this->_menu->addSeparator();
@@ -381,8 +356,6 @@ InfinitDock::_register_panel(Panel* panel)
   ELLE_ASSERT(panel != nullptr);
 
   ELLE_TRACE_SCOPE("%s: register panel %s", *this, *panel);
-  connect(panel, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
-          this, SLOT(_systray_message(fist::SystrayMessageCarrier const&)));
   connect(panel, SIGNAL(set_background_color(QColor const&)),
           this, SLOT(setBackground(QColor const&)));
   panel->hide();
@@ -565,13 +538,8 @@ InfinitDock::hideEvent(QHideEvent* event)
       !fist::settings()["dock"].exists("first_minimizing_popup"))
   {
     fist::settings()["dock"].set("first_minimizing_popup", "1");
-    this->_systray_message(
-      fist::SystrayMessageCarrier(new fist::Message(
-        "Infinit is minimized!",
-        "Make sure the Infinit icon is always "
-        "visible by clicking customize!",
-        QSystemTrayIcon::Information,
-        60000)));
+    fist::notification::center().notify(
+      new fist::notification::Minimized(this));
   }
 }
 

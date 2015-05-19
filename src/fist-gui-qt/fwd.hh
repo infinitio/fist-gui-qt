@@ -42,7 +42,7 @@ namespace fist
   {
     class User;
     class Transaction;
-    // class Link;
+    class Link;
   }
 
   namespace sendview

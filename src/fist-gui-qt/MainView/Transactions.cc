@@ -4,6 +4,8 @@
 #include <QVBoxLayout>
 
 #include <fist-gui-qt/Footer.hh>
+#include <fist-gui-qt/notification/Center.hh>
+#include <fist-gui-qt/notification/IncomingTransaction.hh>
 #include <fist-gui-qt/MainView/Transactions.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
 #include <fist-gui-qt/TextListItem.hh>
@@ -60,17 +62,15 @@ namespace fist
         this->_transaction_list->clearWidgets();
       }
 
-      if (!init && transaction.is_recipient() && !transaction.is_sender_device())
+      if (!init &&
+          transaction.is_recipient() &&
+          !transaction.is_sender_device() &&
+          !transaction.has_recipient_device())
       {
-        emit systray_message(
-          fist::SystrayMessageCarrier(
-            new Message(
-              "Incoming!",
-              QString("%1 wants to send %2 to you.")
-              .arg(transaction.peer().fullname())
-              .arg((transaction.files().size() == 1)
-                   ? transaction.files()[0]
-                   : QString("%1 files").arg(transaction.files().size())))));
+        auto* notif = new fist::notification::IncomingTransaction(transaction, this);
+        connect(notif, SIGNAL(accept_transaction(uint32_t)),
+                &this->_state, SLOT(on_transaction_accepted(uint32_t)));
+        fist::notification::center().notify(notif);
       }
       auto widget = std::make_shared<TransactionWidget>(transaction);
 
@@ -113,78 +113,64 @@ namespace fist
       switch (transaction.status())
       {
         case gap_transaction_new:
-          if (transaction.is_sender())
+          if (transaction.is_sender() && transaction.is_sender_device())
           {
-            emit systray_message(
-              SystrayMessageCarrier(new Message(
-                "Sent",
-                (transaction.files().size() == 1)
-                  ? QString("Your file is on it way")
-                  : QString("Your files are on their way"),
-                QSystemTrayIcon::Warning)));
+            fist::notification::center().notify(
+              "Sent!",
+              "Your files are on their way");
           }
           break;
         case gap_transaction_rejected:
           if (transaction.is_sender())
           {
-            emit systray_message(
-              SystrayMessageCarrier(new Message(
-                "Shenanigans!",
-                QString("%1 declined your transfer.")
-                .arg(transaction.peer().fullname()),
-                QSystemTrayIcon::Warning)));
+            fist::notification::center().notify(
+              "Shenanigans!",
+              QString("%1 declined your transfer.")
+              .arg(transaction.peer().fullname()));
           }
           break;
         case gap_transaction_canceled:
           // Should only be displayed if the user is not the one who cancelled.
-          emit systray_message(
-            SystrayMessageCarrier(new Message(
-              "Nuts!",
-              QString("Your transfer with %1 was cancelled.")
-              .arg(transaction.peer().fullname()))));
+          fist::notification::center().notify(
+            "Nuts!",
+            QString("Your transfer with %1 was cancelled.")
+            .arg(transaction.peer().fullname()));
           break;
         case gap_transaction_failed:
-          if (transaction.is_sender())
-            emit systray_message(
-              SystrayMessageCarrier(new Message(
-                "Oh no!",
-                QString("%1 couldn't be sent to %2.")
-                .arg((transaction.files().size() == 1)
-                     ? transaction.files()[0]
-                     : QString("your %1 files").arg(transaction.files().size()))
-                .arg(transaction.peer().fullname()),
-                QSystemTrayIcon::Warning)));
-          else
-            emit systray_message(
-              SystrayMessageCarrier(
-                new Message(
-                  "Oh no!",
-                  QString("%1 couldn't be received from %2.")
-                  .arg((transaction.files().size() == 1)
-                       ? transaction.files()[0]
-                       : QString("%1 files").arg(transaction.files().size()))
-                  .arg(transaction.peer().fullname()),
-                  QSystemTrayIcon::Warning)));
+          if (transaction.is_sender() && transaction.is_sender_device())
+            fist::notification::center().notify(
+              "Oh no!",
+              QString("%1 couldn't be sent to %2.")
+              .arg((transaction.files().size() == 1)
+                   ? transaction.files()[0]
+                   : QString("your %1 files").arg(transaction.files().size()))
+              .arg(transaction.peer().fullname()));
+          else if (transaction.is_recipient() && transaction.is_recipient_device())
+            fist::notification::center().notify(
+              "Oh no!",
+              QString("%1 couldn't be received from %2.")
+              .arg((transaction.files().size() == 1)
+                   ? transaction.files()[0]
+                   : QString("%1 files").arg(transaction.files().size()))
+              .arg(transaction.peer().fullname()));
           break;
         case gap_transaction_finished:
-          if (transaction.is_sender())
-            emit systray_message(
-              SystrayMessageCarrier(new Message(
-                "Success!",
-                QString("%1 received %2.")
-                .arg(transaction.peer().fullname())
-                .arg((transaction.files().size() == 1)
-                     ? transaction.files()[0]
-                     : QString("your %1 files").arg(transaction.files().size())))));
+          if (transaction.is_sender() && transaction.is_sender_device())
+            fist::notification::center().notify(
+              "Success!",
+              QString("%1 received %2.")
+              .arg(transaction.peer().fullname())
+              .arg((transaction.files().size() == 1)
+                   ? transaction.files()[0]
+                   : QString("your %1 files").arg(transaction.files().size())));
           else
-            emit systray_message(
-              SystrayMessageCarrier(new Message(
-                "Success!",
-                QString("%1 received from %2.")
-                .arg((transaction.files().size() == 1)
-                     ? transaction.files()[0]
-                     : QString("%1 files").arg(transaction.files().size()))
-                .arg(transaction.peer().fullname()))));
+            fist::notification::center().notify(
+              "Success!",
+              QString("%1 received from %2.")
+              .arg((transaction.files().size() == 1)
+                   ? transaction.files()[0]
+                   : QString("%1 files").arg(transaction.files().size()))
+              .arg(transaction.peer().fullname()));
           break;
         default:
           break;

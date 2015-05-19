@@ -71,9 +71,6 @@ private slots:
   _systray_activated(QSystemTrayIcon::ActivationReason reason);
 
   void
-  _systray_message(fist::SystrayMessageCarrier const& message);
-
-  void
   _systray_message_clicked();
 
   void
@@ -252,7 +249,6 @@ private:
   QAction* _quit;
   QAction* _update;
   ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
-  ELLE_ATTRIBUTE(std::unique_ptr<fist::Message>, last_message);
 
 private:
   /*----------.

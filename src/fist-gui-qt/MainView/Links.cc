@@ -5,6 +5,8 @@
 #include <fist-gui-qt/Footer.hh>
 #include <fist-gui-qt/MainView/Links.hh>
 #include <fist-gui-qt/MainView/LinkWidget.hh>
+#include <fist-gui-qt/notification/LinkReady.hh>
+#include <fist-gui-qt/notification/Center.hh>
 #include <fist-gui-qt/popup/NoMoreStorage.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
@@ -47,10 +49,8 @@ namespace fist
     {
       ELLE_ASSERT_CONTAINS(this->_state.links().get<0>(), id);
       auto const& link = *this->_state.links().get<0>().find(id);
-      emit systray_message(
-        SystrayMessageCarrier(
-          new Message("Link ready!",
-                      "Link has been copied to your clipboard")));
+      fist::notification::center().notify(
+        new fist::notification::LinkReady(link, this));
       QClipboard *clipboard = QApplication::clipboard();
       clipboard->setText(link.url().toString());
     }

@@ -51,13 +51,6 @@ namespace fist
     private:
       Q_OBJECT;
 
-      /*--------.
-      | Systray |
-      `--------*/
-    signals:
-      void
-      systray_message(fist::SystrayMessageCarrier const&);
-
     private:
       /*----------.
       | Printable |

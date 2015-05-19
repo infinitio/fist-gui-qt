@@ -58,13 +58,6 @@ public:
   Footer*
   footer();
 
-/*--------.
-| Systray |
-`--------*/
-  signals:
-    void
-    systray_message(fist::SystrayMessageCarrier const&);
-
 private:
   /*----------.
   | Printable |

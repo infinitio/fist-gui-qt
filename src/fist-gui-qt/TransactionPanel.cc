@@ -25,14 +25,6 @@ MainPanel::MainPanel(fist::State& state,
   connect(&this->_state, SIGNAL(link_updated(uint32_t)),
           this->_links, SLOT(on_link_updated(uint32_t)));
   connect(
-    this->_transactions,
-    SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
-    this, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)));
-  connect(
-    this->_links,
-    SIGNAL(systray_message(fist::SystrayMessageCarrier const&)),
-    this, SIGNAL(systray_message(fist::SystrayMessageCarrier const&)));
-  connect(
     &this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
     this->_transactions_tab, SLOT(on_notification_count_changed(size_t)));
   this->_transactions_tab->on_notification_count_changed(

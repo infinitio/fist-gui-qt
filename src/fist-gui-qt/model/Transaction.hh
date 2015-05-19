@@ -46,6 +46,9 @@ namespace fist
       is_recipient_device() const;
 
       bool
+      has_recipient_device() const;
+
+      bool
       concerns_device() const;
 
       model::User const&

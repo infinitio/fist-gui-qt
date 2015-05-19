@@ -288,7 +288,7 @@ namespace fist
     void
     on_transaction_pause_toggled(uint32_t id);
     void
-    open_file(uint32_t id);
+    open_file(uint32_t id = gap_null());
   signals:
     void
     paused(bool);

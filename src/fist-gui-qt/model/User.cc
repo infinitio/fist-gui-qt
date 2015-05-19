@@ -145,48 +145,7 @@ namespace fist
     QPixmap const&
     User::avatar() const
     {
-      // if (this->id() == gap_null() && this->_avatar.isNull())
-      // {
-      //   ELLE_DEBUG("%s: avatar not available yet", *this);
-      //   this->_avatar = QPixmap(QString(":/avatar_default"));
-      //   this->_default_avatar = false;
-      // }
-      // else if (this->_avatar.isNull() || this->_default_avatar == true)
-      // {
-      //   if (this->_new_avatar)
-      //   {
-      //     /// Get user icon data.
-      //     void* data = nullptr;
-      //     size_t len = 0;
-
-      //     auto res = gap_avatar(this->_state.state(), this->id(), &data, &len);
-
-      //     if (res == gap_ok)
-      //     {
-      //       if (len > 0) // An avatar is avalaible. If not, keep the default.
-      //       {
-      //         ELLE_DEBUG("%s: get avatar data", *this);
-      //         QByteArray raw((char *) data, len);
-      //         QBuffer buff(&raw);
-      //         QImageReader reader;
-      //         reader.setDecideFormatFromContent(true);
-      //         reader.setDevice(&buff);
-      //         this->_avatar =  QPixmap::fromImageReader(&reader);
-      //       }
-      //       else if(this->_avatar.isNull())
-      //       {
-      //         this->_avatar = QPixmap(QString(":/avatar_default"));
-      //       }
-      //       this->_default_avatar = false;
-      //     }
-      //     else if(this->_avatar.isNull())
-      //     {
-      //       ELLE_DEBUG("%s: avatar not available yet", *this);
-      //       this->_avatar = QPixmap(QString(":/avatar_default"));
-      //     }
-      //   }
-      // }
-      // this->_new_avatar = false;
+      static const QPixmap default_avatar(QString(":/avatar_default"));
       if (this->_new_avatar)
       {
         auto& array = this->_state.avatar(this->id());
@@ -200,7 +159,6 @@ namespace fist
         }
         else
         {
-          static const QPixmap default_avatar(QString(":/avatar_default"));
           this->_avatar = default_avatar;
         }
         this->_new_avatar = false;
