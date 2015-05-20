@@ -37,7 +37,8 @@ def configure(cxx_toolkit = None,
               qt = None,
               openssl_include_dir = '/usr',
               openssl_libraries = [],
-              libraries = []):
+              libraries = [],
+              python3 = None):
 
   def copy_lib(lib, where = 'lib'):
     if isinstance(lib, drake.cxx.StaticLib):
@@ -639,3 +640,34 @@ def configure(cxx_toolkit = None,
 
     install = drake.Rule('install')
     install << install_nodes(prefix)
+
+  else: # Linux, packaging replaces installer
+
+    ## ------- ##
+    ## Package ##
+    ## ------- ##
+
+    def install_nodes(where, f = drake.install):
+      where = drake.Path(where)
+      res = []
+      res.append(f(application, where))
+      for lib in libraries:
+        res.append(f(lib, where))
+      return res
+
+    package = install_nodes('debian', f = drake.copy)
+    git = drake.git.Git()
+    print(git.version())
+    with drake.templating.Context(content = {
+        'version': git.description(),
+        'version_major': git.version().split('.')[0],
+        'version_minor': git.version().split('.')[1],
+        'python_version_major': python3.version.major,
+        'python_version_minor': python3.version.minor,
+    }):
+      drake.node('control.tmpl')
+    package += drake.copy(drake.nodes('control'), 'debian/DEBIAN')
+    debian = drake.Rule('debian')
+    debian << drake.debian.Packager(
+        'fist-gui_%s_amd64.deb' % git.description(),
+        package, 'debian', preload = elle.elle.dpkg_preload).package
