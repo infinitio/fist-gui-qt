@@ -64,6 +64,9 @@ namespace fist
       bool
       swagger() const;
 
+      bool
+      ghost() const;
+
       void
       swagger(bool);
 

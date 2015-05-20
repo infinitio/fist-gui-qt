@@ -113,6 +113,12 @@ namespace fist
       this->_model.swagger = true;
     }
 
+    bool
+    User::ghost() const
+    {
+      return this->_model.ghost;
+    }
+
     void
     User::status(bool status)
     {
