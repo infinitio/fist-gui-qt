@@ -111,9 +111,9 @@ TransactionWidget::TransactionWidget(Model const& model):
     {
       status_and_cancel->setSpacing(5);
       status_and_cancel->addStretch();
-      status_and_cancel->addWidget(this->_status, 0, Qt::AlignVCenter | Qt::AlignRight);
       status_and_cancel->addWidget(this->_pause_button, 0, Qt::AlignVCenter | Qt::AlignRight);
       status_and_cancel->addWidget(this->_cancel_button, 0, Qt::AlignVCenter | Qt::AlignRight);
+      status_and_cancel->addWidget(this->_status, 0, Qt::AlignVCenter | Qt::AlignRight);
     }
     layout->addWidget(this->_info_area);
   }
@@ -447,7 +447,8 @@ TransactionWidget::_on_status_updated()
     }
   };
 
-  auto tooltip = [] (Model::Status const& status) -> StatusUpdater
+  auto tooltip = [] (Model::Status const& status,
+                     fist::model::User const& peer) -> StatusUpdater
     {
       switch (status)
       {
@@ -467,7 +468,7 @@ TransactionWidget::_on_status_updated()
           return StatusUpdater(QString(), false, "Transferring");
         case gap_transaction_finished:
           return StatusUpdater(
-            QString(":/transaction/received"), false, "Finished");
+            QString(":/transaction/received"), false, peer.ghost() ? "Ghost uploaded" : "Finished");
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
             QString(":/transaction/sent"), false, "Cloud Buffered");
@@ -495,7 +496,8 @@ TransactionWidget::_on_status_updated()
   if (this->_transaction.status() == gap_transaction_finished)
     emit transaction_finished(this->_transaction.id());
 
-  tooltip(this->_transaction.status())(*this->_status);
+  tooltip(this->_transaction.status(), this->_transaction.peer())(
+    *this->_status);
 
   if (this->_transaction.status() == gap_transaction_transferring)
   {
