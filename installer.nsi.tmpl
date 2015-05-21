@@ -182,7 +182,7 @@ Function RegisterContextual
       WriteRegStr HKCR "AllFileSystemObjects\shellex\ContextMenuHandlers\Infinit" "" "{256EF94C-697D-4986-B99B-9D3B15D79B49}"
       WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}" "" "InfinitContextualMenuHandler"
       WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "ThreadingModel" "Apartment"
-      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "" "${'${company_install}'}\${product_name}\lib\libcontextual.dll"
+      WriteRegStr HKCR "CLSID\{256EF94C-697D-4986-B99B-9D3B15D79B49}\InProcServer32" "" "$INSTDIR\lib\libcontextual.dll"
     end:
 FunctionEnd
 
