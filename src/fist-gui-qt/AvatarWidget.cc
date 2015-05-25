@@ -72,7 +72,7 @@ AvatarWidget::setPicture(QPixmap const& avatar)
     this->_picture.fill(Qt::transparent);
     QPainter painter(&this->_picture);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.translate(QPointF(total_size / 2., total_size / 2.));
     // Shadow
     {
@@ -100,8 +100,8 @@ AvatarWidget::setPicture(QPixmap const& avatar)
       {
         mask.fill(Qt::transparent);
         QPainter painter(&mask);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        // painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::Antialiasing, true);
         QPointF center(picture_size / 2., picture_size / 2.);
         QRadialGradient gradient(center, picture_size / 2.,
                                  center, picture_size / 2. - 1);
@@ -115,13 +115,13 @@ AvatarWidget::setPicture(QPixmap const& avatar)
       {
         picture.fill(Qt::transparent);
         QPainter painter(&picture);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        // painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setBrush(Qt::NoBrush);
         painter.setPen(Qt::NoPen);
         if (!avatar.isNull())
         {
-          auto v = avatar.scaled(picture.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+          auto v = avatar.scaled(picture.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
           painter.drawPixmap(QPoint(0, 0), v);
         }
         painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
@@ -185,7 +185,7 @@ AvatarWidget::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-  painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+  painter.setRenderHint(QPainter::Antialiasing, true);
 
   painter.translate(QPointF(total_size / 2., total_size / 2.));
   QRectF progress_region(
