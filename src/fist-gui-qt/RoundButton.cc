@@ -4,8 +4,6 @@
 # include <QBrush>
 # include <QPainter>
 
-# include <iostream>
-
 RoundButton::RoundButton(QColor const& color,
                          QPixmap const& icon,
                          QSize const& size,
@@ -39,7 +37,6 @@ RoundButton::paintEvent(QPaintEvent* /* event */)
   else
     painter.setBrush(this->_color);
 
-  std::cerr << this->width() << ":" << this->height() << std::endl;
   painter.drawEllipse(0, 0, this->width(), this->height());
 
   if (!this->_image.isNull())

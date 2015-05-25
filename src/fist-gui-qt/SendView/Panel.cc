@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <QDir>
 #include <QFuture>
 #include <QtConcurrentRun>

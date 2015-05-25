@@ -1,7 +1,5 @@
 #include <fist-gui-qt/TransactionWindow.hh>
 
-# include <iostream>
-
 TransactionWindow::TransactionWindow(QWidget* parent):
   QWidget(parent)
 {

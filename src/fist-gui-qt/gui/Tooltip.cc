@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iostream>
 
 #include <QHBoxLayout>
 #include <QLabel>

@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <elle/log.hh>
 
 #include <surface/gap/gap.hh>
