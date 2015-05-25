@@ -12,7 +12,7 @@ static QString Arial("Arial");
 static QString Lucida("LucidaGrande");
 static QString Montserrat("Montserrat");
 static QString SourceSans("Source Sans Pro");
-static QString DefaultFont(Arial);
+static QString DefaultFont(SourceSans);
 
 // This file should contain every single dimension, font, color, hint to avoid
 // per file constants.
@@ -123,15 +123,15 @@ namespace view
 
   static
   fist::style::Text const
-  version_style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+  version_style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
 
   static
   fist::style::Text const
-  download_folder_title_style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignLeft);
+  download_folder_title_style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25), Qt::AlignLeft);
 
   static
   fist::style::Text const
-  download_folder_style(fist::Font(DefaultFont, 9), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
+  download_folder_style(fist::Font(Arial, 9), QColor(0x33, 0x33, 0x33), Qt::AlignLeft);
 
   namespace links
   {
@@ -139,32 +139,32 @@ namespace view
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     namespace file
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 9.5), QColor(0x25, 0x25, 0x25));
+      style(fist::Font(Arial, 9.5), QColor(0x25, 0x25, 0x25));
 
       static
       fist::style::Text const
-      failed_style(fist::Font(DefaultFont, 9.5), QColor(0xD3, 0x15, 0x15));
+      failed_style(fist::Font(Arial, 9.5), QColor(0xD3, 0x15, 0x15));
     }
 
     namespace status
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 8.5), QColor(0xA8, 0xA8, 0xA8));
+      style(fist::Font(Arial, 8.5), QColor(0xA8, 0xA8, 0xA8));
     }
 
     namespace counter
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
+      style(fist::Font(Arial, 9), QColor(0xFF, 0xFF, 0xFF), Qt::AlignCenter);
 
     }
   }
@@ -212,7 +212,7 @@ namespace view
   {
     static
     fist::style::Text const
-    style(fist::Font(DefaultFont, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
+    style(fist::Font(Arial, 11), QColor(0xF8, 0xF8, 0xF8), Qt::AlignVCenter);
   }
 
   namespace transaction
@@ -221,7 +221,7 @@ namespace view
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
+      style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
     }
 
     static
@@ -232,25 +232,25 @@ namespace view
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 10), QColor(0x25, 0x25, 0x25));
+      style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25));
     }
 
     namespace files
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 9.5), QColor(0xA8, 0xA8, 0xA8));
+      style(fist::Font(Arial, 9.5), QColor(0xA8, 0xA8, 0xA8));
 
       static
       fist::style::Text const
-      hover_style(fist::Font(DefaultFont, 9), QColor(0x3D, 0x91, 0xD4));
+      hover_style(fist::Font(Arial, 9), QColor(0x3D, 0x91, 0xD4));
     }
 
     namespace date
     {
       static
       fist::style::Text const
-      style(fist::Font(DefaultFont, 8), QColor(0xA8, 0xA8, 0xA8));
+      style(fist::Font(Arial, 8), QColor(0xA8, 0xA8, 0xA8));
     }
   }
 }

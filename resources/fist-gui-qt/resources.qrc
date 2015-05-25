@@ -297,6 +297,23 @@
     <file alias="mimetypes/video">../mimetypes/video.png</file>
     <file alias="mimetypes/video@2x">../mimetypes/video@2x.png</file>
 
+    <!-- onboarding -->
+    <file alias="onboarding/nolimits">../slices/mac/view_onboarding/onboarding-icon-nolimits.png</file>
+    <file alias="onboarding/nolimits@2x">../slices/mac/view_onboarding/onboarding-icon-nolimits@2x.png</file>
+    <file alias="onboarding/secure">../slices/mac/view_onboarding/onboarding-icon-secure.png</file>
+    <file alias="onboarding/secure@2x">../slices/mac/view_onboarding/onboarding-icon-secure@2x.png</file>
+    <file alias="onboarding/unstoppable">../slices/mac/view_onboarding/onboarding-icon-unstoppable.png</file>
+    <file alias="onboarding/unstoppable@2x">../slices/mac/view_onboarding/onboarding-icon-unstoppable@2x.png</file>
+    <file alias="onboarding/fast">../slices/mac/view_onboarding/onboarding-icon-fast.png</file>
+    <file alias="onboarding/fast@2x">../slices/mac/view_onboarding/onboarding-icon-fast@2x.png</file>
+
+    <file alias="onboarding/send_to_an_email_address">../gifs/windows/send-email.gif</file>
+    <file alias="onboarding/send_to_a_contact">../gifs/windows/send-contact.gif</file>
+    <file alias="onboarding/accept">../gifs/windows/receive.gif</file>
+    <file alias="onboarding/send_to_self">../gifs/windows/send-device.gif</file>
+    <file alias="onboarding/always_available">../slices/windows/view_onboarding/show-icon.png</file>
+    <file alias="onboarding/always_available@2x">../slices/windows/view_onboarding/show-icon@2x.png</file>
+
     <!-- os icons -->
     <file alias="os/windows">../slices/mac/view_send/icon-device-windows-avatar.png</file>
     <file alias="os/windows@2x">../slices/mac/view_send/icon-device-windows-avatar@2x.png</file>

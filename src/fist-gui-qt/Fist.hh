@@ -52,6 +52,10 @@ private:
 /*---------------.
 | Initialization |
 `---------------*/
+private slots:
+  void
+  _onboarded();
+
 private:
 
   void

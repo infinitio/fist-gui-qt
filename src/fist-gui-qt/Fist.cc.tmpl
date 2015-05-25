@@ -16,6 +16,7 @@
 
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QApplication>
 #include <QDir>
 #include <QFont>
 #include <QFontDatabase>
@@ -49,6 +50,8 @@
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/State.hh>
+#include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/onboarding/ImageOnboarder.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Fist");
 
@@ -347,10 +350,7 @@ Fist::_initialize_application()
     ELLE_WARN("%s: impossible to install fonts", *this);
 
   QDir::setCurrent(QDesktopServices::storageLocation(QDesktopServices::DesktopLocation));
-  QFont arial("Arial", 11);
-  arial.setPixelSize(11 * 1.4);
-  arial.setStyleStrategy(QFont::PreferAntialias);
-  this->_application->setFont(arial);
+  this->_application->setFont(DefaultFont);
 
   this->_application->setWindowIcon(QIcon(QPixmap(":/logo")));
   this->_application->setQuitOnLastWindowClosed(false);
@@ -455,11 +455,33 @@ Fist::operator ()()
   // Automatically realign update dialog.
   connect(this->_updater->loading_dialog(), SIGNAL(resized()),
           this, SLOT(_reposition_dialog()));
+  if (fist::settings()["onboarding"].exists("main"))
+  {
+    ELLE_DEBUG("initialize login window")
+      this->_initialize_login_window(true);
+    ELLE_DEBUG("check for updates")
+      this->_updater->check_for_updates();
+  }
+  else
+  {
+    auto* onboarder = new fist::onboarding::ImageOnboarder(nullptr);
+    onboarder->show();
+    onboarder->move(QApplication::desktop()->screen()->rect().center() -
+                    onboarder->rect().center());
+    connect(onboarder, SIGNAL(onboarded()), this, SLOT(_onboarded()));
+    connect(onboarder, SIGNAL(onboarded()), onboarder, SLOT(deleteLater()));
+  }
+  return this->_application->exec();
+}
+
+void
+Fist::_onboarded()
+{
+  fist::settings()["onboarding"].set("main", QString(INFINIT_VERSION));
   ELLE_DEBUG("initialize login window")
     this->_initialize_login_window(true);
   ELLE_DEBUG("check for updates")
     this->_updater->check_for_updates();
-  return this->_application->exec();
 }
 
 bool
