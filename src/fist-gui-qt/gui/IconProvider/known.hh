@@ -130,7 +130,7 @@ namespace fist
           { IconProvider::Type::windows, QPixmap(":/os/windows@2x") },
           { IconProvider::Type::macosx, QPixmap(":/os/mac@2x") },
           { IconProvider::Type::linux, QPixmap(":/os/linux@2x") },
-          { IconProvider::Type::ios, QPixmap(":/os/iphone@2x") },
+          { IconProvider::Type::ios, QPixmap(":/os/ios@2x") },
           { IconProvider::Type::android, QPixmap(":/os/android@2x") },
           { IconProvider::Type::unknown_os, QPixmap(":/os/unknown@2x") },
         });
