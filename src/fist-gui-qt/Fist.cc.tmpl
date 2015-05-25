@@ -516,7 +516,10 @@ Fist::_set_uniqunness_guard()
   // XXX: Possible race condition, if both create the server at the exact same
   // time, both socket will be rejected and they will create the servers at the
   // exact same time.
-  static QString lock_name{"InfinitLocalServerLock"};
+  QString name = QString::fromUtf8(qgetenv("USER"));
+  if (name.isEmpty())
+    name = QString::fromUtf8(qgetenv("USERNAME"));
+  QString lock_name = QString("InfinitLocalServerLock-%1").arg(name);
   // Local socket to check if an server (on an other instance) is running.
   ELLE_DEBUG("create local socket to look for running instance")
     this->_other_instance.reset(new QLocalSocket(this));
