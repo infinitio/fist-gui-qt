@@ -21,7 +21,7 @@ namespace fist
       ListItem(parent, Qt::white),
       _model(model),
       _fullname(new QLabel(this->_model.fullname())),
-      _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
+      _avatar(new AvatarIcon(this->_model.avatar(), QSize(25, 25))),
       _selector(new fist::TwoStateIconButton(
                   QPixmap(":/send/user-selected"),
                   QPixmap(":/send/user-selected-active"),
@@ -35,9 +35,9 @@ namespace fist
               this, SLOT(_on_avatar_updated()));
       ELLE_TRACE_SCOPE("%s: contruction", *this);
 
-      this->_layout->setSpacing(4);
+      this->_layout->setSpacing(8);
       this->_layout->setContentsMargins(10, 4, 10, 4);
-      this->_layout->addWidget(this->_avatar);
+      this->_layout->addWidget(this->_avatar, 0, Qt::AlignCenter);
       {
         auto* vlayout = new QVBoxLayout;
         vlayout->setSpacing(0);

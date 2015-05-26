@@ -9,7 +9,7 @@ AvatarIcon::AvatarIcon(QPixmap const& pixmap,
   _uid(0),
   _pixmap(size),
   _mask(size),
-  _border(1),
+  _border(0),
   _geometry(QPoint(0, 0), size - QSize(this->_border * 2, this->_border * 2))
 {
   this->setMinimumSize(size);
@@ -26,6 +26,7 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
     _mask.fill(Qt::transparent);
     QPainter painter(&this->_mask);
     painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
     painter.drawEllipse(this->_geometry);
@@ -39,7 +40,8 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
     painter.drawPixmap(
       QPoint(0, 0),
       pixmap.scaled(this->_geometry.size(),
-                    Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+                    Qt::IgnoreAspectRatio,
+                    Qt::SmoothTransformation));
   }
   painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
   painter.drawPixmap(this->_geometry, this->_mask);
