@@ -640,8 +640,6 @@ void
 Fist::registered()
 {
   this->logged_in();
-  if (this->_command_line == nullptr || this->_command_line->code().isEmpty())
-    this->_dock->_show_ghost_code_view();
 }
 
 void
