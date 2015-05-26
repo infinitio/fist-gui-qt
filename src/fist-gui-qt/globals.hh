@@ -125,6 +125,13 @@ namespace view
   fist::style::Text const
   version_style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25), Qt::AlignCenter);
 
+  namespace menu
+  {
+    static
+    fist::style::Text const
+    style = version_style;
+  }
+
   static
   fist::style::Text const
   download_folder_title_style(fist::Font(Arial, 10), QColor(0x25, 0x25, 0x25), Qt::AlignLeft);

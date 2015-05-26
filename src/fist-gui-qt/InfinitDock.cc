@@ -153,6 +153,7 @@ InfinitDock::InfinitDock(fist::State& state,
   this->_menu->setMaximumWidth(210);
   auto* v2 = this->_menu->addAction(QString("v" INFINIT_VERSION));
   v2->setDisabled(true);
+  view::menu::style(*this->_menu);
   v2->setFont(view::version_style.font());
   this->_menu->addSeparator();
   QWidgetAction* change_download_folder = new QWidgetAction(this);
