@@ -34,57 +34,6 @@ RoundShadowWidget::RoundShadowWidget(int radius,
   this->setBackground(view::background);
 }
 
-// void
-// RoundShadowWidget::childEvent(QChildEvent* event)
-// {
-//   Super::childEvent(event);
-//   if (event->added() || event->removed())
-//     if (dynamic_cast<QWidget*>(event->child()) ||
-//         dynamic_cast<QLayout*>(event->child()))
-//     {
-//       auto* object = static_cast<QObject*>(event->child());
-//       if (event->added())
-//       {
-//         ELLE_DEBUG("install event filter to new widget: %s", *object)
-//           object->installEventFilter(this);
-//       }
-//       else if (event->removed())
-//       {
-//         ELLE_DEBUG("remove event filter from deleted widget: %s", *object)
-//           object->removeEventFilter(this);
-//       }
-//       this->updateGeometry();
-//     }
-// }
-
-// bool
-// RoundShadowWidget::eventFilter(QObject *obj, QEvent *event)
-// {
-//   if (!dynamic_cast<QWidget*>(obj) ||
-//       !dynamic_cast<QLayout*>(obj))
-//     return Super::eventFilter(obj, event);
-
-//   auto action = [&] { this->updateGeometry(); };
-//   if (event->type() == QEvent::Hide)
-//     action();
-//   else if (event->type() == QEvent::Show)
-//     action();
-//   else if (event->type() == QEvent::GraphicsSceneResize)
-//     action();
-//   else if (event->type() == QEvent::Resize)
-//     action();
-//   else if (event->type() == QEvent::LayoutRequest)
-//     action();
-//   else if (event->type() == QEvent::Move)
-//     action();
-//   else if (event->type() == QEvent::Paint);
-//   else if (event->type() == QEvent::Leave);
-//   else if (event->type() == QEvent::Enter);
-
-//   return Super::eventFilter(obj, event);
-// }
-
-
 /*-------------------.
 | Display properties |
 `-------------------*/
