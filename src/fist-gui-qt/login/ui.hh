@@ -22,11 +22,11 @@ namespace fist
       {
         static
         fist::style::Text const
-        default_style(fist::Font(Arial, 9), QColor(0x8A, 0x8A, 0x8A));
+        default_style(fist::Font(Arial, 8, QFont::Bold), QColor(0x8A, 0x8A, 0x8A));
 
         static
         fist::style::Text const
-        selected_style(fist::Font(Arial, 9), QColor(0x33, 0x33, 0x33));
+        selected_style(fist::Font(Arial, 8, QFont::Bold), QColor(0x33, 0x33, 0x33));
 
         namespace login
         {
