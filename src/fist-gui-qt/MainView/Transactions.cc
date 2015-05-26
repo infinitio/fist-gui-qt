@@ -163,7 +163,7 @@ namespace fist
               .arg((transaction.files().size() == 1)
                    ? transaction.files()[0]
                    : QString("your %1 files").arg(transaction.files().size())));
-          else
+          else if (transaction.is_recipient() && transaction.is_recipient_device())
             fist::notification::center().notify(
               "Success!",
               QString("%1 received from %2.")
