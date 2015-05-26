@@ -131,7 +131,8 @@ namespace fist
     bool
     Transaction::running() const
     {
-      return !this->is_final();
+      return !this->is_final() &&
+        this->status() != gap_transaction_waiting_accept;
     }
 
     bool
