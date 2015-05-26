@@ -242,6 +242,7 @@ InfinitDock::_on_logout()
   ELLE_TRACE_SCOPE("%s: logout", *this);
   // Kill everything in order to make sure nothing requiring state is running
   // when destroying it.
+  this->hide();
   this->setCentralWidget(nullptr);
   this->_send_panel.reset();
   this->_transaction_panel.reset();
