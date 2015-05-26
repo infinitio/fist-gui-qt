@@ -443,6 +443,14 @@ namespace fist
     }
 
     void
+    Users::hideEvent(QHideEvent* event)
+    {
+      this->_search_field->setText("");
+      this->_state.cancel_search();
+      Super::hideEvent(event);
+    }
+
+    void
     Users::text_changed(QString const& text)
     {
       this->clear_results();
@@ -460,7 +468,7 @@ namespace fist
     Users::delay_expired()
     {
       auto search = this->_search_field->text();
-
+      this->set_icon(this->_magnifier);
       ELLE_TRACE_SCOPE("%s: search changed: %s", *this, search);
 
       QString trimmed_search = search.trimmed();

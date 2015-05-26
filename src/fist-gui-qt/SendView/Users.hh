@@ -146,6 +146,8 @@ namespace fist
       keyPressEvent(QKeyEvent* event) override;
       void
       showEvent(QShowEvent* event) override;
+      void
+      hideEvent(QHideEvent* event) override;
 
     Q_SIGNALS:
       void
