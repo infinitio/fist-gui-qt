@@ -41,7 +41,7 @@ namespace fist
         label->setWordWrap(true);
         vlayout->addWidget(label, 1, Qt::AlignTop);
         vlayout->addStretch();
-        layout->addLayout(vlayout);
+        layout->addLayout(vlayout, 1);
       }
       {
         auto* vlayout = new QVBoxLayout;
@@ -77,7 +77,7 @@ namespace fist
                                  "  padding-bottom: 9px;"
                                  "  padding-left: 15px;"
                                  "  padding-right: 15px;"
-                                 "  font: bold 14px;"
+                                 "  font: 14px;"
                                  "}");
           vlayout->addWidget(later);
           connect(later, SIGNAL(released()), this, SLOT(hide()));

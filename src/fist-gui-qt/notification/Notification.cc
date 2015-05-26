@@ -41,7 +41,7 @@ namespace fist
         }
         this->setPalette(palette);
       }
-      this->setFixedWidth(400);
+      this->setFixedWidth(360);
       connect(this, SIGNAL(clicked()), SLOT(hide()));
     }
 
@@ -84,10 +84,10 @@ namespace fist
           ? this->_icon->pixmap()->width()
           : this->_icon->width();
         width += view::spacing * 2;
-        painter.drawRect(0, 0, width, this->height());
+        painter.drawRect(0, 0, width - 2, this->height());
         painter.setPen(Qt::NoPen);
         painter.setBrush(view::background.darker(110));
-        painter.drawRect(width + 1, 0, 1, this->height());
+        painter.drawRect(width, 0, 1, this->height());
       }
       Super::paintEvent(event);
     }
@@ -111,7 +111,7 @@ namespace fist
             view::icon::diameter, view::icon::diameter,
             Qt::KeepAspectRatio, Qt::SmoothTransformation)
           : pixmap);
-        layout->addWidget(this->_icon, 0, Qt::AlignCenter);
+        layout->addWidget(this->_icon, 0, Qt::AlignVCenter | Qt::AlignTop);
       }
       layout->addSpacing(10);
       {
@@ -125,11 +125,11 @@ namespace fist
         }
         {
           this->_body->setWordWrap(true);
-          // view::body::style(*this->_body);
+          view::body::style(*this->_body);
           vlayout->addWidget(this->_body);
         }
-        layout->addLayout(vlayout, 1);
         vlayout->addStretch();
+        layout->addLayout(vlayout, 1);
       }
       {
         auto* quit = new IconButton(QPixmap(":/notification/quit"), false, this);

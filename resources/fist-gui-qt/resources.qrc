@@ -76,6 +76,9 @@
     <file alias="notification/minimize">../slices/windows/notifications/minimize.gif</file>
     <file alias="notification/share">../slices/windows/notifications/share.png</file>
 
+    <file alias="notification/quit">../slices/windows/view_send/send-icon-delete.png</file>
+    <file alias="notification/quit@2x">../slices/windows/view_send/send-icon-delete@2x.png</file>
+
     <!-- conversation -->
     <file alias="conversation/accept">../slices/mac/view_conversation/conversation-icon-accept.png</file>
     <file alias="conversation/accept@2x">../slices/mac/view_conversation/conversation-icon-accept@2x.png</file>

@@ -21,14 +21,14 @@ namespace fist
       {
         static
         fist::style::Text const
-        style(fist::Font(Arial, 10, QFont::Bold), QColor(0x13, 0x13, 0x13));
+        style(fist::Font(Arial, 11, QFont::Bold), QColor(0x13, 0x13, 0x13));
       }
 
       namespace body
       {
         static
         fist::style::Text const
-        style(fist::Font(Arial, 10), QColor(0x13, 0x13, 0x13));
+        style(fist::Font(Arial, 11), QColor(0x13, 0x13, 0x13));
       }
     }
 
