@@ -445,7 +445,7 @@ Fist::operator ()()
   ELLE_TRACE_SCOPE("%s: run application", *this);
   auto update_url = elle::os::getenv(
     "FIST_UPDATE_FILE",
-    "http://download.infinit.io/windows/${architecture}/update.xml");
+    "http://hephaestus.infinit.io/windows/${architecture}/update.xml");
   this->_updater.reset(
     new Updater(QString::fromStdString(common::infinit::default_home()),
                 QString::fromStdString(update_url), this));
