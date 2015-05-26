@@ -48,6 +48,7 @@ namespace fist
       inner(family, pointSize, weight)
     {
       inner.setPixelSize(pointSize * 1.4);
+      inner.setStyleStrategy(QFont::PreferAntialias);
     }
     operator QFont& () { return inner; }
     operator QFont const& () const { return inner; }
@@ -59,14 +60,13 @@ namespace fist
     // TextStyle provides a friendly api to set Widget font and color.
     struct Text
     {
-      Text(QFont const& font,
+      Text(Font const& font,
            QColor const& color = QColor(0x25, 0x25, 0x25),
            Qt::Alignment const& aligment = Qt::AlignLeft | Qt::AlignVCenter):
         _font(font),
         _color(color),
         _alignement(aligment)
       {
-        this->_font.setStyleStrategy(QFont::PreferAntialias);
       }
 
       void
@@ -173,7 +173,7 @@ namespace view
   {
     static
     fist::style::Text const
-    style(fist::Font(Montserrat, 9), QColor(0x8B, 0x8B, 0x83));
+    style(fist::Font(Arial, 9, QFont::Bold), QColor(0x8B, 0x8B, 0x83));
 
     static
     QColor
@@ -181,7 +181,7 @@ namespace view
 
     static
     fist::style::Text const
-    hover_style(fist::Font(Montserrat, 9), QColor(0x51, 0x51, 0x49));
+    hover_style(fist::Font(Arial, 9, QFont::Bold), QColor(0x51, 0x51, 0x49));
 
     static
     QColor
@@ -189,21 +189,21 @@ namespace view
 
     static
     fist::style::Text const
-    selected_style(fist::Font(Montserrat, 9), QColor(0x2B, 0xBE, 0xBD));
+    selected_style(fist::Font(Arial, 9, QFont::Bold), QColor(0x2B, 0xBE, 0xBD));
 
     namespace counter
     {
       static
       fist::style::Text const
-      style(fist::Font(Montserrat, 7), tab::style.color(), Qt::AlignTop);
+      style(fist::Font(Arial, 7, QFont::Bold), tab::style.color(), Qt::AlignTop);
 
       static
       fist::style::Text const
-      hover_style(fist::Font(Montserrat, 7), tab::hover_style.color(), Qt::AlignTop);
+      hover_style(fist::Font(Arial, 7, QFont::Bold), tab::hover_style.color(), Qt::AlignTop);
 
       static
       fist::style::Text const
-      selected_style(fist::Font(Montserrat, 7), tab::selected_style.color(), Qt::AlignTop);
+      selected_style(fist::Font(Arial, 7, QFont::Bold), tab::selected_style.color(), Qt::AlignTop);
     }
 
   }

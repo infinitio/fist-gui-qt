@@ -22,11 +22,11 @@ namespace fist
       {
         static
         fist::style::Text const
-        default_style(fist::Font(Montserrat, 9), QColor(0x8A, 0x8A, 0x8A));
+        default_style(fist::Font(Arial, 9), QColor(0x8A, 0x8A, 0x8A));
 
         static
         fist::style::Text const
-        selected_style(fist::Font(Montserrat, 9), QColor(0x33, 0x33, 0x33));
+        selected_style(fist::Font(Arial, 9), QColor(0x33, 0x33, 0x33));
 
         namespace login
         {
@@ -49,7 +49,7 @@ namespace fist
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 12, QFont::Bold),
+          style(fist::Font(Arial, 12, QFont::Bold),
                 QColor(0x51, 0x51, 0x49));
 
           static
@@ -61,7 +61,7 @@ namespace fist
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 8), QColor(0xA7, 0xA7, 0xA7));
+          style(fist::Font(Arial, 8), QColor(0xA7, 0xA7, 0xA7));
 
           static
           QString const
@@ -73,7 +73,7 @@ namespace fist
       {
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 8), QColor(0xAA, 0xAA, 0xAA));
+        style(fist::Font(Arial, 8), QColor(0xAA, 0xAA, 0xAA));
 
         static
         QString const
@@ -86,7 +86,7 @@ namespace fist
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 11), QColor(0x33, 0x33, 0x33));
+          style(fist::Font(Arial, 11), QColor(0x33, 0x33, 0x33));
 
           static
           QSize const
@@ -143,18 +143,18 @@ namespace fist
       {
         static
         fist::style::Text const
-        error_style(fist::Font(DefaultFont, 10.5), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
+        error_style(fist::Font(Arial, 10.5), QColor(0xEE, 0x11, 0x11), Qt::AlignCenter);
 
         static
         fist::style::Text const
-        warning_style(fist::Font(DefaultFont, 10.5), QColor(0x88, 0x88, 0x88), Qt::AlignCenter);
+        warning_style(fist::Font(Arial, 10.5), QColor(0x88, 0x88, 0x88), Qt::AlignCenter);
       }
 
       namespace links
       {
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0x3D, 0x91, 0xD4));
+        style(fist::Font(Arial, 9), QColor(0x3D, 0x91, 0xD4));
 
         static
         Qt::TextInteractionFlags const
@@ -199,7 +199,7 @@ namespace fist
       {
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 8.5), QColor(0x88, 0x88, 0x88));
+        style(fist::Font(Arial, 8.5), QColor(0x88, 0x88, 0x88));
       }
 
       namespace login_button
@@ -210,7 +210,7 @@ namespace fist
 
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 11, QFont::Bold), Qt::white);
+        style(fist::Font(Arial, 11, QFont::Bold), Qt::white);
 
         static
         QString const

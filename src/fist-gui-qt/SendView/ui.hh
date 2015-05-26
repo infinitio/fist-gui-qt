@@ -15,14 +15,14 @@ namespace fist
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+          style(fist::Font(Arial, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
         }
 
         namespace size
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+          style(fist::Font(Arial, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
         }
 
         static
@@ -34,11 +34,11 @@ namespace fist
       {
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
+        style(fist::Font(Arial, 9), QColor(0xB3, 0xB3, 0xB3), Qt::AlignVCenter);
 
         static
         fist::style::Text const
-        hover_style(fist::Font(DefaultFont, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
+        hover_style(fist::Font(Arial, 9), QColor(0x3C, 0x91, 0xD4), Qt::AlignVCenter);
 
         static
         QColor const
@@ -57,7 +57,7 @@ namespace fist
       {
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+        style(fist::Font(Arial, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
         static
         QString const
@@ -74,7 +74,7 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9), QColor(0x51, 0x51, 0x49));
+          style(fist::Font(Arial, 9), QColor(0x51, 0x51, 0x49));
         }
 
         namespace subtitle
@@ -85,7 +85,7 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9, QFont::Bold),
+          style(fist::Font(Arial, 9, QFont::Bold),
                 QColor(0x51, 0x51, 0x49));
         }
       }
@@ -94,7 +94,7 @@ namespace fist
       {
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
+        style(fist::Font(Arial, 9), QColor(0x25, 0x25, 0x25), Qt::AlignVCenter);
 
         static
         QString const
@@ -104,7 +104,7 @@ namespace fist
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
+          style(fist::Font(Arial, 7), QColor(0xA5, 0xA5, 0xA5), Qt::AlignVCenter);
 
         }
       }
@@ -115,14 +115,14 @@ namespace fist
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9), QColor(0x25, 0x25, 0x25));
+          style(fist::Font(Arial, 9), QColor(0x25, 0x25, 0x25));
         }
 
         namespace handle
         {
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 8), QColor(0xC4, 0xC4, 0xC4));
+          style(fist::Font(Arial, 8), QColor(0xC4, 0xC4, 0xC4));
         }
       }
 
@@ -136,7 +136,7 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9, QFont::Bold), QColor(0x51, 0x51, 0x49));
+          style(fist::Font(Arial, 9, QFont::Bold), QColor(0x51, 0x51, 0x49));
         }
 
         namespace subtitle
@@ -147,7 +147,7 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(DefaultFont, 9), QColor(0xB3, 0xB3, 0xB3));
+          style(fist::Font(Arial, 9), QColor(0xB3, 0xB3, 0xB3));
         }
       }
 

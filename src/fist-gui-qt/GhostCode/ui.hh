@@ -24,7 +24,7 @@ namespace fist
 
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 12, QFont::Bold),
+        style(fist::Font(Arial, 12, QFont::Bold),
               QColor(0x51, 0x51, 0x49));
       }
 
@@ -36,14 +36,14 @@ namespace fist
 
         static
         fist::style::Text const
-        style(fist::Font(DefaultFont, 10), QColor(0xA7, 0xA7, 0xA7));
+        style(fist::Font(Arial, 10), QColor(0xA7, 0xA7, 0xA7));
       }
 
       namespace code_field
       {
         static
         fist::style::Text
-        style(fist::Font(Montserrat, 15), QColor(0x33, 0x33, 0x33));
+        style(fist::Font(Arial, 15), QColor(0x33, 0x33, 0x33));
       }
     }
   }
