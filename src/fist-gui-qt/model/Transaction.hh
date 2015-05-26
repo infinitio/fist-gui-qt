@@ -84,7 +84,11 @@ namespace fist
       void
       mtime(double mtime);
     private:
-      ELLE_ATTRIBUTE_Rw(surface::gap::PeerTransaction, transaction);
+      ELLE_ATTRIBUTE_R(surface::gap::PeerTransaction, transaction);
+    public:
+      bool
+      transaction(surface::gap::PeerTransaction const& tr);
+    private:
       // Cache the files as a QVector<Qstring>.
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);
       // Cache the mtime.

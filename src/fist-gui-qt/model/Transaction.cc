@@ -41,7 +41,7 @@ namespace fist
       this->mtime(transaction.mtime);
     }
 
-    void
+    bool
     Transaction::transaction(surface::gap::PeerTransaction const& transaction)
     {
       surface::gap::PeerTransaction old = this->_transaction;
@@ -52,6 +52,7 @@ namespace fist
       else
         this->_pause = false;
       emit status_updated();
+      return old.status != this->status();
     }
 
     bool

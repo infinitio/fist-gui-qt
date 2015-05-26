@@ -605,21 +605,36 @@ namespace fist
       emit new_transaction(id);
       it = this->_transactions.get<0>().find(id);
     }
+
     struct UpdateStatus
     {
-      UpdateStatus(surface::gap::PeerTransaction const& transaction):
-        _transaction(transaction)
+      UpdateStatus(surface::gap::PeerTransaction const& transaction,
+                   bool& changed)
+        : _transaction(transaction)
+        , _changed(changed)
       {}
+
+      UpdateStatus(UpdateStatus const& updater)
+        : _transaction(updater._transaction)
+        , _changed(updater._changed)
+      {
+      }
 
       void
       operator()(model::Transaction& model)
       {
-        model.transaction(this->_transaction);
+        this->_changed = model.transaction(this->_transaction);
       }
 
       ELLE_ATTRIBUTE(surface::gap::PeerTransaction, transaction)
+      ELLE_ATTRIBUTE(bool&, changed);
     };
-    this->_transactions.modify(it, UpdateStatus(tr));
+
+    bool changed = false;
+    auto const& updater = UpdateStatus(tr, changed);
+    this->_transactions.modify(it, updater);
+    if (changed)
+      emit transaction_updated(id);
     this->_compute_active_transactions();
   }
 
