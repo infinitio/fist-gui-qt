@@ -123,7 +123,7 @@ def configure(cxx_toolkit = None,
     ]
     Qt_removed_images_plugins = set(drake.cxx.qt.Qt.imageformats) - set(Qt_images_plugins)
     Qt_configure_args = [
-      '-shared', '-release', '-no-sql-sqlite',
+      '-shared', '-release', '-no-sql-sqlite', '-no-rpath',
       '-no-opengl', '-opensource', '-confirm-license', '-nomake', 'demos',
       '-fast', '-nomake', 'examples', '-nomake', 'tests', '-openssl',
       '-I%s' % openssl_include_dir,
