@@ -59,8 +59,21 @@ namespace fist
       , _avatar()
       , _default_avatar(true)
       , _new_avatar(true)
+      , _last_interraction(QDateTime::fromTime_t(0))
     {
     }
+
+    User&
+    User::operator=(User const& other)
+    {
+      this->_model = other._model;
+      this->_avatar = other._avatar;
+      this->_default_avatar = other._default_avatar;
+      this->_new_avatar = other._new_avatar;
+      this->_last_interraction = other._last_interraction;
+      return *this;
+    }
+
 
     void
     User::model(surface::gap::User const& user)
@@ -96,7 +109,7 @@ namespace fist
     }
 
     bool
-    User::deleted()
+    User::deleted() const
     {
       return this->_model.deleted;
     }
@@ -173,9 +186,17 @@ namespace fist
     }
 
     void
+    User::last_interraction(QDateTime const& time)
+    {
+      if (this->_last_interraction < time)
+        this->_last_interraction = time;
+
+    }
+    void
     User::print(std::ostream& stream) const
     {
-      stream << "User(" << this->id() << ", " << this->_model.fullname << ")";
+      stream << "User(" << this->id() << ", " << this->_model.fullname << ", "
+             << "last interraction: " << this->_last_interraction;
     }
   }
 }
