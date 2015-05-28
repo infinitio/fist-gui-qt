@@ -13,6 +13,7 @@
 #include <QUrl>
 #include <QDir>
 #include <QVector>
+#include <boost/range/adaptor/reversed.hpp>
 
 #include <elle/log.hh>
 #include <elle/os/environ.hh>
@@ -307,8 +308,10 @@ namespace fist
         ELLE_ERR("getting swaggers failed %s", res);
       for (auto const& user: users)
       {
-        this->_users[user.id].reset(new model::User(*this, user));
-        ELLE_DEBUG("user: %s", *this->_users[user.id]);
+        auto p = this->_users.emplace(*this, user);
+        if (!p.second)
+          this->_users.replace(p.first, model::User(*this, user));
+        ELLE_DEBUG("user: %s", this->user(user.id));
       }
     }
 
@@ -374,9 +377,7 @@ namespace fist
   State::_on_avatar_available(uint32_t id)
   {
     ELLE_TRACE_SCOPE("%s: avatar available for id %s", *this, id);
-    if (this->_users.find(id) == this->_users.end())
-      this->_users[id].reset(new model::User(*this, id));
-    auto* fetcher = new AvatarFetcher(id, *this);
+    auto* fetcher = new AvatarFetcher(this->user(id).id(), *this);
     connect(fetcher, SIGNAL(finished()), this, SLOT(_avatar_fetched()));
     fetcher->start();
   }
@@ -387,23 +388,19 @@ namespace fist
     auto* fetcher = static_cast<AvatarFetcher*>(QObject::sender());
     elle::SafeFinally deleter([&] { fetcher->deleteLater(); });
     auto id = fetcher->id();
-    if (this->_users.find(id) == this->_users.end())
-      this->_users[id].reset(new model::User(*this, id));
     {
       this->_avatar_mutex.lock();
       elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });
       ELLE_TRACE("got %s big avatar", fetcher->avatar().size());
       this->_avatars[id] = fetcher->avatar();
     }
-    ELLE_TRACE("update %s avatar", *this->_users[id])
-      this->_users[id]->avatar_available();
+    ELLE_TRACE("update %s avatar", this->user(id))
+      this->user(id).avatar_available();
   }
 
   QByteArray&
   State::avatar(uint32_t id)
   {
-    if (this->_users.find(id) == this->_users.end())
-      this->_users[id].reset(new model::User(*this, id));
     {
       this->_avatar_mutex.lock();
       elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });
@@ -421,37 +418,38 @@ namespace fist
   void
   State::on_swagger_deleted(uint32_t id)
   {
-    if (this->_users.find(id) == this->_users.end())
-      this->_users[id].reset(new model::User(*this, id));
-    this->_users.at(id)->deleted(true);
+    this->user(id).deleted(true);
   }
 
   void
   State::on_user_updated(surface::gap::User const& user)
   {
-    ELLE_TRACE_SCOPE("%s: peer %s updated", *this, user);
-    if (this->_users.find(user.id) == this->_users.end())
-      this->_users[user.id].reset(new model::User(*this, user));
+    ELLE_LOG_SCOPE("%s: peer %s updated", *this, user);
+    auto it = this->_users.get<0>().find(user.id);
+    if (it == this->_users.get<0>().end())
+      this->_users.emplace(*this, user);
     else
-      this->_users.at(user.id)->model(user);
+      this->_users.replace(it, model::User(*this, user));
   }
 
   void
   State::on_user_status_changed(uint32_t id, bool status)
   {
-    if (this->_users.find(id) == this->_users.end())
-      this->_users[id].reset(new model::User(*this, id));
-    this->_users[id]->status(status);
+    this->user(id).status(status);
   }
 
   State::Users
-  State::swaggers(std::function<bool (model::User const&)> filter)
+  State::swaggers(Filter const& filter)
   {
+    ELLE_DEBUG_SCOPE("%s: get swaggers", *this);
     State::Users res;
-    for (auto const& user: this->_users)
+    for (auto const& user: boost::adaptors::reverse(this->_users.get<1>()))
     {
-      if (!user.second->deleted() && user.second->swagger() && filter(*(user.second)))
-        res.push_back(user.first);
+      if (user.swagger() && !user.deleted() && filter(user))
+      {
+        ELLE_DEBUG("add result: %s", user)
+          res.push_back(user.id());
+      }
     }
     return res;
   }
@@ -460,11 +458,14 @@ namespace fist
   State::Users
   State::swaggers(QString const& filter)
   {
+    ELLE_TRACE_SCOPE("%s: get swaggers matching %s", *this, filter);
     return this->swaggers(
       [&filter] (model::User const& user) -> bool
       {
-        return (user.fullname().toLower().contains(filter.toLower()) ||
-                user.handle().toLower().contains(filter.toLower()));
+        return filter.isEmpty()
+          ? true
+          : (user.fullname().toLower().contains(filter.toLower()) ||
+             user.handle().toLower().contains(filter.toLower()));
       });
   }
 
@@ -517,14 +518,11 @@ namespace fist
     auto res = gap_user_by_email(this->state(), email.c_str(), u);
     if (res == gap_ok)
     {
-      if (this->_users.find(u.id) == this->_users.end())
-        this->_users[u.id].reset(new model::User(*this, u));
-      return u.id;
+      return this->user(u.id).id();
     }
     else
       ELLE_WARN("user by email failed: %s", res);
     return gap_null();
-
   }
 
   // Cancel the search operation.
@@ -540,11 +538,17 @@ namespace fist
   }
 
   model::User const&
+  State::user(uint32_t user_id) const
+  {
+    return *this->_users.get<0>().find(user_id);
+  }
+
+  model::User&
   State::user(uint32_t user_id)
   {
-    if (this->_users.find(user_id) == this->_users.end())
-      this->_users[user_id].reset(new model::User(*this, user_id));
-    return *this->_users[user_id];
+    if (this->_users.get<0>().find(user_id) == this->_users.get<0>().end())
+        this->_users.emplace(*this, user_id);
+    return const_cast<model::User&>(*this->_users.get<0>().find(user_id));
   }
 
   State::Users

@@ -162,9 +162,10 @@ namespace fist
     typedef std::vector<uint32_t> Users;
 
     // Return every swaggers.
+    typedef std::function<bool (model::User const&)> Filter;
     Users
     swaggers(
-      std::function<bool (model::User const&)> filter = [] (model::User const&) { return true; });
+      Filter const& filter = [] (model::User const&) { return true; });
 
     // Return a subset of the swaggers.
     Users
@@ -185,12 +186,26 @@ namespace fist
     results();
 
     model::User const&
+    user(uint32_t user_id) const;
+
+    model::User&
     user(uint32_t user_id);
 
     uint32_t
     user_id(std::string const& email);
 
-    typedef std::unordered_map<uint32_t, std::unique_ptr<model::User>> UserModels;
+    // typedef std::unordered_map<uint32_t, std::unique_ptr<model::User>> UserModels;
+    typedef boost::multi_index::multi_index_container<
+      model::User,
+      boost::multi_index::indexed_by<
+        boost::multi_index::ordered_unique<
+          boost::multi_index::const_mem_fun<model::Model, uint32_t, &model::Model::id>
+          >,
+        boost::multi_index::ordered_non_unique<
+          boost::multi_index::const_mem_fun<model::User, QDateTime const&, &model::User::last_interraction>
+          >
+        >
+      > UserModels;
     ELLE_ATTRIBUTE_R(UserModels, users);
     typedef std::vector<uint32_t> Results;
     typedef QFuture<Results> FutureSearchResult;
