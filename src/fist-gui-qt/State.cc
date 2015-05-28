@@ -279,6 +279,21 @@ namespace fist
     return devices;
   }
 
+  struct UpdateTime
+  {
+    UpdateTime(model::Transaction const& transaction)
+      : _transaction(transaction)
+    {}
+
+    void
+    operator()(model::User& model)
+    {
+      model.last_interraction(this->_transaction.mtime());
+    }
+
+    ELLE_ATTRIBUTE(model::Transaction const&, transaction)
+  };
+
   void
   State::use_ghost_code(std::string const& code,
                         bool manual)
@@ -324,8 +339,12 @@ namespace fist
       for (auto const& transaction: transactions)
       {
         this->_transactions.emplace(*this, transaction);
-        ELLE_TRACE("transaction: %s",
-                   *this->_transactions.get<0>().find(transaction.id));
+        auto const& tr = *this->_transactions.get<0>().find(transaction.id);
+        ELLE_TRACE("transaction: %s", tr);
+
+        auto it = this->_users.get<0>().find(tr.peer().id());
+        if (it != this->_users.get<0>().end())
+          this->_users.modify(it, UpdateTime(tr));
       }
       this->_compute_active_transactions();
     }
@@ -639,6 +658,12 @@ namespace fist
     this->_transactions.modify(it, updater);
     if (changed)
       emit transaction_updated(id);
+    {
+      auto const& tr = *it;
+      auto peer = this->_users.get<0>().find(tr.peer().id());
+      if (peer != this->_users.get<0>().end())
+        this->_users.modify(peer, UpdateTime(tr));
+    }
     this->_compute_active_transactions();
   }
 
