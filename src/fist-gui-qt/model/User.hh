@@ -39,6 +39,9 @@ namespace fist
 
       User(User const&) = default;
 
+      User&
+      operator=(User const&);
+
       /// Return true if it's the current user.
       bool
       me() const;
@@ -53,7 +56,7 @@ namespace fist
       deleted(bool status);
 
       bool
-      deleted();
+      deleted() const;
 
       void
       status(bool status);
@@ -88,6 +91,7 @@ namespace fist
       ELLE_ATTRIBUTE_P(bool, new_avatar, mutable);
       typedef std::vector<model::Device> Devices;
       ELLE_ATTRIBUTE_RX(Devices, devices);
+      ELLE_ATTRIBUTE_Rw(QDateTime, last_interraction);
 
     signals:
       void
