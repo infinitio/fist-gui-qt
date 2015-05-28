@@ -34,14 +34,8 @@
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/icons.hh>
 #include <fist-gui-qt/Settings.hh>
-#include <fist-gui-qt/onboarding/Onboarder.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Dock");
-
-static const QString
-onboarded_reception_complete("reception_complete");
-static const QString
-onboarded_sending_complete("sending_complete");
 
 // This ugly macro prevent method to be called multiple times.
 #define ENSURE_ONE_AT_A_TIME()                                          \
@@ -95,9 +89,6 @@ InfinitDock::InfinitDock(fist::State& state,
   , _logout(new QAction(tr("&Logout"), this))
   , _quit(new QAction(tr("&Quit"), this))
   , _update(nullptr)
-#ifndef FIST_PRODUCTION_BUILD
-  , _start_onboarding_action(new QAction(tr("&Start onboarding"), this))
-#endif
 {
   this->_systray.set_icon(fist::icon::normal);
   this->_systray.show();
@@ -201,28 +192,11 @@ InfinitDock::InfinitDock(fist::State& state,
   this->connect(_quit, SIGNAL(triggered()), this, SLOT(_on_logout()));
   this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
 
-  ELLE_DEBUG("check if onboarded reception has been done")
-    if (!fist::settings()["onboarding"].exists(onboarded_reception_complete))
-    {
-      int delay = 1000;
-      ELLE_TRACE_SCOPE("run onboarded reception in %s ms", delay);
-      auto* delay_onboarding = new QTimer(this);
-      delay_onboarding->setSingleShot(true);
-      connect(delay_onboarding, SIGNAL(timeout()),
-              this, SLOT(_start_onboarded_reception()));
-      delay_onboarding->start(delay);
-    }
-
   connect(&this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
           this, SLOT(_active_transactions_changed(size_t)));
   connect(&this->_state, SIGNAL(running_transactions_changed(size_t)),
           this, SLOT(_active_transactions_changed(size_t)));
 
-#ifndef FIST_PRODUCTION_BUILD
-  this->_menu->addAction(_start_onboarding_action);
-  this->connect(this->_start_onboarding_action, SIGNAL(triggered()),
-                this, SLOT(_start_onboarded_reception()));
-#endif
   this->_active_transactions_changed(0);
 
   connect(&fist::notification::center(), SIGNAL(notification_clicked()),
@@ -536,8 +510,7 @@ InfinitDock::hideEvent(QHideEvent* event)
 {
   ELLE_LOG_SCOPE("%s: hide dock", *this);
 
-  if (fist::settings()["onboarding"].exists(onboarded_reception_complete) &&
-      !fist::settings()["dock"].exists("first_minimizing_popup"))
+  if (!fist::settings()["dock"].exists("first_minimizing_popup"))
   {
     fist::settings()["dock"].set("first_minimizing_popup", "1");
     fist::notification::center().notify(
@@ -759,71 +732,6 @@ InfinitDock::report_a_problem()
   }
 
   this->setFocus();
-}
-
-/*-----------.
-| Onboarding |
-`-----------*/
-void
-InfinitDock::_start_onboarded_reception()
-{
-  if (this->_onboarder == nullptr)
-    this->_onboarder.reset(new fist::onboarding::Onboarder(this));
-  QString file = QString::fromStdString(
-    elle::os::getenv(
-      "FIST_ONBOARDING_FILE",
-      (QCoreApplication::applicationDirPath() +
-       QDir::separator() + "Infinit - Episode 2.mp4").toStdString()));
-  this->_onboarder->receive_file(file);
-  connect(this->_onboarder.get(), SIGNAL(reception_completed()),
-          this, SLOT(_on_onboarded_reception_completed()));
-}
-
-void
-InfinitDock::_start_onboarded_sending()
-{
-  if (this->_onboarder == nullptr)
-    this->_onboarder.reset(new fist::onboarding::Onboarder(this));
-  this->_onboarder->send_file();
-  connect(this->_onboarder.get(), SIGNAL(sending_completed()),
-          this, SLOT(_on_onboarded_sending_completed()));
-}
-
-void
-InfinitDock::_on_onboarded_reception_completed()
-{
-  ELLE_TRACE_SCOPE("%s: onboarded reception done", *this);
-  disconnect(this->_onboarder.get(), SIGNAL(reception_completed()),
-             this, SLOT(_on_onboarded_reception_completed()));
-  // Store the version to allow to rerun the onboarding on future version by
-  // checking the previously stored one.
-  fist::settings()["onboarding"].set(
-    onboarded_reception_complete, QString(INFINIT_VERSION));
-
-  ELLE_DEBUG("check if onboarded sending has been done")
-    if (!fist::settings()["onboarding"].exists(onboarded_sending_complete))
-    {
-      int delay = 4000;
-      ELLE_TRACE_SCOPE("run onboarded sending in %s ms", delay);
-      auto* delay_onboarding = new QTimer(this);
-      delay_onboarding->setSingleShot(true);
-      connect(delay_onboarding, SIGNAL(timeout()),
-              this, SLOT(_start_onboarded_sending()));
-      delay_onboarding->start(delay);
-    }
-}
-
-void
-InfinitDock::_on_onboarded_sending_completed()
-{
-  ELLE_TRACE_SCOPE("%s: onboarded sending done", *this);
-  disconnect(this->_onboarder.get(), SIGNAL(sending_completed()),
-             this, SLOT(_on_onboarded_sending_completed()));
-  // Store the version to allow to rerun the onboarding on future version by
-  // checking the previously stored one.
-  fist::settings()["onboarding"].set(
-    onboarded_sending_complete, QString(INFINIT_VERSION));
-  this->_onboarder.release()->deleteLater();
 }
 
 /*------.
