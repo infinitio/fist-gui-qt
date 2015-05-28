@@ -248,7 +248,6 @@ private:
   QAction* _logout;
   QAction* _quit;
   QAction* _update;
-  ELLE_ATTRIBUTE(std::unique_ptr<fist::onboarding::Onboarder>, onboarder);
 
 private:
   /*----------.
@@ -256,33 +255,6 @@ private:
   `----------*/
   void
   print(std::ostream& stream) const override;
-
-  /*-----------.
-  | Friendship |
-  `-----------*/
-  friend fist::onboarding::Onboarder;
-
-  /*-----------.
-  | Onboarding |
-  `-----------*/
-#ifndef FIST_PRODUCTION_BUILD
-private:
-  QAction* _start_onboarding_action;
-#endif
-
-private slots:
-  void
-  _start_onboarded_reception();
-
-  void
-  _start_onboarded_sending();
-
-private slots:
-  void
-  _on_onboarded_reception_completed();
-
-  void
-  _on_onboarded_sending_completed();
 
 private:
   Q_OBJECT
