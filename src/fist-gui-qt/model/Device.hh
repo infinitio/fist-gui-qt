@@ -3,6 +3,7 @@
 
 # include <QObject>
 # include <QString>
+# include <QDateTime>
 
 # include <elle/attribute.hh>
 # include <elle/Printable.hh>
@@ -27,6 +28,7 @@ namespace fist
       ELLE_ATTRIBUTE_R(QString, name);
       ELLE_ATTRIBUTE_R(QString, os);
       ELLE_ATTRIBUTE_R(gui::IconProvider::Type, type);
+      ELLE_ATTRIBUTE_R(QDateTime, last_sync);
 
     private:
       /*----------.

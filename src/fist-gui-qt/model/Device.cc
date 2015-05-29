@@ -7,6 +7,7 @@ namespace fist
 {
   namespace model
   {
+    static const boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
     static
     gui::IconProvider::Type
     os_to_type(QString const& name)
@@ -44,6 +45,7 @@ namespace fist
       , _name(QString::fromStdString(device.name))
       , _os(device.os ? QString::fromStdString(device.os.get()) : QString{})
       , _type(os_to_type(this->_os))
+      , _last_sync(QDateTime::fromTime_t(device.last_sync ? (device.last_sync.get() - epoch).total_seconds() : 0))
     {
       // Remove when devices will be named properly.
       if (fist::regexp::uuid::checker.exactMatch (this->_name))

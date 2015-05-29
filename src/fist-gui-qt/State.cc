@@ -5,6 +5,7 @@
 #endif
 
 #include <functional>
+#include <algorithm>
 
 #include <QDesktopServices>
 #include <QHostInfo>
@@ -276,6 +277,11 @@ namespace fist
     else
       for (auto const& device: _devices)
         devices.emplace_back(*device);
+    std::sort(devices.begin(), devices.end(), [] (model::Device const& l,
+                                                  model::Device const& r)
+              {
+                return l.last_sync() > r.last_sync();
+              });
     return devices;
   }
 
