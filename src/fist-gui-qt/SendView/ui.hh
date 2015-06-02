@@ -90,6 +90,31 @@ namespace fist
         }
       }
 
+      namespace too_many_results
+      {
+        namespace title
+        {
+          static
+          QString const
+          text("Too many results");
+
+          static
+          fist::style::Text const
+          style(fist::Font(Arial, 9, QFont::Bold), QColor(0x51, 0x51, 0x49));
+        }
+
+        namespace subtitle
+        {
+          static
+          QString const
+          text("Search filter your contacts using the search field");
+
+          static
+          fist::style::Text const
+          style(fist::Font(Arial, 9), QColor(0x51, 0x51, 0x49));
+        }
+      }
+
       namespace message
       {
         static

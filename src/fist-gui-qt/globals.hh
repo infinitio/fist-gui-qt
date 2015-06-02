@@ -105,18 +105,22 @@ namespace list
   }
 }
 
-namespace links
-{
-  static
-  Qt::TextInteractionFlags const
-  interration_flags(
-    Qt::TextSelectableByMouse |
-    Qt::LinksAccessibleByMouse |
-    Qt::LinksAccessibleByKeyboard);
-}
-
 namespace view
 {
+  namespace links
+  {
+    static
+    QString const
+    rich("<a style=\"text-decoration: none; color: #489FCE;\" href=\"%1\">%2</a>");
+
+    static
+    Qt::TextInteractionFlags const
+    interration_flags(
+      Qt::TextSelectableByMouse |
+      Qt::LinksAccessibleByMouse |
+      Qt::LinksAccessibleByKeyboard);
+  }
+
   static
   QColor const
   background(0xF8, 0xF8, 0xF8);
