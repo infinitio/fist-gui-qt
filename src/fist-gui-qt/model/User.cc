@@ -61,6 +61,10 @@ namespace fist
       , _new_avatar(true)
       , _last_interraction(QDateTime::fromTime_t(0))
     {
+      if (this->id() == this->_state.my_id())
+      {
+        this->_email = QString::fromStdString(gap_self_email(this->_state.state()));
+      }
     }
 
     User&
@@ -96,10 +100,22 @@ namespace fist
       return QString::fromUtf8(this->_model.fullname.c_str());
     }
 
+    void
+    User::fullname(QString const& fullname)
+    {
+      this->_model.fullname = QString_to_utf8_string(fullname);
+    }
+
     QString
     User::handle() const
     {
       return QString::fromUtf8(this->_model.handle.c_str());
+    }
+
+    void
+    User::handle(QString const& handle)
+    {
+      this->_model.handle = QString_to_utf8_string(handle);
     }
 
     void

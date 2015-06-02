@@ -49,8 +49,14 @@ namespace fist
       QString
       fullname() const;
 
+      void
+      fullname(QString const&);
+
       QString
       handle() const;
+
+      void
+      handle(QString const&);
 
       void
       deleted(bool status);
@@ -92,6 +98,7 @@ namespace fist
       typedef std::vector<model::Device> Devices;
       ELLE_ATTRIBUTE_RX(Devices, devices);
       ELLE_ATTRIBUTE_Rw(QDateTime, last_interraction);
+      ELLE_ATTRIBUTE_RW(QString, email);
 
     signals:
       void
