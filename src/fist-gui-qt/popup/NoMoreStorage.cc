@@ -56,7 +56,7 @@ namespace fist
       {
         auto* label = new QLabel(this);
         label->setText(view::payment::link::text);
-        label->setTextInteractionFlags(::links::interration_flags);
+        label->setTextInteractionFlags(::view::links::interration_flags);
         label->setOpenExternalLinks(true);
         label->setWordWrap(true);
         view::payment::link::style(*label);

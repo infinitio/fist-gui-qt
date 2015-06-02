@@ -158,24 +158,24 @@ namespace fist
 
         static
         Qt::TextInteractionFlags const
-        interration_flags = ::links::interration_flags;
+        interration_flags = view::links::interration_flags;
 
         namespace forgot_password
         {
           static
           QString const
-          text("<a style=\"text-decoration: none; color: #489FCE;\" "
-               "href=\"https://infinit.io/forgot_password?utm_source=app&utm_medium=windows&utm_campaign=forgot_password\">"
-               "Forgot?</a>");
+          text = ::view::links::rich.arg(
+            "https://infinit.io/forgot_password?utm_source=app&utm_medium=windows&utm_campaign=forgot_password",
+            "Forgot?");
         }
 
         namespace help
         {
           static
           QString const
-          text("<a style=\"text-decoration: none; color: #489FCE;\" "
-               "href=\"https://infinit.io/faq?utm_source=app&utm_medium=windows&utm_campaign=help\">"
-               "Help!</a>");
+          text = ::view::links::rich.arg(
+            "https://infinit.io/faq?utm_source=app&utm_medium=windows&utm_campaign=help",
+            "Help!");
         }
 
         namespace need_an_account
