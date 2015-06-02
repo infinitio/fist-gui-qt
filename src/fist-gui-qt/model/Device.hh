@@ -25,7 +25,7 @@ namespace fist
 
     private:
       ELLE_ATTRIBUTE_R(QString, id);
-      ELLE_ATTRIBUTE_R(QString, name);
+      ELLE_ATTRIBUTE_RW(QString, name);
       ELLE_ATTRIBUTE_R(QString, os);
       ELLE_ATTRIBUTE_R(gui::IconProvider::Type, type);
       ELLE_ATTRIBUTE_R(QDateTime, last_sync);
