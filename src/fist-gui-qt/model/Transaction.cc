@@ -71,7 +71,7 @@ namespace fist
     Transaction::is_sender_device() const
     {
       return this->is_sender() &&
-        this->_transaction.sender_device_id == this->_state.device();
+        this->_transaction.sender_device_id == this->_state.device_id();
     }
 
     bool
@@ -84,7 +84,7 @@ namespace fist
     Transaction::is_recipient_device() const
     {
       return this->is_recipient() &&
-        this->_transaction.recipient_device_id == this->_state.device();
+        this->_transaction.recipient_device_id == this->_state.device_id();
     }
 
     bool

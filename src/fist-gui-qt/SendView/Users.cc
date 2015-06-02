@@ -255,7 +255,7 @@ namespace fist
       unsigned int i = 0;
       for (auto const& device: devices)
       {
-        if (device.id() != QString::fromStdString(this->_state.device()))
+        if (device.id() != this->_state.device().id())
         {
           ++i;
           auto widget = std::make_shared<OwnDeviceSearchResult>(me, device, this);

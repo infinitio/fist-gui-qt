@@ -160,12 +160,21 @@ namespace fist
   }
 
   std::string
-  State::device() const
+  State::device_id() const
   {
     static const elle::UUID nil_uuid;
     if (this->_device == nil_uuid.repr())
       this->_device = gap_self_device_id(this->state());
     return this->_device;
+  }
+
+  model::Device
+  State::device() const
+  {
+    for (auto const& device: this->devices())
+      if (device.id() == QString::fromStdString(this->device_id()))
+          return device;
+    elle::unreachable();
   }
 
   void
@@ -391,8 +400,15 @@ namespace fist
       ELLE_ERR("poll failed: %s", res);
   }
 
-  model::User const&
+  model::User&
   State::me()
+  {
+    ELLE_ASSERT(this->my_id() != gap_null());
+    return this->user(this->my_id());
+  }
+
+  model::User const&
+  State::me() const
   {
     ELLE_ASSERT(this->my_id() != gap_null());
     return this->user(this->my_id());

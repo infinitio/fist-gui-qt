@@ -114,6 +114,13 @@ pretty_date(QDateTime const& date)
 }
 
 inline
+std::ostream&
+operator << (std::ostream& out, QDateTime const& d)
+{
+  return out << "Date(" << pretty_date(d) << ")";
+}
+
+inline
 std::string
 QString_to_utf8_string(QString const& input)
 {
