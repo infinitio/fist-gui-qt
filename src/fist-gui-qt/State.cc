@@ -496,7 +496,7 @@ namespace fist
   void
   State::on_user_updated(surface::gap::User const& user)
   {
-    ELLE_LOG_SCOPE("%s: peer %s updated", *this, user);
+    ELLE_DEBUG_SCOPE("%s: peer %s updated", *this, user);
     auto it = this->_users.get<0>().find(user.id);
     if (it == this->_users.get<0>().end())
       this->_users.emplace(*this, user);
