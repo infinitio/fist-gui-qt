@@ -148,9 +148,14 @@ namespace fist
     ELLE_ATTRIBUTE_P(std::string, device, mutable);
   public:
     std::string
+    device_id() const;
+    model::Device
     device() const;
   public:
     model::User const&
+    me() const;
+
+    model::User&
     me();
 
   public:

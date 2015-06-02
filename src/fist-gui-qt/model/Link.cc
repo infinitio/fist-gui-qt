@@ -67,7 +67,7 @@ namespace fist
       }
       if (!_url_available(old.status) && _url_available(this->status()))
       {
-        if (this->_link.sender_device_id == this->_state.device())
+        if (this->sender_device_id() == this->_state.device().id())
           emit url_available(this->id());
       }
       if (old.click_count != this->click_count())
@@ -109,6 +109,12 @@ namespace fist
     Link::rejected() const
     {
       return this->status() == gap_transaction_payment_required;
+    }
+
+    QString
+    Link::sender_device_id() const
+    {
+      return QString::fromStdString(this->_link.sender_device_id);
     }
 
     float

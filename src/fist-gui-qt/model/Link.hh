@@ -48,6 +48,9 @@ namespace fist
       uint64_t
       size() const;
 
+      QString
+      sender_device_id() const;
+
       float
       progress() const;
 
