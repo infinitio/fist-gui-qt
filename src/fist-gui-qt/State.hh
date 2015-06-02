@@ -55,6 +55,8 @@ namespace fist
       return this->_state.get();
     }
 
+    QString
+    session_id() const;
 
     ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
     ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);

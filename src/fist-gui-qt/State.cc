@@ -258,6 +258,15 @@ namespace fist
     emit register_result(this->_register_future.result());
   }
 
+  QString
+  State::session_id() const
+  {
+    std::string session_id;
+    if (gap_session_id(this->state(), session_id) == gap_ok)
+      return QString::fromStdString(session_id);
+    return QString();
+  }
+
   void
   State::on_connection_changed(
     bool status,
