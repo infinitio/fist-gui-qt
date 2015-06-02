@@ -72,6 +72,21 @@ DirText "Choose the install directory"
 UninstallText "This will uninstall ${product_name}."
 UninstallIcon "${resources_folder}/${icon}"
 
+!macro CleanupRunAtStartup
+  DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "${product_name}"
+  Delete "$SMSTARTUP\${product_name}.lnk"
+  Delete "$SMSTARTUP\${product_name}"
+!macroend
+
+Function un.LaunchAtStartup
+  !insertmacro CleanupRunAtStartup
+FunctionEnd
+
+Function LaunchAtStartup
+  !insertmacro CleanupRunAtStartup
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${product_name}" "$INSTDIR\${executable}"
+FunctionEnd
+
 ; Don Tommaso's technique to avoid code duplication between installer and
 ; uninstaller
 !macro INSTALL_UNINSTALL_SWITCH un
@@ -398,6 +413,7 @@ FunctionEnd
 var timestamp
 var uuid
 Section "Install ${product_name}"
+  !insertmacro CleanupRunAtStartup
   IfFileExists "$PROFILE\.infinit\device.uuid" skip 0
     ;; Create .infinit directory and add device.uuid inside.
     CreateDirectory "$PROFILE\.infinit"
@@ -425,17 +441,15 @@ Section "Install ${product_name}"
     ;; Send metrics.
     StrCpy $3 "{$\"event$\":$\"installer/begin$\",$\"os$\":$\"Windows$\",$\"os_version$\":$\"unknown$\",$\"device_id$\":$\"$uuid$\",$\"user$\":$\"unknown$\",$\"timestamp$\":$Timestamp}"
     inetc::post $3 /HEADER "Content-Type:application/json" "http://metrics.9.0.api.production.infinit.io/users" "$PROFILE\.infinit\installer_metric.begin" /END
-
+    Call LaunchAtStartup
   skip:
   ;; Registers.
   ClearErrors
 
-  Delete "$SMSTARTUP\${product_name}.lnk"
-  Delete "$SMSTARTUP\${product_name}"
   WriteRegStr HKLM "${'${regkey}'}" "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM "${'${uninstkey}'}" "DisplayName" "${product_name} (remove only)"
   WriteRegStr HKLM "${'${uninstkey}'}" "UninstallString" '"$INSTDIR\${'${uninstaller}'}"'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "${product_name}" "$INSTDIR\${executable}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${product_name}" "$INSTDIR\${executable}"
   WriteRegStr HKCR "${product_name}\DefaultIcon" "" "$INSTDIR\${icon}"
   WriteRegStr HKCR "${product_name}" "" "URL: ${product_name} Protocol"
   WriteRegStr HKCR "${product_name}" "URL Protocol" ""
@@ -448,7 +462,7 @@ Section "Install ${product_name}"
   Call ReplaceContextualDll
 
   Call RegisterContextual
-  ;; Documentation.
+
   SetOutPath $INSTDIR ; for working directory
   File "${resources_folder}\${license}"
   File "${resources_folder}\${release_notes}"
@@ -490,6 +504,7 @@ SectionEnd
 Section "un.install"
   Call un.KillRunningProcess
   Call un.RegisterContextual
+  Call un.LaunchAtStartup
 
   ;; Registers
   DeleteRegKey HKLM "${'${uninstkey}'}"
