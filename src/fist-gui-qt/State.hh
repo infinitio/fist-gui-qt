@@ -4,7 +4,7 @@
 # include <functional>
 # include <vector>
 
-#include <QByteArray>
+# include <QByteArray>
 
 # include <QDateTime>
 # include <QFuture>
@@ -229,6 +229,10 @@ namespace fist
   public:
     QByteArray&
     avatar(uint32_t id);
+
+    void
+    update_avatar(QPixmap const& pixmap);
+
   private:
     void
     _on_avatar_available(uint32_t);

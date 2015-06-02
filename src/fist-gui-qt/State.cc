@@ -9,6 +9,7 @@
 
 #include <QDesktopServices>
 #include <QHostInfo>
+#include <QBuffer>
 #include <QtConcurrentRun>
 #include <QTimer>
 #include <QUrl>
@@ -463,6 +464,27 @@ namespace fist
       }
       return this->_avatars[id];
     }
+  }
+
+  void
+  State::update_avatar(QPixmap const& avatar)
+  {
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    avatar.save(&buffer, "PNG");
+    bool res = false;
+    if (gap_update_avatar(this->state(),
+                          reinterpret_cast<void const*>(bytes.constData()),
+                          bytes .size()) == gap_ok)
+    {
+      this->_avatar_mutex.lock();
+      elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });
+      this->_avatars[this->my_id()] = bytes;
+      res = true;
+    }
+    if (res)
+      this->me().avatar_available();
   }
 
   void
