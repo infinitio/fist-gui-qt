@@ -42,6 +42,8 @@ namespace fist
     Dots::paintEvent(QPaintEvent* event)
     {
       QPainter painter(this);
+      painter.setRenderHint(QPainter::Antialiasing, true);
+      painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
       painter.setPen(Qt::NoPen);
       for (unsigned int i = 0; i < this->_count; ++i)
       {
