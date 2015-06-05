@@ -82,10 +82,12 @@ public:
   void
   remove_widget(ItemPtr widget, bool all = true);
 
+  void
+  add_separator();
 
 private:
-// Filter anchor events to detect changes like visibility changed,
-// position changed, modal window spawned...
+  // Filter anchor events to detect changes like visibility changed,
+  // position changed, modal window spawned...
   bool
   eventFilter(QObject *obj, QEvent *event) override;
 
