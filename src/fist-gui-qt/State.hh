@@ -153,6 +153,8 @@ namespace fist
     device_id() const;
     model::Device
     device() const;
+    model::Device
+    device(QString const& id) const;
   public:
     model::User const&
     me() const;
