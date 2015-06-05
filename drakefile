@@ -84,7 +84,7 @@ def configure(cxx_toolkit = None,
   # Qt configuration.
   #
   qt_cxx_config = drake.cxx.Config(cxx_config)
-  if qt is not None:
+  if qt:
     qt = drake.cxx.qt.Qt(
       cxx_toolkit = cxx_toolkit,
       prefix = qt,
