@@ -1,6 +1,6 @@
 #include <QAction>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -29,6 +29,7 @@
 #include <fist-gui-qt/notification/UpdateAvailable.hh>
 #include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/GhostCode/Panel.hh>
+#include <fist-gui-qt/Settings/Window.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/globals.hh>
@@ -83,8 +84,9 @@ InfinitDock::InfinitDock(fist::State& state,
   , _systray_menu(new QMenu(this))
   , _show(new QAction(tr("&Show dock"), this))
   , _send_files(new QAction(tr("&Send files..."), this))
-  , _query_changing_download_folder(new IconButton(QPixmap(":/link/edit")))
-  , _download_folder(new QLabel(this->_state.download_folder(), this))
+  , _settings(new QAction(tr("&Settings"), this))
+  , _help(new QAction(tr("&Help!"), this))
+  , _send_feedback(new QAction(tr("&Send feedback"), this))
   , _report_a_problem(new QAction(tr("&Report a problem"), this))
   , _logout(new QAction(tr("&Logout"), this))
   , _quit(new QAction(tr("&Quit"), this))
@@ -94,10 +96,11 @@ InfinitDock::InfinitDock(fist::State& state,
   this->_systray.show();
   // System Tray.
   {
-    this->_systray_menu->addAction(_show);
-    this->_systray_menu->addAction(_send_files);
-    this->_systray_menu->addAction(_quit);
-    this->_systray.inner()->setContextMenu(_systray_menu);
+    view::menu::style(*this->_systray_menu);
+    this->_systray_menu->addAction(this->_show);
+    this->_systray_menu->addAction(this->_send_files);
+    this->_systray_menu->addAction(this->_quit);
+    this->_systray.inner()->setContextMenu(this->_systray_menu);
     connect(this->_systray.inner(),
             SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this,
@@ -135,63 +138,44 @@ InfinitDock::InfinitDock(fist::State& state,
             this,
             SLOT(_show_transactions_view()));
   }
-  connect(&this->_state, SIGNAL(new_download_folder_needed()),
-          this, SLOT(_change_download_folder()));
 
   connect(this, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
 
+  this->_show_transactions_view();
+
+  // Menus.
   this->_menu->setMaximumWidth(210);
+  this->_menu->addAction(this->_settings);
+  this->_menu->addSeparator();
+  this->_menu->addAction(this->_help);
+  this->_menu->addAction(this->_send_feedback);
+  this->_menu->addAction(this->_report_a_problem);
+  this->_menu->addSeparator();
   auto* v2 = this->_menu->addAction(QString("v" INFINIT_VERSION));
   v2->setDisabled(true);
   view::menu::style(*this->_menu);
   v2->setFont(view::version_style.font());
-  this->_menu->addSeparator();
-  QWidgetAction* change_download_folder = new QWidgetAction(this);
-  {
-    QWidget* download_folder_cell = new QWidget(this);
-    QVBoxLayout* vlayout = new QVBoxLayout(download_folder_cell);
-    vlayout->setContentsMargins(5, 0, 5, 0);
-    auto* title = new QLabel("Download folder:", this);
-    view::download_folder_title_style(*title);
-    vlayout->addWidget(title);
-    QHBoxLayout* layout = new QHBoxLayout();
-    vlayout->addLayout(layout);
-    layout->setContentsMargins(5, 0, 5, 0);
-    layout->addWidget(this->_query_changing_download_folder);
-    view::download_folder_style(*this->_download_folder);
-    layout->addWidget(this->_download_folder);
-    download_folder_cell->setLayout(layout);
-    change_download_folder->setDefaultWidget(download_folder_cell);
-    connect(this->_query_changing_download_folder, SIGNAL(released()),
-            this, SLOT(_change_download_folder()));
-    this->_download_folder->setToolTip(this->_download_folder->text());
-  }
-  this->_menu->addAction(change_download_folder);
-  this->_menu->addSeparator();
-  {
-    auto* action = new QAction("Enter a code", this);
-    connect(action, SIGNAL(triggered()), this, SLOT(_show_ghost_code_view()));
-    this->_menu->addAction(action);
-  }
-  this->_menu->addSeparator();
-  this->_menu->addAction(_report_a_problem);
-  this->_menu->addSeparator();
-  this->_menu->addAction(_logout);
-  this->_menu->addAction(_quit);
+  this->_menu->addAction(this->_logout);
+  this->_menu->addAction(this->_quit);
 
-  this->_show_transactions_view();
-
-  this->connect(_send_files, SIGNAL(triggered()), this, SLOT(_pick_files_from_menu()));
-  this->connect(_show, SIGNAL(triggered()), this, SLOT(_show_from_menu()));
-  this->connect(_report_a_problem, SIGNAL(triggered()),
-                this, SLOT(report_a_problem()));
-  this->connect(_logout, SIGNAL(triggered()), this, SLOT(_on_logout()));
-  this->connect(_logout, SIGNAL(triggered()), this, SLOT(hide()));
-  this->connect(_logout, SIGNAL(triggered()), this, SIGNAL(logout_request()));
-  this->connect(_quit, SIGNAL(triggered()), this, SLOT(_on_logout()));
-  this->connect(_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
-
+  // Menu connections.
+  connect(this->_show, SIGNAL(triggered()), this, SLOT(_show_from_menu()));
+  connect(this->_logout, SIGNAL(triggered()), this, SLOT(_on_logout()));
+  connect(this->_logout, SIGNAL(triggered()), this, SLOT(hide()));
+  connect(this->_logout, SIGNAL(triggered()), this, SIGNAL(logout_request()));
+  connect(this->_quit, SIGNAL(triggered()), this, SLOT(_on_logout()));
+  connect(this->_quit, SIGNAL(triggered()), this, SIGNAL(quit_request()));
+  connect(this->_send_files, SIGNAL(triggered()),
+          this, SLOT(_pick_files_from_menu()));
+  connect(this->_settings, SIGNAL(triggered()),
+          this, SLOT(show_settings()));
+  connect(this->_help, SIGNAL(triggered()),
+          this, SLOT(help()));
+  connect(this->_send_feedback, SIGNAL(triggered()),
+          this, SLOT(send_feedback()));
+  connect(this->_report_a_problem, SIGNAL(triggered()),
+          this, SLOT(report_a_problem()));
   connect(&this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
           this, SLOT(_active_transactions_changed(size_t)));
   connect(&this->_state, SIGNAL(running_transactions_changed(size_t)),
@@ -221,6 +205,51 @@ InfinitDock::_on_logout()
   this->setCentralWidget(nullptr);
   this->_send_panel.reset();
   this->_transaction_panel.reset();
+}
+
+void
+InfinitDock::help()
+{
+  static const QString url(
+    "http://help.infinit.io/knowledgebase?utm_source=app&utm_medium=windows");
+  QDesktopServices::openUrl(QUrl(url));
+}
+
+void
+InfinitDock::send_feedback()
+{
+  static const QString url(
+    "http://help.infinit.io?utm_source=app&utm_medium=windows");
+  QDesktopServices::openUrl(QUrl(url));
+}
+
+void
+InfinitDock::report_a_problem()
+{
+  ENSURE_ONE_AT_A_TIME();
+
+  bool ok;
+  QString text = QInputDialog::getText(this,
+                                       tr("Report a problem"),
+                                       tr("Please describe the problem you had"),
+                                       QLineEdit::Normal,
+                                       "Enter your message",
+                                       &ok);
+
+  if (ok)
+  {
+    ELLE_DEBUG("user message: %s", text);
+    auto std_text = QString_to_utf8_string(text);
+    ELLE_DEBUG("user message (%s)", std_text);
+    gap_send_user_report(
+      this->_state.state(),
+      gap_self_email(this->_state.state()),
+      std_text.c_str(),
+      std::vector<std::string>{});
+    ELLE_DEBUG("report sent");
+  }
+
+  this->setFocus();
 }
 
 /*------------.
@@ -253,23 +282,6 @@ void
 InfinitDock::_systray_message_clicked()
 {
   elle::SafeFinally show([&] { this->show(); });
-}
-
-void
-InfinitDock::_change_download_folder()
-{
-  ENSURE_ONE_AT_A_TIME();
-  this->_menu->clearFocus();
-  this->_menu->hide();
-  QString selected = QFileDialog::getExistingDirectory(
-    this,
-    tr("Select a download folder"));
-  if (!selected.isEmpty())
-  {
-    this->_state.download_folder(selected);
-    this->_download_folder->setText(selected);
-    this->_download_folder->setToolTip(this->_download_folder->text());
-  }
 }
 
 void
@@ -620,15 +632,11 @@ void
 InfinitDock::_show_menu()
 {
   ELLE_TRACE_SCOPE("%s: show menu", *this);
-
   this->_menu->show();
-
   QPoint pos(this->geometry().bottomLeft());
-
-  int margin = 3;
+  int margin = 5;
   this->_menu->move(pos.x() + margin,
                     pos.y() - this->_menu->size().height() - margin);
-
 }
 
 // XXX: Qt file dialog implementation is really broken.
@@ -663,11 +671,10 @@ InfinitDock::_pick_files()
 void
 InfinitDock::_add_files(QList<QUrl> const& list)
 {
-  ELLE_LOG_SCOPE("%s: add files %s", *this, list);
+  ELLE_TRACE_SCOPE("%s: add files %s", *this, list);
   for (auto file: list)
   {
-    ELLE_LOG("add file %s", file)
-      this->_send_panel->file_adder()->add_file(file);
+    this->_send_panel->file_adder()->add_file(file);
   }
 }
 
@@ -706,32 +713,11 @@ InfinitDock::get_a_link(QList<QUrl> const& list)
 }
 
 void
-InfinitDock::report_a_problem()
+InfinitDock::show_settings()
 {
-  ENSURE_ONE_AT_A_TIME();
-
-  bool ok;
-  QString text = QInputDialog::getText(this,
-                                       tr("Report a problem"),
-                                       tr("Please describe the problem you had"),
-                                       QLineEdit::Normal,
-                                       "Enter your message",
-                                       &ok);
-
-  if (ok)
-  {
-    ELLE_DEBUG("user message: %s", text);
-    auto std_text = QString_to_utf8_string(text);
-    ELLE_DEBUG("user message (%s)", std_text);
-    gap_send_user_report(
-      this->_state.state(),
-      gap_self_email(this->_state.state()),
-      std_text.c_str(),
-      std::vector<std::string>{});
-    ELLE_DEBUG("report sent");
-  }
-
-  this->setFocus();
+  this->_settings_window.reset(new fist::prefs::Window(this->_state, this));
+  this->_settings_window->show();
+  this->_settings_window->setModal(true);
 }
 
 /*------.
