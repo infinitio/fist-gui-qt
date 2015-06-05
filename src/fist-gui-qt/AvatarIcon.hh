@@ -11,7 +11,8 @@ class AvatarIcon:
 {
 public:
   AvatarIcon(QPixmap const& pixmap,
-             QSize const& size = QSize(35, 35));
+             QSize const& size, // = QSize(35, 35),
+             QWidget* parent = nullptr);
   virtual
   ~AvatarIcon() = default;
 
@@ -22,8 +23,6 @@ protected:
   virtual void paintEvent(QPaintEvent*) override;
 
 private:
-  uint32_t _uid;
-
   QPixmap _pixmap;
   QPixmap _mask;
   int _border;
