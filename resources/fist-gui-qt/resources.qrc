@@ -317,6 +317,14 @@
     <file alias="onboarding/always_available">../slices/windows/view_onboarding/show-icon.png</file>
     <file alias="onboarding/always_available@2x">../slices/windows/view_onboarding/show-icon@2x.png</file>
 
+    <!-- in app onboarding -->
+    <file alias="onboarding/link">../slices/mac/view_main/icon-link.png</file>
+    <file alias="onboarding/link@2x">../slices/mac/view_main/icon-link@2x.png</file>
+    <file alias="onboarding/transaction">../slices/mac/view_main/icon-activity.png</file>
+    <file alias="onboarding/transaction@2x">../slices/mac/view_main/icon-activity@2x.png</file>
+    <file alias="onboarding/icon-pointing-arrow">../slices/mac/view_main/arrow-onboarding-send.png</file>
+    <file alias="onboarding/icon-pointing-arrow@2x">../slices/mac/view_main/arrow-onboarding-send@2x.png</file>
+
     <!-- os icons -->
     <file alias="os/windows">../slices/mac/view_send/icon-device-windows-avatar.png</file>
     <file alias="os/windows@2x">../slices/mac/view_send/icon-device-windows-avatar@2x.png</file>
@@ -330,6 +338,10 @@
     <file alias="os/linux@2x">../slices/mac/view_send/icon-device-default-avatar@2x.png</file>
     <file alias="os/unknown">../slices/mac/view_send/icon-device-default-avatar.png</file>
     <file alias="os/unknown@2x">../slices/mac/view_send/icon-device-default-avatar@2x.png</file>
+
+    <!-- icons -->
+    <file alias="icon/email">../slices/mac/view_send/send-icon-email-results.png</file>
+    <file alias="icon/email@2x">../slices/mac/view_send/send-icon-email-results@2x.png</file>
 
     <!-- Fonts -->
     <file alias="font/LucidaGrande">../fonts/LucidaGrande.ttc</file>
