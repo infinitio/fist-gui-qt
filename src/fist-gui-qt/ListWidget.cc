@@ -365,9 +365,8 @@ ListWidget::paintEvent(QPaintEvent* e)
     height += widget->size().height();
     for (auto const& color: this->_separator._colors)
     {
-      auto darker = widget->darker_next_separator();
-      painter.setPen(!darker ? color : color.darker(110));
-      painter.setBrush(!darker ? color : color.darker(110));
+      painter.setPen(color);
+      painter.setBrush(color);
       painter.drawRect(
         left_margin, height, this->width() - left_margin - right_margin, 0);
       height += 1;
