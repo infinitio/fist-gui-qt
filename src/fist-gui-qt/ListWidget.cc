@@ -6,6 +6,7 @@
 #include <elle/log.hh>
 
 #include <fist-gui-qt/ListWidget.hh>
+#include <fist-gui-qt/HorizontalSeparator.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.ListWidget");
 
@@ -21,6 +22,7 @@ ListWidget::ListWidget(QWidget* parent,
   Super(parent),
   _offset(0),
   _separator(separator),
+  _separators(0),
   _height_hint(0),
   _width_hint(0),
   _max_rows(-1),
@@ -89,6 +91,16 @@ ListWidget::remove_widget(ItemPtr widget, bool all)
   this->_layout();
 }
 
+void
+ListWidget::add_separator()
+{
+  auto b = std::make_shared<HorizontalSeparator>(this, 15);
+  ++this->_separators;
+  b->show();
+  this->_widgets.push_back(b);
+  this->_scroll->raise();
+}
+
 bool
 ListWidget::eventFilter(QObject *obj, QEvent *event)
 {
@@ -148,6 +160,7 @@ void
 ListWidget::clearWidgets()
 {
   this->_widgets.clear();
+  this->_separators = 0;
   this->_layout();
 }
 
@@ -191,7 +204,7 @@ ListWidget::_layout()
       widget_height = widget->size().height();
       ELLE_DEBUG("new height: %s", widget_height);
       height += widget_height + this->_separator.height();
-      if (fixed_height == -1 && ++rows == this->maxRows())
+      if (fixed_height == -1 && ++rows == (this->maxRows() + this->_separators))
       {
         fixed_height = height;
         ELLE_DEBUG("fixed height: %s", fixed_height);
