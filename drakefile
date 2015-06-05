@@ -380,6 +380,10 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/popup/NoMoreStorage.cc",
       "src/fist-gui-qt/popup/NoMoreStorage.hh",
 
+      # Settings.
+      "src/fist-gui-qt/Settings/Window.cc",
+      "src/fist-gui-qt/Settings/Window.hh",
+
       # Empty states.
       "src/fist-gui-qt/MainView/EmptyState.cc",
       "src/fist-gui-qt/MainView/EmptyState.hh",

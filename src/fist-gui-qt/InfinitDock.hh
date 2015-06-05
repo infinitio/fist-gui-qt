@@ -76,9 +76,6 @@ private slots:
   void
   _active_transactions_changed(size_t);
 
-  void
-  _change_download_folder();
-
 /*-------.
 | Update |
 `-------*/
@@ -233,21 +230,33 @@ public slots:
   void
   get_a_link(QList<QUrl> const& list);
 
-  void
-  report_a_problem();
-
 private:
   QPixmap _logo;
   fist::gui::systray::Icon& _systray;
   QMenu* _systray_menu;
   QAction* _show;
   QAction* _send_files;
-  QPushButton* _query_changing_download_folder;
-  QLabel* _download_folder;
+  QAction* _settings;
+  QAction* _help;
+  QAction* _send_feedback;
   QAction* _report_a_problem;
   QAction* _logout;
   QAction* _quit;
   QAction* _update;
+  ELLE_ATTRIBUTE(std::unique_ptr<QDialog>, settings_window);
+
+private slots:
+  void
+  show_settings();
+
+  void
+  help();
+
+  void
+  send_feedback();
+
+  void
+  report_a_problem();
 
 private:
   /*----------.
