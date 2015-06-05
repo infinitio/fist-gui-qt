@@ -178,6 +178,16 @@ namespace fist
     elle::unreachable();
   }
 
+  model::Device
+  State::device(QString const& id) const
+  {
+    for (auto const& device: this->devices())
+      if (device.id() == id)
+        return device;
+    elle::unreachable();
+  }
+
+
   void
   State::login(std::string const& email,
                std::string const& password)
