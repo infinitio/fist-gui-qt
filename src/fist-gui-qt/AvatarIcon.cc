@@ -5,12 +5,13 @@
 # include <QPixmap>
 
 AvatarIcon::AvatarIcon(QPixmap const& pixmap,
-                       QSize const& size):
-  _uid(0),
-  _pixmap(size),
-  _mask(size),
-  _border(0),
-  _geometry(QPoint(0, 0), size - QSize(this->_border * 2, this->_border * 2))
+                       QSize const& size,
+                       QWidget* parent)
+  : QWidget(parent)
+  , _pixmap(size)
+  , _mask(size)
+  , _border(0)
+  , _geometry(QPoint(0, 0), size - QSize(this->_border * 2, this->_border * 2))
 {
   this->setMinimumSize(size);
   this->setMaximumSize(size);

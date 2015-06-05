@@ -13,7 +13,7 @@ UserWidget::UserWidget(fist::model::User const& model,
                        QWidget* parent):
   ListItem(parent),
   _model(model),
-  _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32))),
+  _avatar(new AvatarIcon(this->_model.avatar(), QSize(32, 32), this)),
   _layout(new QHBoxLayout(this))
 {
   ELLE_TRACE_SCOPE("%s: contruction", *this);
