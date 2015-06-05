@@ -8,7 +8,7 @@
 #include <fist-gui-qt/notification/IncomingTransaction.hh>
 #include <fist-gui-qt/MainView/Transactions.hh>
 #include <fist-gui-qt/TransactionWidget.hh>
-#include <fist-gui-qt/TextListItem.hh>
+#include <fist-gui-qt/MainView/EmptyState/Transaction.hh>
 
 #include <elle/log.hh>
 #include <elle/assert.hh>
@@ -35,8 +35,7 @@ namespace fist
       if (this->_state.transactions().get<1>().empty())
       {
         this->_transaction_list->add_widget(
-          std::make_shared<TextListItem>(
-            "You haven't sent or received\nany files yet", 70, this));
+          std::make_shared<empty_state::Transaction>(this));
         return;
       }
 

@@ -378,6 +378,15 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/popup/NoMoreStorage.cc",
       "src/fist-gui-qt/popup/NoMoreStorage.hh",
 
+      # Empty states.
+      "src/fist-gui-qt/MainView/EmptyState.cc",
+      "src/fist-gui-qt/MainView/EmptyState.hh",
+      "src/fist-gui-qt/MainView/EmptyState/Link.cc",
+      "src/fist-gui-qt/MainView/EmptyState/Link.hh",
+      "src/fist-gui-qt/MainView/EmptyState/Transaction.cc",
+      "src/fist-gui-qt/MainView/EmptyState/Transaction.hh",
+
+
       "src/fist-gui-qt/GhostCode/Panel.cc",
       "src/fist-gui-qt/GhostCode/Panel.hh",
       "src/fist-gui-qt/GhostCode/Footer.cc",

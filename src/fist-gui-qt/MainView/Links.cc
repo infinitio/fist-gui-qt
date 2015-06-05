@@ -10,6 +10,8 @@
 #include <fist-gui-qt/popup/NoMoreStorage.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
+#include <fist-gui-qt/MainView/EmptyState/Link.hh>
+
 
 #include <elle/assert.hh>
 #include <elle/log.hh>
@@ -33,15 +35,14 @@ namespace fist
       layout->setContentsMargins(0, 0, 0, 0);
       layout->setMargin(0);
       layout->addWidget(this->_link_list);
+      this->_no_more_storage->hide();
       if (this->_state.links().get<0>().empty())
       {
-        this->_link_list->add_widget(
-          std::make_shared<TextListItem>("You have no links yet", 75, this));
+        this->_link_list->add_widget(std::make_shared<empty_state::Link>(this));
         return;
       }
       for (model::Link const& model: this->_state.links().get<1>())
         this->add_link(model);
-      this->_no_more_storage->hide();
     }
 
     void
