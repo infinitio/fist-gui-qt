@@ -52,7 +52,7 @@ public:
 public:
   typedef ListWidget Self;
   typedef QWidget Super;
-  typedef std::shared_ptr<ListItem> ItemPtr;
+  typedef std::shared_ptr<QWidget> ItemPtr;
 
 /*------.
 | Enums |
@@ -139,6 +139,7 @@ private Q_SLOTS:
 private:
   int _offset;
   Separator _separator;
+  int _separators;
   int _height_hint;
   int _width_hint;
   int _max_rows;
