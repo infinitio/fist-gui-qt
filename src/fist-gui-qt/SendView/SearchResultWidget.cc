@@ -15,24 +15,20 @@ namespace fist
 {
   namespace sendview
   {
-    SearchResultWidget::SearchResultWidget(fist::model::User const& model,
-                                           bool preselected,
-                                           QWidget* parent):
-      ListItem(parent, Qt::white),
-      _model(model),
-      _fullname(new QLabel(this->_model.fullname())),
-      _avatar(new AvatarIcon(this->_model.avatar(), QSize(25, 25))),
-      _selector(new fist::TwoStateIconButton(
-                  QPixmap(":/send/user-selected"),
-                  QPixmap(":/send/user-selected-active"),
-                  QPixmap(":/send/user-selected-hover"),
-                  QPixmap(":/send/user-selected-active"),
-                  preselected,
-                  23)),
-      _layout(new QHBoxLayout(this))
+    _SearchResultWidget::_SearchResultWidget(bool preselected,
+                                             QWidget* parent)
+      : ListItem(parent, Qt::white)
+      , _fullname(new QLabel(this))
+      , _avatar(new AvatarIcon(QPixmap(), QSize(25, 25), this))
+      , _selector(new fist::TwoStateIconButton(
+                    QPixmap(":/send/user-selected"),
+                    QPixmap(":/send/user-selected-active"),
+                    QPixmap(":/send/user-selected-hover"),
+                    QPixmap(":/send/user-selected-active"),
+                    preselected,
+                    23))
+      , _layout(new QHBoxLayout(this))
     {
-      connect(&this->_model, SIGNAL(avatar_updated()),
-              this, SLOT(_on_avatar_updated()));
       ELLE_TRACE_SCOPE("%s: contruction", *this);
 
       this->_layout->setSpacing(8);
@@ -48,6 +44,60 @@ namespace fist
       }
       this->_layout->addWidget(this->_selector);
 
+      connect(this->_selector, SIGNAL(pressed()), this, SLOT(_selected()));
+      connect(this->_selector, SIGNAL(released()), this, SLOT(_unselected()));
+    }
+
+    QSize
+    _SearchResultWidget::sizeHint() const
+    {
+      auto size = this->_layout->minimumSize();
+      return QSize(Super::sizeHint().width(), size.height());
+    }
+
+    void
+    _SearchResultWidget::enterEvent(QEvent* event)
+    {
+      // Super::enterEvent(event);
+      QCoreApplication::sendEvent(this->_selector, event);
+    }
+    void
+    _SearchResultWidget::leaveEvent(QEvent* event)
+    {
+      // Super::leaveEvent(event);
+      QCoreApplication::sendEvent(this->_selector, event);
+    }
+
+    void
+    _SearchResultWidget::trigger()
+    {
+      ELLE_TRACE_SCOPE("%s: clicked", *this);
+      this->_selector->click();
+    }
+
+    void
+    _SearchResultWidget::_update()
+    {
+      ELLE_TRACE_SCOPE("%s: update", *this);
+    }
+
+    void
+    _SearchResultWidget::print(std::ostream& stream) const
+    {
+      stream << "SearchResult";
+    }
+
+    SearchResultWidget::SearchResultWidget(fist::model::User const& model,
+                                           bool preselected,
+                                           QWidget* parent)
+      : Super(preselected, parent)
+      , _model(model)
+    {
+      this->_fullname->setText(this->_model.fullname());
+      this->_avatar->set_avatar(model.avatar());
+      connect(&this->_model, SIGNAL(avatar_updated()),
+              this, SLOT(_on_avatar_updated()));
+
 #ifndef FIST_PRODUCTION_BUILD
       this->setToolTip(
         QString::fromStdString(
@@ -55,41 +105,17 @@ namespace fist
                         this->_model.id(), this->_model.fullname(), this->_model.handle())));
 #endif
 
-      connect(this->_selector, SIGNAL(pressed()), this, SLOT(_selected()));
-      connect(this->_selector, SIGNAL(released()), this, SLOT(_unselected()));
-
       if (this->_model.me())
       {
         this->_fullname->setText("Me (my other devices)");
       }
     }
 
-    QSize
-    SearchResultWidget::sizeHint() const
-    {
-      auto size = this->_layout->minimumSize();
-      return QSize(Super::sizeHint().width(), size.height());
-    }
-
     void
-    SearchResultWidget::enterEvent(QEvent* event)
+    SearchResultWidget::_on_avatar_updated()
     {
-      // Super::enterEvent(event);
-      QCoreApplication::sendEvent(this->_selector, event);
-    }
-    void
-    SearchResultWidget::leaveEvent(QEvent* event)
-    {
-      // Super::leaveEvent(event);
-      QCoreApplication::sendEvent(this->_selector, event);
-    }
-
-
-    void
-    SearchResultWidget::trigger()
-    {
-      ELLE_TRACE_SCOPE("%s: clicked", *this);
-      this->_selector->click();
+      this->_avatar->set_avatar(this->_model.avatar());
+      this->update();
     }
 
     void
@@ -105,22 +131,10 @@ namespace fist
     }
 
     void
-    SearchResultWidget::_on_avatar_updated()
-    {
-      this->_avatar->set_avatar(this->_model.avatar());
-      this->update();
-    }
-
-    void
-    SearchResultWidget::_update()
-    {
-      ELLE_TRACE_SCOPE("%s: update", *this);
-    }
-
-    void
     SearchResultWidget::print(std::ostream& stream) const
     {
       stream << "SearchResult(" << this->_model << ")";
     }
+
   }
 }

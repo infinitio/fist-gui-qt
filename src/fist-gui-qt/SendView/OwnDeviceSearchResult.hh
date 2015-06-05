@@ -8,14 +8,17 @@ namespace fist
   namespace sendview
   {
     class OwnDeviceSearchResult
-      : public SearchResultWidget
+      : public _SearchResultWidget
     {
+      typedef _SearchResultWidget Super;
     public:
-      OwnDeviceSearchResult(fist::model::User const& model,
+      OwnDeviceSearchResult(fist::model::User const& user,
                             fist::model::Device const& device,
+                            bool selected,
                             QWidget* parent = nullptr);
 
       ELLE_ATTRIBUTE_R(fist::model::Device, device);
+      ELLE_ATTRIBUTE_R(fist::model::User::ID, id);
 
     signals:
       void

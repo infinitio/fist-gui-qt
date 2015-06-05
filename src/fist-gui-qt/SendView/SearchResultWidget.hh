@@ -13,17 +13,17 @@ namespace fist
 {
   namespace sendview
   {
-    class SearchResultWidget
+    class _SearchResultWidget
       : public ListItem
     {
       typedef ListItem Super;
-    public:
-      SearchResultWidget(fist::model::User const& model,
-                         bool preselected = false,
+    protected:
+      _SearchResultWidget(bool preselected = false,
                          QWidget* parent = nullptr);
       virtual
-      ~SearchResultWidget() = default;
+      ~_SearchResultWidget() = default;
 
+    private:
       QSize
       sizeHint() const override;
 
@@ -47,23 +47,18 @@ namespace fist
       void
       _update() override;
 
-    private slots:
-      void
-      _on_avatar_updated();
-
     protected slots:
       virtual
       void
-      _selected();
+      _selected() = 0;
 
       virtual
       void
-      _unselected();
+      _unselected() = 0;
 /*-----------.
   | Attributes |
   `-----------*/
     protected:
-      fist::model::User const& _model;
       QLabel* _fullname;
       AvatarIcon* _avatar;
       ELLE_ATTRIBUTE_R(fist::TwoStateIconButton*, selector);
@@ -74,7 +69,7 @@ namespace fist
     private:
       QHBoxLayout* _layout;
 
-/*----------.
+  /*----------.
   | Printable |
   `----------*/
       void
@@ -83,6 +78,41 @@ namespace fist
     private:
       Q_OBJECT;
     };
+
+    class SearchResultWidget
+      : public _SearchResultWidget
+    {
+      typedef _SearchResultWidget Super;
+    public:
+      SearchResultWidget(fist::model::User const& model,
+                         bool preselected,
+                         QWidget* parent);
+
+      ~SearchResultWidget() = default;
+    protected:
+      fist::model::User const& _model;
+
+    private slots:
+      void      _on_avatar_updated();
+
+
+    protected slots:
+      void
+      _selected();
+
+      void
+      _unselected();
+
+      /*----------.
+      | Printable |
+      `----------*/
+      void
+      print(std::ostream& stream) const override;
+
+    private:
+      Q_OBJECT;
+    };
+
   }
 }
 #endif
