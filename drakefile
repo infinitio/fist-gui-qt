@@ -408,7 +408,7 @@ def configure(cxx_toolkit = None,
     sources + libraries,
     cxx_toolkit,
     qt_cxx_config,
-    strip = True)
+    strip = fist_production_build)
 
   build << application
 
