@@ -176,27 +176,22 @@ namespace fist
       else
       {
         auto recipients = this->_users->recipients();
-        if (regexp::email::checker.exactMatch(this->_users->text()))
-        {
-          QString recipient = this->_users->text();
-          uint32_t id = this->_state.user_id(recipient.toStdString());
-          if (id == gap_null())
-          {
-            ELLE_TRACE_SCOPE("send files to %s", recipient);
-            gap_send_files(
-              this->_state.state(), recipient.toStdString(), files, message);
-          }
-          else if (recipients.find(id) == recipients.end())
-            recipients.insert(id);
-        }
         for (auto const& recipient: recipients)
         {
-          if (recipient.id() != gap_null())
+          if (recipient.to_email())
           {
-            if (recipient.id() != this->_state.my_id())
-              ELLE_ASSERT(!recipient.device_uuid());
             gap_send_files(
-              this->_state.state(), recipient, files, message, recipient.device_uuid());
+              this->_state.state(), QString_to_utf8_string(recipient.email().get()), files, message);
+          }
+          else if (recipient.to_device())
+          {
+            gap_send_files(
+              this->_state.state(), recipient.id(), files, message, QString_to_utf8_string(recipient.device().get().id()));
+          }
+          else
+          {
+            gap_send_files(
+              this->_state.state(), recipient.id(), files, message);
           }
         }
       }
