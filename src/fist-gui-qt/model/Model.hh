@@ -16,9 +16,11 @@ namespace fist
       : public QObject
       , public elle::Printable
     {
+    public:
+      typedef uint32_t ID;
     protected:
       Model(fist::State& state,
-            uint32_t id);
+            ID id);
     public:
       Model(Model const&) = default;
       virtual
@@ -26,7 +28,7 @@ namespace fist
 
     protected:
       fist::State& _state;
-      ELLE_ATTRIBUTE_R(uint32_t, id);
+      ELLE_ATTRIBUTE_R(ID, id);
 
     private:
       /*----------.
