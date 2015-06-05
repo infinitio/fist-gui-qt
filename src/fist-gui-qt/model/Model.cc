@@ -5,7 +5,7 @@ namespace fist
   namespace model
   {
     Model::Model(fist::State& state,
-                 uint32_t id)
+                 ID id)
       : _state(state)
       , _id(id)
     {}
