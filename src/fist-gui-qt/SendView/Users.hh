@@ -43,18 +43,34 @@ namespace fist
     };
 
     class Recipient
+      : public elle::Printable
     {
       ELLE_ATTRIBUTE_R(uint32_t, id);
-      ELLE_ATTRIBUTE_R(boost::optional<std::string>, device_uuid);
+      ELLE_ATTRIBUTE_R(boost::optional<model::Device>, device);
+      ELLE_ATTRIBUTE_R(boost::optional<QString>, email);
 
     public:
       Recipient(uint32_t id,
-                QString const& device_name = "")
+                boost::optional<model::Device> device = boost::none,
+                QString const& email = "")
         : _id(id)
-        , _device_uuid(device_name.isEmpty()
-                       ? boost::optional<std::string>{}
-                       : boost::optional<std::string>{device_name.toStdString()})
+        , _device(device)
+        , _email(email.isEmpty()
+                 ? boost::optional<QString>{}
+                 : boost::optional<QString>{email})
       {}
+
+      bool
+      to_device() const
+      {
+        return static_cast<bool>(this->_device);
+      }
+
+      bool
+      to_email() const
+      {
+        return static_cast<bool>(this->_email);
+      }
 
       operator uint32_t() const
       {
@@ -65,6 +81,30 @@ namespace fist
       operator == (uint32_t id) const
       {
         return this->id() == id;
+      }
+
+      bool
+      operator == (QString const& value) const
+      {
+        if (this->to_device())
+          return this->_device.get().id() == value;
+        if (this->to_email())
+          return this->_email.get() == value;
+        return false;
+      }
+
+      bool
+      operator == (Recipient const& rec) const;
+
+      void
+      print(std::ostream& out) const override
+      {
+        if (this->to_device())
+          out << "Device(" << this->device().get() << ")";
+        else if (this->to_email())
+          out << "Email(" << this->_email.get() << ")";
+        else
+          out << "User(" << this->id() << ")";
       }
     };
   }
@@ -104,24 +144,29 @@ namespace fist
       ELLE_ATTRIBUTE(fist::State&, state);
       // Icon.
       ELLE_ATTRIBUTE(QPixmap, magnifier);
-      ELLE_ATTRIBUTE(QMovie*, loading_icon);
       ELLE_ATTRIBUTE(QLabel*, icon);
       // Search field.
       ELLE_ATTRIBUTE_X(SearchField*, search_field);
       // Resutls.
-      typedef std::unordered_map<uint32_t, std::shared_ptr<SearchResultWidget>> Results;
+      typedef std::vector<Recipient> Results;
       ELLE_ATTRIBUTE(Results, results);
-      typedef std::unordered_set<Recipient> Recipients;
+      typedef std::vector<Recipient> Recipients;
       ELLE_ATTRIBUTE_R(Recipients, recipients);
       ELLE_ATTRIBUTE(HorizontalSeparator*, separator);
       ELLE_ATTRIBUTE(ListWidget*, users);
+      ELLE_ATTRIBUTE(int, max);
+
+    private:
+      void
+      _compute_results(UserList const& users,
+                       bool no_self);
+
+      void
+      _add_result(Recipient const& rec, bool foo);
 
     public:
       void
       set_icon(QPixmap const& pixmap);
-
-      void
-      set_icon(QMovie& movie);
 
       void
       set_text(QString const& text);
@@ -149,6 +194,8 @@ namespace fist
       void
       hideEvent(QHideEvent* event) override;
 
+    private:
+      ELLE_ATTRIBUTE(QMutex, user_mutex);
     Q_SIGNALS:
       void
       search_field_focused();
@@ -180,16 +227,14 @@ namespace fist
 
 
     private:
-      void
-      _add_search_result(model::User const& model);
+      // std::shared_ptr<_SearchResultWidget>
+      // _add_search_result(model::User const& model);
 
-      void
-      _add_device_search_result(model::User const& me);
+      // void
+      // _add_device_search_result(model::Device const& device,
+      //                           bool selected);
 
     private slots:
-      void
-      delay_expired();
-
       void
       text_changed(QString const& text);
 
@@ -200,11 +245,16 @@ namespace fist
       focusInEvent(QFocusEvent* event) override;
 
       void
-      _set_users();
-
-      void
       set_users(UserList const& users, bool local);
 
+    private:
+      bool
+      _add_recipient(Recipient const&);
+
+      bool
+      _remove_recipient(Recipient const&);
+
+    private slots:
       void
       _add_peer(uint32_t);
 
@@ -217,8 +267,11 @@ namespace fist
       void
       _remove_device(uint32_t, QString const&);
 
-    private:
-      QTimer _search_delay;
+      void
+      _add_email(QString const&);
+
+      void
+      _remove_email(QString const&);
 
     private:
       bool
