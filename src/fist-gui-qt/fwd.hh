@@ -51,7 +51,7 @@ namespace fist
     class Footer;
     class Files;
     class Users;
-    class SearchResultWidget;
+    class _SearchResultWidget;
     class FileAdder;
     class EmptyFileAdder;
     class NonEmptyFileAdder;
