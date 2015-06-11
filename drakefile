@@ -37,8 +37,7 @@ def configure(cxx_toolkit = None,
               qt = None,
               openssl_include_dir = '/usr',
               openssl_libraries = [],
-              libraries = [],
-              python3 = None):
+              libraries = []):
 
   def copy_lib(lib, where = 'lib'):
     if isinstance(lib, drake.cxx.StaticLib):
@@ -697,8 +696,6 @@ def configure(cxx_toolkit = None,
         'version': git.description(),
         'version_major': git.version().split('.')[0],
         'version_minor': git.version().split('.')[1],
-        'python_version_major': python3.version.major,
-        'python_version_minor': python3.version.minor,
     }):
       drake.node('control.tmpl')
     package += drake.copy(drake.nodes('control'), 'debian/DEBIAN')
