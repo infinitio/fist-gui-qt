@@ -171,7 +171,7 @@ namespace fist
       if (this->_tabs->is_active_tab(*this->_link_tab))
       {
         ELLE_TRACE("generate link")
-          gap_create_link_transaction(this->_state.state(), files, message.c_str());
+          gap_create_link_transaction(this->_state.state(), files, message.c_str(), false);
       }
       else
       {
