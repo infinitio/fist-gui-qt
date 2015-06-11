@@ -137,6 +137,10 @@ def configure(cxx_toolkit = None,
       'Qt3Support', 'QtCore', 'QtDeclarative', 'QtGui',
       'QtMultimedia', 'QtNetwork', 'QtWebKit', 'QtXml',
       'QtXmlPatterns']
+    Qt_rcc = drake.Node('Qt/bin/rcc')
+    Qt_qmake = drake.Node('Qt/bin/qmake')
+    Qt_uic = drake.Node('Qt/bin/uic')
+    Qt_moc = drake.Node('Qt/bin/moc')
     if cxx_toolkit.os == drake.os.windows:
       Qt_configure_args += [
         '-xplatform', 'win32-g++', '-device-option',
@@ -153,7 +157,8 @@ def configure(cxx_toolkit = None,
     Qt_args.append("PREFIX=%s" % cxx_toolkit.prefix)
     Qt_targets = Qt_libs + \
                  Qt_images_plugins + \
-                 drake.nodes(*(map(lambda x: 'Qt/include/' + x, drake.cxx.qt.per_version_headers[4])))
+                 drake.nodes(*(map(lambda x: 'Qt/include/' + x, drake.cxx.qt.per_version_headers[4]))) + \
+                 [Qt_rcc, Qt_qmake, Qt_uic, Qt_moc]
     GNUBuilder(
       cxx_toolkit,
       configure = Qt_configure_call,
@@ -177,6 +182,10 @@ def configure(cxx_toolkit = None,
       prefix = Qt_prefix_absolute,
       version_effective = Qt_version,
       prefer_shared = True,
+      rcc = Qt_rcc,
+      moc = Qt_moc,
+      uic = Qt_uic,
+      qmake = Qt_qmake,
     )
   # Qt use file generation tools, which create function with
   # missing declaration.
@@ -405,7 +414,7 @@ def configure(cxx_toolkit = None,
 
   application = drake.cxx.Executable(
     'bin/Infinit',
-    sources + libraries,
+    sources + libraries + dynamic_libraries,
     cxx_toolkit,
     qt_cxx_config,
     strip = fist_production_build)
