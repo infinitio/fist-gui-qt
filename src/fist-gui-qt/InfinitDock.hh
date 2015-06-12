@@ -1,5 +1,6 @@
-#ifndef INFINITDOCK_HH
-# define INFINITDOCK_HH
+
+#ifndef FIST_GUI_QT_INFINITDOCK_HH
+# define FIST_GUI_QT_INFINITDOCK_HH
 
 # include <memory>
 
