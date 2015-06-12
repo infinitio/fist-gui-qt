@@ -103,13 +103,17 @@ seconds_since_midnight(QDateTime const& date)
 
 inline
 QString
-pretty_date(QDateTime const& date)
+pretty_date(QDateTime const& date,
+            bool detailed = false)
 {
   auto current = QDateTime::currentDateTime();
   auto local_date = date.toLocalTime();
-  QString format(local_date.secsTo(current) < seconds_since_midnight(current)
-                 ? "h:mA"
-                 : "MMM d");
+  QString format =
+    detailed
+    ? "ddd MMMM d yy hh:mm:ss:zz"
+    : (local_date.secsTo(current) < seconds_since_midnight(current)
+       ? "hh:mmA"
+       : "MMM d");
   return local_date.toString(format);
 }
 
