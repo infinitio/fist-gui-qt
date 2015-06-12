@@ -201,6 +201,55 @@ def configure(cxx_toolkit = None,
   qt_cxx_config += boost_system
   qt_cxx_config += boost_program_options
 
+  ## --- ##
+  ## Qxt ##
+  ## --- ##
+
+  qxt_version = drake.Version(0, 6, 2)
+  qxt_basename = 'libqxt-libqxt-dadc327c2a6a'
+  qxt_url = 'http://dev.libqxt.org/libqxt/get/v%s.tar.bz2' % qxt_version
+  qxt_tarball = \
+    drake.node('qxt/%s.tar.bz2' % qxt_basename)
+  qxt_configure = \
+    drake.node('qxt/%s/configure' % qxt_basename)
+  qxt_prefix = drake.path_build('qxt')
+  qxt_prefix_absolute = drake.path_root() / qxt_prefix
+  qxt_libs = ['Core', 'Gui']
+  if cxx_toolkit.os == drake.os.windows:
+    qxt_libs = [drake.cxx.DynLib('qxt/lib/Qxt%s.dll' % x) for x in qxt_libs]
+  else:
+    qxt_libs = [drake.cxx.DynLib('qxt/lib/libQxt%s.so' % x) for x in qxt_libs]
+  drake.HTTPDownload(
+    qxt_url,
+    qxt_tarball,
+    # fingerprint = '5b151e3c83b31f5931b4a9fc01635bfd',
+  )
+  drake.TarballExtractor(
+    qxt_tarball,
+    targets = ['%s/configure' % qxt_basename],
+  )
+  configure_args = [
+    '-prefix', str(qxt_prefix_absolute),
+    '-qmake-bin', str(drake.path_build('Qt/bin/qmake', absolute = True)),
+    '-no-db',
+    '-no-xrandr',
+    '-no-zeroconf',
+    '-no-avahi']
+  for module in ['docs', 'berkeley', 'designer', 'network', 'sql', 'web', 'zeroconf']:
+    configure_args += ['-nomake', module]
+  GNUBuilder(
+    cxx_toolkit,
+    configure = qxt_configure,
+    configure_args = configure_args,
+    targets = qxt_libs,
+    sources = [],
+  )
+  qt_cxx_config.add_local_include_path('qxt/include/QxtCore')
+  qt_cxx_config.add_local_include_path('qxt/include')
+  qxt_libs = [copy_lib(x) for x in qxt_libs]
+  drake.Rule('qxt') << qxt_libs
+  dynamic_libraries += qxt_libs
+
   # Windows specific libraries.
   # XXX: Maybe some clean could be made.
   if cxx_toolkit.os == drake.os.windows:
