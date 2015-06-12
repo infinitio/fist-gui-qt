@@ -33,8 +33,6 @@ ELLE_LOG_COMPONENT("infinit.FIST.State");
 
 namespace fist
 {
-  static State* g_state = nullptr;
-
   void
   State::GapDeleter::operator() (gap_State* state) const
   {
@@ -81,7 +79,6 @@ namespace fist
             this, SLOT(_on_ghost_code_result_ready()));
 
     ELLE_TRACE_SCOPE("%s: construction", *this);
-    g_state = this;
 
     // Callbacks.
     gap_update_user_callback(
@@ -147,7 +144,6 @@ namespace fist
         this->_poll_timer.reset();
       }
     }
-    g_state = nullptr;
     ELLE_DEBUG("cancel search")
       this->cancel_search();
   }
