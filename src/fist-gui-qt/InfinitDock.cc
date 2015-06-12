@@ -589,22 +589,6 @@ InfinitDock::closeEvent(QCloseEvent* event)
 }
 
 void
-InfinitDock::mouseReleaseEvent(QMouseEvent* event)
-{
-  ELLE_TRACE_SCOPE("%s: mouse released", *this);
-
-  if (event->button() == Qt::LeftButton)
-  {
-    ELLE_DEBUG("left button clicked");
-
-    event->accept();
-    this->toggle_dock(true);
-  }
-  else
-    Super::mouseReleaseEvent(event);
-}
-
-void
 InfinitDock::keyPressEvent(QKeyEvent* event)
 {
   ELLE_TRACE_SCOPE("%s: key pressed (%s)", *this, event->key());

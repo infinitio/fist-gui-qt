@@ -197,10 +197,6 @@ protected:
 
   virtual
   void
-  mouseReleaseEvent(QMouseEvent* event) override;
-
-  virtual
-  void
   enterEvent(QEvent* event) override;
 
   void
