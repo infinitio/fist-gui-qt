@@ -72,7 +72,7 @@ namespace fist
       _check_files();
 
       void
-      _send();
+      _send(bool screenshot = false);
 
       void
       _pick_user();
@@ -104,7 +104,7 @@ namespace fist
 
     public slots:
       void
-      send();
+      send(bool screenshot = false);
 
     Q_SIGNALS:
       void

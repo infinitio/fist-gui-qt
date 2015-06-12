@@ -146,7 +146,7 @@ namespace fist
     }
 
     void
-    Panel::_send()
+    Panel::_send(bool screenshot)
     {
       if (!this->_check_files())
         return;
@@ -172,10 +172,12 @@ namespace fist
       if (this->_tabs->is_active_tab(*this->_link_tab))
       {
         ELLE_TRACE("generate link")
-          gap_create_link_transaction(this->_state.state(), files, message.c_str(), false);
+          gap_create_link_transaction(this->_state.state(), files, message.c_str(), screenshot);
       }
       else
       {
+        if (screenshot)
+          ELLE_WARN("screenshot argument was ignored");
         auto recipients = this->_users->recipients();
         for (auto const& recipient: recipients)
         {
@@ -214,9 +216,9 @@ namespace fist
     }
 
     void
-    Panel::send()
+    Panel::send(bool screenshot)
     {
-      this->_send();
+      this->_send(screenshot);
     }
 
     void

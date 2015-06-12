@@ -1,7 +1,10 @@
 #include <QAction>
 #include <QApplication>
 #include <QDesktopServices>
+#include <QFileInfo>
 #include <QDesktopWidget>
+#include <QApplication>
+#include <QFile>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
@@ -185,7 +188,15 @@ InfinitDock::InfinitDock(fist::State& state,
 
   connect(&fist::notification::center(), SIGNAL(notification_clicked()),
           this, SLOT(show()));
+
+  // Screenshot.
+  connect(this->_state.fullscreen_screenshot, SIGNAL(activated()), this, SLOT(_fullscreen_screenshot()));
+  this->_state.update_fullscreen_screenshot_shortcut();
+
+  connect(this->_state.region_screenshot, SIGNAL(activated()), this, SLOT(_region_screenshot()));
+  this->_state.update_region_screenshot_shortcut();
 }
+
 /*------------.
 | Destruction |
 `------------*/
@@ -692,14 +703,15 @@ InfinitDock::p2p(QList<QUrl> const& list)
 }
 
 void
-InfinitDock::get_a_link(QList<QUrl> const& list)
+InfinitDock::get_a_link(QList<QUrl> const& list,
+                        bool screenshot)
 {
   ELLE_TRACE_SCOPE("link");
   // Bypass the send view.
   this->_send_panel->mode(fist::Mode::link);
   this->_send_panel->file_adder()->clear();
   this->_add_files(list);
-  this->_send_panel->send();
+  this->_send_panel->send(screenshot);
 }
 
 void
@@ -717,4 +729,59 @@ void
 InfinitDock::print(std::ostream& stream) const
 {
   stream << "Dock";
+}
+
+void
+InfinitDock::_upload_screenshot(QPixmap const& pixmap)
+{
+  ELLE_TRACE_SCOPE("%s: upload screenshot", *this);
+  QString name("%1/screenshot %2.png");
+  name = name.arg(
+    QDir::tempPath(), pretty_date(QDateTime::currentDateTime(), true));
+  ELLE_DEBUG("adapting the milliseconds detail")
+    name.remove(name.size() - 8, 4);
+  ELLE_DEBUG("screen shot name: %s", name);
+  QFile* file = new QFile(name, nullptr);
+  auto opened = file->open(QIODevice::WriteOnly | QIODevice::Unbuffered);
+  if (opened)
+  {
+    pixmap.save(file, "png", -1);
+    QFileInfo info(*file);
+    ELLE_DEBUG("screen shot path: %s", info.absoluteFilePath());
+    this->get_a_link(
+      {QUrl::fromLocalFile(QDir::toNativeSeparators(info.absoluteFilePath()))},
+      true);
+  }
+  else
+    ELLE_WARN("impossible to save the screenshot");
+}
+
+// Get screenshot.
+void
+InfinitDock::_fullscreen_screenshot()
+{
+  ELLE_TRACE_SCOPE("%s: fullscreen screenshot", *this);
+  this->_upload_screenshot(QPixmap::grabWindow(QApplication::desktop()->winId()));
+}
+
+// Get app screenshot.
+void
+InfinitDock::_region_screenshot()
+{
+  ELLE_TRACE_SCOPE("%s: take region screenshot", *this);
+  this->_region_selector.reset();
+  this->_region_selector.reset(new fist::screenshot::RegionSelector(this));
+  connect(this->_region_selector.get(), SIGNAL(done()),
+          this, SLOT(_upload_region_screenshot()));
+}
+
+void
+InfinitDock::_upload_region_screenshot()
+{
+  ELLE_TRACE_SCOPE("%s: upload region", *this);
+  if (!this->_region_selector->selection.isNull())
+  {
+    this->_upload_screenshot(this->_region_selector->selection);
+  }
+  this->_region_selector->close();
 }
