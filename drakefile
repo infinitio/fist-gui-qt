@@ -381,6 +381,9 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/gui/SystemTrayIcon.hh",
       "src/fist-gui-qt/gui/SystemTrayIcon.cc",
 
+      "src/fist-gui-qt/gui/EnterKeySequence.cc",
+      "src/fist-gui-qt/gui/EnterKeySequence.hh",
+
       "src/fist-gui-qt/State.hh",
       "src/fist-gui-qt/State.cc",
 
