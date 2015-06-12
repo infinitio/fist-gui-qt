@@ -55,24 +55,19 @@ namespace fist
     bool
     Recipient::operator == (Recipient const& rec) const
     {
-      ELLE_LOG("compare %s and %s", *this, rec);
+      ELLE_DEBUG_SCOPE("compare %s and %s", *this, rec);
       if (this->to_email())
       {
-        ELLE_DEBUG("To email");
         if (!rec.to_email())
           return false;
-        ELLE_DEBUG("%s vs %s", this->_email.get(), rec.email().get());
         return this->_email.get() == rec.email().get();
       }
       if (this->to_device())
       {
-        ELLE_DEBUG("To device");
         if (!rec.to_device())
           return false;
-        ELLE_DEBUG("%s vs %s", this->_device.get().id(), rec.device().get().id());
         return this->_device.get().id() == rec.device().get().id();
       }
-      ELLE_DEBUG("%s vs %s", this->id(), rec.id());
       return this->id() == rec.id();
     }
 
@@ -300,10 +295,7 @@ namespace fist
     void
     Users::set_users(UserList const& users, bool local)
     {
-      ELLE_LOG("users: %s", users);
-      ELLE_LOG("recipients: %s", this->_recipients);
       this->_compute_results(users, this->text().isEmpty());
-      ELLE_LOG("results: %s", this->_results);
       if (regexp::email::checker.exactMatch(this->text()))
       {
         this->_add_result(Recipient(gap_null(), boost::none, this->text()), false);
@@ -350,7 +342,7 @@ namespace fist
           {
             this->_add_result(Recipient(this->_state.my_id()), false);
           }
-          ELLE_LOG("%s", this->_results);
+          ELLE_DEBUG("%s", this->_results);
           if (!this->_results.empty())
             this->_users->add_separator();
         }
