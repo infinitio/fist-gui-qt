@@ -22,6 +22,7 @@
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/gui/SystemTrayIcon.hh>
+# include <fist-gui-qt/ScreenShot/Window.hh>
 
 class InfinitDock:
   public RoundShadowWidget
@@ -208,6 +209,7 @@ protected:
   {
     this->_position_panel();
   }
+
 private:
   void
   _pick_files();
@@ -244,6 +246,22 @@ private:
   QAction* _quit;
   QAction* _update;
   ELLE_ATTRIBUTE(std::unique_ptr<QDialog>, settings_window);
+  ELLE_ATTRIBUTE(
+    std::unique_ptr<fist::screenshot::RegionSelector>, region_selector);
+
+private slots:
+  void
+  _fullscreen_screenshot();
+
+  void
+  _region_screenshot();
+
+private slots:
+  void
+  _upload_screenshot(QPixmap const& pixmap);
+
+  void
+  _upload_region_screenshot();
 
 private slots:
   void

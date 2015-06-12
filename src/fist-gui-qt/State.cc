@@ -941,7 +941,7 @@ namespace fist
   State::update_fullscreen_screenshot_shortcut()
   {
     this->fullscreen_screenshot->setShortcut(
-      QKeySequence(fist::settings()["Shortcuts"].get("region", "Ctrl+Shift+I").toString()));
+      QKeySequence(fist::settings()["Shortcuts"].get("fullscreen", "Ctrl+Shift+I").toString()));
   }
 
   void

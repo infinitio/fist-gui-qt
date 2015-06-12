@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QApplication>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
@@ -185,7 +186,15 @@ InfinitDock::InfinitDock(fist::State& state,
 
   connect(&fist::notification::center(), SIGNAL(notification_clicked()),
           this, SLOT(show()));
+
+  // Screenshot.
+  connect(this->_state.fullscreen_screenshot, SIGNAL(activated()), this, SLOT(_fullscreen_screenshot()));
+  this->_state.update_fullscreen_screenshot_shortcut();
+
+  connect(this->_state.region_screenshot, SIGNAL(activated()), this, SLOT(_region_screenshot()));
+  this->_state.update_region_screenshot_shortcut();
 }
+
 /*------------.
 | Destruction |
 `------------*/
@@ -717,4 +726,45 @@ void
 InfinitDock::print(std::ostream& stream) const
 {
   stream << "Dock";
+}
+
+void
+InfinitDock::_upload_screenshot(QPixmap const& pixmap)
+{
+  ELLE_TRACE_SCOPE("%s: upload screenshot", *this);
+  QString name("%1/screen shot - %2.png");
+  name = name.arg(QDir::temp().absolutePath(), pretty_date(QDateTime::currentDateTime(), true));
+  ELLE_DEBUG("save temp file to %s", name);
+  pixmap.save(name, "png", -1);
+  this->get_a_link({QUrl::fromLocalFile(name)});
+}
+
+// Get screenshot.
+void
+InfinitDock::_fullscreen_screenshot()
+{
+  ELLE_TRACE_SCOPE("%s: fullscreen screenshot", *this);
+  this->_upload_screenshot(QPixmap::grabWindow(QApplication::desktop()->winId()));
+}
+
+// Get app screenshot.
+void
+InfinitDock::_region_screenshot()
+{
+  ELLE_TRACE_SCOPE("%s: take region screenshot", *this);
+  this->_region_selector.reset();
+  this->_region_selector.reset(new fist::screenshot::RegionSelector(this));
+  connect(this->_region_selector.get(), SIGNAL(done()),
+          this, SLOT(_upload_region_screenshot()));
+}
+
+void
+InfinitDock::_upload_region_screenshot()
+{
+  ELLE_TRACE_SCOPE("%s: upload region", *this);
+  if (!this->_region_selector->selection.isNull())
+  {
+    this->_upload_screenshot(this->_region_selector->selection);
+  }
+  this->_region_selector->close();
 }
