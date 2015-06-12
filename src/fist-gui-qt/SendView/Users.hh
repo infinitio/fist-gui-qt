@@ -175,13 +175,13 @@ namespace fist
       text() const;
 
       void
-      clear_search();
+      clear_search(bool final = false);
 
       void
       clear_results ();
 
       void
-      clear();
+      clear(bool final = false);
 
       bool
       peer_valid() const;

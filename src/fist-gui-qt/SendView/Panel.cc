@@ -89,8 +89,8 @@ namespace fist
               &this->_state, SLOT(send_metric(UIMetricsType, std::unordered_map<std::string, std::string> const&)));
 
       this->setAcceptDrops(true);
-
       this->setMaximumHeight(500);
+      connect(this, SIGNAL(sent()), SLOT(clear()));
     }
 
     void
@@ -164,6 +164,7 @@ namespace fist
         files.push_back(
           QUrl_to_native_path(this->_file_adder->files().keys().at(i)));
       }
+      ELLE_DEBUG("files: %s", files);
 
       auto message = QString_to_utf8_string(this->_message->text());
       ELLE_DEBUG("message: %s", message);
@@ -273,7 +274,7 @@ namespace fist
     void
     Panel::clear()
     {
-      this->_users->clear();
+      this->_users->clear(true);
       this->_file_adder->clear();
       this->_message->clear();
     }

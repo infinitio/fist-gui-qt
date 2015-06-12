@@ -191,22 +191,20 @@ namespace fist
     }
 
     void
-    Users::clear_search()
+    Users::clear_search(bool final)
     {
       ELLE_DEBUG_SCOPE("%s: clear search", *this);
-      // if (this->_results.empty())
-      // {
-        this->set_text("");
+      this->set_text("");
+      if (!final)
         this->text_changed("");
-      // }
     }
 
     void
-    Users::clear()
+    Users::clear(bool final)
     {
       ELLE_DEBUG_SCOPE("%s: clear", *this);
       this->_recipients.clear();
-      this->clear_search();
+      this->clear_search(final);
       this->clear_results();
     }
 
