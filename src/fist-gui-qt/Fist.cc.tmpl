@@ -386,8 +386,23 @@ void
 Fist::quit()
 {
   ELLE_TRACE_SCOPE("%s: quit", *this);
+  static std::unique_ptr<QTimer> timer;
+  if (timer == nullptr)
+  {
+    timer.reset(new QTimer);
+    timer->setSingleShot(true);
+    connect(timer.get(), SIGNAL(timeout()), this, SLOT(force_quit()));
+    timer->start(8000);
+  }
   ELLE_LOG("quit")
     this->_application->quit();
+}
+
+void
+Fist::force_quit()
+{
+  ELLE_LOG("force quit");
+  exit(0);
 }
 
 void

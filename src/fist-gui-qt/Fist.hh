@@ -100,6 +100,9 @@ public slots:
   void
   quit();
 
+  void
+  force_quit();
+
 private:
   // Destroy the state, dock and login window.
   void
