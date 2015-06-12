@@ -71,10 +71,7 @@
     <file alias="code/right@2x">../slices/mac/view_login/illustration-code-right@2x.png</file>
 
     <!-- notification -->
-    <file alias="notification/logo">../slices/windows/notifications/logo.png</file>
-    <file alias="notification/update">../slices/windows/notifications/update.gif</file>
-    <file alias="notification/minimize">../slices/windows/notifications/minimize.gif</file>
-    <file alias="notification/share">../slices/windows/notifications/share.png</file>
+    <file alias="notification/logo">../slices/mac/icon/icon_128x128.png</file>
 
     <file alias="notification/quit">../slices/windows/view_send/send-icon-delete.png</file>
     <file alias="notification/quit@2x">../slices/windows/view_send/send-icon-delete@2x.png</file>

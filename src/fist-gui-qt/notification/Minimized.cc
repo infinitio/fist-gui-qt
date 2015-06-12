@@ -16,7 +16,7 @@ namespace fist
       auto* layout = new QHBoxLayout(this);
       {
         auto* icon = new QLabel(this);
-        icon->setMovie(new QMovie(":/notification/minimized", QByteArray(), this));
+        icon->setMovie(new QMovie(":/logo", QByteArray(), this));
         icon->movie()->start();
         layout->addWidget(icon, 0, 0);
       }
