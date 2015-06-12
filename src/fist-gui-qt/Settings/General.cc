@@ -1,0 +1,171 @@
+#include <fist-gui-qt/Settings.hh>
+#include <fist-gui-qt/Settings/General.hh>
+#include <fist-gui-qt/Settings/utils.hh>
+#include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/State.hh>
+
+#include <QGridLayout>
+#include <QFileDialog>
+
+namespace fist
+{
+  namespace prefs
+  {
+    General::General(fist::State& state,
+                     QWidget *parent)
+      : QWidget(parent)
+      , _state(state)
+      , _download_folder(new QLabel(this->_state.download_folder(), this))
+      , _launch_at_startup(new QCheckBox(this))
+      , _device_name(line_edit(this->_state.device().name(), this))
+      , _reminders(new QCheckBox(this))
+    {
+      this->setFocusPolicy(Qt::NoFocus);
+      this->_launch_at_startup->setFocusPolicy(Qt::NoFocus);
+      QPalette palette = this->palette();
+      {
+        palette.setColor(QPalette::Window, Qt::white);
+        palette.setColor(QPalette::Base, Qt::white);
+      }
+      this->setPalette(palette);
+      {
+        connect(this->_device_name, SIGNAL(editingFinished()),
+                this, SLOT(_update_device_name()));
+      }
+      {
+        QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+        this->_launch_at_startup->setCheckState(
+          settings.contains("infinit") ? Qt::Checked : Qt::Unchecked);
+        connect(this->_launch_at_startup, SIGNAL(stateChanged(int)),
+                this, SLOT(_modify_startup_option(int)));
+      }
+      auto* change_download_folder = make_button("Change", this);
+      {
+        connect(change_download_folder, SIGNAL(released()),
+                this, SLOT(_choose_download_folder()));
+      }
+      QGridLayout* layout = new QGridLayout(this);
+      layout->setContentsMargins(45, 45, 45, 45);
+      layout->setSpacing(25);
+      layout->setColumnStretch(4, 1);
+      layout->addItem(new QSpacerItem(45, 0, QSizePolicy::Fixed), 0, 1, -1);
+      {
+        auto* general = new QLabel("General", this);
+        view::title::style(*general);
+        layout->addWidget(general, 0, 0); // , 1, 0);
+      }
+      layout->addWidget(section("Launch at startup", this), 1, 0);
+      layout->addWidget(this->_launch_at_startup, 1, 2);
+      {
+        auto* vlayout = new QVBoxLayout;
+        vlayout->setContentsMargins(0, 0, 0, 0);
+        vlayout->setSpacing(5);
+        vlayout->addWidget(section("Download folder", this));
+        this->_download_folder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        vlayout->addWidget(this->_download_folder);
+        layout->addLayout(vlayout, 2, 0, 1, 2);
+      }
+      layout->addWidget(change_download_folder, 2, 2, 1, -1, Qt::AlignTop);
+      layout->addWidget(section("Device name", this), 3, 0, Qt::AlignTop | Qt::AlignLeft);
+      layout->addWidget(this->_device_name, 3, 2, 1, -1);
+      layout->addWidget(section("Reminders", this), 4, 0, Qt::AlignTop | Qt::AlignLeft);
+      layout->addWidget(this->_reminders, 4, 2);
+      layout->addWidget(
+        link(view::account::text.arg(this->_state.session_id()), this),
+        5, 0, 1, -1);
+      layout->setRowStretch(6, 1);
+    }
+
+    void
+    General::showEvent(QShowEvent* event)
+    {
+      this->_set_download_folder(this->_state.download_folder());
+    }
+
+    void
+    General::_set_download_folder(QString const& text)
+    {
+      QFontMetrics metrics(this->_download_folder->font());
+      this->updateGeometry();
+      this->repaint();
+      this->_download_folder->updateGeometry();
+      QString elidedText = metrics.elidedText(text, Qt::ElideRight, this->_download_folder->width());
+      this->_download_folder->setText(elidedText);
+      this->_download_folder->setToolTip(text);
+    }
+
+    void
+    General::_update_device_name()
+    {
+      {
+        auto device_name = this->_device_name->text().trimmed();
+        this->_device_name->setText(device_name);
+      }
+      auto device_name = this->_device_name->text();
+      if (device_name != this->_state.device().name())
+      {
+        new FireAndForget(
+          [this, device_name]
+          {
+            if (gap_set_device_name(this->_state.state(), QString_to_utf8_string(device_name)) == gap_ok)
+              this->_state.device().name(device_name);
+          }, this);
+      }
+    }
+
+    void
+    General::_modify_startup_option(int)
+    {
+#ifdef INFINIT_WINDOWS
+      QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+      switch (this->_launch_at_startup->checkState())
+      {
+         case Qt::Unchecked:
+           settings.remove("Infinit");
+           fist::settings()["StartUp"].remove("infinit");
+           this->_launch_at_startup->setCheckState(Qt::Unchecked);
+           break;
+         case Qt::Checked:
+           settings.setValue("Infinit", QDir::toNativeSeparators(QCoreApplication::applicationFilePath()));
+           fist::settings()["StartUp"].set("infinit", "auto");
+           this->_launch_at_startup->setCheckState(Qt::Checked);
+           break;
+         default:
+           break;
+       }
+#endif
+    }
+
+    void
+    General::_choose_download_folder()
+    {
+      QString selected = QFileDialog::getExistingDirectory(
+        this,
+        tr("Select a download folder"));
+      if (!selected.isEmpty())
+      {
+        this->_state.download_folder(selected);
+        this->_set_download_folder(this->_state.download_folder());
+      }
+    }
+
+    void
+    General::_modify_reminders(int)
+    {
+      switch (this->_launch_at_startup->checkState())
+      {
+         case Qt::Unchecked:
+           fist::settings()["Reminders"].remove("active");
+           this->_reminders->setCheckState(Qt::Unchecked);
+           break;
+         case Qt::Checked:
+           fist::settings()["Reminders"].set("active", "1");
+           this->_reminders->setCheckState(Qt::Checked);
+           break;
+         default:
+           break;
+       }
+    }
+
+  }
+}
