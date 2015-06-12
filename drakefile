@@ -230,19 +230,20 @@ def configure(cxx_toolkit = None,
   )
   configure_args = [
     '-prefix', str(qxt_prefix_absolute),
-    '-qmake-bin', str(drake.path_build('Qt/bin/qmake', absolute = True)),
+    '-qmake-bin', str(drake.path_build(str(qt.qmake.name_relative), absolute = True)),
     '-no-db',
     '-no-xrandr',
     '-no-zeroconf',
     '-no-avahi']
   for module in ['docs', 'berkeley', 'designer', 'network', 'sql', 'web', 'zeroconf']:
     configure_args += ['-nomake', module]
+  qxt_headers = drake.nodes('qxt/include/QxtGui/QxtGlobalShortcut',)
   GNUBuilder(
     cxx_toolkit,
     configure = qxt_configure,
     configure_args = configure_args,
-    targets = qxt_libs,
-    sources = [],
+    targets = qxt_libs + qxt_headers,
+    sources = [qt.qmake],
   )
   qt_cxx_config.add_local_include_path('qxt/include/QxtCore')
   qt_cxx_config.add_local_include_path('qxt/include')
