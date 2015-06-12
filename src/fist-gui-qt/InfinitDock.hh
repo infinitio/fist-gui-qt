@@ -52,6 +52,9 @@ public:
 public:
   ~InfinitDock();
 
+public:
+  void
+  reset_docks();
 signals:
   void
   quit_request();

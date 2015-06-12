@@ -795,6 +795,7 @@ Fist::logout(bool kicked_out,
               this, SLOT(_kicked_out_reset()));
     else if (!final)
       connect(this->_dock.get(), SIGNAL(destroyed()), this, SLOT(_reset()));
+    this->_dock->reset_docks();
     this->_dock.release()->deleteLater();
   }
   this->_clear();

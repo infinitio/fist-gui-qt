@@ -196,6 +196,13 @@ InfinitDock::~InfinitDock()
 }
 
 void
+InfinitDock::reset_docks()
+{
+  this->_send_panel.reset();
+  this->_transaction_panel.reset();
+}
+
+void
 InfinitDock::_on_logout()
 {
   ELLE_TRACE_SCOPE("%s: logout", *this);
@@ -203,8 +210,7 @@ InfinitDock::_on_logout()
   // when destroying it.
   this->hide();
   this->setCentralWidget(nullptr);
-  this->_send_panel.reset();
-  this->_transaction_panel.reset();
+  this->reset_docks();
 }
 
 void
