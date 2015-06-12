@@ -59,6 +59,8 @@ namespace fist
     , _links()
     , _active_links()
     , _poll_timer(new QTimer)
+    , fullscreen_screenshot(new QxtGlobalShortcut(this))
+    , region_screenshot(new QxtGlobalShortcut(this))
   {
     QString _download_folder = fist::settings()["State"].get("download_folder", "").toString();
     auto download_folder = QString_to_utf8_string(_download_folder);
@@ -933,6 +935,20 @@ namespace fist
   {
     auto id = QString::fromStdString(gap_facebook_app_id());
     return id;
+  }
+
+  void
+  State::update_fullscreen_screenshot_shortcut()
+  {
+    this->fullscreen_screenshot->setShortcut(
+      QKeySequence(fist::settings()["Shortcuts"].get("region", "Ctrl+Shift+I").toString()));
+  }
+
+  void
+  State::update_region_screenshot_shortcut()
+  {
+    this->region_screenshot->setShortcut(
+      QKeySequence(fist::settings()["Shortcuts"].get("region", "Ctrl+Shift+O").toString()));
   }
 
   void

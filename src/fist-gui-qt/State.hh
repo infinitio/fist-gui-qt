@@ -14,6 +14,8 @@
 # include <QString>
 # include <QVector>
 
+#include <QxtGui/QxtGlobalShortcut>
+
 # include <boost/multi_index_container.hpp>
 # include <boost/multi_index/sequenced_index.hpp>
 # include <boost/multi_index/ordered_index.hpp>
@@ -365,6 +367,16 @@ namespace fist
     QString
     facebook_app_id() const;
 
+  public:
+    // Global shortcuts.
+    QxtGlobalShortcut* fullscreen_screenshot;
+    QxtGlobalShortcut* region_screenshot;
+
+  public:
+    void
+    update_fullscreen_screenshot_shortcut();
+    void
+    update_region_screenshot_shortcut();
   private:
     Q_OBJECT;
   };
@@ -386,6 +398,7 @@ namespace fist
     ELLE_ATTRIBUTE_R(QByteArray, avatar);
   private:
     void run() override;
+
   private:
     Q_OBJECT;
   };
