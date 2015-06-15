@@ -94,7 +94,7 @@ def configure(cxx_toolkit = None,
   else:
     openssl_lib_dirs = drake.path_build('.', absolute = True) / 'lib'
     for lib in os.listdir(openssl_lib_dirs):
-        print("LIB IS: %s" % lib)
+        print("LIB IS: %s" % str(lib))
     Qt_version = drake.Version(4, 8, 6)
     Qt_short_version = (Qt_version.major, Qt_version.minor)
     Qt_basename = 'qt-everywhere-opensource-src-%s' % Qt_version
