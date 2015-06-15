@@ -129,7 +129,7 @@ def configure(cxx_toolkit = None,
       '-L%s' % openssl_lib_dirs
     ] + ["-no-%s" % plugin for plugin in Qt_removed_images_plugins]
     Qt_env = {
-      'OPENSSL_LIBS': '-lssl -lcrypto -L%s' % openssl_lib_dirs
+            'OPENSSL_LIBS': '-l:libssl.so.1.0.0 -l:libcrypto.so.1.0.0 -L%s' % openssl_lib_dirs
     }
     if cxx_toolkit.os == drake.os.windows:
       Qt_env['OPENSSL_LIBS'] += ' -lws2_32 -lgdi32 -lcrypt32'
