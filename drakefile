@@ -93,6 +93,8 @@ def configure(cxx_toolkit = None,
     )
   else:
     openssl_lib_dirs = drake.path_build('.', absolute = True) / 'lib'
+    for lib in os.listdir(openssl_lib_dirs):
+        print("LIB IS: %s" % lib)
     Qt_version = drake.Version(4, 8, 6)
     Qt_short_version = (Qt_version.major, Qt_version.minor)
     Qt_basename = 'qt-everywhere-opensource-src-%s' % Qt_version
@@ -121,6 +123,7 @@ def configure(cxx_toolkit = None,
       'gif', 'jpeg', 'ico',
     ]
     Qt_removed_images_plugins = set(drake.cxx.qt.Qt.imageformats) - set(Qt_images_plugins)
+
     Qt_configure_args = [
       '-shared', '-release', '-no-sql-sqlite', '-no-rpath',
       '-no-opengl', '-opensource', '-confirm-license', '-nomake', 'demos',
