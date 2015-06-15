@@ -16,7 +16,6 @@
 #include <fist-gui-qt/SendView/SearchResultWidget.hh>
 #include <fist-gui-qt/SendView/NoSearchResultWidget.hh>
 #include <fist-gui-qt/SendView/EmailResultWidget.hh>
-#include <fist-gui-qt/SendView/TooManyResults.hh>
 #include <fist-gui-qt/SendView/Users.hh>
 #include <fist-gui-qt/SendView/ui.hh>
 #include <fist-gui-qt/TextListItem.hh>
