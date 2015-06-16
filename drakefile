@@ -440,6 +440,10 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/popup/NoMoreStorage.cc",
       "src/fist-gui-qt/popup/NoMoreStorage.hh",
 
+      # Proxy.
+      "src/fist-gui-qt/proxy/Panel.cc",
+      "src/fist-gui-qt/proxy/Panel.hh",
+
       # Settings.
       "src/fist-gui-qt/Settings/Window.cc",
       "src/fist-gui-qt/Settings/Window.hh",

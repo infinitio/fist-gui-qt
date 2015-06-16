@@ -236,6 +236,16 @@ namespace fist
       void
       launch_facebook_connect();
 
+  /*------.
+  | Proxy |
+  `------*/
+    private:
+      ELLE_ATTRIBUTE(QLabel*, proxy);
+      ELLE_ATTRIBUTE(std::unique_ptr<QDialog>, proxy_dialog);
+    private slots:
+      void
+      _apply_proxy_configuration();
+
     private:
       Q_OBJECT
     };

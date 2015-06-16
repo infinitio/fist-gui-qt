@@ -117,6 +117,7 @@ namespace fist
       , _facebook_button(new QPushButton(this))
       , _facebook_window(nullptr)
       , _facebook_connect_attempt(false)
+      , _proxy(new QLabel("proxy", this))
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
@@ -126,6 +127,10 @@ namespace fist
         // Help
         {
           this->_help_link->adjustSize();
+        }
+        // Help
+        {
+          this->_proxy->adjustSize();
         }
         // Loading.
         {
@@ -220,6 +225,11 @@ namespace fist
           link->setOpenExternalLinks(true);
         }
       }
+      // Proxy.
+      {
+        this->_proxy->installEventFilter(this);
+        view::links::style(*this->_proxy);
+      }
       // Version.
       {
         view::version::style(*this->_version_field);
@@ -271,8 +281,15 @@ namespace fist
       auto mlayout = new QVBoxLayout;
       mlayout->setSizeConstraint(QLayout::SetFixedSize);
       mlayout->setSpacing(0);
-      mlayout->setContentsMargins(0, 5, 5, 0);
-      mlayout->addWidget(this->_help_link, 0, Qt::AlignRight);
+      mlayout->setContentsMargins(5, 5, 5, 0);
+      {
+        auto* layout = new QHBoxLayout;
+        layout->setSpacing(0);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(this->_proxy, 0, Qt::AlignLeft);
+        layout->addWidget(this->_help_link, 0, Qt::AlignRight);
+        mlayout->addLayout(layout);
+      }
       auto layout = new QVBoxLayout;
       mlayout->addLayout(layout);
       layout->setSpacing(5);
@@ -322,7 +339,7 @@ namespace fist
       connect(&this->_state, SIGNAL(internet_issue(QString const&)),
               this, SLOT(_internet_issue(QString const&)));
       this->update();
-
+      this->_apply_proxy_configuration();
       this->_update_geometry();
       this->move(QApplication::desktop()->screen()->rect().center() -
                  this->rect().center());
@@ -452,7 +469,17 @@ namespace fist
           !dynamic_cast<QLayout*>(obj))
         return Super::eventFilter(obj, event);
 
-      if (obj == this->_login_tabber)
+      if (obj == this->_proxy)
+      {
+        if (event->type() == QEvent::MouseButtonRelease)
+        {
+          this->_proxy_dialog.reset(new proxy::Window(this->_state, this));
+          connect(this->_proxy_dialog.get(), SIGNAL(done()), this,
+                  SLOT(_apply_proxy_configuration()));
+          this->_proxy_dialog->show();
+        }
+      }
+      else if (obj == this->_login_tabber)
       {
         if (event->type() == QEvent::MouseButtonRelease &&
             this->_mode == Mode::Register)
@@ -1025,5 +1052,28 @@ namespace fist
       this->show();
       this->set_message(error, error, true);
     }
+
+    void
+    Window::_apply_proxy_configuration()
+    {
+      auto proxy_enabled = fist::settings()["proxy"].get("activated", "0").toString() == "1";
+      if (proxy_enabled)
+      {
+        auto host = fist::settings()["proxy"].get("host", "").toString().trimmed();
+        gap_set_proxy(
+          this->_state.state(),
+          host.startsWith("https://") ? gap_proxy_https : gap_proxy_http,
+          QString_to_utf8_string(host),
+          fist::settings()["proxy"].get("port", "0").toInt(),
+          QString_to_utf8_string(fist::settings()["proxy"].get("username", "").toString()),
+          QString_to_utf8_string(fist::settings()["proxy"].get("password", "").toString()));
+      }
+      else
+      {
+        gap_unset_proxy(this->_state.state(), gap_proxy_http);
+        gap_unset_proxy(this->_state.state(), gap_proxy_https);
+      }
+    }
+
   }
 }
