@@ -15,7 +15,6 @@ namespace fist
     public:
       CircularSelector(std::string const& pattern,
                        int log_rotation_size = 4);
-      ~CircularSelector() = default;
 
       std::string
       previous_log_file() const override;

@@ -13,7 +13,7 @@ namespace fist
       Selector(std::string const& log_file);
 
       virtual
-      ~Selector() = default;
+      ~Selector() {}
 
       virtual
       std::string const&
