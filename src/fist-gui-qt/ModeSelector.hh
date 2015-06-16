@@ -15,7 +15,7 @@ namespace fist
     ModeSelector(Mode default_mode = Mode::p2p);
 
     virtual
-    ~ModeSelector() = default;
+    ~ModeSelector() {};
 
     ELLE_ATTRIBUTE_Rw(Mode, mode);
 

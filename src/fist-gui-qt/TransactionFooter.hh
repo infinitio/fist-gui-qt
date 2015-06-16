@@ -17,9 +17,6 @@ class TransactionFooter
 public:
   TransactionFooter();
 
-  virtual
-  ~TransactionFooter() = default;
-
 private:
   void
   _mode_implementation() override;

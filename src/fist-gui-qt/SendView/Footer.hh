@@ -23,9 +23,6 @@ namespace fist
     public:
       Footer();
 
-      virtual
-      ~Footer() = default;
-
     private:
       ELLE_ATTRIBUTE_R(IconButton*, back);
       ELLE_ATTRIBUTE_R(IconButton*, send);
