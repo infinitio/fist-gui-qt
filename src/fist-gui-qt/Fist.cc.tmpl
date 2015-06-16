@@ -708,13 +708,14 @@ Fist::_update_loginwindow_updater_connections(bool connection)
 {
   ELLE_TRACE_SCOPE("%s: %sconnect signal between login window and updater",
                    *this, connection ? "" : "dis");
-  auto func = connection
-    ? [&] (const QObject * sender, const char * signal,
-    const QObject * receiver, const char * method) -> bool
-    { return Self::connect(sender, signal, receiver, method); }
-    : [&] (const QObject * sender, const char * signal,
-    const QObject * receiver, const char * method) -> bool
-      { return Self::disconnect(sender, signal, receiver, method); };
+  auto func = [&] (QObject const* sender, char const* signal,
+                   QObject const* recipient, char const* slot)
+  {
+    if (connection)
+      connect(sender, signal, recipient, slot);
+    else
+      disconnect(sender, signal, recipient, slot);
+  };
   // Notify when the login window that installer is ready to be installed.
   func(this->_updater.get(), SIGNAL(installer_ready()),
        this->_login_window.get(), SLOT(download_ready()));
