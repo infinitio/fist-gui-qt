@@ -203,6 +203,8 @@ private:
   ELLE_ATTRIBUTE(fist::gui::systray::Icon, systray);
   ELLE_ATTRIBUTE(std::unique_ptr<fist::login::Window>, login_window);
   ELLE_ATTRIBUTE(std::unique_ptr<InfinitDock>, dock);
+
+private:
   // Files passed through the command line.
   // XXX: Rework that heresy someday, use rpc to communicate between intances.
   struct CommandLine

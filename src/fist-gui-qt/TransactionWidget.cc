@@ -1,10 +1,10 @@
 #include <map>
 
 #include <QEvent>
-#include <QSpacerItem>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMovie>
+#include <QSpacerItem>
 
 #include <elle/log.hh>
 

@@ -3,10 +3,10 @@
 
 # include <map>
 
-# include <QWidget>
 # include <QByteArray>
 # include <QPixmap>
 # include <QPropertyAnimation>
+# include <QWidget>
 
 # include <elle/attribute.hh>
 

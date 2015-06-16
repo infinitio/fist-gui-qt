@@ -3,12 +3,12 @@
 
 # include <iostream>
 
+# include <QCheckBox>
 # include <QDialog>
-# include <QTabWidget>
 # include <QLabel>
 # include <QLineEdit>
-# include <QCheckBox>
 # include <QTabBar>
+# include <QTabWidget>
 
 # include <fist-gui-qt/State.hh>
 

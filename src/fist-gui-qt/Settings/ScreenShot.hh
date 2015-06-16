@@ -1,13 +1,14 @@
 #ifndef FIST_GUI_QT_SETTINGS_SCREENSHOT_HH
 # define FIST_GUI_QT_SETTINGS_SCREENSHOT_HH
 
-# include <QWidget>
 # include <QLabel>
 # include <QLineEdit>
+# include <QWidget>
+
+# include <elle/attribute.hh>
 
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/gui/EnterKeySequence.hh>
-# include <elle/attribute.hh>
 
 namespace fist
 {

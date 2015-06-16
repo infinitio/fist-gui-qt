@@ -3,9 +3,8 @@
 #include <fist-gui-qt/Settings/utils.hh>
 #include <fist-gui-qt/State.hh>
 
-#include <QGridLayout>
 #include <QFileDialog>
-
+#include <QGridLayout>
 
 namespace fist
 {

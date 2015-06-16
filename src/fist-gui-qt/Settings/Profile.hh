@@ -3,11 +3,11 @@
 
 # include <memory>
 
-# include <QWidget>
+# include <QDialog>
 # include <QLabel>
 # include <QLineEdit>
-# include <QDialog>
 # include <QPushButton>
+# include <QWidget>
 
 # include <elle/attribute.hh>
 

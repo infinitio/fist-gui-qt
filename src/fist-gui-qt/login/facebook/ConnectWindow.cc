@@ -1,7 +1,7 @@
 #include <QMainWindow>
-#include <QWebView>
-#include <QUrl>
 #include <QNetworkAccessManager>
+#include <QUrl>
+#include <QWebView>
 
 #include <elle/log.hh>
 

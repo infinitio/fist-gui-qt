@@ -1,8 +1,8 @@
-#include <fist-gui-qt/HorizontalSeparator.hh>
-
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBrush>
+
+#include <fist-gui-qt/HorizontalSeparator.hh>
 
 HorizontalSeparator::HorizontalSeparator(QWidget* parent,
                                          int margin)

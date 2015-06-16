@@ -2,8 +2,8 @@
 # define FIST_GUI_QT_LOGIN_FACEBOOKCONNECTWINDOW_HH
 
 # include <QMainWindow>
-# include <QNetworkReply>
 # include <QNetworkCookieJar>
+# include <QNetworkReply>
 
 # include <elle/log.hh>
 

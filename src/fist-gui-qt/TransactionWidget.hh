@@ -3,18 +3,18 @@
 
 # include <memory>
 
-# include <QWidget>
+# include <QLabel>
 # include <QPushButton>
 # include <QTimer>
-# include <QLabel>
+# include <QWidget>
 
 # include <elle/attribute.hh>
 
-# include <fist-gui-qt/fwd.hh>
+# include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/ListItem.hh>
 # include <fist-gui-qt/TransactionWindow.hh>
+# include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/model/Transaction.hh>
-# include <fist-gui-qt/IconButton.hh>
 
 class TransactionWidget:
   public ListItem

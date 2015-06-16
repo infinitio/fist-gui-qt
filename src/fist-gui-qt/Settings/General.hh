@@ -1,10 +1,10 @@
 #ifndef FIST_GUI_QT_SETTINGS_GENERAL_HH
 # define FIST_GUI_QT_SETTINGS_GENERAL_HH
 
-# include <QWidget>
-# include <QLabel>
 # include <QCheckBox>
+# include <QLabel>
 # include <QLineEdit>
+# include <QWidget>
 
 # include <elle/attribute.hh>
 

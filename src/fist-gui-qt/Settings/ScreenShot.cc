@@ -1,11 +1,11 @@
+#include <QGridLayout>
+
+#include <elle/log.hh>
+
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/Settings/ScreenShot.hh>
 #include <fist-gui-qt/Settings/utils.hh>
 #include <fist-gui-qt/State.hh>
-
-#include <QGridLayout>
-
-#include <elle/log.hh>
 
 ELLE_LOG_COMPONENT("fist.prefs.ScreenShot");
 

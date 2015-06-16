@@ -1,25 +1,25 @@
 #include <QApplication>
+#include <QBrush>
 #include <QByteArray>
 #include <QDesktopWidget>
 #include <QFuture>
 #include <QHBoxLayout>
+#include <QPainter>
 #include <QPixmap>
 #include <QRegExp>
 #include <QSettings>
 #include <QString>
 #include <QToolTip>
 #include <QVBoxLayout>
-#include <QPainter>
-#include <QBrush>
 
 #include <elle/Buffer.hh>
 #include <elle/finally.hh>
+#include <elle/log.hh>
 #include <elle/serialize/extract.hh>
 #include <elle/serialize/insert.hh>
-#include <elle/log.hh>
 
-#include <cryptography/SecretKey.hh>
 #include <cryptography/Exception.hh>
+#include <cryptography/SecretKey.hh>
 
 #include <surface/gap/gap.hh>
 #include <version.hh>
@@ -30,8 +30,9 @@
 #include <fist-gui-qt/login/Window.hh>
 #include <fist-gui-qt/login/facebook/ConnectWindow.hh>
 #include <fist-gui-qt/login/ui.hh>
-#include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/proxy/Panel.hh>
 #include <fist-gui-qt/regexp.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.login.Window");
 

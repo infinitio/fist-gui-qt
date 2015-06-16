@@ -3,25 +3,25 @@
 
 # include <memory>
 
-# include <QLabel>
+# include <QFuture>
+# include <QFutureWatcher>
 # include <QKeyEvent>
-# include <QPushButton>
-# include <QVBoxLayout>
+# include <QLabel>
 # include <QLineEdit>
 # include <QMainWindow>
 # include <QMovie>
-# include <QFuture>
-# include <QFutureWatcher>
+# include <QPushButton>
+# include <QVBoxLayout>
 
 # include <elle/attribute.hh>
 
 # include <surface/gap/fwd.hh>
 
-# include <fist-gui-qt/fwd.hh>
-# include <fist-gui-qt/login/fwd.hh>
 # include <fist-gui-qt/InfinitDock.hh>
 # include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/SmoothLayout.hh>
+# include <fist-gui-qt/fwd.hh>
+# include <fist-gui-qt/login/fwd.hh>
 
 namespace fist
 {
@@ -220,6 +220,9 @@ namespace fist
       void
       print(std::ostream& stream) const override;
 
+  /*---------.
+  | Facebook |
+  `---------*/
     private slots:
       void
       fb(QString const& code);

@@ -6,8 +6,8 @@
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/Settings/General.hh>
 #include <fist-gui-qt/Settings/utils.hh>
-#include <fist-gui-qt/utils.hh>
 #include <fist-gui-qt/State.hh>
+#include <fist-gui-qt/utils.hh>
 
 namespace fist
 {

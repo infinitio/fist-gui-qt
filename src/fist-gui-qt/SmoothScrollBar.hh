@@ -1,5 +1,5 @@
-#ifndef SMOOTHSCROLLBAR_HH
-# define SMOOTHSCROLLBAR_HH
+#ifndef FIST_GUI_QT_SMOOTHSCROLLBAR_HH
+# define FIST_GUI_QT_SMOOTHSCROLLBAR_HH
 
 # include <QPropertyAnimation>
 # include <QWidget>

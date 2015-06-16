@@ -263,20 +263,20 @@ Fist::_parse_options(int argc, char** argv)
   ELLE_TRACE("command_line: %s", this->_command_line.get());
 }
 
-Fist::Fist(int argc, char** argv):
-  _prologue(new Fist::Prologue()),
-  _state(nullptr),
-  _lock(nullptr),
-  _previous_session_crashed(false),
-  _filelock(
+Fist::Fist(int argc, char** argv)
+  : _prologue(new Fist::Prologue())
+  , _state(nullptr)
+  , _lock(nullptr)
+  , _previous_session_crashed(false)
+  , _filelock(
     QString::fromStdString(
-      elle::os::path::join(common::infinit::default_home(), "lock"))),
-  _application(new QApplication(argc, argv)),
-  _updater(nullptr),
-  _systray(fist::icon::inactive, this),
-  _login_window(nullptr),
-  _dock(nullptr),
-  _command_line(nullptr)
+      elle::os::path::join(common::infinit::default_home(), "lock")))
+  , _application(new QApplication(argc, argv))
+  , _updater(nullptr)
+  , _systray(fist::icon::inactive, this)
+  , _login_window(nullptr)
+  , _dock(nullptr)
+  , _command_line(nullptr)
 {
   ELLE_TRACE_SCOPE("%s: construction", *this);
   g_fist = this;

@@ -1,5 +1,5 @@
-#ifndef FILEITEM_HH
-# define FILEITEM_HH
+#ifndef FIST_GUI_QT_FILEITEM_HH
+# define FIST_GUI_QT_FILEITEM_HH
 
 # include <QFileIconProvider>
 # include <QGraphicsPixmapItem>

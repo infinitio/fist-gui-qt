@@ -1,26 +1,26 @@
 #include <iostream>
 
 #include <QBuffer>
-#include <QDialog>
-#include <QTabWidget>
-#include <QFileDialog>
 #include <QCoreApplication>
-#include <QSpacerItem>
+#include <QDialog>
 #include <QEvent>
-#include <QKeyEvent>
+#include <QFileDialog>
 #include <QGridLayout>
-#include <QPushButton>
+#include <QKeyEvent>
 #include <QLineEdit>
 #include <QPainter>
+#include <QPushButton>
+#include <QSpacerItem>
 #include <QStackedLayout>
+#include <QTabWidget>
 
 #include <elle/container/map.hh>
 
 #include <fist-gui-qt/AvatarIcon.hh>
-#include <fist-gui-qt/Settings/Window.hh>
 #include <fist-gui-qt/Settings/General.hh>
 #include <fist-gui-qt/Settings/Profile.hh>
 #include <fist-gui-qt/Settings/ScreenShot.hh>
+#include <fist-gui-qt/Settings/Window.hh>
 #include <fist-gui-qt/Settings/utils.hh>
 #include <fist-gui-qt/State.hh>
 

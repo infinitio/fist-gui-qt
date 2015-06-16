@@ -24,7 +24,7 @@ AvatarIcon::set_avatar(QPixmap const& pixmap)
   this->_pixmap.fill(Qt::transparent);
 
   {
-    _mask.fill(Qt::transparent);
+    this->_mask.fill(Qt::transparent);
     QPainter painter(&this->_mask);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
@@ -53,5 +53,5 @@ AvatarIcon::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
   painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-  painter.drawPixmap(_geometry, this->_pixmap);
+  painter.drawPixmap(this->_geometry, this->_pixmap);
 }
