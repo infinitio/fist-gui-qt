@@ -23,10 +23,6 @@
 # include <fist-gui-qt/RoundShadowWidget.hh>
 # include <fist-gui-qt/SmoothLayout.hh>
 
-# include <phonon/VideoPlayer>
-# include <phonon/MediaSource>
-# include <phonon/VideoWidget>
-
 namespace fist
 {
   namespace login
@@ -167,8 +163,6 @@ namespace fist
       ELLE_ATTRIBUTE(QLabel*, version_field);
       ELLE_ATTRIBUTE(QPushButton*, login_button);
       ELLE_ATTRIBUTE(QPushButton*, facebook_button);
-
-      ELLE_ATTRIBUTE(QWidget*, video);
 
       ELLE_ATTRIBUTE(std::unique_ptr<facebook::ConnectWindow>, facebook_window);
       ELLE_ATTRIBUTE(bool, facebook_connect_attempt);

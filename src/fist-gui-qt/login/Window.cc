@@ -35,14 +35,6 @@
 
 ELLE_LOG_COMPONENT("infinit.FIST.login.Window");
 
-#ifndef INFINIT_WINDOWS
-// # define VIDEO
-#endif
-
-#ifdef VIDEO
-static Phonon::VideoPlayer* player;
-#endif
-
 namespace fist
 {
   namespace login
@@ -98,33 +90,32 @@ namespace fist
     Window::Window(fist::State& state,
                    fist::gui::systray::Icon& systray,
                    bool fill_email_and_password_fields,
-                   bool previous_session_crashed):
-      RoundShadowWidget(
+                   bool previous_session_crashed)
+      : RoundShadowWidget(
         0, 0, Qt::Window | Qt::WindowCloseButtonHint |
-              Qt::WindowMinimizeButtonHint |
-              Qt::MSWindowsFixedSizeDialogHint),
-      _state(state),
-      _previous_session_crashed(previous_session_crashed),
-      _systray(systray),
-      _mode(Mode::None),
-      _signup_tabber(new QLabel(view::mode::signup::text, this)),
-      _login_tabber(new QLabel(view::mode::login::text, this)),
-      _separator(new QLabel(view::separator::text, this)),
-      _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this)),
-      _loading(new QLabel(this)),
-      _facebook_email_info(new QWidget(this)),
-      _fullname_field(new QLineEdit(this)),
-      _email_field(new QLineEdit(this)),
-      _password_field(new QLineEdit(this)),
-      _message_field(new QLabel(this)),
-      _help_link(new QLabel(view::links::help::text, this)),
-      _forgot_password_link(new QLabel(view::links::forgot_password::text, this->_password_field)),
-      _version_field(new QLabel(this)),
-      _login_button(new QPushButton(this)),
-      _facebook_button(new QPushButton(this)),
-      _video(nullptr),
-      _facebook_window(nullptr),
-      _facebook_connect_attempt(false)
+        Qt::WindowMinimizeButtonHint |
+              Qt::MSWindowsFixedSizeDialogHint)
+      , _state(state)
+      , _previous_session_crashed(previous_session_crashed)
+      , _systray(systray)
+      , _mode(Mode::None)
+      , _signup_tabber(new QLabel(view::mode::signup::text, this))
+      , _login_tabber(new QLabel(view::mode::login::text, this))
+      , _separator(new QLabel(view::separator::text, this))
+      , _loading_icon(new QMovie(QString(":/loading"), QByteArray(), this))
+      , _loading(new QLabel(this))
+      , _facebook_email_info(new QWidget(this))
+      , _fullname_field(new QLineEdit(this))
+      , _email_field(new QLineEdit(this))
+      , _password_field(new QLineEdit(this))
+      , _message_field(new QLabel(this))
+      , _help_link(new QLabel(view::links::help::text, this))
+      , _forgot_password_link(new QLabel(view::links::forgot_password::text, this->_password_field))
+      , _version_field(new QLabel(this))
+      , _login_button(new QPushButton(this))
+      , _facebook_button(new QPushButton(this))
+      , _facebook_window(nullptr)
+      , _facebook_connect_attempt(false)
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);
       this->setWindowIcon(QIcon(":/logo"));
@@ -269,29 +260,6 @@ namespace fist
         connect(this->_facebook_button, SIGNAL(released()),
                 this, SLOT(launch_facebook_connect()));
       }
-      // Video Logo
-      {
- #ifdef VIDEO
-        player = new Phonon::VideoPlayer(Phonon::VideoCategory, this);
-        player->play(Phonon::MediaSource(":/login/preboardingideo.avi"));
-        player->pause();
-        auto* widget = player->videoWidget();
-        widget->setScaleMode(Phonon::VideoWidget::ScaleAndCrop);
-        widget->setAspectRatio(Phonon::VideoWidget::AspectRatioWidget);
-        widget->setFixedSize(400, 470);
-        this->_video = widget;
-#else
-        auto* widget = new QLabel(this);
-        widget->setMovie(new QMovie(":/login/preboarding"));
-        widget->movie()->start();
-        // widget->setScaledContents(true);
-        this->_video = widget;
-        this->_update_geometry();
-#endif
-        // widget->setFixedSize(400, 470);
-        widget->show();
-        widget->installEventFilter(this);
-      }
       auto central_widget = new QWidget(this);
       {
         // central_widget->setFixedWidth(this->width());
@@ -339,13 +307,6 @@ namespace fist
       layout->addStretch();
       layout->addSpacing(10);
       glayout->addLayout(mlayout);
-      {
-        auto layout = new QVBoxLayout;
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(0);
-        layout->addWidget(this->_video);
-        glayout->addLayout(layout);
-      }
 
       this->setCentralWidget(central_widget);
       connect(this->_login_button, SIGNAL(clicked()),
@@ -409,16 +370,11 @@ namespace fist
         this->_password_field->width() - this->_forgot_password_link->width() - 5,
         this->_password_field->height() / 2 - this->_forgot_password_link->height() / 2);
       this->_password_field->setTextMargins(12, 0, 5 + this->_forgot_password_link->width(), 0);
-      ELLE_ASSERT(this->_video != nullptr);
-      // this->_help_link->move(QPoint{this->_video->x() - this->_help_link->width() - 5, 5});
     }
 
     Window::~Window()
     {
       ELLE_TRACE_SCOPE("%s: destruction", *this);
-#ifdef VIDEO
-      delete player;
-#endif
     }
 
     void
@@ -507,30 +463,6 @@ namespace fist
             this->_mode == Mode::Login)
           this->mode(Mode::Register);
       }
-      else if (obj == this->_video)
-      {
-        if (event->type() == QEvent::MouseButtonRelease)
-        {
-#ifdef VIDEO
-          if (player->isPaused())
-            player->play();
-          else
-            player->pause();
-#else
-          auto* movie = static_cast<QLabel*>(this->_video)->movie();
-          if (movie->state() == QMovie::MovieState::Paused)
-            movie->setPaused(false);
-          else if (movie->state() == QMovie::MovieState::Running)
-            movie->setPaused(true);
-          else
-          {
-            movie->setPaused(false);
-            movie->start();
-          }
-#endif
-        }
-      }
-
       return Super::eventFilter(obj, event);
     }
 
@@ -1014,7 +946,7 @@ namespace fist
         auto const& g = this->active()->geometry();
         qreal top_height = this->active()->y() + g.height() + arrow_height + 7;
         qreal arrow_center = this->active()->x() + g.width() / 2;
-        qreal right_border = this->_video->geometry().x();
+        qreal right_border = this->width();
         painter.drawRect(0, 0, this->width(), this->height());
         painter.setBrush(QColor(0xF8, 0xF8, 0xF8));
         painter.setPen(Qt::NoPen);
