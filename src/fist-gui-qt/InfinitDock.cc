@@ -31,7 +31,6 @@
 #include <fist-gui-qt/notification/Minimized.hh>
 #include <fist-gui-qt/notification/UpdateAvailable.hh>
 #include <fist-gui-qt/SendView/Panel.hh>
-#include <fist-gui-qt/GhostCode/Panel.hh>
 #include <fist-gui-qt/Settings/Window.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
 #include <fist-gui-qt/utils.hh>
@@ -80,7 +79,6 @@ InfinitDock::InfinitDock(fist::State& state,
   , _state(state)
   , _transaction_panel(new MainPanel(this->_state))
   , _send_panel(new fist::sendview::Panel(this->_state))
-  , _ghost_code_panel(new fist::ghost_code::Panel(this->_state))
   , _menu(new QMenu(this))
   , _logo(":/menu-bar/fire@2x")
   , _systray(systray)
@@ -112,7 +110,6 @@ InfinitDock::InfinitDock(fist::State& state,
   }
   this->_register_panel(this->_transaction_panel.get());
   this->_register_panel(this->_send_panel.get());
-  this->_register_panel(this->_ghost_code_panel.get());
   // Transaction panel.
   {
     connect(this->_transaction_panel->footer()->send(), SIGNAL(released()),
@@ -134,14 +131,6 @@ InfinitDock::InfinitDock(fist::State& state,
     connect(this->_send_panel.get(), SIGNAL(choose_files()),
             this, SLOT(_pick_files_from_sendview()));
   }
-  // Ghost code panel.
-  {
-    connect(this->_ghost_code_panel->footer()->skip(),
-            SIGNAL(released()),
-            this,
-            SLOT(_show_transactions_view()));
-  }
-
   connect(this, SIGNAL(onSizeChanged()),
           SLOT(_position_panel()));
 
@@ -412,13 +401,6 @@ InfinitDock::_show_send_view()
 }
 
 void
-InfinitDock::_show_ghost_code_view()
-{
-  ELLE_TRACE_SCOPE("%s: show ghost code view", *this);
-  this->_switch_view(this->_ghost_code_panel.get());
-}
-
-void
 InfinitDock::_show_user_view(uint32_t /* sender_id */)
 {
   ELLE_TRACE_SCOPE("%s: show user view", *this);
@@ -567,8 +549,7 @@ InfinitDock::focusOutEvent(QFocusEvent* event)
 {
   ELLE_TRACE_SCOPE("%s: focus lost (reason %s)", *this, event->reason());
   // Swallow focus lost event to keep the send view on top
-  if (this->centralWidget() == this->_send_panel.get() ||
-      this->centralWidget() == this->_ghost_code_panel.get())
+  if (this->centralWidget() == this->_send_panel.get())
   {
     event->accept();
     return;
@@ -622,8 +603,7 @@ InfinitDock::keyPressEvent(QKeyEvent* event)
     }
   }
 
-  if (this->centralWidget() != this->_ghost_code_panel.get())
-    QCoreApplication::sendEvent(this->centralWidget(), event);
+  QCoreApplication::sendEvent(this->centralWidget(), event);
 }
 
 /*------.

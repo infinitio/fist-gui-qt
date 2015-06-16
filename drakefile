@@ -459,11 +459,6 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/MainView/EmptyState/Transaction.cc",
       "src/fist-gui-qt/MainView/EmptyState/Transaction.hh",
 
-      "src/fist-gui-qt/GhostCode/Panel.cc",
-      "src/fist-gui-qt/GhostCode/Panel.hh",
-      "src/fist-gui-qt/GhostCode/Footer.cc",
-      "src/fist-gui-qt/GhostCode/Footer.hh",
-
       "src/fist-gui-qt/ScreenShot/Window.hh",
       "src/fist-gui-qt/ScreenShot/Window.cc",
     )

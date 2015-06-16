@@ -57,11 +57,6 @@ namespace fist
     class NonEmptyFileAdder;
   }
 
-  namespace ghost_code
-  {
-    class Panel;
-  }
-
   enum class Mode
   {
     p2p,
