@@ -276,7 +276,7 @@ namespace fist
         // central_widget->setFixedWidth(this->width());
       }
       auto glayout = new QHBoxLayout(central_widget);
-      glayout->setContentsMargins(0, 0, 0, 0);
+      glayout->setContentsMargins(0, 0, 0, 15);
       glayout->setSpacing(0);
       auto mlayout = new QVBoxLayout;
       mlayout->setSizeConstraint(QLayout::SetFixedSize);
