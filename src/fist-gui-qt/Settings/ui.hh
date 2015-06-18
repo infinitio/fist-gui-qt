@@ -13,7 +13,7 @@ namespace fist
       {
         static
         QString const
-        text = ::view::links::rich.arg("https://infinit.io/account?%1",
+        text = ::view::links::rich.arg("https://infinit.io/account?session_id=%1",
                                        "You can change on the web.");
       }
 
@@ -21,7 +21,7 @@ namespace fist
       {
         static
         QString const
-        text = ::view::links::rich.arg("https://infinit.io/account?%1",
+        text = ::view::links::rich.arg("https://infinit.io/account?session_id=%1",
                                        "Go to your web profile.");
       }
 
