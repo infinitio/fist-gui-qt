@@ -343,6 +343,11 @@ namespace fist
       this->_update_geometry();
       this->move(QApplication::desktop()->screen()->rect().center() -
                  this->rect().center());
+      connect(
+        this->_systray.inner(),
+        SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+        this,
+        SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
     }
 
     void
@@ -959,6 +964,13 @@ namespace fist
       Super::closeEvent(event);
 
       emit quit_request();
+    }
+
+    void
+    Window::_systray_activated(QSystemTrayIcon::ActivationReason reason)
+    {
+      this->show();
+      this->showNormal();
     }
 
     void

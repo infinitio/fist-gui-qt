@@ -682,6 +682,10 @@ Fist::logged_in()
           this->_dock.get(), SLOT(p2p(QList<QUrl> const&)));
   connect(this, SIGNAL(get_a_link(QList<QUrl> const&)),
           this->_dock.get(), SLOT(get_a_link(QList<QUrl> const&)));
+  disconnect(this->_systray.inner(),
+             SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+             this->_login_window.get(),
+             SLOT(_systray_activated(QSystemTrayIcon::ActivationReason)));
   this->_dock->hide();
   // Handle command line arguments.
   if (this->_command_line)

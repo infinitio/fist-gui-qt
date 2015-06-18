@@ -140,6 +140,11 @@ namespace fist
       void
       mode(Mode mode,
            bool clear_message = true);
+
+    private slots:
+      void
+      _systray_activated(QSystemTrayIcon::ActivationReason reason);
+
     private:
       ELLE_ATTRIBUTE(bool, previous_session_crashed);
       ELLE_ATTRIBUTE(fist::gui::systray::Icon&, systray);
