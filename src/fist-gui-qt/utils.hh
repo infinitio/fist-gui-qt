@@ -110,7 +110,7 @@ pretty_date(QDateTime const& date,
   auto local_date = date.toLocalTime();
   QString format =
     detailed
-    ? "ddd MMMM d yy hh:mm:ss:zz"
+    ? "MMMM d - hh'h'mm'm'ss's'zz"
     : (local_date.secsTo(current) < seconds_since_midnight(current)
        ? "hh:mmA"
        : "MMM d");
