@@ -77,7 +77,7 @@ namespace fist
       layout->addWidget(section("Device name", this), ++i, 0, Qt::AlignTop | Qt::AlignLeft);
       layout->addWidget(this->_device_name, i, 2, 1, -1);
       layout->addWidget(
-        link(view::account::text.arg(this->_state.session_id()), this),
+        link(view::account::text.arg(QString(QUrl::toPercentEncoding(this->_state.session_id()))), this),
         ++i, 0, 1, -1);
       layout->setRowStretch(++i, 1);
     }

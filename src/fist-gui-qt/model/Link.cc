@@ -80,10 +80,15 @@ namespace fist
     }
 
     QUrl
-    Link::url() const
+    Link::url(bool logged_in) const
     {
       if (this->_link.link)
-        return QUrl(QString::fromStdString(this->_link.link.get()));
+      {
+        auto link = QString::fromStdString(this->_link.link.get());
+        if (logged_in)
+          link += "?session_id=" + QUrl::toPercentEncoding(this->_state.session_id());
+        return QUrl(link);
+      }
       return QUrl();
     }
 

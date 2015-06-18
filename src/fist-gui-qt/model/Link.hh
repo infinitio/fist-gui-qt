@@ -37,7 +37,7 @@ namespace fist
 
     public:
       QUrl
-      url() const;
+      url(bool logged_in = false) const;
 
       QString
       name() const;
