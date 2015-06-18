@@ -26,6 +26,7 @@ namespace fist
       , _icon(new QLabel(this))
     {
       this->setWindowFlags(
+        Qt::Tool | // Doesn't take focus from the app.
         Qt::Window | // Add if popup doesn't show up
         Qt::FramelessWindowHint | // No window border
         Qt::WindowStaysOnTopHint // Always on top
@@ -102,7 +103,7 @@ namespace fist
       , _body(new QLabel(body, this))
     {
       auto* layout = new QHBoxLayout(this);
-      layout->setContentsMargins(view::spacing, 15, 15, 15);
+      layout->setContentsMargins(view::spacing, view::spacing, view::spacing, view::spacing);
       layout->setSpacing(view::spacing);
       {
         this->_icon->setPixmap(
@@ -111,7 +112,7 @@ namespace fist
             view::icon::diameter, view::icon::diameter,
             Qt::KeepAspectRatio, Qt::SmoothTransformation)
           : pixmap);
-        layout->addWidget(this->_icon, 0, Qt::AlignVCenter | Qt::AlignTop);
+        layout->addWidget(this->_icon, 0, Qt::AlignTop | Qt::AlignLeft);
       }
       layout->addSpacing(10);
       {
@@ -127,6 +128,7 @@ namespace fist
           this->_body->setWordWrap(true);
           view::body::style(*this->_body);
           vlayout->addWidget(this->_body);
+          this->_body->adjustSize();
         }
         vlayout->addStretch();
         layout->addLayout(vlayout, 1);

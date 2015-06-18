@@ -10,11 +10,11 @@ namespace fist
     namespace view
     {
       static const QColor background(241, 241, 241);
-      static const int spacing = 15;
+      static const int spacing = 12;
 
       namespace icon
       {
-        static const int diameter = 64;
+        static const int diameter = 48;
       }
 
       namespace title

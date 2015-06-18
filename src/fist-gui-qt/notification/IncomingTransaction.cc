@@ -14,22 +14,27 @@ namespace fist
 {
   namespace notification
   {
+    static float icon_diameter = 22;
+
     IncomingTransaction::IncomingTransaction(
       model::Transaction const& transaction,
       QWidget* parent)
-      : Super(3000, nullptr)
+      : Super(10000, nullptr)
       , _transaction(transaction)
     {
       auto* layout = new QHBoxLayout(this);
       layout->setContentsMargins(view::spacing, 0, 0, 0);
       layout->setSpacing(view::spacing);
       {
-        layout->addWidget(this->_icon, 0, Qt::AlignCenter);
+        QVBoxLayout* vlayout = new QVBoxLayout;
+        vlayout->setContentsMargins(0, view::spacing, 0, view::spacing + icon_diameter * 0.33);
+        vlayout->addWidget(this->_icon, 0, Qt::AlignTop);
+        layout->addLayout(vlayout);
       }
-      layout->addSpacing(15);
+      layout->addSpacing(view::spacing);
       {
         QVBoxLayout* vlayout = new QVBoxLayout;
-        vlayout->setContentsMargins(0, 15, 0, 0);
+        vlayout->setContentsMargins(0, view::spacing, 0, 0);
         auto* label = new QLabel(
           incoming_transaction::view::body::text
           .arg(transaction.peer().fullname())
@@ -55,8 +60,8 @@ namespace fist
                                  "  background-color: rgb(190, 239, 102);"
                                  "  border-radius: 0px;"
                                  "  color: white;"
-                                 "  padding-top: 7px;"
-                                 "  padding-bottom: 7px;"
+                                 "  padding-top: 5px;"
+                                 "  padding-bottom: 5px;"
                                  "  padding-left: 15px;"
                                  "  padding-right: 15px;"
                                  "  font: bold 18px;"
@@ -73,8 +78,8 @@ namespace fist
                                  "  background-color: rgb(215, 215, 215);"
                                  "  border-radius: 0px;"
                                  "  color: white;"
-                                 "  padding-top: 9px;"
-                                 "  padding-bottom: 9px;"
+                                 "  padding-top: 5px;"
+                                 "  padding-bottom: 5px;"
                                  "  padding-left: 15px;"
                                  "  padding-right: 15px;"
                                  "  font: 14px;"
@@ -84,6 +89,7 @@ namespace fist
         }
         layout->addLayout(vlayout);
       }
+      this->resize(this->minimumSizeHint());
     }
 
     void
@@ -98,7 +104,6 @@ namespace fist
       int margin = 0;
       if (this->_avatar.isNull())
       {
-        float icon_diameter = 22;
         QPixmap mask(view::icon::diameter, view::icon::diameter);
         {
           mask.fill(Qt::transparent);
@@ -122,18 +127,20 @@ namespace fist
         paint.setCompositionMode(QPainter::CompositionMode_DestinationIn);
         paint.drawPixmap(margin, margin + 5, mask);
         paint.setCompositionMode(QPainter::CompositionMode_SourceOver);
-        QPixmap logo(icon_diameter * 1.4, icon_diameter * 1.4);
+        float factor = 0.10;
+        QPixmap logo(icon_diameter * (1 + 2 * factor), icon_diameter * (1 + 2 * factor));
         {
           logo.fill(Qt::transparent);
           QPainter paint(&logo);
           paint.setPen(view::background);
           paint.setBrush(view::background);
           paint.setRenderHint(QPainter::Antialiasing);
+          paint.setRenderHint(QPainter::HighQualityAntialiasing);
           paint.drawEllipse(
-            0, 0, icon_diameter * 1.4, icon_diameter * 1.4);
+            0, 0, icon_diameter * (1 + 2 * factor), icon_diameter * (1 + 2 * factor));
           paint.drawPixmap(
-            (float) icon_diameter * 0.2 + 1,
-            (float) icon_diameter * 0.2 + 1,
+            (float) icon_diameter * factor + 1,
+            (float) icon_diameter * factor + 1,
             QPixmap(":/notification/logo").scaled(
               icon_diameter, icon_diameter,
               Qt::KeepAspectRatio, Qt::SmoothTransformation));
