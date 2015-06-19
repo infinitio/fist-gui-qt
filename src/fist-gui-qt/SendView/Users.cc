@@ -326,7 +326,7 @@ namespace fist
                                  this->_recipients.end(),
                                  [&] (Recipient const& recipient)
                                  {
-                                   ELLE_LOG("%s - %s", recipient,  device.id());
+                                   ELLE_DUMP("%s - %s", recipient,  device.id());
                                    return recipient == device.id();
                                  }) == this->_recipients.end())
                 {
