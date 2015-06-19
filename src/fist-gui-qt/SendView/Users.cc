@@ -365,9 +365,10 @@ namespace fist
 
       if (this->_results.empty() && !this->text().isEmpty() && !regexp::email::checker.exactMatch(this->text()))
       {
-        this->_users->add_widget(
-          std::make_shared<NoSearchResultWidget>(this),
-          ListWidget::Position::Top);
+        if (this->_users->widgets().empty())
+          this->_users->add_widget(
+            std::make_shared<NoSearchResultWidget>(this),
+            ListWidget::Position::Top);
       }
 
     }
@@ -551,8 +552,10 @@ namespace fist
     {
       ELLE_DEBUG_SCOPE("%s: text changed to %s", *this, text);
       QString trimmed_search = text.trimmed();
-      this->clear_results();
-      this->set_users(this->_state.search(trimmed_search), true);
+      auto results = this->_state.search(trimmed_search);
+      if (!results.empty() || !this->_results.empty())
+        this->clear_results();
+      this->set_users(results, true);
     }
 
     void
