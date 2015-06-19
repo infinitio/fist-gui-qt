@@ -20,19 +20,22 @@ namespace fist
       typedef QMainWindow Super;
     public:
       RegionSelector(QWidget *parent = 0);
-      virtual ~RegionSelector() = default;
+      virtual
+      ~RegionSelector();
 
     protected:
       void
-      paintEvent(QPaintEvent *event) override;
+      paintEvent(QPaintEvent* event) override;
       void
-      mousePressEvent(QMouseEvent *event) override;
+      mousePressEvent(QMouseEvent* event) override;
       void
-      mouseReleaseEvent(QMouseEvent *event) override;
+      mouseReleaseEvent(QMouseEvent* event) override;
       void
-      mouseMoveEvent(QMouseEvent *event) override;
+      mouseMoveEvent(QMouseEvent* event) override;
       void
-      keyPressEvent(QKeyEvent *event) override;
+      keyPressEvent(QKeyEvent* event) override;
+      void
+      hideEvent(QHideEvent* event) override;
     signals:
       void
       done();

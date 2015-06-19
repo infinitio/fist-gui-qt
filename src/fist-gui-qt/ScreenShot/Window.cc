@@ -34,7 +34,13 @@ namespace fist
       this->resize(QApplication::desktop()->size());
     }
 
-    void RegionSelector::paintEvent(QPaintEvent * event)
+    RegionSelector::~RegionSelector()
+    {
+      this->releaseKeyboard();
+    }
+
+    void
+    RegionSelector::paintEvent(QPaintEvent* event)
     {
       if (this->_desktop_clear.isNull())
       {
@@ -47,7 +53,8 @@ namespace fist
       this->_draw_selection_rectangle(painter);
     }
 
-    void RegionSelector::mousePressEvent(QMouseEvent* event)
+    void
+    RegionSelector::mousePressEvent(QMouseEvent* event)
     {
       if (event->button() != Qt::LeftButton)
         return;
@@ -56,7 +63,8 @@ namespace fist
       this->_process_selection = true;
     }
 
-    void RegionSelector::mouseReleaseEvent(QMouseEvent* event)
+    void
+    RegionSelector::mouseReleaseEvent(QMouseEvent* event)
     {
       if (event->button() != Qt::LeftButton)
         return;
@@ -67,7 +75,8 @@ namespace fist
       emit done();
     }
 
-    void RegionSelector::mouseMoveEvent(QMouseEvent *event)
+    void
+    RegionSelector::mouseMoveEvent(QMouseEvent *event)
     {
       if (this->_process_selection)
       {
@@ -77,7 +86,8 @@ namespace fist
       }
     }
 
-    void RegionSelector::keyPressEvent(QKeyEvent* event)
+    void
+    RegionSelector::keyPressEvent(QKeyEvent* event)
     {
       if (event->key() == Qt::Key_Escape)
       {
@@ -88,7 +98,15 @@ namespace fist
         event->ignore();
     }
 
-    void RegionSelector::_draw_background()
+    void
+    RegionSelector::hideEvent(QHideEvent* event)
+    {
+      this->releaseKeyboard();
+      Super::hideEvent(event);
+    }
+
+    void
+    RegionSelector::_draw_background()
     {
       QPainter painter(&this->_desktop_background);
 
@@ -121,7 +139,8 @@ namespace fist
       setPalette(newPalette);
     }
 
-    void RegionSelector::_draw_selection_rectangle(QPainter &painter)
+    void
+    RegionSelector::_draw_selection_rectangle(QPainter &painter)
     {
       if (!this->_desktop_clear.isNull())
       {
