@@ -21,12 +21,11 @@ namespace fist
       , _fullname(new QLabel(this))
       , _avatar(new AvatarIcon(QPixmap(), QSize(25, 25), this))
       , _selector(new fist::TwoStateIconButton(
-                    QPixmap(":/send/user-selected"),
-                    QPixmap(":/send/user-selected-active"),
-                    QPixmap(":/send/user-selected-hover"),
-                    QPixmap(":/send/user-selected-active"),
+                    ":/send/user-selected",
+                    ":/send/user-selected-active",
                     preselected,
-                    23))
+                    this,
+                    QSize(23, 23)))
       , _layout(new QHBoxLayout(this))
     {
       ELLE_TRACE_SCOPE("%s: contruction", *this);

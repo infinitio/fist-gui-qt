@@ -10,6 +10,8 @@
 
 # include <functional>
 
+# include <elle/attribute.hh>
+
 class IconButton:
   public QPushButton
 {
@@ -17,18 +19,10 @@ class IconButton:
 
   typedef std::function<void ()> Callback;
 public:
-  IconButton(QPixmap const& pixmap,
-             bool shadow = false,
+  IconButton(QString const& resource,
              QWidget* parent = nullptr,
+             QSize const& size = QSize(),
              Callback const& = {});
-
-  Q_PROPERTY(bool shadow READ hasShadow);
-  Q_PROPERTY_R(bool, has_shadow, hasShadow);
-
-private:
-  void _draw_shape(QPixmap& pixmap,
-                   QColor const& color = QColor());
-  void _refresh();
 
 public:
   void
@@ -60,13 +54,14 @@ private slots:
 
 public slots:
   void
-  set_pixmap(QPixmap const& pixmap);
+  set_pixmap(QString const& resource,
+             QSize const& size = QSize(),
+             bool hover = false);
 
 private:
-  QPixmap _cache;
+  ELLE_ATTRIBUTE(QString, resource);
+  ELLE_ATTRIBUTE(QSize, size);
   QPixmap _original;
-  QPixmap _icon;
-  QPixmap _shadow;
   Callback _callback;
 };
 

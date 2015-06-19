@@ -82,14 +82,14 @@
     <file alias="conversation/accept-active">../slices/mac/view_conversation/conversation-icon-accept-active.png</file>
     <file alias="conversation/accept-active@2x">../slices/mac/view_conversation/conversation-icon-accept-active@2x.png</file>
     <file alias="conversation/accept-hover">../slices/mac/view_conversation/conversation-icon-accept-hover.png</file>
-    <file alias="conversation/accept-hover@2x">../slices/mac/view_conversation/conversation-icon-accept-hover@2x.png</file>
+    <file alias="conversation/accept@2x-hover">../slices/mac/view_conversation/conversation-icon-accept-hover@2x.png</file>
 
     <file alias="conversation/reject">../slices/mac/view_conversation/conversation-icon-reject.png</file>
     <file alias="conversation/reject@2x">../slices/mac/view_conversation/conversation-icon-reject@2x.png</file>
     <file alias="conversation/reject-active">../slices/mac/view_conversation/conversation-icon-reject-active.png</file>
     <file alias="conversation/reject-active@2x">../slices/mac/view_conversation/conversation-icon-reject-active@2x.png</file>
     <file alias="conversation/reject-hover">../slices/mac/view_conversation/conversation-icon-reject-hover.png</file>
-    <file alias="conversation/reject-hover@2x">../slices/mac/view_conversation/conversation-icon-reject-hover@2x.png</file>
+    <file alias="conversation/reject@2x-hover">../slices/mac/view_conversation/conversation-icon-reject-hover@2x.png</file>
 
     <file alias="conversation/cancel">../slices/windows/view_home/icon-reject.png</file>
     <file alias="conversation/cancel@2x">../slices/windows/view_home/icon-reject@2x.png</file>
@@ -99,7 +99,7 @@
     <file alias="conversation/resume@2x">../slices/windows/view_home/icon-resume@2x.png</file>
 
     <file alias="conversation/cancel-hover">../slices/mac/view_conversation/conversation-icon-cancel-hover.png</file>
-    <file alias="conversation/cancel-hover@2x">../slices/mac/view_conversation/conversation-icon-cancel-hover@2x.png</file>
+    <file alias="conversation/cancel@2x-hover">../slices/mac/view_conversation/conversation-icon-cancel-hover@2x.png</file>
 
     <file alias="conversation/bufferised">../slices/mac/view_conversation/conversation-icon-bufferised.png</file>
     <file alias="conversation/bufferised@2x">../slices/mac/view_conversation/conversation-icon-bufferised@2x.png</file>
@@ -139,7 +139,7 @@
     <file alias="conversation/retry-active">../slices/mac/view_conversation/conversation-icon-retry-active.png</file>
     <file alias="conversation/retry-active@2x">../slices/mac/view_conversation/conversation-icon-retry-active@2x.png</file>
     <file alias="conversation/retry-hover">../slices/mac/view_conversation/conversation-icon-retry-hover.png</file>
-    <file alias="conversation/retry-hover@2x">../slices/mac/view_conversation/conversation-icon-retry-hover@2x.png</file>
+    <file alias="conversation/retry@2x-hover">../slices/mac/view_conversation/conversation-icon-retry-hover@2x.png</file>
 
     <file alias="conversation/peer-offline@2x">../slices/mac/view_conversation/conversation-icon-status-offline@2x.png</file>
     <file alias="conversation/peer-offline">../slices/mac/view_conversation/conversation-icon-status-offline.png</file>
@@ -160,32 +160,32 @@
     <!-- links -->
     <file alias="link/clipboard">../slices/mac/view_link/icon-clipboard.png</file>
     <file alias="link/clipboard@2x">../slices/mac/view_link/icon-clipboard@2x.png</file>
-    <file alias="link/clipboard-hover@2x">../slices/mac/view_link/icon-clipboard-hover@2x.png</file>
+    <file alias="link/clipboard@2x-hover">../slices/mac/view_link/icon-clipboard-hover@2x.png</file>
     <file alias="link/clipboard-hover">../slices/mac/view_link/icon-clipboard-hover.png</file>
 
     <file alias="link/delete">../slices/mac/view_link/icon-delete.png</file>
     <file alias="link/delete@2x">../slices/mac/view_link/icon-delete@2x.png</file>
     <file alias="link/delete-hover">../slices/mac/view_link/icon-delete-hover.png</file>
-    <file alias="link/delete-hover@2x">../slices/mac/view_link/icon-delete-hover@2x.png</file>
+    <file alias="link/delete@2x-hover">../slices/mac/view_link/icon-delete-hover@2x.png</file>
 
     <file alias="link/delete-confirm">../slices/mac/view_link/icon-delete-confirm.png</file>
     <file alias="link/delete-confirm@2x">../slices/mac/view_link/icon-delete-confirm@2x.png</file>
 
-    <file alias="link/edit">../slices/mac/view_link/icon-edit.png</file>
-    <file alias="link/edit@2x">../slices/mac/view_link/icon-edit@2x.png</file>
-    <file alias="link/edit-hover@2x">../slices/mac/view_link/icon-edit-hover@2x.png</file>
-    <file alias="link/edit-hover">../slices/mac/view_link/icon-edit-hover.png</file>
+    <file alias="link/edit">../slices/mac/view_link/icon-admin-link.png</file>
+    <file alias="link/edit@2x">../slices/mac/view_link/icon-admin-link@2x.png</file>
+    <file alias="link/edit@2x-hover">../slices/mac/view_link/icon-admin-link-hover@2x.png</file>
+    <file alias="link/edit-hover">../slices/mac/view_link/icon-admin-link-hover.png</file>
 
     <file alias="link/share">../slices/mac/view_link/icon-share.png</file>
     <file alias="link/share@2x">../slices/mac/view_link/icon-share@2x.png</file>
     <file alias="link/share-hover">../slices/mac/view_link/icon-share-hover.png</file>
-    <file alias="link/share-hover@2x">../slices/mac/view_link/icon-share-hover@2x.png</file>
+    <file alias="link/share@2x-hover">../slices/mac/view_link/icon-share-hover@2x.png</file>
 
     <file alias="link/upload">../slices/mac/view_link/icon-upload.png</file>
     <file alias="link/upload@2x">../slices/mac/view_link/icon-upload@2x.png</file>
 
     <file alias="link/cancel-hover">../slices/mac/view_link/link-icon-cancel-hover.png</file>
-    <file alias="link/cancel-hover@2x">../slices/mac/view_link/link-icon-cancel-hover@2x.png</file>
+    <file alias="link/cancel@2x-hover">../slices/mac/view_link/link-icon-cancel-hover@2x.png</file>
 
     <file alias="link/cancel">../slices/mac/view_link/link-icon-cancel.png</file>
     <file alias="link/cancel@2x">../slices/mac/view_link/link-icon-cancel@2x.png</file>
@@ -197,7 +197,7 @@
     <file alias="login/close">../slices/mac/view_login/login-icon-close.png</file>
     <file alias="login/close@2x">../slices/mac/view_login/login-icon-close@2x.png</file>
     <file alias="login/close-hover">../slices/mac/view_login/login-icon-close-hover.png</file>
-    <file alias="login/close-hover@2x">../slices/mac/view_login/login-icon-close-hover@2x.png</file>
+    <file alias="login/close@2x-hover">../slices/mac/view_login/login-icon-close-hover@2x.png</file>
 
     <file alias="login/logo">../slices/windows/view_login/logotype.png</file>
     <file alias="login/logo@2x">../slices/windows/view_login/logotype@2x.png</file>
@@ -248,7 +248,7 @@
     <file alias="send/user-selected-active">../slices/windows/view_send/icon-select-active.png</file>
     <file alias="send/user-selected-active@2x">../slices/windows/view_send/icon-select-active@2x.png</file>
     <file alias="send/user-selected-hover">../slices/windows/view_send/icon-select-hover.png</file>
-    <file alias="send/user-selected-hover@2x">../slices/windows/view_send/icon-select-hover@2x.png</file>
+    <file alias="send/user-selected@2x-hover">../slices/windows/view_send/icon-select-hover@2x.png</file>
 
     <file alias="send/delete">../slices/windows/view_send/send-icon-delete.png</file>
     <file alias="send/delete@2x">../slices/windows/view_send/send-icon-delete@2x.png</file>
@@ -257,7 +257,7 @@
     <file alias="send/files@2x">../slices/windows/view_send/send-icon-files@2x.png</file>
 
     <file alias="send/files-hover">../slices/windows/view_send/send-icon-files-hover.png</file>
-    <file alias="send/files-hover@2x">../slices/windows/view_send/send-icon-files-hover@2x.png</file>
+    <file alias="send/files@2x-hover">../slices/windows/view_send/send-icon-files-hover@2x.png</file>
 
     <file alias="send/show-files">../slices/windows/view_send/send-icon-show-files.png</file>
     <file alias="send/show-files@2x">../slices/windows/view_send/send-icon-show-files@2x.png</file>

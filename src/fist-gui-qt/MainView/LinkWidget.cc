@@ -31,9 +31,9 @@ namespace fist
       , _name(this->_model.name())
       , _status()
       , _click_counter()
-      , _cancel_link(new IconButton(QPixmap(":/link/delete")))
-      , _go_to_website(new IconButton(QPixmap(":/link/share")))
-      , _copy_link(new IconButton(QPixmap(":/link/clipboard")))
+      , _cancel_link(new IconButton(":/link/delete", this))
+      , _go_to_website(new IconButton(":/link/edit", this))
+      , _copy_link(new IconButton(":/link/clipboard", this))
       , _progress_timer(nullptr)
       , _update_progress_interval(1000)
       , _smooth_progress(0.0f)
@@ -71,10 +71,10 @@ namespace fist
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 0);
         hlayout->setSpacing(9);
-        hlayout->addWidget(this->_go_to_website);
-        this->_go_to_website->setToolTip("Open the link");
         hlayout->addWidget(this->_copy_link);
         this->_copy_link->setToolTip("Copy the link to clipboard");
+        hlayout->addWidget(this->_go_to_website);
+        this->_go_to_website->setToolTip("Open the link");
         hlayout->addWidget(this->_cancel_link);
         this->_cancel_link->installEventFilter(this);
         this->_cancel_link->setToolTip("Cancel");

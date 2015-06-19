@@ -134,7 +134,7 @@ namespace fist
         layout->addLayout(vlayout, 1);
       }
       {
-        auto* quit = new IconButton(QPixmap(":/notification/quit"), false, this);
+        auto* quit = new IconButton(":/notification/quit", this);
         connect(quit, SIGNAL(released()), this, SLOT(hide()));
         layout->addWidget(quit, 0, Qt::AlignRight | Qt::AlignTop);
       }

@@ -8,8 +8,8 @@ namespace fist
   {
     Footer::Footer()
       : ::Footer()
-      , _back(new IconButton(QPixmap(":/send/cancel")))
-      , _send(new IconButton(QPixmap(":/send/transfer")))
+      , _back(new IconButton(":/send/cancel", this))
+      , _send(new IconButton(":/send/transfer", this))
     {
       this->_back->setToolTip("Cancel");
       this->_layout->addWidget(this->_back);
@@ -25,12 +25,12 @@ namespace fist
       switch (this->mode())
       {
         case Mode::p2p:
-          this->_send->set_pixmap(QPixmap(":/send/transfer"));
+          this->_send->set_pixmap(":/send/transfer");
           this->_send->setToolTip("Send");
           this->update();
           break;
         case Mode::link:
-          this->_send->set_pixmap(QPixmap(":/send/upload"));
+          this->_send->set_pixmap(":/send/upload");
           this->_send->setToolTip("Generate a link");
           this->update();
           break;

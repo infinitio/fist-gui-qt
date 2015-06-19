@@ -26,11 +26,11 @@ TransactionWidget::TransactionWidget(Model const& model):
   _peer_status(new QLabel),
   _layout(nullptr),
   _filename(new QLabel(this)),
-  _accept_button(new IconButton(QPixmap(":/conversation/accept"))),
-  _reject_button(new IconButton(QPixmap(":/conversation/reject"))),
+  _accept_button(new IconButton(":/conversation/accept", this)),
+  _reject_button(new IconButton(":/conversation/reject", this)),
   _accept_reject_area(new QWidget),
-  _pause_button(new IconButton(QPixmap(":/conversation/pause"))),
-  _cancel_button(new IconButton(QPixmap(":/conversation/cancel"))),
+  _pause_button(new IconButton(":/conversation/pause", this)),
+  _cancel_button(new IconButton(":/conve rsation/cancel", this)),
   _mtime(new QLabel),
   _status(new QLabel),
   _info_area(new QWidget),
@@ -315,12 +315,12 @@ TransactionWidget::apply_update()
   {
     if (this->_transaction.pause())
     {
-      this->_pause_button->set_pixmap(QPixmap(":/conversation/resume"));
+      this->_pause_button->set_pixmap(":/conversation/resume");
       this->_pause_button->setToolTip("Resume");
     }
     else
     {
-      this->_pause_button->set_pixmap(QPixmap(":/conversation/pause"));
+      this->_pause_button->set_pixmap(":/conversation/pause");
       this->_pause_button->setToolTip("Pause");
     }
     this->_pause_button->show();

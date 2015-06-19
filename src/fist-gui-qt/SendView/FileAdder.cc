@@ -138,13 +138,14 @@ namespace fist
 
     NonEmptyFileAdder::NonEmptyFileAdder(QWidget* parent)
       : FileAdder(parent)
-      , _attach(new IconButton(QPixmap(":/send/files")))
+      , _attach(new IconButton(":/send/files", this))
       , _message(new QLabel(this))
       , _expanser(
-        new fist::TwoStateIconButton(QPixmap(":/send/show-files@2x"),
-                                     QPixmap(":/send/hide-files@2x"),
-                                     QPixmap(":/send/show-files@2x"),
-                                     QPixmap(":/send/hide-files@2x"), true, 10))
+        new fist::TwoStateIconButton(":/send/show-files",
+                                     ":/send/hide-files",
+                                     true,
+                                     this,
+                                     QSize(10, 10)))
     {
       this->setFixedHeight(45);
       QHBoxLayout* layout = new QHBoxLayout(this);
@@ -181,7 +182,7 @@ namespace fist
       if (event->type() == QEvent::Enter || event->type() == QEvent::DragEnter)
       {
         if (obj == this->_attach)
-          this->_attach->set_pixmap(QPixmap(":/send/files-hover"));
+          this->_attach->set_pixmap(":/send/files-hover");
         else if (obj == this->_message)
         {
           this->_old_text = this->_message->text();
@@ -190,7 +191,7 @@ namespace fist
       }
       else if (event->type() == QEvent::Leave || event->type() == QEvent::DragLeave || event->type() == QEvent::WindowBlocked)
       {
-        this->_attach->set_pixmap(QPixmap(":/send/files"));
+        this->_attach->set_pixmap(":/send/files");
         if (obj == this->_message)
           this->_message->setText(this->_old_text);
       }

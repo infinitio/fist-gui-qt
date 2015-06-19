@@ -21,12 +21,11 @@ namespace fist
     };
 
   public:
-    TwoStateIconButton(QPixmap const& released,
-                       QPixmap const& pressed,
-                       QPixmap const& released_hover,
-                       QPixmap const& pressed_hover,
+    TwoStateIconButton(QString const& released,
+                       QString const& pressed,
                        bool already_pressed = false,
-                       int width = 20);
+                       QWidget* parent = nullptr,
+                       QSize const& size = QSize(20, 20));
 
   public:
     void
@@ -48,11 +47,8 @@ namespace fist
 
   private:
     ELLE_ATTRIBUTE_R(State, state);
-    ELLE_ATTRIBUTE(QPixmap, released_pixmap);
-    ELLE_ATTRIBUTE(QPixmap, pressed_pixmap);
-    // XXX: Do something better.
-    ELLE_ATTRIBUTE(QPixmap, released_hover_pixmap);
-    ELLE_ATTRIBUTE(QPixmap, pressed_hover_pixmap);
+    ELLE_ATTRIBUTE(QString, released);
+    ELLE_ATTRIBUTE(QString, pressed);
 
   private:
     Q_OBJECT;

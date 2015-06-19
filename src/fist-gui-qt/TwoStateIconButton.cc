@@ -7,19 +7,15 @@ ELLE_LOG_COMPONENT("infinit.FIST.TwoStateIconButton");
 
 namespace fist
 {
-  TwoStateIconButton::TwoStateIconButton(QPixmap const& released,
-                                         QPixmap const& pressed,
-                                         QPixmap const& released_hover,
-                                         QPixmap const& pressed_hover,
+  TwoStateIconButton::TwoStateIconButton(QString const& released,
+                                         QString const& pressed,
                                          bool already_pressed,
-                                         int width)
-    : IconButton(already_pressed ? pressed.scaledToHeight(width) :
-                                   released.scaledToHeight(width))
+                                         QWidget* parent,
+                                         QSize const& size)
+    : IconButton(already_pressed ? pressed : released, parent, size)
     , _state(already_pressed ? State::pressed : State::released)
-    , _released_pixmap(released.scaledToHeight(width))
-    , _pressed_pixmap(pressed.scaledToHeight(width))
-    , _released_hover_pixmap(released_hover.scaledToHeight(width))
-    , _pressed_hover_pixmap(pressed_hover.scaledToHeight(width))
+    , _released(released)
+    , _pressed(pressed)
   {}
 
   void
@@ -27,12 +23,10 @@ namespace fist
   {
     if (this->_state == State::pressed)
     {
-      this->set_pixmap(this->_pressed_hover_pixmap);
       this->_state = State::pressed_hover;
     }
     else if (this->_state == State::released)
     {
-      this->set_pixmap(this->_released_hover_pixmap);
       this->_state = State::released_hover;
     }
     Super::enterEvent(event);
@@ -43,12 +37,10 @@ namespace fist
   {
     if (this->_state == State::pressed_hover)
     {
-      this->set_pixmap(this->_pressed_pixmap);
       this->_state = State::pressed;
     }
     else if (this->_state == State::released_hover)
     {
-      this->set_pixmap(this->_released_pixmap);
       this->_state = State::released;
     }
     Super::leaveEvent(event);
@@ -78,18 +70,12 @@ namespace fist
     ELLE_DEBUG("new status: %s", this->_state);
     if (this->_state == State::pressed || this->_state == State::pressed_hover)
     {
-      if (this->_state == State::pressed)
-        this->set_pixmap(this->_pressed_pixmap);
-      else
-        this->set_pixmap(this->_pressed_hover_pixmap);
+      this->set_pixmap(this->_pressed);
       emit pressed();
     }
     else
     {
-      if (this->_state == State::released)
-        this->set_pixmap(this->_released_pixmap);
-      else
-        this->set_pixmap(this->_released_hover_pixmap);
+      this->set_pixmap(this->_released);
       emit released();
     }
   }
