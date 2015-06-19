@@ -88,7 +88,6 @@ def configure(cxx_toolkit = None,
     qt = drake.cxx.qt.Qt(
       cxx_toolkit = cxx_toolkit,
       prefix = qt,
-      version_effective = drake.Version(4, 8, 0),
       prefer_shared = True,
     )
   else:
@@ -180,7 +179,6 @@ def configure(cxx_toolkit = None,
     qt = drake.cxx.qt.Qt(
       cxx_toolkit = cxx_toolkit,
       prefix = Qt_prefix_absolute,
-      version_effective = Qt_version,
       prefer_shared = True,
       rcc = Qt_rcc,
       moc = Qt_moc,
