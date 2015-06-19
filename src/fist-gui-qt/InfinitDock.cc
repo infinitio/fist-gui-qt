@@ -28,7 +28,6 @@
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
 #include <fist-gui-qt/notification/Center.hh>
-#include <fist-gui-qt/notification/Minimized.hh>
 #include <fist-gui-qt/notification/UpdateAvailable.hh>
 #include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/Settings/Window.hh>
@@ -525,7 +524,8 @@ InfinitDock::hideEvent(QHideEvent* event)
   {
     fist::settings()["dock"].set("first_minimizing_popup", "1");
     fist::notification::center().notify(
-      new fist::notification::Minimized(this));
+      "Infinit is minimized!",
+      "Make sure the Infinit icon is always visible by clicking customize!");
   }
 }
 
