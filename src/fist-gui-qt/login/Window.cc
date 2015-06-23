@@ -293,7 +293,7 @@ namespace fist
       auto layout = new QVBoxLayout;
       mlayout->addLayout(layout);
       layout->setSpacing(5);
-      layout->setContentsMargins(40, 0, 40, 0);
+      layout->setContentsMargins(20, 0, 20, 0);
       {
         layout->addSpacing(5);
         layout->addWidget(logo, 0, Qt::AlignCenter);
