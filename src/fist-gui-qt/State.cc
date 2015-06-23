@@ -375,8 +375,7 @@ namespace fist
       {
         this->_transactions.emplace(*this, transaction);
         auto const& tr = *this->_transactions.get<0>().find(transaction.id);
-        ELLE_TRACE("transaction: %s", tr);
-
+        ELLE_DEBUG("transaction: %s", tr);
         auto it = this->_users.get<0>().find(tr.peer().id());
         if (it != this->_users.get<0>().end())
           this->_users.modify(it, UpdateTime(tr));
@@ -389,7 +388,7 @@ namespace fist
       std::vector<surface::gap::LinkTransaction> links;
       gap_Status res = gap_link_transactions(this->state(), links);
       if (res != gap_ok)
-        ELLE_ERR("getting transactions failed %s", res);
+        ELLE_ERR("getting links failed %s", res);
       for (auto const& link: links)
       {
         if (link.status != gap_transaction_canceled &&
