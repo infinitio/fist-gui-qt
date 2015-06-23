@@ -23,6 +23,8 @@
 #include <elle/UUID.hh>
 
 #include <fist-gui-qt/Settings.hh>
+#include <fist-gui-qt/notification/Center.hh>
+#include <fist-gui-qt/notification/IncomingTransaction.hh>
 #include <fist-gui-qt/State.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/model/User.hh>
@@ -399,10 +401,43 @@ namespace fist
       }
       this->_compute_active_links();
     }
+
+    {
+      auto* reminder =  new QTimer(this);
+      reminder->setSingleShot(false);
+      connect(reminder, SIGNAL(timeout()), this, SLOT(_transactions_reminder()));
+      reminder->setInterval(60 * 60 * 24); // 24 hrs.
+      reminder->start();
+      this->_transactions_reminder();
+    }
   }
 
   void
-  State::send_metric(UIMetricsType metric,
+  State::_transactions_reminder()
+  {
+    ELLE_DEBUG_SCOPE("%s: transaction reminder", *this);
+    std::vector<model::Transaction const*> acceptables;
+    for (auto const& tr: this->_transactions.get<0>())
+    {
+      if (tr.acceptable())
+        acceptables.push_back(&tr);
+    }
+    if (acceptables.size() > 1)
+      notification::center().notify(
+        "Infinit",
+        QString("You have %1 transactions waiting for you").arg(acceptables.size()),
+        5000);
+    else if (acceptables.size() == 1)
+    {
+      auto* notif = new fist::notification::IncomingTransaction(**acceptables.begin(), nullptr);
+      connect(notif, SIGNAL(accept_transaction(uint32_t)),
+              this, SLOT(on_transaction_accepted(uint32_t)));
+      fist::notification::center().notify(notif);
+    }
+  }
+
+  void
+ State::send_metric(UIMetricsType metric,
                      std::unordered_map<std::string, std::string> const& add)
   {
     gap_send_metric(this->state(), metric, add);

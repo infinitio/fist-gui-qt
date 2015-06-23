@@ -331,6 +331,9 @@ namespace fist
     void
     running_transactions_changed(size_t);
 
+  private slots:
+    void
+    _transactions_reminder();
   private:
     /*------.
     | Links |
