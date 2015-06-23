@@ -591,41 +591,6 @@ namespace fist
   State::search(QString const& filter)
   {
     ELLE_DEBUG("search %s", filter);
-    ELLE_DEBUG("cancel future")
-      this->cancel_search();
-    if (!filter.isEmpty())
-    {
-      ELLE_DEBUG("make concurent run")
-        this->_search_future = QtConcurrent::run(
-          [&,filter] {
-            std::string text = filter.toStdString();
-            std::vector<uint32_t> users;
-            if (filter.count('@') == 1 && regexp::email::checker.exactMatch(filter))
-            {
-              surface::gap::User u;
-              auto res = gap_user_by_email(this->state(), text.c_str(), u);
-              if (res == gap_ok && !u.deleted)
-                users.push_back(u.id);
-              else
-                ELLE_WARN("user by email failed: %s", res);
-            }
-            else
-            {
-              if (elle::os::inenv("FIST_SEARCH_IN_META"))
-              {
-                std::vector<surface::gap::User> _users;
-                auto res = gap_users_search(this->state(), text.c_str(), _users);
-                if (res == gap_ok)
-                  for (auto const& user: _users)
-                    users.push_back(user.id);
-                else
-                  ELLE_WARN("user search failed: %s", res);
-              }
-            }
-            return users;
-          });
-      this->_search_watcher.setFuture(this->_search_future);
-    }
     return this->swaggers(filter);
   }
 
