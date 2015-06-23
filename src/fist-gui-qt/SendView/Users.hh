@@ -78,20 +78,10 @@ namespace fist
       }
 
       bool
-      operator == (uint32_t id) const
-      {
-        return this->id() == id;
-      }
+      operator == (uint32_t id) const;
 
       bool
-      operator == (QString const& value) const
-      {
-        if (this->to_device())
-          return this->_device.get().id() == value;
-        if (this->to_email())
-          return this->_email.get() == value;
-        return false;
-      }
+      operator == (QString const& value) const;
 
       bool
       operator == (Recipient const& rec) const;

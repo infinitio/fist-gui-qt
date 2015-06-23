@@ -52,6 +52,25 @@ namespace fist
 {
   namespace sendview
   {
+
+    bool
+    Recipient::operator == (uint32_t id) const
+    {
+      ELLE_DEBUG_SCOPE("%s: compare recipient by id: %s", *this, id);
+      return this->id() == id;
+    }
+
+    bool
+    Recipient::operator == (QString const& value) const
+    {
+      ELLE_DEBUG_SCOPE("%s: compare recipient by string: %s", *this, value);
+      if (this->to_device())
+        return this->_device.get().id() == value;
+      if (this->to_email())
+        return this->_email.get() == value;
+      return false;
+    }
+
     bool
     Recipient::operator == (Recipient const& rec) const
     {
@@ -257,6 +276,7 @@ namespace fist
         connect(widget.get(), SIGNAL(email_unselected(QString const&)),
                 this, SLOT(_remove_email(QString const&)));
         this->_users->add_widget(widget, ListWidget::Position::Bottom);
+        this->_results.insert(this->_results.begin(), rec);
       }
       else
       {
@@ -274,6 +294,8 @@ namespace fist
     Users::_compute_results(UserList const& users,
                             bool no_self)
     {
+      ELLE_DEBUG_SCOPE("%s: compute_results from %s", *this, users);
+      ELLE_DUMP("recipients: %s", this->_recipients);
       this->_results.clear();
       for (auto const& user: users)
       {
@@ -284,6 +306,7 @@ namespace fist
                            return recipient.id() == user;
                          }) == this->_recipients.end())
         {
+          ELLE_DEBUG("%s not in the recipient list", user);
           if (user != this->_state.me().id())
             this->_results.push_back(Recipient(user));
           else if (!no_self)
@@ -298,7 +321,15 @@ namespace fist
       this->_compute_results(users, this->text().isEmpty());
       if (regexp::email::checker.exactMatch(this->text()))
       {
-        this->_add_result(Recipient(gap_null(), boost::none, this->text()), false);
+        ELLE_DEBUG("text %s is an email", this->text());
+        auto picked = std::find_if(
+          this->_recipients.begin(),
+          this->_recipients.end(),
+          [&] (Recipient const& recipient)
+          {
+            return recipient == this->text();
+          }) != this->_recipients.end();
+        this->_add_result(Recipient(gap_null(), boost::none, this->text()), picked);
       }
       else
       {
@@ -307,6 +338,7 @@ namespace fist
           ELLE_DEBUG("recipients")
             for (Recipient const& rec: this->_recipients)
             {
+              ELLE_DEBUG("add recipient %s", rec);
               this->_add_result(rec, true);
             };
           if (!this->_recipients.empty())
@@ -318,8 +350,9 @@ namespace fist
           {
             int i = 0;
             ELLE_DEBUG("devices")
-              for (auto device: this->_state.devices())
+              for (auto device: devices)
               {
+                ELLE_DEBUG("device: %s", device);
                 auto recipient_device = Recipient(this->_state.my_id(), device);
                 if (this->_state.device().id() != device.id() &&
                     std::find_if(this->_recipients.begin(),
@@ -332,6 +365,7 @@ namespace fist
                 {
                   auto it = this->_results.begin();
                   std::advance(it, i);
+                  ELLE_DEBUG("add device %s", *it);
                   this->_results.insert(it, recipient_device);
                   this->_add_result(recipient_device, false);
                   ++i;
@@ -351,9 +385,9 @@ namespace fist
         ELLE_DEBUG("results")
           for (Recipient const& rec: this->_results)
           {
-            if (rec.to_device())
+            ELLE_DEBUG("result: %s", rec);
+            if (rec.to_device() || rec.to_email())
               continue;
-
             this->_add_result(rec, false);
             ++count;
             if (count == this->_max)
@@ -416,21 +450,6 @@ namespace fist
     Users::_add_peer(uint32_t uid)
     {
       ELLE_TRACE_SCOPE("%s: add peer: %s", *this, uid);
-      // auto index = [&] {
-      //   try
-      //   {
-      //     return this->_users->index(this->_results.at(uid));
-      //   }
-      //   catch (std::out_of_range const&)
-      //   {
-      //     return -1;
-      //   }
-      // }();
-      // emit send_metric(UIMetrics_SelectPeer,
-      //                  {
-      //                    { "filter", this->text().toStdString() },
-      //                    { "index", std::to_string(index) },
-      //                  });
       this->_add_recipient(Recipient(uid));
     }
 
@@ -439,22 +458,6 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: remove peer: %s", *this, uid);
       this->_remove_recipient(Recipient(uid));
-      // auto index = [&] {
-      //   try
-      //   {
-      //     return this->_users->index(this->_results.at(uid));
-      //   }
-      //   catch (std::out_of_range const&)
-      //   {
-      //     return -1;
-      //   }
-      // }();
-      // emit send_metric(
-      //   UIMetrics_UnselectPeer,
-      //   {
-      //     { "filter", this->text().toStdString() },
-      //     { "index", std::to_string(index) },
-      //   });
     }
 
     void
@@ -510,7 +513,7 @@ namespace fist
     QString
     Users::text() const
     {
-      return this->_search_field->text();
+      return this->_search_field->text().trimmed();
     }
 
     void
@@ -553,7 +556,8 @@ namespace fist
       ELLE_DEBUG_SCOPE("%s: text changed to %s", *this, text);
       QString trimmed_search = text.trimmed();
       auto results = this->_state.search(trimmed_search);
-      if (!results.empty() || !this->_results.empty())
+      if (!results.empty() || !this->_results.empty() ||
+          !regexp::email::checker.exactMatch(this->text()))
         this->clear_results();
       this->set_users(results, true);
     }
