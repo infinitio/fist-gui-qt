@@ -495,15 +495,19 @@ namespace fist
   QByteArray&
   State::avatar(uint32_t id)
   {
+    ELLE_DEBUG("get avatar for %s", id);
     {
       this->_avatar_mutex.lock();
       elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });
       if (this->_avatars.find(id) == this->_avatars.end())
       {
         this->_avatars[id] = QByteArray();
-        auto* fetcher = new AvatarFetcher(id, *this);
-        connect(fetcher, SIGNAL(finished()), this, SLOT(_avatar_fetched()));
-        fetcher->start();
+        if (id != gap_null())
+        {
+          auto* fetcher = new AvatarFetcher(id, *this);
+          connect(fetcher, SIGNAL(finished()), this, SLOT(_avatar_fetched()));
+          fetcher->start();
+        }
       }
       return this->_avatars[id];
     }
