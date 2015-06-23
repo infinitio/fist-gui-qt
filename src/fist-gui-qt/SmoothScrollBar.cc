@@ -5,18 +5,24 @@
 
 #include <fist-gui-qt/SmoothScrollBar.hh>
 
-SmoothScrollBar::SmoothScrollBar(QWidget* parent):
-  QWidget(parent),
-  _minimum(0),
-  _maximum(1),
-  _pageSize(1),
-  _displayMinimum(_minimum),
-  _displayMaximum(_maximum),
-  _displayPageSize(_pageSize),
-  _value(0),
-  _value_animation(new QPropertyAnimation(this, "value")),
-  _opacity(0.6),
-  _opacity_animation(new QPropertyAnimation(this, "opacity"))
+#include <elle/log.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.SmoothScrollBar");
+
+SmoothScrollBar::SmoothScrollBar(QWidget* parent)
+  : QWidget(parent)
+  , _minimum(0)
+  , _maximum(1)
+  , _pageSize(1)
+  , _displayMinimum(_minimum)
+  , _displayMaximum(_maximum)
+  , _displayPageSize(_pageSize)
+  , _value(0)
+  , _value_target(0)
+  , _value_animation(new QPropertyAnimation(this, "value", this))
+  , _opacity(0.6)
+  , _opacity_animation(new QPropertyAnimation(this, "opacity", this))
+  , _delta(0)
 {
   this->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
@@ -50,7 +56,7 @@ SmoothScrollBar::setMaximum(int const& height)
   }
 
   QPropertyAnimation* animation =
-    new QPropertyAnimation(this, "displayMaximum");
+    new QPropertyAnimation(this, "displayMaximum", this);
   animation->setDuration(200);
   animation->setEndValue(height);
   animation->start();
@@ -114,6 +120,7 @@ SmoothScrollBar::_scroll_to(int value, int speed)
 void
 SmoothScrollBar::_scroll(int delta)
 {
+  ELLE_DUMP("scroll delta: %s", delta);
   int value = this->_value_target;
   value -= delta;
   if (delta < 0)

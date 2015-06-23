@@ -43,10 +43,10 @@ FileItem::FileItem(QUrl const& path):
   _layout(new QHBoxLayout(this)),
   _path(path),
   _file(path.toLocalFile()),
-  _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last())),
-  _icon(new QLabel),
+  _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last(), this)),
+  _icon(new QLabel(this)),
   size(compute_size(QFileInfo(path.toLocalFile()))),
-  _size(new QLabel(readable_size(this->size))),
+  _size(new QLabel(readable_size(this->size), this)),
   _remove(new IconButton(":/send/delete", // Remove.
                          this,
                          QSize(),

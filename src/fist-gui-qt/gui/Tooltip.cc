@@ -33,8 +33,8 @@ namespace fist
       , _duration_until_fade(duration)
       , _finished(false)
       , _opacity(0.8f)
-      , _fade_animation(new QPropertyAnimation(this, "opacity"))
-      , _show_animation(new QPropertyAnimation(this, "opacity"))
+      , _fade_animation(new QPropertyAnimation(this, "opacity", this))
+      , _show_animation(new QPropertyAnimation(this, "opacity", this))
       , _blocked_by_a_modal_window(0)
     {
       ELLE_TRACE_SCOPE("%s: construction", *this);

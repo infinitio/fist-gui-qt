@@ -30,7 +30,7 @@ AvatarWidget::AvatarWidget(QWidget* parent)
   , _transaction_count(0)
   , _progress(0)
   , _smooth_progress(0)
-  , _progress_animation(new QPropertyAnimation(this, "smooth_progress"))
+  , _progress_animation(new QPropertyAnimation(this, "smooth_progress", this))
 {
   this->setMinimumSize(total_size, total_size);
   this->setMaximumSize(total_size, total_size);

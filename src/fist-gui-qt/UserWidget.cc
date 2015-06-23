@@ -25,12 +25,12 @@ UserWidget::UserWidget(fist::model::User const& model,
   {
     auto texts = new QVBoxLayout();
     {
-      auto fullname = new QLabel(this->_model.fullname());
+      auto fullname = new QLabel(this->_model.fullname(), this);
       fist::sendview::view::user::fullname::style(*fullname);
       texts->addWidget(fullname);
     }
     {
-      auto handle = new QLabel(this->_model.fullname());
+      auto handle = new QLabel(this->_model.fullname(), this);
       fist::sendview::view::user::handle::style(*handle);
       texts->addWidget(handle);
     }

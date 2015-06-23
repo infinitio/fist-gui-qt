@@ -67,7 +67,7 @@ Updater::Updater(QString const& home,
 #else
                 "installer"
 #endif
-                )))
+                ), this))
   , _loading_dialog(new LoadingDialog(this))
   , _network_manager(new QNetworkAccessManager(this))
   , _check_for_update_timer(nullptr)

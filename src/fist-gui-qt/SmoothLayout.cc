@@ -20,8 +20,8 @@ SmoothLayout::SmoothLayout(QWidget* owner,
   _width_hint(0),
   _maximum_height(0),
   _maximum_width(0),
-  _height_animation(new QPropertyAnimation(this, "heightHint")),
-  _width_animation(new QPropertyAnimation(this, "widthHint"))
+  _height_animation(new QPropertyAnimation(this, "heightHint", this)),
+  _width_animation(new QPropertyAnimation(this, "widthHint", this))
 {
   this->_height_animation->setDuration(height_animation_duration);
   connect(this->_height_animation, SIGNAL(finished()),

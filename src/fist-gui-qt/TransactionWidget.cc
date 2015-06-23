@@ -22,18 +22,18 @@ ELLE_LOG_COMPONENT("infinit.FIST.TransactionWidget");
 TransactionWidget::TransactionWidget(Model const& model):
   ListItem(nullptr, view::background, false),
   _transaction(model),
-  _peer_avatar(new AvatarWidget(this->_transaction.peer().avatar())),
-  _peer_status(new QLabel),
+  _peer_avatar(new AvatarWidget(this->_transaction.peer().avatar(), this)),
+  _peer_status(new QLabel(this)),
   _layout(nullptr),
   _filename(new QLabel(this)),
   _accept_button(new IconButton(":/conversation/accept", this)),
   _reject_button(new IconButton(":/conversation/reject", this)),
-  _accept_reject_area(new QWidget),
+  _accept_reject_area(new QWidget(this)),
   _pause_button(new IconButton(":/conversation/pause", this)),
   _cancel_button(new IconButton(":/conve rsation/cancel", this)),
-  _mtime(new QLabel),
-  _status(new QLabel),
-  _info_area(new QWidget),
+  _mtime(new QLabel(this)),
+  _status(new QLabel(this)),
+  _info_area(new QWidget(this)),
   _progress_timer(nullptr)
 {
   connect(&this->_transaction, SIGNAL(status_updated()),
@@ -70,7 +70,7 @@ TransactionWidget::TransactionWidget(Model const& model):
     texts->addStretch();
     auto user_and_status = new QHBoxLayout;
     texts->addLayout(user_and_status);
-    auto username = new QLabel(this->_transaction.peer().fullname());
+    auto username = new QLabel(this->_transaction.peer().fullname(), this);
     {
       view::transaction::peer::style(*username);
       username->setMaximumWidth(150);

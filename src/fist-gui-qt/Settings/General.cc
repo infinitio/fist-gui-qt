@@ -34,7 +34,8 @@ namespace fist
       {
         connect(this->_device_name, SIGNAL(editingFinished()),
                 this, SLOT(_update_device_name()));
-        QRegExpValidator* validator = new QRegExpValidator(QRegExp(".{1,64}", Qt::CaseInsensitive));
+        QRegExpValidator* validator =
+          new QRegExpValidator(QRegExp(".{1,64}", Qt::CaseInsensitive), this);
         this->_device_name->setValidator(validator);
       }
       QGridLayout* layout = new QGridLayout(this);

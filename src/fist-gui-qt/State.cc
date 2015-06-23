@@ -60,7 +60,7 @@ namespace fist
     , _running_transactions(0)
     , _links()
     , _active_links()
-    , _poll_timer(new QTimer)
+    , _poll_timer(new QTimer(this))
     , fullscreen_screenshot(new QxtGlobalShortcut(this))
     , region_screenshot(new QxtGlobalShortcut(this))
   {

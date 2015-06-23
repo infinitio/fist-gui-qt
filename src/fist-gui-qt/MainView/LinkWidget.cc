@@ -37,7 +37,7 @@ namespace fist
       , _progress_timer(nullptr)
       , _update_progress_interval(1000)
       , _smooth_progress(0.0f)
-      , _progress_animation(new QPropertyAnimation(this, "smooth_progress"))
+      , _progress_animation(new QPropertyAnimation(this, "smooth_progress", this))
     {
       connect(&this->_model, SIGNAL(status_updated()),
               this, SLOT(_on_status_updated()));

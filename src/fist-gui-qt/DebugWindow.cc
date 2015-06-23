@@ -6,9 +6,9 @@
 
 DebugWindow::DebugWindow()
 {
-  auto add = new QPushButton("Add transaction");
+  auto add = new QPushButton("Add transaction", this);
 
-  auto central = new QWidget;
+  auto central = new QWidget(this);
   this->setCentralWidget(central);
   auto layout = new QVBoxLayout(central);
   layout->addWidget(add);

@@ -56,7 +56,7 @@ class SmoothScrollBar:
   Q_PROPERTY(int minimum READ minimum WRITE setMinimum);
   PROPERTY_RWN(int, minimum, minimum, setMinimum,
                QPropertyAnimation* animation =
-               new QPropertyAnimation(this, "displayMinimum");
+               new QPropertyAnimation(this, "displayMinimum", this);
                animation->setDuration(200);
                animation->setEndValue(value);
                animation->start();
@@ -67,7 +67,7 @@ class SmoothScrollBar:
   Q_PROPERTY(int pageSize READ pageSize WRITE setPageSize);
   PROPERTY_RWN(int, pageSize, pageSize, setPageSize,
                QPropertyAnimation* animation =
-               new QPropertyAnimation(this, "displayPageSize");
+               new QPropertyAnimation(this, "displayPageSize", this);
                animation->setDuration(200);
                animation->setEndValue(value);
                animation->start();

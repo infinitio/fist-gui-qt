@@ -16,7 +16,7 @@ namespace fist
       : QWidget(parent)
       , _body(body)
       , _minimumHeightHint(1)
-      , _height_animator(new QPropertyAnimation(this, "minimumHeightHint"))
+      , _height_animator(new QPropertyAnimation(this, "minimumHeightHint", this))
       , _state(State::expanded)
     {
       this->setContentsMargins(0, 0, 0, 0);
