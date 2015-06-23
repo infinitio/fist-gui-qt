@@ -442,6 +442,9 @@ def configure(cxx_toolkit = None,
       "src/fist-gui-qt/Settings/Window.cc",
       "src/fist-gui-qt/Settings/Window.hh",
 
+      "src/fist-gui-qt/Settings/utils.cc",
+      "src/fist-gui-qt/Settings/utils.hh",
+
       "src/fist-gui-qt/Settings/General.cc",
       "src/fist-gui-qt/Settings/General.hh",
       "src/fist-gui-qt/Settings/Profile.cc",
