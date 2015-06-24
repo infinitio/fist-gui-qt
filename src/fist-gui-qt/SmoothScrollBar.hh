@@ -105,6 +105,8 @@ Q_SIGNALS:
 
 public:
   SmoothScrollBar(QWidget* parent);
+  virtual
+  ~SmoothScrollBar() {}
 
   virtual
   QSize
@@ -121,6 +123,8 @@ protected:
   showEvent(QShowEvent*) override;
 
 private:
+  int _delta;
+
   void
   _scroll(int delta);
 

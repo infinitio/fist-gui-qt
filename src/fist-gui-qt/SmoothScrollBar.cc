@@ -138,7 +138,14 @@ SmoothScrollBar::_scroll(int delta)
 void
 SmoothScrollBar::wheelEvent(QWheelEvent* event)
 {
-  this->_scroll(event->delta());
+  ELLE_DUMP("scroll delta: %s", event->delta());
+  this->_delta += event->delta();
+  ELLE_DUMP("delta: %s", this->_delta);
+  if (this->_delta <= -120 || this->_delta >= 120)
+  {
+    this->_scroll(this->_delta);
+    this->_delta = 0;
+  }
 }
 
 void
