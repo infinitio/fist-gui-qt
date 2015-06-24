@@ -38,22 +38,22 @@ compute_size(QFileInfo const& info)
   return sizex;
 }
 
-FileItem::FileItem(QUrl const& path):
-  ListItem(nullptr, fist::sendview::view::file::background, false),
-  _layout(new QHBoxLayout(this)),
-  _path(path),
-  _file(path.toLocalFile()),
-  _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last(), this)),
-  _icon(new QLabel(this)),
-  size(compute_size(QFileInfo(path.toLocalFile()))),
-  _size(new QLabel(readable_size(this->size), this)),
-  _remove(new IconButton(":/send/delete", // Remove.
-                         this,
-                         QSize(),
-                         [this]
-                         {
-                           emit remove(this->_path);
-                         }))
+FileItem::FileItem(QUrl const& path)
+  : ListItem(nullptr, fist::sendview::view::file::background, false)
+  , _layout(new QHBoxLayout(this))
+  , _path(path)
+  , _file(path.toLocalFile())
+  , _name(new QLabel(QDir::toNativeSeparators(path.toLocalFile()).split(QDir::separator()).last(), this))
+  , _icon(new QLabel(this))
+  , size(compute_size(QFileInfo(path.toLocalFile())))
+  , _size(new QLabel(readable_size(this->size), this))
+  , _remove(new IconButton(":/send/delete",
+                           this,
+                           QSize(),
+                           [this]
+                           {
+                             emit remove(this->_path);
+                           }))
 {
   this->_layout->setAlignment(Qt::AlignVCenter);
   ELLE_TRACE_SCOPE("%s: construction with path %s", *this, path);
