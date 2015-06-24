@@ -178,6 +178,7 @@ def configure(cxx_toolkit = None,
     qt_cxx_config += Qt_config
     qt = drake.cxx.qt.Qt(
       cxx_toolkit = cxx_toolkit,
+      version_effective = Qt_version,
       prefix = Qt_prefix_absolute,
       prefer_shared = True,
       rcc = Qt_rcc,
