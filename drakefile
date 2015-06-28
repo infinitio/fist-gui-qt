@@ -736,7 +736,7 @@ def configure(cxx_toolkit = None,
     install = drake.Rule('install')
     install << install_nodes(prefix)
 
-  else: # Linux, packaging replaces installer
+  else: # Linux
 
     ## ------- ##
     ## Package ##
@@ -747,6 +747,9 @@ def configure(cxx_toolkit = None,
       res = []
       res.append(f(application, where))
       return res
+
+    install = drake.Rule('install')
+    install << install_nodes(prefix)
 
     package = install_nodes('debian/opt/infinit', f = drake.copy)
     with drake.templating.Context(content = {
