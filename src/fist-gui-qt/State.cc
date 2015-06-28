@@ -405,7 +405,7 @@ namespace fist
       auto* reminder =  new QTimer(this);
       reminder->setSingleShot(false);
       connect(reminder, SIGNAL(timeout()), this, SLOT(_transactions_reminder()));
-      reminder->setInterval(60 * 60 * 24); // 24 hrs.
+      reminder->setInterval(1000 * 60 * 60 * 24); // 24 hrs.
       reminder->start();
       this->_transactions_reminder();
     }
