@@ -515,8 +515,8 @@ def configure(cxx_toolkit = None,
         """
         self.__source = source
         self.__target = source.clone(to.canonize())
-        self.__cetificate = drake.Node('resources/authenticode.spc')
-        self.__key = drake.Node('resources/authenticode.key')
+        self.__cetificate = drake.Node('resources/authenticode.cer.pem')
+        self.__key = drake.Node('resources/authenticode.key.pem')
         drake.Builder.__init__(self,
                                [self.__source, osslsigncode],
                                [self.__target])

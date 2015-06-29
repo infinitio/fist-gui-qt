@@ -1,0 +1,93 @@
+- UPDATE CODE SIGNING CERTIFICATE -
+
+██╗   ██╗███████╗███████╗
+██║   ██║██╔════╝██╔════╝
+██║   ██║███████╗█████╗
+██║   ██║╚════██║██╔══╝
+╚██████╔╝███████║███████╗
+ ╚═════╝ ╚══════╝╚══════╝
+██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗███████╗████████╗
+██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔════╝╚══██╔══╝
+██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██╔██╗ ██║█████╗     ██║
+██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══╝     ██║
+██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║███████╗   ██║
+╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝
+███████╗██╗  ██╗██████╗ ██╗      ██████╗ ██████╗ ███████╗██████╗
+██╔════╝╚██╗██╔╝██╔══██╗██║     ██╔═══██╗██╔══██╗██╔════╝██╔══██╗
+█████╗   ╚███╔╝ ██████╔╝██║     ██║   ██║██████╔╝█████╗  ██████╔╝
+██╔══╝   ██╔██╗ ██╔═══╝ ██║     ██║   ██║██╔══██╗██╔══╝  ██╔══██╗
+███████╗██╔╝ ██╗██║     ███████╗╚██████╔╝██║  ██║███████╗██║  ██║
+╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+
+USE INTERNET EXPLORER on WINDOWS (you can try with wine but... your problem).
+
+For steps 1 to 30 you *HAVE TO* use the *SAME* internet explorer.
+
+1. Go to https://www.tbs-internet.com.
+2. Click on YOUR ACCOUNT - Manage your certificates.
+3. Login.
+4. On the left panel, click on 'Renouvelement'.
+5. Click on the certificate about to expire.
+
+== Follow the instructions ==*
+6. Check the informations (Julien information, Mefyl information)...
+7. Choose the private key security (use the default 2048).
+8. To secure the transfer, IE will generate a private key (pfx). Choose the highest security.
+9. Choose a password.
+10. Click [Finish].
+
+== Wait for the email ==
+11. Click on the link.
+12. An automatic download will start (cert.cer) file (If the download doesn't start, click [Continue]).
+13. Open the file (Certificate).
+14. Click [Install Certificate].
+15. Choose 'Install for current user' and [Next].
+16. Choose 'Automatically select the certificate store...' and [Next].
+17. Click [Finish].
+18. If the update is successful go to step 19, otherwise go to step 999.
+
+== Fun with windows ==.
+19. Open internet options.
+20. Tab 'Content'
+21. Click [Certificates].
+22. The right certificate SHOULD appear in 'Personal' (with intented purposes: 'Code Signing') otherwise go to 999.
+23. Click [Export].
+
+== Certificate Export Wizard ==
+24. Click [Next].
+25. Choose 'Yes, export my private key' and [Next].
+26. .PFX should be checked (and the first option).
+27. Click [Next].
+28. Check Password and enter the password (step 9.) and [Next].
+29. Choose a location and [Next] (in the example [..]/YOUR_PFX.pfx).
+30. Click [Finish].
+
+== Go to a sain environment (e.g. Linux) ==
+> https://wiki.cac.washington.edu/display/infra/Extracting+Certificate+and+Private+Key+Files+from+a+.pfx+File
+> xx (current year) and yy (next year).
+31. Copy YOUR_PFX.pfx to a new folder.
+32. Extract the certificate (> openssl pkcs12 -in YOUR_PFX.pfx -nocerts -out c_AuthentiCode_20xx-20yy.pem -nodes)
+33. Enter your password.
+34. Extract the private key (> openssl pkcs12 -in YOUR_PFX.pfx -nokeys -out encrypted_k_AuthentiCode_20xx-20yy.pem -nodes)
+35. Enter your password.
+36. Enter a new PEM password (USE THE SAME).
+37. Remove private key password protection (> openssl rsa -in k_WindowsAuthenticode_20xx-20xx.pem -out k_WindowsAuthenticode_20xx-20yy.pem)
+38. Enter a new PEM password (USE THE SAME).
+
+Now you have:
+> c_AuthentiCode_20xx-20yy.pem (the certificate).
+> k_AuthentiCode_20xx-20yy.pem (the key not password protected).
+
+39. Copy k_AuthentiCode_20xx-20yy.pem to resources/authenticode.key.pem.
+40. Copy c_AuthentiCode_20xx-20yy.pem to resources/authenticode.cer.pem.
+
+999. Good luck (call 0805696344 or mail support@tbs-internet.com).
+
+NB.
+I. The (.spc, .crt) on tbs-internet is useless unless you have the right private key.
+II. Checking modulus.
+  The following commands should output the same modulus.
+  > openssl x509 -noout -modulus -in resources/authenticode.cer.pem
+  > openssl ras -noout -modulus -in resources/authenticode.key.pem
+
+*: The doc has been written afterward, that part is
