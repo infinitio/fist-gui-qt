@@ -127,6 +127,13 @@ namespace fist
       {
         this->on_link_updated(transaction);
       });
+    gap_account_changed_callback(
+      this->state(),
+      [this] (::Account const& account)
+      {
+        this->account(account);
+      });
+
     connect(&this->_search_watcher, SIGNAL(finished()),
             this, SLOT(_on_search_results_ready()));
 
@@ -938,6 +945,13 @@ namespace fist
   {
     auto id = QString::fromStdString(gap_facebook_app_id());
     return id;
+  }
+
+  void
+  State::account(Account const& account)
+  {
+    this->_account = account;
+    emit account_updated();
   }
 
   void

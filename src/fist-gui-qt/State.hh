@@ -370,6 +370,16 @@ namespace fist
     QString
     facebook_app_id() const;
 
+    /*--------.
+    | Account |
+    `--------*/
+  private:
+    ELLE_ATTRIBUTE_Rw(::Account, account);
+
+  signals:
+    void
+    account_updated();
+
   public:
     // Global shortcuts.
     QxtGlobalShortcut* fullscreen_screenshot;
