@@ -84,9 +84,10 @@ namespace fist
     {
       if (this->_link.link)
       {
+        ELLE_DEBUG("get link: %s", this->_link.link.get());
         auto link = QString::fromStdString(this->_link.link.get());
         if (logged_in)
-          link += "?session_id=" + QUrl::toPercentEncoding(this->_state.session_id());
+          link += "?login_token=" + QUrl::toPercentEncoding(this->_state.web_login_token());
         return QUrl(link);
       }
       return QUrl();

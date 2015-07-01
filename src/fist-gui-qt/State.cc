@@ -277,11 +277,11 @@ namespace fist
   }
 
   QString
-  State::session_id() const
+  State::web_login_token() const
   {
-    std::string session_id;
-    if (gap_session_id(this->state(), session_id) == gap_ok)
-      return QString::fromStdString(session_id);
+    std::string web_token;
+    if (gap_web_login_token(this->state(), web_token) == gap_ok)
+      return QString::fromStdString(web_token);
     return QString();
   }
 
@@ -952,6 +952,27 @@ namespace fist
   {
     this->_account = account;
     emit account_updated();
+  }
+
+  QString
+  State::profile_url(QString const& utm_campaign) const
+  {
+    static const QString _url = QString("https://infinit.io/account?login_token=%1&email=%2").arg(
+      QString(QUrl::toPercentEncoding(this->web_login_token())),
+      this->me().emails()[0]);
+    QString url = _url;
+    if (!utm_campaign.isEmpty())
+    {
+      url.append(QString("&utm_source=app&utm_medium=windows&utm_campaign=%1").arg(utm_campaign));
+    }
+    ELLE_DEBUG("profile url: %s", url);
+    return url;
+  }
+
+  void
+  State::go_to_online_profile(QString const& utm_campaign) const
+  {
+    QDesktopServices::openUrl(this->profile_url(utm_campaign));
   }
 
   void

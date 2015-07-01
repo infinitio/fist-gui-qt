@@ -58,7 +58,7 @@ namespace fist
     }
 
     QString
-    session_id() const;
+    web_login_token() const;
 
     ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
     ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
@@ -384,6 +384,16 @@ namespace fist
     // Global shortcuts.
     QxtGlobalShortcut* fullscreen_screenshot;
     QxtGlobalShortcut* region_screenshot;
+
+    /*--------.
+    | Profile |
+    `--------*/
+  public:
+    QString
+    profile_url(QString const& utm_source) const;
+
+    void
+    go_to_online_profile(QString const& utm_source) const;
 
   public:
     void

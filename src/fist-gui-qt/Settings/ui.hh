@@ -13,16 +13,18 @@ namespace fist
       {
         static
         QString const
-        text = ::view::links::rich.arg("https://infinit.io/account?session_id=%1",
-                                       "You can change on the web.");
+        text = ::view::links::rich.arg(
+          "https://infinit.io/account?login_token=%1&email=%2",
+          "You can change on the web.");
       }
 
       namespace account
       {
         static
         QString const
-        text = ::view::links::rich.arg("https://infinit.io/account?session_id=%1",
-                                       "Go to your web profile.");
+        text = ::view::links::rich.arg(
+          "https://infinit.io/account?login_token=%1&email=%2",
+          "Go to your web profile.");
       }
 
       namespace title

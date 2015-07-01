@@ -112,8 +112,8 @@ namespace fist
     void
     UpgradePlan::_go_to_website()
     {
-      ELLE_TRACE_SCOPE("%s: go to %s", *this, view::payment::link::url);
-      QDesktopServices::openUrl(QUrl(view::payment::link::url));
+      ELLE_TRACE_SCOPE("%s: go to %s", *this, view::payment::storage::body::url);
+      this->_state.go_to_online_profile(this->_campaign());
       this->hide();
     }
 
