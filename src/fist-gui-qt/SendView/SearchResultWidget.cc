@@ -99,9 +99,7 @@ namespace fist
 
 #ifndef FIST_PRODUCTION_BUILD
       this->setToolTip(
-        QString::fromStdString(
-          elle::sprintf("id: %s\nfullname: %s\nhandle: %s",
-                        this->_model.id(), this->_model.fullname(), this->_model.handle())));
+        QString::fromStdString(elle::sprintf("%s", this->_model)));
 #endif
 
       if (this->_model.me())
