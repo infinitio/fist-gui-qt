@@ -218,12 +218,12 @@ namespace fist
         >
       > UserModels;
     ELLE_ATTRIBUTE_R(UserModels, users);
-    typedef std::vector<uint32_t> Results;
+    typedef Users Results;
     typedef QFuture<Results> FutureSearchResult;
     typedef QFutureWatcher<Results> SearchResultWatcher;
     ELLE_ATTRIBUTE(FutureSearchResult, search_future);
     ELLE_ATTRIBUTE_X(SearchResultWatcher, search_watcher);
-    ELLE_ATTRIBUTE(Results, last_results);
+    ELLE_ATTRIBUTE_R(Results, last_results);
 
     // Avatars.
     typedef std::unordered_map<uint32_t, QByteArray> Avatars;

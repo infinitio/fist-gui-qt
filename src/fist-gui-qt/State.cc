@@ -570,7 +570,8 @@ namespace fist
     State::Users res;
     for (auto const& user: boost::adaptors::reverse(this->_users.get<1>()))
     {
-      if (user.swagger() && !user.deleted() && filter(user))
+      auto ignore = !user.swagger() && !user.deleted();
+      if (!ignore && filter(user))
       {
         ELLE_DEBUG("add result: %s", user)
           res.push_back(user.id());
@@ -590,7 +591,8 @@ namespace fist
         return filter.isEmpty()
           ? true
           : (user.fullname().toLower().contains(filter.toLower()) ||
-             user.handle().toLower().contains(filter.toLower()));
+             user.handle().toLower().contains(filter.toLower()) ||
+             user.emails().contains(filter.toLower()));
       });
   }
 
@@ -598,7 +600,35 @@ namespace fist
   State::search(QString const& filter)
   {
     ELLE_DEBUG("search %s", filter);
-    return this->swaggers(filter);
+    ELLE_DEBUG("cancel future")
+      this->cancel_search();
+    auto results = this->swaggers(filter);
+    if (!filter.isEmpty())
+    {
+      ELLE_DEBUG("make concurent run")
+        this->_search_future = QtConcurrent::run(
+          [&,filter] {
+            std::string text = filter.toStdString();
+            std::vector<uint32_t> users;
+            if (filter.count('@') == 1 && regexp::email::checker.exactMatch(filter))
+            {
+              surface::gap::User u;
+              auto res = gap_user_by_email(this->state(), text.c_str(), u);
+              if (res == gap_ok)
+              {
+                auto& user = State::user(u.id);
+                user.add_email(filter);
+                if (!user.deleted())
+                  users.push_back(user.id());
+              }
+              else
+                ELLE_WARN("user by email failed: %s", res);
+            }
+            return users;
+          });
+      this->_search_watcher.setFuture(this->_search_future);
+    }
+    return results;
   }
 
   uint32_t
