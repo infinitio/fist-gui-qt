@@ -189,6 +189,9 @@ namespace fist
       }
       vlayout->addWidget(this->_separator);
       vlayout->addWidget(this->_users);
+
+      connect(&this->_state, SIGNAL(search_results_ready()),
+              this, SLOT(_results_ready()));
     }
 
     bool
@@ -299,12 +302,7 @@ namespace fist
       this->_results.clear();
       for (auto const& user: users)
       {
-        if (std::find_if(this->_recipients.begin(),
-                         this->_recipients.end(),
-                         [&] (Recipient const& recipient)
-                         {
-                           return recipient.id() == user;
-                         }) == this->_recipients.end())
+        if (!this->_in_recipients(user))
         {
           ELLE_DEBUG("%s not in the recipient list", user);
           if (user != this->_state.me().id())
@@ -319,16 +317,10 @@ namespace fist
     Users::set_users(UserList const& users, bool local)
     {
       this->_compute_results(users, this->text().isEmpty());
-      if (regexp::email::checker.exactMatch(this->text()))
+      if (regexp::email::checker.exactMatch(this->text()) && users.empty())
       {
         ELLE_DEBUG("text %s is an email", this->text());
-        auto picked = std::find_if(
-          this->_recipients.begin(),
-          this->_recipients.end(),
-          [&] (Recipient const& recipient)
-          {
-            return recipient == this->text();
-          }) != this->_recipients.end();
+        auto picked = this->_in_recipients(this->text());
         this->_add_result(Recipient(gap_null(), boost::none, this->text()), picked);
       }
       else
@@ -355,13 +347,7 @@ namespace fist
                 ELLE_DEBUG("device: %s", device);
                 auto recipient_device = Recipient(this->_state.my_id(), device);
                 if (this->_state.device().id() != device.id() &&
-                    std::find_if(this->_recipients.begin(),
-                                 this->_recipients.end(),
-                                 [&] (Recipient const& recipient)
-                                 {
-                                   ELLE_DUMP("%s - %s", recipient,  device.id());
-                                   return recipient == device.id();
-                                 }) == this->_recipients.end())
+                    !this->_in_recipients(device.id()))
                 {
                   auto it = this->_results.begin();
                   std::advance(it, i);
@@ -374,7 +360,9 @@ namespace fist
           }
           else
           {
-            this->_add_result(Recipient(this->_state.my_id()), false);
+            auto recipient = Recipient(this->_state.my_id());
+            if (!this->_in_recipients(recipient))
+              this->_add_result(recipient, false);
           }
           ELLE_DEBUG("%s", this->_results);
           if (!this->_results.empty())
@@ -404,7 +392,6 @@ namespace fist
             std::make_shared<NoSearchResultWidget>(this),
             ListWidget::Position::Top);
       }
-
     }
 
     bool
@@ -555,11 +542,25 @@ namespace fist
     {
       ELLE_DEBUG_SCOPE("%s: text changed to %s", *this, text);
       QString trimmed_search = text.trimmed();
-      auto results = this->_state.search(trimmed_search);
-      if (!results.empty() || !this->_results.empty() ||
-          !regexp::email::checker.exactMatch(this->text()))
-        this->clear_results();
-      this->set_users(results, true);
+      this->_show_results(this->_state.search(trimmed_search));
+    }
+
+    void
+    Users::_show_results(fist::State::Users const& results,
+                         bool local)
+    {
+      ELLE_DEBUG_SCOPE("%s: show results: %s", *this, results);
+      this->clear_results();
+      this->set_users(results, local);
+    }
+
+    void
+    Users::_results_ready()
+    {
+      ELLE_LOG_SCOPE("%s: results ready", *this);
+      auto results = this->_state.last_results();
+      if (!results.empty())
+        this->_show_results(results, false);
     }
 
     void

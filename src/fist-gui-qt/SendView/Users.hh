@@ -238,6 +238,19 @@ namespace fist
       set_users(UserList const& users, bool local);
 
     private:
+      void
+      _show_results(fist::State::Users const& users,
+                    bool local = true);
+
+      template <typename T>
+      bool
+      _in_recipients(T const& recipient) const;
+
+    private slots:
+      void
+      _results_ready();
+
+    private:
       bool
       _add_recipient(Recipient const&);
 
@@ -284,4 +297,7 @@ namespace fist
     };
   }
 }
+
+# include <fist-gui-qt/SendView/Users.hxx>
+
 #endif
