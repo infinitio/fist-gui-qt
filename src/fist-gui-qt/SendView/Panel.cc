@@ -159,10 +159,11 @@ namespace fist
       }
 
       std::vector<std::string> files;
-      for (int i = 0; i < this->_file_adder->files().size(); ++i)
+      uint64_t size = 0;
+      for (auto const& file: this->_file_adder->files())
       {
-        files.push_back(
-          QUrl_to_native_path(this->_file_adder->files().keys().at(i)));
+        size += file->size;
+        files.push_back(QUrl_to_native_path(file->path()));
       }
       ELLE_DEBUG("files: %s", files);
 

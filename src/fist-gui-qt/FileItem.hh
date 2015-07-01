@@ -9,6 +9,8 @@
 # include <QString>
 # include <QUrl>
 
+# include <elle/attribute.hh>
+
 # include <fist-gui-qt/IconButton.hh>
 # include <fist-gui-qt/ListItem.hh>
 
@@ -31,7 +33,7 @@ Q_SIGNALS:
 
 private:
   QHBoxLayout* _layout;
-  QUrl _path;
+  ELLE_ATTRIBUTE_R(QUrl, path);
   QFile _file;
   QLabel* _name;
   QLabel* _icon;
