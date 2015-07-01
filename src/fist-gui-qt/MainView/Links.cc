@@ -27,7 +27,7 @@ namespace fist
       , _state(state)
       , _link_list(new ListWidget(this, ListWidget::Separator(list::separator::colors), view::background))
       , _widgets()
-      , _no_more_storage(new popup::NoMoreStorage(this))
+      , _no_more_storage(new popup::NoMoreStorage(this->_state, this))
     {
       this->_link_list->setMaxRows(4);
       auto* layout = new QVBoxLayout(this);

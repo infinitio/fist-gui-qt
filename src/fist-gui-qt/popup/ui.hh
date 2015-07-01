@@ -15,12 +15,8 @@ namespace fist
         QColor const
         background(0xFF, 0xFF, 0xFF);
 
-        namespace main
+        namespace title
         {
-          static
-          QString const
-          text("You have reached your 1GB storage limit for links.");
-
           static
           fist::style::Text const
           style(fist::Font(DefaultFont, 20.5), QColor(0x51, 0x51, 0x49));
@@ -29,20 +25,46 @@ namespace fist
         namespace link
         {
           static
-          QString const
-          url("https://infinit.io/account"
-              "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan");
-          static
-          QString const
-          text = QString(
-            "You can either <a style=\"text-decoration: none; color: #2BBEBD;\""
-            "href=\"%1\">"
-            "upgrade to a premium plan</a> or remove old links to free up space")
-          .arg(url);
-
-          static
           fist::style::Text const
-          style(fist::Font(SourceSans, 15.5), QColor(0x51, 0x51, 0x49));
+          style(fist::Font(SourceSans, 14.5), QColor(0x51, 0x51, 0x49));
+        }
+
+        namespace storage
+        {
+          static
+          QString const
+          text("You have reached your %1 storage limit for links.");
+
+          namespace body
+          {
+            static
+            QString const
+            url("https://infinit.io/account"
+                "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan");
+
+            static
+            QString const
+            text = QString(
+              "You can either <a style=\"text-decoration: none; color: #2BBEBD;\""
+              "href=\"%1\">"
+              "upgrade to a premium plan</a> or remove old links to free up space.")
+              .arg(url);
+          }
+        }
+
+        namespace too_big
+        {
+          static
+          QString const
+          text("Upgrade to send files over 2GB to an email address.");
+
+          namespace body
+          {
+            static
+            QString const
+            text("You can upgrade to a better plan or ask your friend to create"
+                 " an Infinit account to get unlimited size transfers.");
+          }
         }
 
         namespace contact
@@ -54,7 +76,7 @@ namespace fist
 
           static
           fist::style::Text const
-          style(fist::Font(SourceSans, 15.5), QColor(0x9D, 0x9D, 0x9D));
+          style(fist::Font(SourceSans, 14.5), QColor(0x9D, 0x9D, 0x9D));
         }
 
         namespace button
