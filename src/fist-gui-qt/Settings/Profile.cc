@@ -60,7 +60,7 @@ namespace fist
         auto* vlayout = new QVBoxLayout;
         vlayout->setContentsMargins(0, 0, 0, 0);
         vlayout->setSpacing(5);
-        vlayout->addWidget(new QLabel(this->_state.me().email(), this));
+        vlayout->addWidget(new QLabel(this->_state.me().emails()[0], this));
         vlayout->addWidget(new QLabel("You can have multiple email addresses", this));
         vlayout->addWidget(
           link(view::manage_email_addresses::text.arg(

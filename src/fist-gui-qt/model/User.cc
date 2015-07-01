@@ -63,7 +63,7 @@ namespace fist
     {
       if (this->id() == this->_state.my_id())
       {
-        this->_email = QString::fromStdString(gap_self_email(this->_state.state()));
+        this->add_email(QString::fromStdString(gap_self_email(this->_state.state())));
       }
     }
 
@@ -77,7 +77,6 @@ namespace fist
       this->_last_interraction = other._last_interraction;
       return *this;
     }
-
 
     void
     User::model(surface::gap::User const& user)
@@ -208,11 +207,27 @@ namespace fist
         this->_last_interraction = time;
 
     }
+
+    void
+    User::add_email(QString const& email)
+    {
+      auto lowered = email.toLower();
+      if (!this->_emails.contains(lowered))
+        this->_emails.push_back(email.toLower());
+    }
+
     void
     User::print(std::ostream& stream) const
     {
-      stream << "User(" << this->id() << ", " << this->_model.fullname << ", "
-             << "last interraction: " << this->_last_interraction;
+      stream << "User(" << this->id() << ", " << this->_model.fullname << "/" << this->_model.handle;
+      if (!this->_emails.isEmpty())
+      {
+        QStringList emails;
+        for (auto const& email: this->_emails)
+          emails << email;
+        stream << " - known as: " << emails.join(", ");
+      }
+      stream << ")";
     }
   }
 }

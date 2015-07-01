@@ -8,6 +8,7 @@
 # include <elle/attribute.hh>
 
 # include <QString>
+# include <QSet>
 # include <QPixmap>
 # include <QVariant>
 
@@ -98,7 +99,11 @@ namespace fist
       typedef std::vector<model::Device> Devices;
       ELLE_ATTRIBUTE_RX(Devices, devices);
       ELLE_ATTRIBUTE_Rw(QDateTime, last_interraction);
-      ELLE_ATTRIBUTE_RW(QString, email);
+      ELLE_ATTRIBUTE_R(QVector<QString>, emails);
+
+    public:
+      void
+      add_email(QString const& email);
 
     signals:
       void
