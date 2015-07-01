@@ -25,6 +25,7 @@
 #include <fist-gui-qt/regexp.hh>
 #include <fist-gui-qt/utils.hh>
 
+#include <fist-gui-qt/popup/NoMoreStorage.hh>
 /*-------------.
 | Construction |
 `-------------*/
@@ -65,6 +66,7 @@ namespace fist
             this->_message,
             this->_file_adder,
           }))
+      , _alert(new popup::TooBig(this->_state, this))
     {
       // File adder.
       connect(this->_file_adder, SIGNAL(clicked()),
@@ -91,6 +93,8 @@ namespace fist
       this->setAcceptDrops(true);
       this->setMaximumHeight(500);
       connect(this, SIGNAL(sent()), SLOT(clear()));
+
+      this->_alert->hide();
     }
 
     void
@@ -182,10 +186,16 @@ namespace fist
         auto recipients = this->_users->recipients();
         for (auto const& recipient: recipients)
         {
+          bool over_limit = size >= (1lu << 31) &&
+            this->_state.account().plan.value() ==
+            infinit::oracles::meta::AccountPlanType::AccountPlanType_Basic;
           if (recipient.to_email())
           {
-            gap_send_files(
-              this->_state.state(), QString_to_utf8_string(recipient.email().get()), files, message);
+            if (over_limit)
+              this->_alert->show();
+            else
+              gap_send_files(
+                this->_state.state(), QString_to_utf8_string(recipient.email().get()), files, message);
           }
           else if (recipient.to_device())
           {
@@ -194,8 +204,12 @@ namespace fist
           }
           else
           {
-            gap_send_files(
-              this->_state.state(), recipient.id(), files, message);
+            auto const& user = this->_state.user(recipient.id());
+            if (user.ghost() && over_limit)
+              this->_alert->show();
+            else
+              gap_send_files(
+                this->_state.state(), user.id(), files, message);
           }
         }
       }

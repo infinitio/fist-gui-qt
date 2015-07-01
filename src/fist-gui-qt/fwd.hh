@@ -30,6 +30,7 @@ namespace fist
   namespace popup
   {
     class NoMoreStorage;
+    class TooBig;
   }
 
   namespace login

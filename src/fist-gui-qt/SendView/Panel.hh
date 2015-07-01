@@ -15,15 +15,16 @@
 
 # include <surface/gap/fwd.hh>
 
+# include <fist-gui-qt/ModeSelector.hh>
+# include <fist-gui-qt/Panel.hh>
 # include <fist-gui-qt/SendView/Files.hh>
 # include <fist-gui-qt/SendView/Footer.hh>
 # include <fist-gui-qt/SendView/Message.hh>
 # include <fist-gui-qt/SendView/Users.hh>
-# include <fist-gui-qt/Panel.hh>
 # include <fist-gui-qt/State.hh>
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/gui/TabWidget.hh>
-# include <fist-gui-qt/ModeSelector.hh>
+# include <fist-gui-qt/popup/NoMoreStorage.hh>
 
 namespace fist
 {
@@ -140,6 +141,7 @@ namespace fist
       ELLE_ATTRIBUTE_R(Files*, file_adder);
       ELLE_ATTRIBUTE(gui::Tab*, transaction_tab);
       ELLE_ATTRIBUTE(gui::Tab*, link_tab);
+      ELLE_ATTRIBUTE(std::unique_ptr<popup::TooBig>, alert);
 
     protected:
       void
