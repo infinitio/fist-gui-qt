@@ -59,7 +59,7 @@ namespace fist
 
     QString
     web_login_token() const;
-
+    ELLE_ATTRIBUTE_R(bool, logged_in);
     ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
     ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
     ELLE_ATTRIBUTE(QFuture<gap_Status>, register_future);
@@ -109,6 +109,9 @@ namespace fist
     on_connection_changed(
       bool status, bool still_retrying, std::string last_error);
 
+    void
+    on_contact_joined(uint32_t id, std::string const&);
+
   signals:
     void
     connection_enable();
@@ -119,6 +122,9 @@ namespace fist
     void
     new_download_folder_needed();
 
+  protected:
+    void
+    customEvent(QEvent* event) override;
   public:
     /*-----------.
     | Ghost code |

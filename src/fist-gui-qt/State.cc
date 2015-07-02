@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <QDesktopServices>
+#include <QApplication>
 #include <QHostInfo>
 #include <QBuffer>
 #include <QtConcurrentRun>
@@ -31,7 +32,14 @@
 #include <fist-gui-qt/regexp.hh>
 #include <fist-gui-qt/utils.hh>
 
+#include <fist-gui-qt/CustomEvents/ContactJoined.hh>
+#include <fist-gui-qt/CustomEvents/AccountUpdated.hh>
+#include <fist-gui-qt/CustomEvents/Events.hh>
+
+# include <surface/gap/gap.hh>
+
 ELLE_LOG_COMPONENT("infinit.FIST.State");
+
 
 namespace fist
 {
@@ -43,6 +51,7 @@ namespace fist
 
   State::State()
     : _state()
+    , _logged_in(false)
     , _login_future()
     , _login_watcher()
     , _register_future()
@@ -131,12 +140,10 @@ namespace fist
       this->state(),
       [this] (::Account const& account)
       {
-        this->account(account);
+        QApplication::postEvent(this, new AccountUpdated(account));
       });
-
     connect(&this->_search_watcher, SIGNAL(finished()),
             this, SLOT(_on_search_results_ready()));
-
     ELLE_DEBUG("start the update loop")
     {
       connect(this->_poll_timer.get(), SIGNAL(timeout()), this, SLOT(_poll()));
@@ -302,6 +309,23 @@ namespace fist
       emit kicked_out(QString::fromStdString(last_error));
   }
 
+  void
+  State::on_contact_joined(uint32_t id,
+                           std::string const&)
+  {
+    ELLE_TRACE_SCOPE("%s: contact %s joined", *this, id);
+    auto it = this->_users.get<0>().find(id);
+    if (it == this->_users.get<0>().end())
+    {
+      auto p = this->_users.emplace(*this, id);
+      it = p.first;
+    }
+    notification::center().notify(
+      "Infinit",
+      QString("%1 just joined Infinit").arg(it->fullname()),
+      2000);
+  }
+
   std::vector<model::Device>
   State::devices() const
   {
@@ -357,6 +381,7 @@ namespace fist
   void
   State::on_logged_in()
   {
+    this->_logged_in = true;
     ELLE_TRACE("load swaggers")
     {
       std::vector<surface::gap::User> users;
@@ -407,7 +432,13 @@ namespace fist
       }
       this->_compute_active_links();
     }
-
+    gap_contact_joined_callback(
+      this->state(),
+      [this] (uint32_t user_id,
+              std::string const& contact)
+      {
+        QApplication::postEvent(this, new ContactJoined(user_id, contact));
+      });
     {
       auto* reminder =  new QTimer(this);
       reminder->setSingleShot(false);
@@ -980,8 +1011,20 @@ namespace fist
   void
   State::account(Account const& account)
   {
+    auto old_plan = this->_account.plan.value();
+    auto new_plan = account.plan.value();
     this->_account = account;
-    emit account_updated();
+    ELLE_DEBUG_SCOPE("plan updated: %s -> %s (notify: %s)",
+                     old_plan, new_plan, this->_logged_in);
+    if (this->_logged_in && new_plan != old_plan)
+    {
+      notification::center().notify(
+        "Infinit",
+        QString("Your plan has been %1graded to %2").arg(
+          QString(new_plan > old_plan ? "up": "down"),
+          QString::fromStdString(elle::sprintf("%s", new_plan))));
+      emit account_updated();
+    }
   }
 
   QString
@@ -1034,6 +1077,27 @@ namespace fist
         QByteArray raw((char *) data, len);
         this->_avatar = raw;
       }
+    }
+  }
+
+  void
+  State::customEvent(QEvent* event)
+  {
+    elle::SafeFinally acceptor([&] { event->accept(); });
+    if (event->type() == CONTACT_JOINED)
+    {
+      auto* contact_joined = static_cast<ContactJoined*>(event);
+      this->on_contact_joined(contact_joined->id(),
+                              contact_joined->contact());
+    }
+    else if (event->type() == ACCOUNT_UPDATED)
+    {
+      auto* account_updated = static_cast<AccountUpdated*>(event);
+      this->account(account_updated->account());
+    }
+    else
+    {
+      acceptor.abort();
     }
   }
 }

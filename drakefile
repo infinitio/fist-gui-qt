@@ -468,6 +468,12 @@ def configure(cxx_toolkit,
       "src/fist-gui-qt/Settings/ScreenShot.cc",
       "src/fist-gui-qt/Settings/ScreenShot.hh",
 
+      # Events.
+      "src/fist-gui-qt/CustomEvents/ContactJoined.hh",
+      "src/fist-gui-qt/CustomEvents/ContactJoined.cc",
+      "src/fist-gui-qt/CustomEvents/AccountUpdated.hh",
+      "src/fist-gui-qt/CustomEvents/AccountUpdated.cc",
+
       # Empty states.
       "src/fist-gui-qt/MainView/EmptyState.cc",
       "src/fist-gui-qt/MainView/EmptyState.hh",
