@@ -776,5 +776,5 @@ def configure(cxx_toolkit,
     package += drake.copy(drake.nodes('control'), 'debian/DEBIAN')
     debian = drake.Rule('debian')
     debian << drake.debian.Packager(
-        'infinit_%s_amd64.deb' % git.description(),
-        package, 'debian', preload = elle.elle.dpkg_preload).package
+      'infinit_%s_amd64.deb' % git.description(),
+      package, 'debian').package
