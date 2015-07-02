@@ -186,12 +186,14 @@ def configure(cxx_toolkit = None,
       uic = Qt_uic,
       qmake = Qt_qmake,
     )
+
   # Qt use file generation tools, which create function with
   # missing declaration.
   qt_cxx_config.warnings.missing_declarations = None
   qt_cxx_config += qt.config()
   for l in ['core', 'gui', 'network', 'webkit']:
-    qt_cxx_config += getattr(qt, 'config_' + l)(static = False)
+    config = getattr(qt, 'config_%s' % l)
+    qt_cxx_config += config(static = False, link = False)
     lib = getattr(qt, l + '_dynamic')
     lib = copy_lib(lib)
     qt_cxx_config.library_add(lib)
