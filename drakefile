@@ -217,9 +217,11 @@ def configure(cxx_toolkit = None,
   qxt_prefix_absolute = drake.path_root() / qxt_prefix
   qxt_libs = ['Core', 'Gui']
   if cxx_toolkit.os == drake.os.windows:
-    qxt_libs = [drake.cxx.DynLib('qxt/lib/Qxt%s.dll' % x) for x in qxt_libs]
+    qxt_libs = [
+      drake.cxx.DynLib('qxt/lib/Qxt%s.dll' % x) for x in qxt_libs]
   else:
-    qxt_libs = [drake.cxx.DynLib('qxt/lib/libQxt%s.so' % x) for x in qxt_libs]
+    qxt_libs = [
+      drake.cxx.DynLib('qxt/lib/libQxt%s.so.0' % x) for x in qxt_libs]
   drake.HTTPDownload(
     qxt_url,
     qxt_tarball,
