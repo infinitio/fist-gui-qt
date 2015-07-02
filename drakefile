@@ -27,17 +27,20 @@ def architecture_dictionary(cxx_toolkit):
 
 Node.extensions['def'] = drake.cxx.Object
 
-def configure(cxx_toolkit = None,
-              cxx_config = drake.cxx.Config(),
-              prefix = drake.Path('/usr/local'),
-              fist_production_build = False,
-              boost = None,
-              git = None,
-              elle = None,
-              qt = None,
-              openssl_include_dir = '/usr',
-              openssl_libraries = [],
-              libraries = []):
+def configure(cxx_toolkit,
+              cxx_config,
+              prefix,
+              fist_production_build,
+              boost,
+              git,
+              elle,
+              oracles,
+              qt,
+              openssl_include_dir,
+              openssl_libraries,
+              gap_lib,
+              crash_lib,
+            ):
 
   def copy_lib(lib, where = 'lib'):
     if isinstance(lib, drake.cxx.StaticLib):
@@ -50,8 +53,16 @@ def configure(cxx_toolkit = None,
   prefix = drake.Path(prefix)
   cxx_config = drake.cxx.Config(cxx_config)
   cxx_toolkit = cxx_toolkit or drake.cxx.Toolkit()
-  git = git or drake.git.Git(path = drake.path_source('..'))
   dynamic_libraries = []
+  libraries = [gap_lib]
+  if cxx_toolkit.os != drake.os.windows:
+    libraries += [
+      elle.elle.library,
+      elle.cryptography.library,
+      crash_lib,
+      oracles.transaction_lib,
+      oracles.meta.client.lib,
+    ]
   libraries = [copy_lib(lib) for lib in libraries]
   openssl_libraries = [copy_lib(lib) for lib in openssl_libraries]
   for lib in libraries + openssl_libraries:
