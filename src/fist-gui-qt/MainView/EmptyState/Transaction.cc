@@ -1,4 +1,5 @@
 #include <fist-gui-qt/MainView/EmptyState/Transaction.hh>
+#include <fist-gui-qt/onboarding/ImageOnboarder.hh>
 
 namespace fist
 {

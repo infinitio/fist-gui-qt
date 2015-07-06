@@ -2,7 +2,6 @@
 # define FIST_GUI_QT_MAINVIEW_EMPTYSTATE_TRANSACTION_HH
 
 # include <fist-gui-qt/MainView/EmptyState.hh>
-# include <fist-gui-qt/onboarding/ImageOnboarder.hh>
 
 namespace fist
 {
