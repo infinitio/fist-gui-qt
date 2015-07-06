@@ -3,11 +3,16 @@
 #include <QGridLayout>
 #include <QRegExpValidator>
 
+#include <elle/log.hh>
+
+#include <fist-gui-qt/onboarding/ImageOnboarder.hh>
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/Settings/General.hh>
 #include <fist-gui-qt/Settings/utils.hh>
 #include <fist-gui-qt/State.hh>
 #include <fist-gui-qt/utils.hh>
+
+ELLE_LOG_COMPONENT("infinit.FIST.Settings.General");
 
 namespace fist
 {
@@ -22,6 +27,7 @@ namespace fist
       , _launch_at_startup(new QCheckBox(this))
 #endif
       , _device_name(line_edit(this->_state.device().name(), this))
+      , _tutorial(new QLabel("<a style=\"text-decoration: none; color: #489FCE;\">Watch tutorial</a>", this))
     {
       int i = -1;
       this->setFocusPolicy(Qt::NoFocus);
@@ -37,6 +43,9 @@ namespace fist
         QRegExpValidator* validator =
           new QRegExpValidator(QRegExp(".{1,64}", Qt::CaseInsensitive), this);
         this->_device_name->setValidator(validator);
+      }
+      {
+        this->_tutorial->installEventFilter(this);
       }
       QGridLayout* layout = new QGridLayout(this);
       layout->setContentsMargins(45, 45, 45, 45);
@@ -82,7 +91,30 @@ namespace fist
                                      this->_state.me().emails()[0]),
              this),
         ++i, 0, 1, -1);
+      layout->addWidget(this->_tutorial, ++i, 0, 1, -1);
       layout->setRowStretch(++i, 1);
+    }
+
+    bool
+    General::eventFilter(QObject *obj, QEvent *event)
+    {
+      if (obj == this->_tutorial)
+      {
+        if (event->type() == QEvent::Enter)
+        {
+          this->setCursor(QCursor(Qt::PointingHandCursor));
+        }
+        else if (event->type() == QEvent::Leave)
+        {
+          this->setCursor(QCursor(Qt::ArrowCursor));
+        }
+
+        if (event->type() == QEvent::MouseButtonRelease)
+        {
+          this->_watch_tutorial();
+        }
+      }
+      return Super::eventFilter(obj, event);
     }
 
     void
@@ -145,6 +177,14 @@ namespace fist
            break;
        }
 #endif
+    }
+
+    void
+    General::_watch_tutorial() const
+    {
+      ELLE_DEBUG_SCOPE("show tutorial");
+      auto* window = new onboarding::ImageOnboarder(nullptr);
+      window->show();
     }
 
     void

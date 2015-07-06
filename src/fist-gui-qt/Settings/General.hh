@@ -36,6 +36,9 @@ namespace fist
       void
       _update_device_name();
 
+      void
+      _watch_tutorial() const;
+
     private:
       void
       _set_download_folder(QString const&);
@@ -43,11 +46,17 @@ namespace fist
     private:
       void
       showEvent(QShowEvent* event) override;
+
+    private:
+      bool
+      eventFilter(QObject *obj, QEvent *event) override;
+
     private:
       ELLE_ATTRIBUTE(fist::State&, state);
       ELLE_ATTRIBUTE(QLabel*, download_folder);
       ELLE_ATTRIBUTE(QCheckBox*, launch_at_startup);
       ELLE_ATTRIBUTE(QLineEdit*, device_name);
+      ELLE_ATTRIBUTE(QLabel*, tutorial);
     };
   }
 }
