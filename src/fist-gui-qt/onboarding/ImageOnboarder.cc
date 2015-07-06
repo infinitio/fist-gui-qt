@@ -306,6 +306,7 @@ namespace fist
         this->_next->setText(tr("Get started"));
         connect(this->_next, SIGNAL(released()), this, SLOT(close()));
         connect(this->_next, SIGNAL(released()), this, SIGNAL(onboarded()));
+        connect(this->_next, SIGNAL(released()), this, SLOT(deleteLater()));
       }
       else
       {
