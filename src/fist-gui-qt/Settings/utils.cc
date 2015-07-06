@@ -34,7 +34,7 @@ namespace fist
     link(QString text, QWidget* parent)
     {
       auto* link = new QLabel(text, parent);
-      link->setTextInteractionFlags(::view::links::interration_flags);
+      link->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
       link->setOpenExternalLinks(true);
       return link;
     }

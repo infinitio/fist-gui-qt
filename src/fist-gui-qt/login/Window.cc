@@ -189,6 +189,7 @@ namespace fist
             this->_password_field->setText(this->_saved_password(saved_email));
           }
 
+          ELLE_LOG("%s", view::links::forgot_password::text);
           this->_forgot_password_link->setText(view::links::forgot_password::text);
         }
       }
@@ -220,9 +221,10 @@ namespace fist
         for (auto& link: {this->_help_link, this->_forgot_password_link})
         {
           view::links::style(*link);
-          link->setTextInteractionFlags(view::links::interration_flags);
+          link->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
           link->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
           link->setOpenExternalLinks(true);
+          link->raise();
         }
       }
       // Proxy.

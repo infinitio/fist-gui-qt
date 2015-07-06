@@ -112,13 +112,6 @@ namespace view
     static
     QString const
     rich("<a style=\"text-decoration: none; color: #489FCE;\" href=\"%1\">%2</a>");
-
-    static
-    Qt::TextInteractionFlags const
-    interration_flags(
-      Qt::TextSelectableByMouse |
-      Qt::LinksAccessibleByMouse |
-      Qt::LinksAccessibleByKeyboard);
   }
 
   static
