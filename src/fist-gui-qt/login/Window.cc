@@ -476,6 +476,17 @@ namespace fist
           !dynamic_cast<QLayout*>(obj))
         return Super::eventFilter(obj, event);
 
+      if (obj == this->_login_tabber || obj == this->_signup_tabber || this->_proxy)
+      {
+        if (event->type() == QEvent::Enter)
+        {
+          this->setCursor(QCursor(Qt::PointingHandCursor));
+        }
+        else if (event->type() == QEvent::Leave)
+        {
+          this->setCursor(QCursor(Qt::ArrowCursor));
+        }
+      }
       if (obj == this->_proxy)
       {
         if (event->type() == QEvent::MouseButtonRelease)
