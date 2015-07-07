@@ -5,6 +5,7 @@
 #include <elle/log.hh>
 
 #include <fist-gui-qt/log/CircularSelector.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.log.CircularSelector");
 
@@ -21,9 +22,10 @@ namespace fist
         int available_slot = 0;
         for (int i = 0; i < rotation_size; ++i)
         {
+          std::string file = elle::sprintf(pattern, i);
           if (!QFile::exists(
                 QDir::toNativeSeparators(
-                  QString::fromStdString(elle::sprintf(pattern, i)))))
+                  QString_from_utf8_string(file))))
           {
             available_slot = i;
             break;
@@ -65,7 +67,7 @@ namespace fist
     bool
     CircularSelector::remove_next_log() const
     {
-      auto next_slot = QString::fromStdString(this->next_log_file());
+      auto next_slot = QString_from_utf8_string(this->next_log_file());
       ELLE_DEBUG("remove next slot: %s", next_slot);
       return QFile::remove(next_slot);
     }

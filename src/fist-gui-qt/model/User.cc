@@ -96,7 +96,7 @@ namespace fist
     QString
     User::fullname() const
     {
-      return QString::fromUtf8(this->_model.fullname.c_str());
+      return QString_from_utf8_string(this->_model.fullname);
     }
 
     void
@@ -108,7 +108,7 @@ namespace fist
     QString
     User::handle() const
     {
-      return QString::fromUtf8(this->_model.handle.c_str());
+      return QString_from_utf8_string(this->_model.handle);
     }
 
     void

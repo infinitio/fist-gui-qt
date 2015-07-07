@@ -187,8 +187,8 @@ namespace fist
   State::device() const
   {
     for (auto const& device: this->devices())
-      if (device.id() == QString::fromStdString(this->device_id()))
-          return device;
+      if (device.id() == QString_from_utf8_string(this->device_id()))
+        return device;
     elle::unreachable();
   }
 
@@ -288,7 +288,7 @@ namespace fist
   {
     std::string web_token;
     if (gap_web_login_token(this->state(), web_token) == gap_ok)
-      return QString::fromStdString(web_token);
+      return QString_from_utf8_string(web_token);
     return QString();
   }
 
@@ -306,7 +306,7 @@ namespace fist
     else if (status == false && still_retrying)
       emit internet_issue("trying to connect");
     else
-      emit kicked_out(QString::fromStdString(last_error));
+      emit kicked_out(QString_from_utf8_string(last_error));
   }
 
   void
@@ -736,7 +736,7 @@ namespace fist
   QString
   State::download_folder() const
   {
-    return QString::fromUtf8(gap_get_output_dir(this->state()).c_str());
+    return QString_from_utf8_string(gap_get_output_dir(this->state()));
   }
 
   void
@@ -1004,7 +1004,7 @@ namespace fist
   QString
   State::facebook_app_id() const
   {
-    auto id = QString::fromStdString(gap_facebook_app_id());
+    auto id = QString_from_utf8_string(gap_facebook_app_id());
     return id;
   }
 
@@ -1022,7 +1022,7 @@ namespace fist
         "Infinit",
         QString("Your plan has been %1graded to %2").arg(
           QString(new_plan > old_plan ? "up": "down"),
-          QString::fromStdString(elle::sprintf("%s", new_plan))));
+          QString_from_utf8_string(elle::sprintf("%s", new_plan))));
       emit account_updated();
     }
   }

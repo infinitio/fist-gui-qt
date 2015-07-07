@@ -94,7 +94,7 @@ Updater::download_update()
   request.setUrl(this->_updater_url);
   request.setRawHeader(
     "User-Agent",
-    QString::fromStdString(
+    QString_from_utf8_string(
       elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
   this->_reply.reset(this->_network_manager->get(request));
   connect(this->_reply.get(), SIGNAL(downloadProgress(qint64, qint64)),
@@ -149,7 +149,7 @@ Updater::check_for_updates()
   request.setUrl(this->_version_file_url);
   request.setRawHeader(
     "User-Agent",
-    QString::fromStdString(elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
+    QString_from_utf8_string(elle::sprintf("Windows %s", INFINIT_VERSION)).toUtf8());
   this->_reply.reset(this->_network_manager->get(request));
 }
 
@@ -258,9 +258,9 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
         {
           elle::SafeFinally next([&] { xr.readNext(); });
           if (xr.isStartElement())
-            updater_info[name].append(QString::fromStdString(elle::sprintf("<%s>", xr.name().toString())));
+            updater_info[name].append(QString_from_utf8_string(elle::sprintf("<%s>", xr.name().toString())));
           else if (xr.isEndElement())
-            updater_info[name].append(QString::fromStdString(elle::sprintf("</%s>", xr.name().toString())));
+            updater_info[name].append(QString_from_utf8_string(elle::sprintf("</%s>", xr.name().toString())));
           else if (xr.isCharacters())
             updater_info[name].append(xr.text().toString());
         }
@@ -393,7 +393,7 @@ Updater::_update(QNetworkReply* reply)
     if (!this->_installer_folder.mkpath(this->_installer_folder.path()))
       emit update_error(
         "unable to download installer",
-        QString::fromStdString(
+        QString_from_utf8_string(
           elle::sprintf(
             "destination folder %s is unreachable.",
             QDir::toNativeSeparators(this->_installer_folder.path()))));
@@ -402,7 +402,7 @@ Updater::_update(QNetworkReply* reply)
     ELLE_ERR("unable to open location: %s", this->_installer->fileName());
     emit update_error(
         "unable to download installer",
-        QString::fromStdString(
+        QString_from_utf8_string(
           elle::sprintf(
             "destination folder %s may be write protected.",
             QDir::toNativeSeparators(this->_installer->fileName()))));
@@ -464,7 +464,7 @@ Updater::run_installer()
     {
       emit update_error(
         "unable to run installer",
-        QString::fromStdString(
+        QString_from_utf8_string(
           elle::sprintf(
             "You can run it manually at %s",
             QDir::toNativeSeparators(this->_installer->fileName()))));

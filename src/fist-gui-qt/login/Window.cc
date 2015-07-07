@@ -47,15 +47,15 @@ namespace fist
       static std::string secret_key_password("S4LT%sPasswordSecretKey");
       return infinit::cryptography::SecretKey(
         infinit::cryptography::cipher::Algorithm::aes256,
-        elle::sprintf(secret_key_password, email.toStdString()));
+        elle::sprintf(secret_key_password, QString_to_utf8_string(email)));
     }
 
     void
     Window::_save_password(QString const& email,
                            QString const& password)
     {
-      auto encrypted_password = secret_key(email).encrypt(
-        password.toStdString());
+      auto pass = QString_to_utf8_string(password);
+      auto encrypted_password = secret_key(email).encrypt(pass);
       std::string encrypted_password_string;
       elle::serialize::to_string(encrypted_password_string) << encrypted_password;
       auto eps = encrypted_password_string;
@@ -76,7 +76,7 @@ namespace fist
           infinit::cryptography::Code code;
           elle::serialize::from_string(str) >> code;
           auto password_string = secret_key(email).decrypt<std::string>(code);
-          return QString::fromStdString(password_string);
+          return QString_from_utf8_string(password_string);
         }
         catch (elle::Exception const& e)
         {
@@ -787,7 +787,6 @@ namespace fist
     {
       elle::SafeFinally unlock_register([&] {
           this->_enable();
-          // this->_footer->mode(Mode::Register);
         });
       this->_disable();
       elle::SafeFinally register_failed_guard([&] { emit this->register_failed(); });
@@ -821,7 +820,6 @@ namespace fist
     {
       elle::SafeFinally unlock_login([&] {
           this->_enable();
-          // this->_footer->mode(Mode::Login);
         });
       this->_disable();
       elle::SafeFinally login_failed_guard([&] { emit this->login_failed(); });

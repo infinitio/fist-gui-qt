@@ -41,9 +41,9 @@ namespace fist
     }
 
     Device::Device(surface::gap::Device const& device)
-      : _id(QString::fromStdString(device.id.repr()))
-      , _name(QString::fromStdString(device.name))
-      , _os(device.os ? QString::fromStdString(device.os.get()) : QString{})
+      : _id(QString_from_utf8_string(device.id.repr()))
+      , _name(QString_from_utf8_string(device.name))
+      , _os(device.os ? QString_from_utf8_string(device.os.get()) : QString())
       , _type(os_to_type(this->_os))
       , _last_sync(QDateTime::fromTime_t(device.last_sync ? (device.last_sync.get() - epoch).total_seconds() : 0))
     {

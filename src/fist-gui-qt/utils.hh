@@ -132,4 +132,11 @@ QString_to_utf8_string(QString const& input)
   return std::string{array.constData()};
 }
 
+inline
+QString
+QString_from_utf8_string(std::string const& input)
+{
+  return QString::fromUtf8(input.c_str());
+}
+
 #endif

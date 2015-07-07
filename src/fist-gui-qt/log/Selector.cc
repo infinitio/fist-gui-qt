@@ -3,6 +3,7 @@
 #include <elle/log.hh>
 
 #include <fist-gui-qt/log/Selector.hh>
+#include <fist-gui-qt/utils.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.log.Selector");
 
@@ -38,7 +39,7 @@ namespace fist
       ELLE_TRACE_SCOPE("%s: remove current log: %s", *this, this->_log_file);
       if (this->_log_file.empty())
         return true;
-      QFile irrelevant(QString::fromStdString(this->_log_file));
+      QFile irrelevant(QString_from_utf8_string(this->_log_file));
       irrelevant.close();
       if (!irrelevant.exists())
         ELLE_DEBUG("irrelevant log doesn't exist");
@@ -46,7 +47,8 @@ namespace fist
       {
         ELLE_WARN("impossible to remove log (%s): %s",
                   this->_log_file, irrelevant.errorString());
-        if (!irrelevant.rename(QString::fromStdString(this->_log_file + ".old")))
+        std::string file = this->_log_file + ".old";
+        if (!irrelevant.rename(QString_from_utf8_string(file)))
         {
           ELLE_WARN("impossible to rename log (%s): %s",
                     this->_log_file, irrelevant.errorString());

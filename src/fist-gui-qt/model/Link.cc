@@ -8,6 +8,7 @@
 
 #include <fist-gui-qt/model/Link.hh>
 #include <fist-gui-qt/State.hh>
+#include <fist-gui-qt/utils.hh>
 
 
 ELLE_LOG_COMPONENT("infinit.FIST.model.Link");
@@ -96,7 +97,7 @@ namespace fist
     QString
     Link::name() const
     {
-      return QString::fromUtf8(this->_link.name.c_str());
+      return QString_from_utf8_string(this->_link.name);
     }
 
     uint32_t

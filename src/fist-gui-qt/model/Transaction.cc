@@ -172,7 +172,7 @@ namespace fist
       if (this->_files.isEmpty())
       {
         for (auto const& file: this->_transaction.file_names)
-          this->_files.append(QString::fromUtf8(file.c_str()));
+          this->_files.append(QString_from_utf8_string(file));
       }
       return this->_files;
     }
