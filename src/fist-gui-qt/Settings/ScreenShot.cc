@@ -115,11 +115,11 @@ namespace fist
     void
     ScreenShot::_change_fullscreen_shortcut(QString const& sequence)
     {
-      ELLE_LOG("fullscreen: %s", sequence);
-      if (this->_validate_key_sequence(sequence, this->_region->sequence()))
+      ELLE_DEBUG_SCOPE("fullscreen: %s", sequence);
+      if (this->_validate_key_sequence(sequence, this->_region->sequence()) &&
+          this->_state.update_fullscreen_screenshot_shortcut(sequence))
       {
         fist::settings()["Shortcuts"].set("fullscreen", sequence);;
-        this->_state.update_fullscreen_screenshot_shortcut();
       }
       else
       {
@@ -130,11 +130,11 @@ namespace fist
     void
     ScreenShot::_change_region_shortcut(QString const& sequence)
     {
-      ELLE_LOG("region: %s", sequence);
-      if (this->_validate_key_sequence(sequence, this->_fullscreen->sequence()))
+      ELLE_DEBUG_SCOPE("region: %s", sequence);
+      if (this->_validate_key_sequence(sequence, this->_fullscreen->sequence()) &&
+          this->_state.update_region_screenshot_shortcut(sequence))
       {
         fist::settings()["Shortcuts"].set("region", sequence);
-        this->_state.update_region_screenshot_shortcut();
       }
       else
       {

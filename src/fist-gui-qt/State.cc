@@ -1048,18 +1048,24 @@ namespace fist
     QDesktopServices::openUrl(this->profile_url(utm_campaign));
   }
 
-  void
-  State::update_fullscreen_screenshot_shortcut()
+  bool
+  State::update_fullscreen_screenshot_shortcut(QString const& sequence_)
   {
-    this->fullscreen_screenshot->setShortcut(
-      QKeySequence(fist::settings()["Shortcuts"].get("fullscreen", "Ctrl+Shift+I").toString()));
+    QString sequence = sequence_;
+    if (sequence.isEmpty())
+      sequence = fist::settings()["Shortcuts"].get("fullscreen",
+                                                   "Ctrl+Shift+I").toString();
+    return this->fullscreen_screenshot->setShortcut(QKeySequence(sequence));
   }
 
-  void
-  State::update_region_screenshot_shortcut()
+  bool
+  State::update_region_screenshot_shortcut(QString const& sequence_)
   {
-    this->region_screenshot->setShortcut(
-      QKeySequence(fist::settings()["Shortcuts"].get("region", "Ctrl+Shift+O").toString()));
+    QString sequence = sequence_;
+    if (sequence.isEmpty())
+      sequence = fist::settings()["Shortcuts"].get("region",
+                                                   "Ctrl+Shift+O").toString();
+    return this->region_screenshot->setShortcut(QKeySequence(sequence));
   }
 
   void

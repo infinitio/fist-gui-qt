@@ -402,10 +402,10 @@ namespace fist
     go_to_online_profile(QString const& utm_source) const;
 
   public:
-    void
-    update_fullscreen_screenshot_shortcut();
-    void
-    update_region_screenshot_shortcut();
+    bool
+    update_fullscreen_screenshot_shortcut(QString const& sequence = "");
+    bool
+    update_region_screenshot_shortcut(QString const& sequence = "");
   private:
     Q_OBJECT;
   };
