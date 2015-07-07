@@ -58,7 +58,7 @@ namespace fist
     {
       if (event->button() != Qt::LeftButton)
         return;
-
+      ELLE_DEBUG("start selection at %s", event->pos());
       this->_selection_origin = event->pos();
       this->_process_selection = true;
     }
@@ -69,6 +69,7 @@ namespace fist
       if (event->button() != Qt::LeftButton)
         return;
 
+      ELLE_DEBUG("end selection at %s", event->pos());
       this->_selection_end = event->pos();
       this->_process_selection = false;
       this->selection = this->_desktop_clear.copy(this->_selection_rectangle);
