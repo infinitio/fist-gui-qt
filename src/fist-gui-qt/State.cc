@@ -1031,8 +1031,8 @@ namespace fist
   State::profile_url(QString const& utm_campaign) const
   {
     static const QString _url = QString("https://infinit.io/account?login_token=%1&email=%2").arg(
-      QString(QUrl::toPercentEncoding(this->web_login_token())),
-      this->me().emails()[0]);
+      url_encode(this->web_login_token()),
+      url_encode(this->me().emails()[0]));
     QString url = _url;
     if (!utm_campaign.isEmpty())
     {

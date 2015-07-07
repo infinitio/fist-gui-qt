@@ -87,8 +87,8 @@ namespace fist
       layout->addWidget(section("Device name", this), ++i, 0, Qt::AlignTop | Qt::AlignLeft);
       layout->addWidget(this->_device_name, i, 2, 1, -1);
       layout->addWidget(
-        link(view::account::text.arg(QString(QUrl::toPercentEncoding(this->_state.web_login_token())),
-                                     this->_state.me().emails()[0]),
+        link(view::account::text.arg(url_encode(this->_state.web_login_token()),
+                                     url_encode(this->_state.me().emails()[0])),
              this),
         ++i, 0, 1, -1);
       layout->addWidget(this->_tutorial, ++i, 0, 1, -1);
