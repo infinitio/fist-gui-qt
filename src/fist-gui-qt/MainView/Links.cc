@@ -6,7 +6,6 @@
 #include <fist-gui-qt/MainView/Links.hh>
 #include <fist-gui-qt/MainView/LinkWidget.hh>
 #include <fist-gui-qt/notification/Center.hh>
-#include <fist-gui-qt/popup/NoMoreStorage.hh>
 #include <fist-gui-qt/TextListItem.hh>
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/MainView/EmptyState/Link.hh>
@@ -27,14 +26,13 @@ namespace fist
       , _state(state)
       , _link_list(new ListWidget(this, ListWidget::Separator(list::separator::colors), view::background))
       , _widgets()
-      , _no_more_storage(new popup::NoMoreStorage(this->_state, this))
+      , _no_more_storage()
     {
       this->_link_list->setMaxRows(4);
       auto* layout = new QVBoxLayout(this);
       layout->setContentsMargins(0, 0, 0, 0);
       layout->setMargin(0);
       layout->addWidget(this->_link_list);
-      this->_no_more_storage->hide();
       if (this->_state.links().get<0>().empty())
       {
         this->_link_list->add_widget(std::make_shared<empty_state::Link>(this));
@@ -104,6 +102,8 @@ namespace fist
         this->_link_list->remove_widget(it->second);
         this->_widgets.erase(link->id());
       }
+      this->_no_more_storage.reset(
+        new popup::NoMoreStorage(this->_state, this));
       this->_no_more_storage->show();
     }
 
