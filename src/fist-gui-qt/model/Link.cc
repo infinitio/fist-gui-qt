@@ -60,6 +60,8 @@ namespace fist
       this->_link = new_link;
       ELLE_DEBUG("%s -> %s", old, this->_link);
       this->_mtime = QDateTime::fromTime_t(this->_link.mtime);
+      if (old.status == gap_transaction_deleted)
+        return;
       if (old.status != this->status())
       {
         emit status_updated();
