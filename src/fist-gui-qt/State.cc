@@ -1032,7 +1032,7 @@ namespace fist
   QUrl
   State::profile_url(QString const& utm_campaign) const
   {
-    static const QString _url = QString("https://infinit.io/account?login_token=%1&email=%2").arg(
+    QString _url = QString("https://infinit.io/account?login_token=%1&email=%2").arg(
       this->web_login_token(),
       url_encode(this->me().emails()[0]));
     QString url = _url;
