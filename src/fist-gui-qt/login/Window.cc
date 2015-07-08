@@ -188,8 +188,6 @@ namespace fist
           {
             this->_password_field->setText(this->_saved_password(saved_email));
           }
-
-          ELLE_LOG("%s", view::links::forgot_password::text);
           this->_forgot_password_link->setText(view::links::forgot_password::text);
         }
       }
