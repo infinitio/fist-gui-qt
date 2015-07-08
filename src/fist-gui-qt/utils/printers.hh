@@ -73,7 +73,7 @@ readable_size(qint64 size)
   int i = 0;
   std::vector<QString> units = {
     "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
-  while (size > 1000)
+  while (size >= 1000)
   {
     size /= 1000.f;
     i++;
