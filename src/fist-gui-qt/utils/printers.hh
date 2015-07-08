@@ -68,9 +68,10 @@ operator << (std::ostream& out, QNetworkReply const& r)
 
 inline
 QString
-readable_size(qint64 size)
+readable_size(qint64 size_)
 {
   int i = 0;
+  double size = size_;
   std::vector<QString> units = {
     "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
   while (size >= 1000)
@@ -78,7 +79,7 @@ readable_size(qint64 size)
     size /= 1000.f;
     i++;
   }
-  return QString("%1").arg(size) + " " + units[i];
+  return QString::number(size, 'g', 3) + " " + units[i];
 };
 
 static
