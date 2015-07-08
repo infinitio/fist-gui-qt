@@ -88,8 +88,11 @@ namespace fist
         ELLE_DEBUG("get link: %s", this->_link.link.get());
         auto link = QString::fromStdString(this->_link.link.get());
         if (logged_in)
-          link += "?login_token=" + QUrl::toPercentEncoding(this->_state.web_login_token());
-        return QUrl(link);
+        {
+          link += "?login_token=" + this->_state.web_login_token();
+          link += "&email=" + url_encode(this->_state.me().emails()[0]);
+        }
+        return QUrl(link, QUrl::StrictMode);
       }
       return QUrl();
     }

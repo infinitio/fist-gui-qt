@@ -1,6 +1,8 @@
 #ifndef FIST_GUI_QT_UTILS_CONVERSIONS_HH
 # define FIST_GUI_QT_UTILS_CONVERSIONS_HH
 
+# include <elle/log.hh>
+
 inline
 std::string
 QString_to_utf8_string(QString const& input)
@@ -20,7 +22,7 @@ inline
 QString
 url_encode(QString const& input)
 {
-  return QString(QUrl::toPercentEncoding(input)).replace("+", "%20");
+  return input;
 }
 
 #endif

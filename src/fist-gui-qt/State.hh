@@ -395,11 +395,11 @@ namespace fist
     | Profile |
     `--------*/
   public:
-    QString
-    profile_url(QString const& utm_source) const;
+    QUrl
+    profile_url(QString const& utm_campaign = "") const;
 
     void
-    go_to_online_profile(QString const& utm_source) const;
+    go_to_online_profile(QString const& utm_campaign = "") const;
 
   public:
     bool

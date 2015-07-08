@@ -63,9 +63,7 @@ namespace fist
         vlayout->addWidget(new QLabel(this->_state.me().emails()[0], this));
         vlayout->addWidget(new QLabel("You can have multiple email addresses", this));
         vlayout->addWidget(
-          link(view::manage_email_addresses::text.arg(
-                 url_encode(this->_state.web_login_token()),
-                 url_encode(this->_state.me().emails()[0])),
+          link(view::manage_email_addresses::text.arg(this->_state.profile_url().toString()),
                this));
         layout->addLayout(vlayout, 4, 2, 1, -1);
       }
@@ -76,9 +74,7 @@ namespace fist
         layout->addWidget(button, 5, 2, 1, -1);
       }
       layout->addWidget(
-        link(view::account::text.arg(
-               url_encode(this->_state.web_login_token()),
-               url_encode(this->_state.me().emails()[0])),
+        link(view::account::text.arg(this->_state.profile_url().toString()),
              this));
     }
 

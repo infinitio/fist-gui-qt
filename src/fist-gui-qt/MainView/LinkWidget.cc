@@ -266,7 +266,7 @@ namespace fist
     void
     LinkWidget::_open_link()
     {
-      ELLE_TRACE_SCOPE("%s: open link %s", *this, this->_model.url());
+      ELLE_TRACE_SCOPE("%s: open link %s", *this, this->_model.url(true));
       QDesktopServices::openUrl(this->_model.url(true));
     }
 
