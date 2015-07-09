@@ -30,7 +30,7 @@ TransactionWidget::TransactionWidget(Model const& model):
   _reject_button(new IconButton(":/conversation/reject", this)),
   _accept_reject_area(new QWidget(this)),
   _pause_button(new IconButton(":/conversation/pause", this)),
-  _cancel_button(new IconButton(":/conve rsation/cancel", this)),
+  _cancel_button(new IconButton(":/conversation/cancel", this)),
   _mtime(new QLabel(this)),
   _status(new QLabel(this)),
   _info_area(new QWidget(this)),
