@@ -87,7 +87,8 @@ namespace fist
       ELLE_ATTRIBUTE_R(surface::gap::PeerTransaction, transaction);
     public:
       bool
-      transaction(surface::gap::PeerTransaction const& tr);
+      transaction(surface::gap::PeerTransaction const& tr,
+                  bool notify = true);
     private:
       // Cache the files as a QVector<Qstring>.
       ELLE_ATTRIBUTE_P(QVector<QString>, files, mutable);

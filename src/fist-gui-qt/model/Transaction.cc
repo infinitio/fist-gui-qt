@@ -33,16 +33,17 @@ namespace fist
     Transaction::Transaction(fist::State& state,
                              surface::gap::PeerTransaction const& transaction)
       : Super(state, transaction.id)
-      , _transaction(transaction)
+      , _transaction()
       , _mtime()
       , _pause(false)
     {
       ELLE_DEBUG_SCOPE("%s: construction", *this);
-      this->mtime(transaction.mtime);
+      this->transaction(transaction, false);
     }
 
     bool
-    Transaction::transaction(surface::gap::PeerTransaction const& transaction)
+    Transaction::transaction(surface::gap::PeerTransaction const& transaction,
+                             bool notify)
     {
       surface::gap::PeerTransaction old = this->_transaction;
       this->_transaction = transaction;
@@ -51,7 +52,8 @@ namespace fist
         this->_pause = true;
       else
         this->_pause = false;
-      emit status_updated();
+      if (notify)
+        emit status_updated();
       return old.status != this->status();
     }
 
