@@ -211,6 +211,7 @@ namespace fist
     void
     User::add_email(QString const& email)
     {
+      ELLE_DEBUG_SCOPE("%s: add email %s", *this, email);
       auto lowered = email.toLower();
       if (!this->_emails.contains(lowered))
         this->_emails.push_back(email.toLower());

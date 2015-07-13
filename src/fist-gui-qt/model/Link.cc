@@ -91,7 +91,7 @@ namespace fist
         auto link = QString::fromStdString(this->_link.link.get());
         if (logged_in)
         {
-          link += "?login_token=" + this->_state.web_login_token();
+          link += "?login_token=" + this->_state.web_token();
           link += "&email=" + url_encode(this->_state.me().emails()[0]);
         }
         return QUrl(link, QUrl::StrictMode);

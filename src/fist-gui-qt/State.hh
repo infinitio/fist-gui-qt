@@ -57,8 +57,6 @@ namespace fist
       return this->_state.get();
     }
 
-    QString
-    web_login_token() const;
     ELLE_ATTRIBUTE_R(bool, logged_in);
     ELLE_ATTRIBUTE(QFuture<gap_Status>, login_future);
     ELLE_ATTRIBUTE(QFutureWatcher<gap_Status>, login_watcher);
@@ -174,6 +172,9 @@ namespace fist
     std::vector<model::Device>
     devices() const;
 
+  private:
+    ELLE_ATTRIBUTE_R(QString, web_token);
+
   public:
     // typedef std::vector<model::User const&> Users;
     typedef std::vector<uint32_t> Users;
@@ -223,7 +224,7 @@ namespace fist
           >
         >
       > UserModels;
-    ELLE_ATTRIBUTE_R(UserModels, users);
+    ELLE_ATTRIBUTE_RP(UserModels, users, mutable);
     typedef Users Results;
     typedef QFuture<Results> FutureSearchResult;
     typedef QFutureWatcher<Results> SearchResultWatcher;

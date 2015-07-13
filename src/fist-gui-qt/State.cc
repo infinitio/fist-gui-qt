@@ -60,6 +60,7 @@ namespace fist
     , _ghost_code_watcher()
     , _my_id(gap_null())
     , _device(elle::UUID().repr())
+    , _web_token()
     , _users()
     , _search_future()
     , _search_watcher()
@@ -283,15 +284,6 @@ namespace fist
     emit register_result(this->_register_future.result());
   }
 
-  QString
-  State::web_login_token() const
-  {
-    std::string web_token;
-    if (gap_web_login_token(this->state(), web_token) == gap_ok)
-      return QString_from_utf8_string(web_token);
-    return QString();
-  }
-
   void
   State::on_connection_changed(
     bool status,
@@ -439,6 +431,13 @@ namespace fist
       {
         QApplication::postEvent(this, new ContactJoined(user_id, contact));
       });
+    {
+      std::string web_token;
+      if (gap_web_login_token(this->state(), web_token) == gap_ok)
+      {
+        this->_web_token = QString_from_utf8_string(web_token);
+      }
+    }
     {
       auto* reminder =  new QTimer(this);
       reminder->setSingleShot(false);
@@ -691,6 +690,8 @@ namespace fist
   model::User const&
   State::user(uint32_t user_id) const
   {
+    if (this->_users.get<0>().find(user_id) == this->_users.get<0>().end())
+      this->_users.emplace(const_cast<State&>(*this), user_id);
     return *this->_users.get<0>().find(user_id);
   }
 
@@ -1033,7 +1034,7 @@ namespace fist
   State::profile_url(QString const& utm_campaign) const
   {
     QString _url = QString("https://infinit.io/account?login_token=%1&email=%2").arg(
-      this->web_login_token(),
+      this->web_token(),
       url_encode(this->me().emails()[0]));
     QString url = _url;
     if (!utm_campaign.isEmpty())
