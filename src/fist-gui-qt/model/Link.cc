@@ -87,13 +87,31 @@ namespace fist
     {
       if (this->_link.link)
       {
-        ELLE_DEBUG("get link: %s", this->_link.link.get());
-        auto link = QString::fromStdString(this->_link.link.get());
+        ELLE_DEBUG("get link: %s", this->_link.hash.get());
+        std::string domain(this->_state.account().custom_domain.value());
+        if (domain.empty())
+          domain = "infinit.io";
+        ELLE_DEBUG("domain: %s", domain);
+        auto format = this->_state.account().link_format.value();
+        ELLE_DEBUG("format: %s", format);
+        // Make sure the format have the right number of placeholders.
+        {
+          if (QString::fromStdString(format).count("%s") != 2)
+          {
+            ELLE_WARN("format %s was wrong, fallbacking", format);
+            format = "http://%s/_/%s";
+          }
+        }
+        auto link = QString::fromStdString(
+          elle::sprintf(format,
+                        domain,
+                        this->_link.hash.get()));
         if (logged_in)
         {
           link += "?login_token=" + this->_state.web_token();
           link += "&email=" + url_encode(this->_state.me().emails()[0]);
         }
+        ELLE_DEBUG("final url: %s", link);
         return QUrl(link, QUrl::StrictMode);
       }
       return QUrl();
