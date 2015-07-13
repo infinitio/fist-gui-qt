@@ -28,7 +28,6 @@
 #include <fist-gui-qt/InfinitDock.hh>
 #include <fist-gui-qt/RoundShadowWidget.hh>
 #include <fist-gui-qt/notification/Center.hh>
-#include <fist-gui-qt/notification/UpdateAvailable.hh>
 #include <fist-gui-qt/SendView/Panel.hh>
 #include <fist-gui-qt/Settings/Window.hh>
 #include <fist-gui-qt/TransactionPanel.hh>
@@ -329,8 +328,11 @@ void
 InfinitDock::download_ready()
 {
   ELLE_TRACE_SCOPE("%s: an update is available", *this);
-  fist::notification::center().notify(
-    new fist::notification::UpdateAvailable(this));
+  auto* notif = fist::notification::center().notify(
+    "Infinit",
+    "A new version is available. Click here to update.",
+    8000);
+  connect(notif, SIGNAL(clicked()), this, SIGNAL(update_application()));
   if (this->_update == nullptr)
   {
     this->_menu->addSeparator();

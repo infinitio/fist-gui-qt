@@ -439,8 +439,6 @@ def configure(cxx_toolkit,
 
       "src/fist-gui-qt/notification/IncomingTransaction.cc",
       "src/fist-gui-qt/notification/IncomingTransaction.hh",
-      "src/fist-gui-qt/notification/UpdateAvailable.cc",
-      "src/fist-gui-qt/notification/UpdateAvailable.hh",
 
       # Onboarding.
       "src/fist-gui-qt/onboarding/ImageOnboarder.cc",
