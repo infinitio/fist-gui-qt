@@ -23,7 +23,7 @@ class Updater:
 public:
   Updater(QString const& home,
           QUrl const& version_url =
-            QString("http://hephaestus.infinit.io/windows/32/update.xml"),
+            QString("http://download.infinit.io/windows/32/update.xml"),
           QObject* parent = nullptr);
 
   virtual
