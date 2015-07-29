@@ -560,7 +560,7 @@ namespace fist
     bool res = false;
     if (gap_update_avatar(this->state(),
                           reinterpret_cast<void const*>(bytes.constData()),
-                          bytes .size()) == gap_ok)
+                          bytes.size()) == gap_ok)
     {
       this->_avatar_mutex.lock();
       elle::SafeFinally unlock([&] { this->_avatar_mutex.unlock(); });

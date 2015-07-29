@@ -218,7 +218,7 @@ namespace fist
       }
       // Help.
       {
-        for (auto& link: {this->_help_link, this->_forgot_password_link})
+        for (auto& link: std::array<QLabel*, 2>{{this->_help_link, this->_forgot_password_link}})
         {
           view::links::style(*link);
           link->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
@@ -1097,6 +1097,5 @@ namespace fist
         gap_unset_proxy(this->_state.state(), gap_proxy_https);
       }
     }
-
   }
 }
