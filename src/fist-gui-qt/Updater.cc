@@ -26,7 +26,7 @@
 #include <elle/serialize/extract.hh>
 #include <elle/serialize/insert.hh>
 
-#include <cryptography/oneway.hh>
+#include <cryptography/Oneway.hh>
 
 #include <common/common.hh>
 
@@ -355,8 +355,8 @@ Updater::_check_if_up_to_date(QNetworkReply* reply)
       auto size = elle::os::file::size(file);
       auto const& str = elle::system::read_file_chunk(file, 0, size).string();
       infinit::cryptography::Plain installer_plain(str);
-      auto hash = infinit::cryptography::oneway::hash(
-        installer_plain, infinit::cryptography::oneway::Algorithm::sha1);
+      auto hash = infinit::cryptography::hash(
+        installer_plain, infinit::cryptography::Oneway::sha1);
       std::string updater_hash(elle::format::hexadecimal::encode(hash.buffer()));
       ELLE_DEBUG("updater(%s) vs local(%s)", updater_info["hash"].toStdString(), updater_hash);
       return updater_info["hash"].toStdString() == updater_hash;

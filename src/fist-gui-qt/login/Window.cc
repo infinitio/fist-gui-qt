@@ -1,3 +1,5 @@
+#include <array>
+
 #include <QApplication>
 #include <QBrush>
 #include <QByteArray>
@@ -46,8 +48,8 @@ namespace fist
     {
       static std::string secret_key_password("S4LT%sPasswordSecretKey");
       return infinit::cryptography::SecretKey(
-        infinit::cryptography::cipher::Algorithm::aes256,
-        elle::sprintf(secret_key_password, QString_to_utf8_string(email)));
+        elle::sprintf(secret_key_password, QString_to_utf8_string(email)),
+        infinit::cryptography::Cipher::aes256);
     }
 
     void
