@@ -303,7 +303,7 @@ namespace fist
 
   void
   State::on_contact_joined(uint32_t id,
-                           std::string const&)
+                           std::string const& info)
   {
     ELLE_TRACE_SCOPE("%s: contact %s joined", *this, id);
     auto it = this->_users.get<0>().find(id);
@@ -314,7 +314,8 @@ namespace fist
     }
     notification::center().notify(
       "Infinit",
-      QString("%1 just joined Infinit").arg(it->fullname()),
+      QString("Your contact %1 (%2) joined Infinit").arg(
+        it->fullname(), QString_from_utf8_string(info)),
       2000);
   }
 
