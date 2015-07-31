@@ -131,6 +131,22 @@ namespace fist
     }
 
     bool
+    Transaction::ghost_uploaded() const
+    {
+      return this->status() == gap_transaction_finished &&
+        this->peer().ghost();
+    }
+
+    bool
+    Transaction::can_be_canceled() const
+    {
+      return !this->is_final() ||
+        (this->is_sender() &&
+         ((this->status() == gap_transaction_cloud_buffered) ||
+          (this->ghost_uploaded())));
+    }
+
+    bool
     Transaction::running() const
     {
       return !this->is_final() &&

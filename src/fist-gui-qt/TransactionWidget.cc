@@ -298,10 +298,8 @@ TransactionWidget::apply_update()
 
   if (this->_accept_reject_area->isHidden())
   {
-    if (!this->_transaction.is_final())
-    {
+    if (this->_transaction.can_be_canceled())
       this->_cancel_button->show();
-    }
     this->_status->show();
     this->_mtime->show();
     this->_info_area->show();

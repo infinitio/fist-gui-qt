@@ -64,6 +64,12 @@ namespace fist
       acceptable() const;
 
       bool
+      ghost_uploaded() const;
+
+      bool
+      can_be_canceled() const;
+
+      bool
       running() const;
 
       bool
