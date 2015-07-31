@@ -340,6 +340,8 @@ namespace fist
 
   private slots:
     void
+    _activate_reminders(bool first = false);
+    void
     _transactions_reminder();
   private:
     /*------.

@@ -440,19 +440,44 @@ namespace fist
       }
     }
     {
-      auto* reminder =  new QTimer(this);
-      reminder->setSingleShot(false);
-      connect(reminder, SIGNAL(timeout()), this, SLOT(_transactions_reminder()));
-      reminder->setInterval(1000 * 60 * 60 * 24); // 24 hrs.
-      reminder->start();
-      this->_transactions_reminder();
+      this->_activate_reminders(true);
+    }
+  }
+
+  void
+  State::_activate_reminders(bool first)
+  {
+    auto create_reminder = [this, first] (uint32_t interval,
+                                   bool loop)
+      {
+        auto* reminder =  new QTimer(this);
+        ELLE_DEBUG_SCOPE("%s with interval %s", reminder, interval);
+        reminder->setSingleShot(!loop);
+        connect(reminder, SIGNAL(timeout()), this, SLOT(_transactions_reminder()));
+        if (first)
+          connect(reminder, SIGNAL(timeout()), this, SLOT(_activate_reminders()));
+        reminder->setInterval(interval);
+        reminder->start();
+      };
+    if (first)
+    {
+      auto initial = 10_min; // 10 min after the program starts.
+      create_reminder(initial.total_milliseconds(), false);
+    }
+    else
+    {
+      auto r = 3_h; // 3hrs after.
+      auto daily = 24_h; // Every 24hrs.
+      create_reminder(r.total_milliseconds(), false);
+      create_reminder(daily.total_milliseconds(), true);
     }
   }
 
   void
   State::_transactions_reminder()
   {
-    ELLE_DEBUG_SCOPE("%s: transaction reminder", *this);
+    ELLE_LOG_SCOPE("%s: transaction reminder (caller: %s)",
+                     *this, QObject::sender());
     std::vector<model::Transaction const*> acceptables;
     for (auto const& tr: this->_transactions.get<0>())
     {
