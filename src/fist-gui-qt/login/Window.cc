@@ -20,7 +20,7 @@
 #include <elle/serialize/extract.hh>
 #include <elle/serialize/insert.hh>
 
-#include <cryptography/Exception.hh>
+#include <cryptography/Error.hh>
 #include <cryptography/SecretKey.hh>
 
 #include <surface/gap/gap.hh>
