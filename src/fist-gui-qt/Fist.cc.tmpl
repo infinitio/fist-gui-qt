@@ -449,9 +449,6 @@ Fist::operator ()()
     {
       SIGINT,
       SIGTERM,
-#ifndef INFINIT_WINDOWS
-      SIGKILL,
-#endif
     }, try_to_quit);
   // We have to create a state here because crash report need a
   // state to be ran.
