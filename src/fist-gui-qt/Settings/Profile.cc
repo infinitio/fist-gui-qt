@@ -1,10 +1,11 @@
+#include <QFileDialog>
+#include <QGridLayout>
+
 #include <fist-gui-qt/Settings.hh>
 #include <fist-gui-qt/Settings/Profile.hh>
 #include <fist-gui-qt/Settings/utils.hh>
 #include <fist-gui-qt/State.hh>
-
-#include <QFileDialog>
-#include <QGridLayout>
+#include <fist-gui-qt/utils/FireAndForget.hh>
 
 namespace fist
 {

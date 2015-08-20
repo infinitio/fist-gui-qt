@@ -8,6 +8,7 @@
 # include <QThread>
 
 #include <fist-gui-qt/Settings/ui.hh>
+#include <fist-gui-qt/utils.hh>
 
 namespace fist
 {
@@ -50,31 +51,6 @@ namespace fist
 
     QLabel*
     link(QString text, QWidget* parent);
-
-    class FireAndForget
-      : public QThread
-    {
-    public:
-      typedef std::function<void ()> Action;
-    public:
-      FireAndForget(Action const& action,
-                    QObject* parent)
-        : QThread(parent)
-        , _action(action)
-      {
-        connect(this, SIGNAL(finished()), SLOT(deleteLater()));
-        this->start();
-      }
-
-    private:
-      void
-      run() override
-      {
-        this->_action();
-      }
-    private:
-      Action _action;
-    };
   }
 }
 

@@ -452,6 +452,10 @@ def configure(cxx_toolkit,
       "src/fist-gui-qt/proxy/Panel.cc",
       "src/fist-gui-qt/proxy/Panel.hh",
 
+      # Utils.
+      "src/fist-gui-qt/utils/FireAndForget.cc",
+      "src/fist-gui-qt/utils/FireAndForget.hh",
+
       # Settings.
       "src/fist-gui-qt/Settings/Window.cc",
       "src/fist-gui-qt/Settings/Window.hh",

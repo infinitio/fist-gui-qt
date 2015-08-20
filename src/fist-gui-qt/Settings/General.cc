@@ -11,6 +11,7 @@
 #include <fist-gui-qt/Settings/utils.hh>
 #include <fist-gui-qt/State.hh>
 #include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/utils/FireAndForget.hh>
 
 ELLE_LOG_COMPONENT("infinit.FIST.Settings.General");
 
