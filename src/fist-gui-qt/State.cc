@@ -1041,10 +1041,9 @@ namespace fist
     auto old_plan = this->_account.plan.value();
     auto new_plan = account.plan.value();
     this->_account = account;
-    ELLE_DEBUG_SCOPE("plan updated: %s -> %s (notify: %s) (quota: %s/%s)",
+    ELLE_DEBUG_SCOPE("plan updated: %s -> %s (notify: %s) (%s)",
                      old_plan, new_plan, this->_logged_in,
-                     account.link_size_used.value(),
-                     account.link_size_quota.value());
+                     account);
     if (this->_logged_in && new_plan != old_plan)
     {
       notification::center().notify(
@@ -1052,8 +1051,8 @@ namespace fist
         QString("Your plan has been %1graded to %2").arg(
           QString(new_plan > old_plan ? "up": "down"),
           QString_from_utf8_string(elle::sprintf("%s", new_plan))));
-      emit account_updated();
     }
+    emit account_updated();
   }
 
   QUrl

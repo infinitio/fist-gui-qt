@@ -7,7 +7,9 @@
 class Footer:
   public QWidget
 {
+protected:
   typedef QWidget Super;
+
 public:
   Footer(QWidget* parent = nullptr);
   virtual ~Footer() = default;

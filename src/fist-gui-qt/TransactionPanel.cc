@@ -8,7 +8,7 @@
 
 MainPanel::MainPanel(fist::State& state,
                      QWidget* parent)
-  : Panel(new TransactionFooter, parent)
+  : Panel(new TransactionFooter(state), parent)
   , _state(state)
   , _tabs(new fist::gui::TabWidget(this))
   , _transactions(new fist::mainview::Transactions(state, this))
