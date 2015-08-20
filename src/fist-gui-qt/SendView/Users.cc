@@ -32,7 +32,6 @@ namespace std
   hash<fist::sendview::Recipient>::operator()(
     fist::sendview::Recipient const& recipient) const
   {
-    // XXX: The id is definitely not unique.
     auto id = recipient.id();
     if (id == gap_null())
       id = recipient.to_email()
