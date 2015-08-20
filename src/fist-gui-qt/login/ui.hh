@@ -174,7 +174,7 @@ namespace fist
           static
           QString const
           text = ::view::links::rich.arg(
-            "https://infinit.io/faq?utm_source=app&utm_medium=windows&utm_campaign=help",
+            "http://help.infinit.io?utm_source=app&utm_medium=windows&utm_campaign=help",
             "Help!");
         }
 
