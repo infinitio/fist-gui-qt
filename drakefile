@@ -470,6 +470,11 @@ def configure(cxx_toolkit,
       "src/fist-gui-qt/Settings/ScreenShot.cc",
       "src/fist-gui-qt/Settings/ScreenShot.hh",
 
+      # Containers.
+      "src/fist-gui-qt/containers/Updatable.hh",
+      "src/fist-gui-qt/containers/Updatable.cc",
+      "src/fist-gui-qt/containers/Set.hh",
+
       # Events.
       "src/fist-gui-qt/CustomEvents/ContactJoined.hh",
       "src/fist-gui-qt/CustomEvents/ContactJoined.cc",
