@@ -24,8 +24,8 @@
 #include <fist-gui-qt/globals.hh>
 #include <fist-gui-qt/regexp.hh>
 #include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/utils/FireAndForget.hh>
 
-#include <fist-gui-qt/popup/NoMoreStorage.hh>
 /*-------------.
 | Construction |
 `-------------*/
@@ -66,7 +66,6 @@ namespace fist
             this->_message,
             this->_file_adder,
           }))
-      , _alert(new popup::TooBig(this->_state, this))
     {
       // File adder.
       connect(this->_file_adder, SIGNAL(clicked()),
@@ -94,7 +93,8 @@ namespace fist
       this->setMaximumHeight(500);
       connect(this, SIGNAL(sent()), SLOT(clear()));
 
-      this->_alert->hide();
+      connect(this, SIGNAL(send_to_self_limit_reached(bool)),
+              &this->_state, SLOT(send_to_self_limit_alert(bool)));
     }
 
     void
@@ -174,10 +174,24 @@ namespace fist
       auto message = QString_to_utf8_string(this->_message->text());
       ELLE_DEBUG("message: %s", message);
 
+      std::vector<std::function<void ()>> actions;
+      elle::SafeFinally perform_actions(
+        [&]
+        {
+          for (auto const& action: actions)
+          {
+            new fist::FireAndForget(action, this);
+          }
+        });
       if (this->_tabs->is_active_tab(*this->_link_tab))
       {
         ELLE_TRACE("generate link")
-          gap_create_link_transaction(this->_state.state(), files, message.c_str(), screenshot);
+          actions.emplace_back(
+            [this, files, message, screenshot]
+            {
+              gap_create_link_transaction(
+                this->_state.state(), files, message.c_str(), screenshot);
+            });
       }
       else
       {
@@ -186,35 +200,72 @@ namespace fist
         auto recipients = this->_users->recipients();
         for (auto const& recipient: recipients)
         {
-          bool over_limit = size >= (1lu << 31) &&
-            this->_state.account().plan.value() ==
-            infinit::oracles::meta::AccountPlanType::AccountPlanType_Basic;
+          bool send_to_self = [&]
+            {
+              if (recipient.to_email())
+              {
+                return this->_state.me().emails().contains(
+                          recipient.email().get());
+              }
+              if (recipient.to_device())
+              {
+                return true;
+              }
+              return recipient.id() == this->_state.my_id();
+            }();
+          if (send_to_self)
+          {
+            auto const& send_to_self =
+              this->_state.account().quotas.value().send_to_self;
+            if (send_to_self.quota)
+            {
+              if (send_to_self.used >= send_to_self.quota.get())
+              {
+                perform_actions.abort();
+                emit send_to_self_limit_reached(true);
+                break;
+              }
+            }
+          }
           if (recipient.to_email())
           {
-            if (over_limit)
-              this->_alert->show();
-            else
-              gap_send_files(
-                this->_state.state(), QString_to_utf8_string(recipient.email().get()), files, message);
+            actions.emplace_back(
+              [this, recipient, files, message]
+              {
+                gap_send_files(
+                  this->_state.state(),
+                  QString_to_utf8_string(recipient.email().get()), files,
+                  message);
+              });
           }
           else if (recipient.to_device())
           {
-            gap_send_files(
-              this->_state.state(), recipient.id(), files, message, QString_to_utf8_string(recipient.device().get().id()));
+            actions.emplace_back(
+              [this, recipient, files, message]
+              {
+                gap_send_files(
+                  this->_state.state(), recipient.id(), files, message,
+                  QString_to_utf8_string(recipient.device().get().id()));
+              });
           }
           else
           {
-            auto const& user = this->_state.user(recipient.id());
-            if (user.ghost() && over_limit)
-              this->_alert->show();
-            else
-              gap_send_files(
-                this->_state.state(), user.id(), files, message);
+            actions.emplace_back(
+              [this, recipient, files, message]
+              {
+                gap_send_files(
+                  this->_state.state(), this->_state.user(recipient.id()).id(),
+                  files, message);
+              });
+
           }
         }
       }
-      ELLE_DEBUG("done")
-        emit sent();
+      if (!perform_actions.aborted())
+      {
+        ELLE_DEBUG("done")
+          emit sent();
+      }
     }
 
     void

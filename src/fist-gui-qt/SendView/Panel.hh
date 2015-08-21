@@ -120,6 +120,9 @@ namespace fist
       void
       canceled();
 
+      void
+      send_to_self_limit_reached(bool preemptively);
+
     /*--------------.
     | Drag and drop |
     `--------------*/
@@ -141,7 +144,6 @@ namespace fist
       ELLE_ATTRIBUTE_R(Files*, file_adder);
       ELLE_ATTRIBUTE(gui::Tab*, transaction_tab);
       ELLE_ATTRIBUTE(gui::Tab*, link_tab);
-      ELLE_ATTRIBUTE(std::unique_ptr<popup::TooBig>, alert);
 
     protected:
       void
