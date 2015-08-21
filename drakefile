@@ -219,7 +219,7 @@ def configure(cxx_toolkit,
 
   qxt_version = drake.Version(0, 6, 2)
   qxt_basename = 'libqxt-libqxt-dadc327c2a6a'
-  qxt_url = 'http://dev.libqxt.org/libqxt/get/v%s.tar.bz2' % qxt_version
+  qxt_url = 'https://bitbucket.org/libqxt/libqxt/get/v%s.tar.bz2' % qxt_version
   qxt_tarball = \
     drake.node('qxt/%s.tar.bz2' % qxt_basename)
   qxt_configure = \
@@ -236,7 +236,7 @@ def configure(cxx_toolkit,
   drake.HTTPDownload(
     qxt_url,
     qxt_tarball,
-    # fingerprint = '5b151e3c83b31f5931b4a9fc01635bfd',
+    fingerprint = 'a859a1757dc0aaf010df1a0783e3e001',
   )
   drake.TarballExtractor(
     qxt_tarball,
