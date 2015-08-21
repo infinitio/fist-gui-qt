@@ -218,7 +218,11 @@ namespace fist
       }
       // Help.
       {
-        for (auto& link: std::array<QLabel*, 2>{{this->_help_link, this->_forgot_password_link}})
+        std::vector<QLabel*> links{
+          {this->_help_link, this->_forgot_password_link}};
+        ELLE_ASSERT_EQ(links.size(), 2);
+        ELLE_ASSERT_NEQ(links[0], links[1]);
+        for (auto& link: links)
         {
           view::links::style(*link);
           link->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
