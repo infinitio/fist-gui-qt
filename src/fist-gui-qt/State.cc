@@ -31,6 +31,7 @@
 #include <fist-gui-qt/model/User.hh>
 #include <fist-gui-qt/regexp.hh>
 #include <fist-gui-qt/utils.hh>
+#include <fist-gui-qt/utils/FireAndForget.hh>
 
 #include <fist-gui-qt/CustomEvents/ContactJoined.hh>
 #include <fist-gui-qt/CustomEvents/AccountUpdated.hh>
@@ -903,7 +904,11 @@ namespace fist
     {
       this->on_peer_transaction_updated(
         this->_force_transaction_status(id, gap_transaction_connecting));
-      gap_accept_transaction(this->state(), id);
+      new FireAndForget(
+        [this, id]
+        {
+          gap_accept_transaction(this->state(), id);
+        }, this);
     }
   }
 
@@ -913,7 +918,11 @@ namespace fist
     ELLE_ASSERT(id != gap_null());
     this->on_peer_transaction_updated(
       this->_force_transaction_status(id, gap_transaction_rejected));
-    gap_reject_transaction(this->state(), id);
+    new FireAndForget(
+      [this, id]
+      {
+        gap_reject_transaction(this->state(), id);
+      }, this);
   }
 
   void
@@ -922,7 +931,11 @@ namespace fist
     ELLE_ASSERT(id != gap_null());
     this->on_peer_transaction_updated(
       this->_force_transaction_status(id, gap_transaction_canceled));
-    gap_cancel_transaction(this->state(), id);
+    new FireAndForget(
+      [this, id]
+      {
+        gap_cancel_transaction(this->state(), id);
+      }, this);
   }
 
   void
@@ -938,8 +951,12 @@ namespace fist
   {
     ELLE_ASSERT(id != gap_null());
     this->on_link_updated(
-      this->_force_link_status(id, gap_transaction_deleted));;
-    gap_delete_transaction(this->state(), id);
+      this->_force_link_status(id, gap_transaction_deleted));
+    new FireAndForget(
+      [this, id]
+      {
+        gap_delete_transaction(this->state(), id);
+      }, this);
   }
 
   void
