@@ -170,6 +170,7 @@ namespace fist
       }
       else
       {
+        ELLE_TRACE("delete link %s", this->_model);
         emit transaction_deleted(this->_model.id());
       }
     }
