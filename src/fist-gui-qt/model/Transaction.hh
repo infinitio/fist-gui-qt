@@ -118,6 +118,11 @@ namespace fist
       void
       peer_changed() const;
 
+      void
+      send_to_self_limit_reached();
+
+      void
+      ghost_download_limit_reached(uint32_t);
 
     private:
   /*----------.

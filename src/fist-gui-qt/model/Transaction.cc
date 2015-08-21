@@ -8,6 +8,8 @@
 #include <QBuffer>
 #include <QImageReader>
 
+# include <surface/gap/enums.hh>
+
 ELLE_LOG_COMPONENT("infinit.FIST.model.Transaction");
 
 namespace fist
@@ -38,6 +40,11 @@ namespace fist
       , _pause(false)
     {
       ELLE_DEBUG_SCOPE("%s: construction", *this);
+      connect(this, SIGNAL(send_to_self_limit_reached()),
+              &this->_state, SLOT(send_to_self_limit_alert()));
+      connect(this, SIGNAL(ghost_download_limit_reached(uint32_t)),
+              &this->_state, SLOT(ghost_download_limit_alert(uint32_t)));
+
       this->transaction(transaction, false);
     }
 
@@ -47,6 +54,23 @@ namespace fist
     {
       surface::gap::PeerTransaction old = this->_transaction;
       this->_transaction = transaction;
+      bool new_status_info = !old.status_info &&
+        this->_transaction.status_info;
+      if (new_status_info)
+      {
+        switch (this->_transaction.status_info.get())
+        {
+          case gap_send_to_self_limit_reached:
+            emit send_to_self_limit_reached();
+            break;
+          case gap_ghost_download_limit_reached:
+            emit ghost_download_limit_reached(this->peer().id());
+            break;
+          default:
+            break;
+        }
+        ELLE_LOG("status: %s", this->_transaction.status_info.get());
+      }
       this->mtime(this->_transaction.mtime);
       if (this->status() == gap_transaction_paused)
         this->_pause = true;
