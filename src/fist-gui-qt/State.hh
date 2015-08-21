@@ -25,6 +25,7 @@
 
 # include <fist-gui-qt/model/Link.hh>
 # include <fist-gui-qt/model/User.hh>
+# include <fist-gui-qt/containers/Set.hh>
 # include <fist-gui-qt/model/Transaction.hh>
 
 # include <surface/gap/gap.hh>
@@ -280,7 +281,7 @@ namespace fist
       model::Transaction,
       boost::multi_index::indexed_by<
         boost::multi_index::ordered_unique<
-          boost::multi_index::const_mem_fun<model::Model, uint32_t, &model::Model::id>
+          boost::multi_index::const_mem_fun<model::Model, model::Model::ID, &model::Model::id>
           >,
         boost::multi_index::ordered_non_unique<
           boost::multi_index::const_mem_fun<model::Transaction, QDateTime const&, &model::Transaction::mtime>
@@ -288,8 +289,10 @@ namespace fist
         >
       > Transactions;
     ELLE_ATTRIBUTE_R(Transactions, transactions);
-    ELLE_ATTRIBUTE_Rw(size_t, acceptable_transactions);
-    ELLE_ATTRIBUTE_Rw(size_t, running_transactions);
+    ELLE_ATTRIBUTE_RX(Set<model::Model::ID>, acceptable_transactions);
+    ELLE_ATTRIBUTE_RX(Set<model::Model::ID>, transferring_transactions);
+
+
     // Some method are static in order to provide a prototype matching  callback
     // the the C api.
     // A global instance of state is accessible in order to allow the bouncing
@@ -302,9 +305,6 @@ namespace fist
 
     model::Transaction const&
     transaction(uint32_t id);
-
-    void
-    _compute_active_transactions();
 
   private:
     surface::gap::PeerTransaction
@@ -333,10 +333,6 @@ namespace fist
     new_transaction(uint32_t id);
     void
     transaction_updated(uint32_t id);
-    void
-    acceptable_transactions_changed(size_t);
-    void
-    running_transactions_changed(size_t);
 
   private slots:
     void

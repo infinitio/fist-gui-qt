@@ -76,6 +76,14 @@ namespace fist
         this->_pause = true;
       else
         this->_pause = false;
+      if (this->transferring())
+        this->_state.transferring_transactions().insert(this->id());
+      else
+        this->_state.transferring_transactions().erase(this->id());
+      if (this->acceptable())
+        this->_state.acceptable_transactions().insert(this->id());
+      else
+        this->_state.acceptable_transactions().erase(this->id());
       if (notify)
         emit status_updated();
       return old.status != this->status();
@@ -175,6 +183,12 @@ namespace fist
     {
       return !this->is_final() &&
         this->status() != gap_transaction_waiting_accept;
+    }
+
+    bool
+    Transaction::transferring() const
+    {
+      return this->status() == gap_transaction_transferring;
     }
 
     bool

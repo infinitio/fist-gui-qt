@@ -25,10 +25,10 @@ MainPanel::MainPanel(fist::State& state,
   connect(&this->_state, SIGNAL(link_updated(uint32_t)),
           this->_links, SLOT(on_link_updated(uint32_t)));
   connect(
-    &this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
+    &(this->_state.acceptable_transactions()), SIGNAL(size_changed(size_t)),
     this->_transactions_tab, SLOT(on_notification_count_changed(size_t)));
   this->_transactions_tab->on_notification_count_changed(
-    this->_state.acceptable_transactions());
+    this->_state.acceptable_transactions().size());
   connect(this->_transactions_tab, SIGNAL(activated()), this, SLOT(p2p_mode()));
   connect(&this->_state, SIGNAL(active_links_changed(size_t)),
           this->_links_tab, SLOT(on_notification_count_changed(size_t)));

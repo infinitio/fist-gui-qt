@@ -166,9 +166,11 @@ InfinitDock::InfinitDock(fist::State& state,
           this, SLOT(send_feedback()));
   connect(this->_report_a_problem, SIGNAL(triggered()),
           this, SLOT(report_a_problem()));
-  connect(&this->_state, SIGNAL(acceptable_transactions_changed(size_t)),
+  connect(&(this->_state.acceptable_transactions()),
+          SIGNAL(size_changed(size_t)),
           this, SLOT(_active_transactions_changed(size_t)));
-  connect(&this->_state, SIGNAL(running_transactions_changed(size_t)),
+  connect(&(this->_state.transferring_transactions()),
+          SIGNAL(size_changed(size_t)),
           this, SLOT(_active_transactions_changed(size_t)));
 
   this->_active_transactions_changed(0);
@@ -291,19 +293,19 @@ InfinitDock::_systray_message_clicked()
 void
 InfinitDock::_active_transactions_changed(size_t)
 {
-  bool acceptable = (this->_state.acceptable_transactions() != 0);
-  bool running = (this->_state.running_transactions() != 0);
+  bool acceptable = (this->_state.acceptable_transactions().size() != 0);
+  bool transferring = (this->_state.transferring_transactions().size() != 0);
 
   if (acceptable)
   {
-    if (running)
+    if (transferring)
       this->_systray.set_icon(fist::icon::transferring_waiting_for_decistion);
     else
       this->_systray.set_icon(fist::icon::waiting_for_decistion);
   }
   else
   {
-    if (running)
+    if (transferring)
       this->_systray.set_icon(fist::icon::transferring_waiting_for_decistion);
     else
       this->_systray.set_icon(fist::icon::normal);

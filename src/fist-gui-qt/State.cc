@@ -66,8 +66,8 @@ namespace fist
     , _search_watcher()
     , _last_results()
     , _transactions()
-    , _acceptable_transactions(0)
-    , _running_transactions(0)
+    , _acceptable_transactions()
+    , _transferring_transactions()
     , _links()
     , _active_links()
     , _poll_timer(new QTimer(this))
@@ -405,7 +405,6 @@ namespace fist
         if (it != this->_users.get<0>().end())
           this->_users.modify(it, UpdateTime(tr));
       }
-      this->_compute_active_transactions();
     }
 
     ELLE_TRACE("load links")
@@ -478,20 +477,17 @@ namespace fist
   {
     ELLE_LOG_SCOPE("%s: transaction reminder (caller: %s)",
                      *this, QObject::sender());
-    std::vector<model::Transaction const*> acceptables;
-    for (auto const& tr: this->_transactions.get<0>())
-    {
-      if (tr.acceptable())
-        acceptables.push_back(&tr);
-    }
-    if (acceptables.size() > 1)
+    if (this->_acceptable_transactions.size() > 1)
       notification::center().notify(
         "Infinit",
-        QString("You have %1 transactions waiting for you").arg(acceptables.size()),
+        QString("You have %1 transactions waiting for you").arg(this->_acceptable_transactions.size()),
         5000);
-    else if (acceptables.size() == 1)
+    else if (this->_acceptable_transactions.size() == 1)
     {
-      auto* notif = new fist::notification::IncomingTransaction(**acceptables.begin(), nullptr);
+      auto it = this->_transactions.get<0>().find(
+        *this->_acceptable_transactions.cbegin());
+      ELLE_ASSERT(it != this->_transactions.get<0>().end());
+      auto* notif = new fist::notification::IncomingTransaction(*it, nullptr);
       connect(notif, SIGNAL(accept_transaction(uint32_t)),
               this, SLOT(on_transaction_accepted(uint32_t)));
       fist::notification::center().notify(notif);
@@ -823,7 +819,6 @@ namespace fist
       if (peer != this->_users.get<0>().end())
         this->_users.modify(peer, UpdateTime(tr));
     }
-    this->_compute_active_transactions();
   }
 
   void
@@ -874,45 +869,7 @@ namespace fist
       this->_transactions.emplace(*this, id);
       emit new_transaction(id);
     }
-
     return *this->_transactions.get<0>().find(id);
-  }
-
-  // XXX: Use a per transaction boolean which says if it's active or not.
-
-  void
-  State::_compute_active_transactions()
-  {
-    size_t acceptable = 0, running = 0;
-    for (auto const& transaction: this->_transactions.get<0>())
-    {
-      if (transaction.acceptable())
-        ++acceptable;
-      if (transaction.running())
-        ++running;
-    }
-    this->acceptable_transactions(acceptable);
-    this->running_transactions(running);
-  }
-
-  void
-  State::acceptable_transactions(size_t acceptable)
-  {
-    if (this->_acceptable_transactions != acceptable)
-    {
-      this->_acceptable_transactions = acceptable;
-      emit acceptable_transactions_changed(this->_acceptable_transactions);
-    }
-  }
-
-  void
-  State::running_transactions(size_t running)
-  {
-    if (this->_running_transactions != running)
-    {
-      this->_running_transactions = running;
-      emit running_transactions_changed(this->_running_transactions);
-    }
   }
 
   surface::gap::PeerTransaction

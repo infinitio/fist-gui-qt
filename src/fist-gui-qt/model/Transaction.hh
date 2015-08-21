@@ -73,6 +73,9 @@ namespace fist
       running() const;
 
       bool
+      transferring() const;
+
+      bool
       is_final() const;
 
       float
