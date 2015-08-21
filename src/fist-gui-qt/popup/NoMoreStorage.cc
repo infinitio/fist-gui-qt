@@ -23,7 +23,9 @@ namespace fist
     UpgradePlan::UpgradePlan(QString const& title,
                              QString const& text,
                              fist::State const& state,
-                             QWidget* parent)
+                             QWidget* parent,
+                             QString const& cancel_button_text,
+                             bool show_invite)
       : QMainWindow(parent, Qt::WindowCloseButtonHint | Qt::Dialog)
       , _state(state)
     {
@@ -33,7 +35,7 @@ namespace fist
         this->setPalette(palette);
         this->setAutoFillBackground(true);
       }
-      this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+      this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
       auto* body = new QWidget(this);
       auto* layout = new QGridLayout(body);
       layout->setContentsMargins(45, 45, 45, 20);
@@ -41,20 +43,24 @@ namespace fist
       {
         auto* hlayout = new QHBoxLayout;
         hlayout->setContentsMargins(0, 0, 0, 10);
+        // hlayout->setSizeConstraint(QLayout::SetMinimumSize);
         {
           QLabel* thermometer = new QLabel(this);
+          QVBoxLayout* layout = new QVBoxLayout;
+          layout->setContentsMargins(0, 10, 0, 10);
           thermometer->setPixmap(
             QPixmap(QString(":/monetisation/thermometer")));
-          hlayout->addWidget(thermometer);
+          layout->addWidget(thermometer);
+          hlayout->addLayout(layout);
         }
         {
           hlayout->addSpacing(35);
         }
         {
-          auto* label = new QLabel(this);
-          label->setText(title);
+          auto* label = new QLabel(title, this);
           label->setWordWrap(true);
           view::payment::title::style(*label);
+          label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
           hlayout->addWidget(label, 1);
         }
         layout->addLayout(hlayout, 0, 0, 1, -1);
@@ -78,18 +84,29 @@ namespace fist
       layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed), 3, 0, -1, 1);
       {
         auto* cancel = new QPushButton(
-          view::payment::button::cancel::text, this);
+          cancel_button_text.isEmpty()
+          ? view::payment::button::cancel::text
+          : cancel_button_text, this);
         cancel->setCursor(QCursor(Qt::PointingHandCursor));
         cancel->setStyleSheet(view::payment::button::stylesheet.arg(
                                 "rgb(158, 158, 158)", "rgb(133, 133, 133)"));
         connect(cancel, SIGNAL(released()), this, SLOT(hide()));
-        auto* hlayout = new QHBoxLayout;
-        hlayout->setContentsMargins(0, 0, 0, 0);
-        hlayout->addWidget(cancel);
-        hlayout->addStretch();
-        layout->addLayout(hlayout, 4, 0);
+        layout->addWidget(cancel, 4, 0, Qt::AlignLeft);
       }
       {
+        int index = 0;
+        if (show_invite)
+        {
+          auto* invite = new QPushButton(
+            view::payment::button::invite::text, this);
+          invite->setCursor(QCursor(Qt::PointingHandCursor));
+          invite->setStyleSheet(view::payment::button::stylesheet.arg(
+                                  "rgb(242, 94, 90)", "rgb(231, 85, 81)"));
+          connect(invite, SIGNAL(released()),
+                  this, SLOT(_go_to_website()));
+          layout->addWidget(invite, 4, ++index, Qt::AlignRight);
+        }
+
         auto* upgrade = new QPushButton(
           view::payment::button::upgrade::text, this);
         upgrade->setCursor(QCursor(Qt::PointingHandCursor));
@@ -97,11 +114,8 @@ namespace fist
                                  "rgb(242, 94, 90)", "rgb(231, 85, 81)"));
         connect(upgrade, SIGNAL(released()),
                 this, SLOT(_go_to_website()));
-        auto* hlayout = new QHBoxLayout;
-        hlayout->setContentsMargins(0, 0, 0, 0);
-        hlayout->addStretch();
-        hlayout->addWidget(upgrade);
-        layout->addLayout(hlayout, 4, 1);
+
+        layout->addWidget(upgrade, 4, ++index, Qt::AlignRight);
         this->_upgrade = upgrade;
       }
       this->setCentralWidget(body);
@@ -146,11 +160,12 @@ namespace fist
 
     NoMoreStorage::NoMoreStorage(fist::State& state,
                                  QWidget* parent)
-      : UpgradePlan(view::payment::storage::text.arg(
-                      readable_size(state.account().link_size_quota.value())),
-                    view::payment::storage::body::text,
-                    state,
-                    parent)
+      : UpgradePlan(
+        view::payment::storage::text.arg(
+          readable_size(state.account().quotas.value().links.quota.get())),
+        view::payment::storage::body::text,
+        state,
+        parent)
     {
     }
 
@@ -161,19 +176,38 @@ namespace fist
       return campaign;
     }
 
-    TooBig::TooBig(fist::State& state,
-                   QWidget* parent)
-      : UpgradePlan(view::payment::too_big::text,
-                    view::payment::too_big::body::text,
+    SendToSelfQuotaExceeded::SendToSelfQuotaExceeded(fist::State& state,
+                                                     QWidget* parent)
+      : UpgradePlan(view::payment::send_to_self::text,
+                    view::payment::send_to_self::body::text,
                     state,
                     parent)
     {
     }
 
     QString const&
-    TooBig::_campaign() const
+    SendToSelfQuotaExceeded::_campaign() const
     {
-      static QString campaign("quota_send");
+      static QString campaign("quota_send_to_self");
+      return campaign;
+    }
+
+    GhostDownloadsLimit::GhostDownloadsLimit(fist::State& state,
+                                             QString const& recipient,
+                                             QWidget* parent)
+      : UpgradePlan(view::payment::ghost_downloads::text.arg(recipient),
+                    view::payment::ghost_downloads::body::text,
+                    state,
+                    parent,
+                    "CLOSE",
+                    false)
+    {
+    }
+
+    QString const&
+    GhostDownloadsLimit::_campaign() const
+    {
+      static QString campaign("quota_ghost_downloads_limit");
       return campaign;
     }
   };

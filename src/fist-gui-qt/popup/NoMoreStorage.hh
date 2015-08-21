@@ -20,7 +20,9 @@ namespace fist
       UpgradePlan(QString const& title,
                   QString const& text,
                   fist::State const& state,
-                  QWidget* parent);
+                  QWidget* parent = nullptr,
+                  QString const& cancel_button_test = "",
+                  bool show_invite = true);
 
     private slots:
       void
@@ -56,17 +58,31 @@ namespace fist
       _campaign() const override;
     };
 
-    class TooBig
+   class SendToSelfQuotaExceeded
       : public UpgradePlan
     {
     public:
-      TooBig(fist::State& state,
-             QWidget* parent);
+      SendToSelfQuotaExceeded(fist::State& state,
+                              QWidget* parent);
 
     protected:
       QString const&
       _campaign() const override;
     };
+
+   class GhostDownloadsLimit
+      : public UpgradePlan
+    {
+    public:
+      GhostDownloadsLimit(fist::State& state,
+                          QString const& recipient,
+                          QWidget* parent);
+
+    protected:
+      QString const&
+      _campaign() const override;
+    };
+
   }
 }
 #endif

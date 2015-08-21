@@ -39,31 +39,60 @@ namespace fist
           {
             static
             QString const
+            url("https://infinit.io/account/referral"
+                "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan");
+
+            static
+            QString const
+            text = QString(
+              "You can <a style=\"text-decoration: none; color: #2BBEBD;\" href=\"%1\">"
+              "upgrade your plan or invite friends</a> to remove this limitation.")
+              .arg(url);
+          }
+        }
+
+        namespace send_to_self
+        {
+          static
+          QString const
+          text("You have reached your monthly limit for sending files to your "
+               "own devices.");
+
+          namespace body
+          {
+            static
+            QString const
+            url("https://infinit.io/account/referral"
+                "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan");
+
+            static
+            QString const
+            text = QString(
+              "You can <a style=\"text-decoration: none; color: #2BBEBD;\" href=\"%1\">"
+              "upgrade your plan or invite friends</a> to remove this limitation.")
+              .arg(url);
+          }
+        }
+
+        namespace ghost_downloads
+        {
+          static
+          QString const
+          text("%1 will need to install Infinit to get the files you sent.");
+
+          namespace body
+          {
+            static
+            QString const
             url("https://infinit.io/account"
                 "?utm_source=app&utm_medium=windows&utm_campaign=upgrade_plan");
 
             static
             QString const
             text = QString(
-              "You can either <a style=\"text-decoration: none; color: #2BBEBD;\""
-              "href=\"%1\">"
-              "upgrade to a premium plan</a> or remove old links to free up space.")
+              "You can <a style=\"text-decoration: none; color: #2BBEBD;\""
+              "href=\"%1\">upgrade</a> your plan to remove this limitation.")
               .arg(url);
-          }
-        }
-
-        namespace too_big
-        {
-          static
-          QString const
-          text("Upgrade to send files over 2GB to an email address.");
-
-          namespace body
-          {
-            static
-            QString const
-            text("You can upgrade to a better plan or ask your friend to create"
-                 " an Infinit account to get unlimited size transfers.");
           }
         }
 
@@ -104,6 +133,13 @@ namespace fist
             static
             QString const
             text("CANCEL");
+          }
+
+          namespace invite
+          {
+            static
+            QString const
+            text("INVITE FRIENDS");
           }
 
           namespace upgrade
