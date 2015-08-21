@@ -292,6 +292,17 @@ namespace fist
     ELLE_ATTRIBUTE_RX(Set<model::Model::ID>, acceptable_transactions);
     ELLE_ATTRIBUTE_RX(Set<model::Model::ID>, transferring_transactions);
 
+    ELLE_ATTRIBUTE(std::unique_ptr<popup::SendToSelfQuotaExceeded>,
+                   send_to_self_alert);
+    ELLE_ATTRIBUTE(std::unique_ptr<popup::GhostDownloadsLimit>,
+                   ghost_downloads_alert);
+
+  private slots:
+    void
+    send_to_self_limit_alert(bool preemptively = false);
+
+    void
+    ghost_download_limit_alert(uint32_t user_id);
 
     // Some method are static in order to provide a prototype matching  callback
     // the the C api.

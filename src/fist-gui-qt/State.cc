@@ -36,6 +36,7 @@
 #include <fist-gui-qt/CustomEvents/ContactJoined.hh>
 #include <fist-gui-qt/CustomEvents/AccountUpdated.hh>
 #include <fist-gui-qt/CustomEvents/Events.hh>
+#include <fist-gui-qt/popup/NoMoreStorage.hh>
 
 # include <surface/gap/gap.hh>
 
@@ -69,6 +70,8 @@ namespace fist
     , _transactions()
     , _acceptable_transactions()
     , _transferring_transactions()
+    , _send_to_self_alert(new popup::SendToSelfQuotaExceeded(*this, nullptr))
+    , _ghost_downloads_alert()
     , _links()
     , _active_links()
     , _poll_timer(new QTimer(this))
@@ -202,7 +205,6 @@ namespace fist
         return device;
     elle::unreachable();
   }
-
 
   void
   State::login(std::string const& email,
@@ -496,7 +498,7 @@ namespace fist
   }
 
   void
- State::send_metric(UIMetricsType metric,
+  State::send_metric(UIMetricsType metric,
                      std::unordered_map<std::string, std::string> const& add)
   {
     gap_send_metric(this->state(), metric, add);
@@ -957,6 +959,28 @@ namespace fist
       {
         gap_delete_transaction(this->state(), id);
       }, this);
+  }
+
+  void
+  State::send_to_self_limit_alert(bool preemptively)
+  {
+    if (preemptively)
+    {
+      auto const& quota = this->account().quotas.value().send_to_self.quota;
+      uint32_t limit = quota ? quota.get() : 0;
+      gap_send_to_self_limit_metric(this->state(), limit);
+    }
+    this->_send_to_self_alert->show();
+    this->_send_to_self_alert->setFocus();
+  }
+
+  void
+  State::ghost_download_limit_alert(uint32_t recipient_id)
+  {
+    this->_ghost_downloads_alert.reset(
+      new popup::GhostDownloadsLimit(*this, this->user(recipient_id).fullname(), nullptr));
+    this->_ghost_downloads_alert->show();
+    this->_ghost_downloads_alert->setFocus();
   }
 
   void

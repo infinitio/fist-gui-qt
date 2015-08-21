@@ -55,8 +55,8 @@ namespace fist
         {
           static
           QString const
-          text("You have reached your monthly limit for sending files to your "
-               "own devices.");
+          text("You have reached your <b>monthly</b> limit for sending files "
+               "to your own devices.");
 
           namespace body
           {
