@@ -323,22 +323,25 @@ namespace fist
   }
 
   std::vector<model::Device>
-  State::devices() const
+  State::devices(bool use_cache) const
   {
-    std::vector<model::Device> devices;
+    if (!this->_cached_devices.empty() && use_cache)
+      return this->_cached_devices;
+    this->_cached_devices.clear();
     std::vector<surface::gap::Device const*> _devices;
     auto res = gap_devices(this->state(), _devices);
     if (res != gap_ok)
       ELLE_WARN("%s: fetching devices failed", *this);
     else
       for (auto const& device: _devices)
-        devices.emplace_back(*device);
-    std::sort(devices.begin(), devices.end(), [] (model::Device const& l,
-                                                  model::Device const& r)
+        this->_cached_devices.emplace_back(*device);
+    std::sort(this->_cached_devices.begin(),
+              this->_cached_devices.end(), [] (model::Device const& l,
+                                               model::Device const& r)
               {
                 return l.last_sync() > r.last_sync();
               });
-    return devices;
+    return this->_cached_devices;
   }
 
   struct UpdateTime

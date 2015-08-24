@@ -170,9 +170,11 @@ namespace fist
     me();
 
   public:
-    std::vector<model::Device>
-    devices() const;
+    typedef std::vector<model::Device> Devices;
+    Devices
+    devices(bool use_cache = false) const;
 
+    ELLE_ATTRIBUTE_P(Devices, cached_devices, mutable);
   private:
     ELLE_ATTRIBUTE_R(QString, web_token);
 
