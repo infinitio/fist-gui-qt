@@ -50,8 +50,11 @@ this->_layout->setContentsMargins(7, 7, 7, 0);
     "}"
     );
   this->_usage_bar->setFixedHeight(6);
+  this->_usage_bar->installEventFilter(this);
   ::style(*this->_usage_caption);
   this->_usage_caption->installEventFilter(this);
+  this->_usage_bar->setToolTip("Click to discover how to get more");
+  this->_usage_caption->setToolTip("Click to discover how to get more");
   this->_menu->setToolTip("Options");
   this->_send->setToolTip("Send files");
   this->_layout->addWidget(this->_menu, 0, Qt::AlignCenter);
@@ -88,8 +91,7 @@ TransactionFooter::_account_updated()
           QString_from_utf8_string(
             elle::sprintf("%s monthly transfers to yourself left", remaining)));
         this->_usage_bar->setMaximum(sts.quota.get());
-        this->_usage_bar->setValue(remaining);
-        this->setToolTip("Click to discover how to get more");
+        this->_usage_bar->setValue(sts.quota.get() - remaining);
       }
       else
       {
@@ -111,9 +113,7 @@ TransactionFooter::_account_updated()
         QString_from_utf8_string(
           elle::sprintf("%s storage left", readable_size(remaining))));
       this->_usage_bar->setMaximum(100);
-      this->_usage_bar->setValue(100 * remaining_ratio);
-
-      this->setToolTip("Click to discover how to get more.");
+      this->_usage_bar->setValue(100 * (1.0 - remaining_ratio));
     }
   default:
     break;
@@ -142,7 +142,7 @@ TransactionFooter::_mode_implementation()
 bool
 TransactionFooter::eventFilter(QObject *obj, QEvent *event)
 {
-  if (obj == this->_usage_caption)
+  if (obj == this->_usage_caption || this->_usage_bar)
   {
     if (event->type() == QEvent::Enter)
     {
