@@ -103,7 +103,7 @@ namespace fist
           invite->setStyleSheet(view::payment::button::stylesheet.arg(
                                   "rgb(242, 94, 90)", "rgb(231, 85, 81)"));
           connect(invite, SIGNAL(released()),
-                  this, SLOT(_go_to_website()));
+                  this, SLOT(_go_to_referral_page()));
           layout->addWidget(invite, 4, ++index, Qt::AlignRight);
         }
 
@@ -128,6 +128,14 @@ namespace fist
     {
       ELLE_TRACE_SCOPE("%s: go to %s", *this, view::payment::storage::body::url);
       this->_state.go_to_online_profile(this->_campaign());
+      this->hide();
+    }
+
+    void
+    UpgradePlan::_go_to_referral_page()
+    {
+      ELLE_TRACE_SCOPE("%s: go to %s", *this, view::payment::storage::body::url);
+      this->_state.go_to_online_profile(this->_campaign(), "/referral");
       this->hide();
     }
 

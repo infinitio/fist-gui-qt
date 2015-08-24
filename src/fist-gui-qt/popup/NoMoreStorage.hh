@@ -28,6 +28,9 @@ namespace fist
       void
       _go_to_website();
 
+      void
+      _go_to_referral_page();
+
     private:
       void
       showEvent(QShowEvent* event) override;
