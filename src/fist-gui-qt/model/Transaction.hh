@@ -96,6 +96,10 @@ namespace fist
 
       void
       mtime(double mtime);
+
+      QDateTime
+      order() const;
+
     private:
       ELLE_ATTRIBUTE_R(surface::gap::PeerTransaction, transaction);
     public:

@@ -286,7 +286,7 @@ namespace fist
           boost::multi_index::const_mem_fun<model::Model, model::Model::ID, &model::Model::id>
           >,
         boost::multi_index::ordered_non_unique<
-          boost::multi_index::const_mem_fun<model::Transaction, QDateTime const&, &model::Transaction::mtime>
+          boost::multi_index::const_mem_fun<model::Transaction, QDateTime, &model::Transaction::order>
           >
         >
       > Transactions;
