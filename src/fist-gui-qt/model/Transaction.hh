@@ -1,7 +1,7 @@
 #ifndef FIST_GUI_QT_TRANSACTIONMODEL_HH
 # define FIST_GUI_QT_TRANSACTIONMODEL_HH
 
-# include <boost/logic/tribool.hpp>
+# include <boost/optional.hpp>
 
 # include <QVector>
 # include <QString>
@@ -10,6 +10,7 @@
 
 # include <fist-gui-qt/fwd.hh>
 # include <fist-gui-qt/model/Model.hh>
+# include <fist-gui-qt/model/Device.hh>
 # include <surface/gap/gap.hh>
 # include <surface/gap/PeerTransaction.hh>
 
@@ -50,6 +51,9 @@ namespace fist
 
       bool
       concerns_device() const;
+
+      bool
+      sent_to_self() const;
 
       model::User const&
       peer() const;
@@ -104,6 +108,11 @@ namespace fist
       // Cache the mtime.
       ELLE_ATTRIBUTE_R(QDateTime, mtime);
       ELLE_ATTRIBUTE_RX(bool, pause);
+
+      ELLE_ATTRIBUTE_rP(boost::optional<model::Device>, sender_device,
+                        mutable);
+      ELLE_ATTRIBUTE_rP(boost::optional<model::Device>, recipient_device,
+                        mutable);
   /*-------------.
   | Orderability |
   `-------------*/

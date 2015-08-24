@@ -127,6 +127,12 @@ namespace fist
       return this->is_sender_device() || this->is_recipient_device();
     }
 
+    bool
+    Transaction::sent_to_self() const
+    {
+      return this->is_sender() && this->is_recipient();
+    }
+
     model::User const&
     Transaction::peer() const
     {
@@ -152,6 +158,43 @@ namespace fist
       }
       tooltip.remove(tooltip.size() - 1, 1);
       return tooltip;
+    }
+
+    boost::optional<model::Device> const&
+    Transaction::recipient_device() const
+    {
+      if (this->_recipient_device)
+        return this->_recipient_device;
+
+      if (this->has_recipient_device())
+      {
+        auto devices = this->_state.devices(true);
+        for (auto const& device: devices)
+        {
+          if (device.id() == QString_from_utf8_string(this->_transaction.recipient_device_id))
+            this->_recipient_device = device;
+          if (this->_recipient_device && this->_sender_device)
+            break;
+        }
+      }
+      return this->_recipient_device;
+    }
+
+    boost::optional<model::Device> const&
+    Transaction::sender_device() const
+    {
+      if (this->_sender_device)
+        return this->_sender_device;
+      auto devices = this->_state.devices(true);
+      for (auto const& device: devices)
+      {
+        if (device.id() == QString_from_utf8_string(this->_transaction.sender_device_id))
+        {
+          this->_sender_device = device;
+          break;
+        }
+      }
+      return this->_sender_device;
     }
 
     bool
