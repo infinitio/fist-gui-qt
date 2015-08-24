@@ -408,10 +408,12 @@ namespace fist
     `--------*/
   public:
     QUrl
-    profile_url(QString const& utm_campaign = "") const;
+    profile_url(QString const& utm_campaign = "",
+                QString const& section = "") const;
 
     void
-    go_to_online_profile(QString const& utm_campaign = "") const;
+    go_to_online_profile(QString const& utm_campaign = "",
+                         QString const& section = "") const;
 
   public:
     bool

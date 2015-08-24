@@ -1057,9 +1057,11 @@ namespace fist
   }
 
   QUrl
-  State::profile_url(QString const& utm_campaign) const
+  State::profile_url(QString const& utm_campaign,
+                     QString const& section) const
   {
-    QString _url = QString("https://infinit.io/account?login_token=%1&email=%2").arg(
+    QString _url = QString("https://infinit.io/account%1?login_token=%2&email=%3").arg(
+      section,
       this->web_token(),
       url_encode(this->me().emails()[0]));
     QString url = _url;
@@ -1072,9 +1074,10 @@ namespace fist
   }
 
   void
-  State::go_to_online_profile(QString const& utm_campaign) const
+  State::go_to_online_profile(QString const& utm_campaign,
+                              QString const& section) const
   {
-    QDesktopServices::openUrl(this->profile_url(utm_campaign));
+    QDesktopServices::openUrl(this->profile_url(utm_campaign, section));
   }
 
   bool
