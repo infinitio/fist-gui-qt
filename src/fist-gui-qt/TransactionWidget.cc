@@ -70,10 +70,60 @@ TransactionWidget::TransactionWidget(Model const& model):
     texts->addStretch();
     auto user_and_status = new QHBoxLayout;
     texts->addLayout(user_and_status);
-    auto username = new QLabel(this->_transaction.peer().fullname(), this);
+    auto username = new QLabel(this);
+
+#define GREY "style=\"text-decoration: none; color: #666666;\""
+    if (this->_transaction.sent_to_self())
+    {
+      auto const& to_your_self = [&] {
+        username->setText(QString("<a " GREY ">To</a> your self"));
+      };
+      if (this->_transaction.is_sender_device())
+      {
+        if (this->_transaction.recipient_device())
+        {
+          username->setText(
+            QString("<a " GREY ">To</a> ")
+            + this->_transaction.recipient_device().get().name());
+        }
+        else
+        {
+          to_your_self();
+        }
+      }
+      else if (this->_transaction.is_recipient_device() ||
+               !this->_transaction.has_recipient_device())
+      {
+        if (this->_transaction.sender_device())
+        {
+          username->setText(
+            QString("<a " GREY ">From</a> ")
+            + this->_transaction.sender_device().get().name());
+        }
+        else
+        {
+          username->setText(QString("<a " GREY ">From</a> your self"));
+        }
+      }
+      else
+      {
+        to_your_self();
+      }
+    }
+    else if (this->_transaction.is_sender())
+    {
+      username->setText(
+        QString("<a style=\"text-decoration: none; color: #666666;\">To</a> ")
+        + this->_transaction.peer().fullname());
+    }
+    else
+    {
+      username->setText(
+        QString("<a style=\"text-decoration: none; color: #666666;\">From</a> ")
+        + this->_transaction.peer().fullname());
+    }
     {
       view::transaction::peer::style(*username);
-      username->setMaximumWidth(150);
       username->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
       user_and_status->addWidget(username);
     }
