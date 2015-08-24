@@ -32,6 +32,7 @@ namespace fist
       , _status()
       , _click_counter()
       , _cancel_link(new IconButton(":/link/delete", this))
+      , _already_clicked(false)
       , _go_to_website(new IconButton(":/link/edit", this))
       , _copy_link(new IconButton(":/link/clipboard", this))
       , _progress_timer(nullptr)
@@ -132,7 +133,8 @@ namespace fist
         QString("%1").arg(this->_model.click_count()));
       if (this->_model.unavailable())
       {
-        this->_text_style = view::links::file::failed_style;
+        ELLE_DEBUG("unavailable")
+          this->_text_style = view::links::file::failed_style;
       }
       else if (this->_model.status() == gap_transaction_finished)
       {
@@ -161,9 +163,11 @@ namespace fist
     void
     LinkWidget::_cancel()
     {
-      ELLE_TRACE_SCOPE("%s: cancel/delete transaction", *this);
-      this->_first_click = !this->_first_click;
-      if (this->_first_click)
+      ELLE_TRACE_SCOPE("%s: cancel/delete transaction (first click: %s)",
+                       *this, this->_already_clicked);
+      elle::SafeFinally update(
+        [&] {this->_already_clicked = !this->_already_clicked; });
+      if (!this->_already_clicked)
       {
         this->_go_to_website->hide();
         this->_copy_link->hide();
@@ -184,7 +188,8 @@ namespace fist
         {
           this->_go_to_website->show();
           this->_copy_link->show();
-          this->_first_click = false;
+          ELLE_TRACE("reset first click")
+            this->_already_clicked = false;
         }
       }
       return Super::eventFilter(obj, event);
