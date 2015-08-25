@@ -286,11 +286,7 @@ namespace fist
     Transaction::order() const
     {
       if (this->acceptable())
-        ELLE_DEBUG("acceptable: %s", this->mtime().addYears(2))
-          return this->mtime().addYears(2);
-      else if (this->can_be_canceled())
-        ELLE_DEBUG("cancellable: %s", this->mtime().addYears(1))
-          return this->mtime().addYears(1);
+        return this->mtime().addYears(1);
       return this->mtime();
     }
 
