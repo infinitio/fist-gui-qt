@@ -628,8 +628,7 @@ namespace fist
     State::Users res;
     for (auto const& user: boost::adaptors::reverse(this->_users.get<1>()))
     {
-      auto ignore = !user.swagger() && !user.deleted();
-      if (!ignore && filter(user))
+      if (user.swagger() && !user.deleted() && filter(user))
       {
         ELLE_DEBUG("add result: %s", user)
           res.push_back(user.id());
