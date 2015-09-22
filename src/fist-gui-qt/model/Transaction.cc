@@ -263,6 +263,13 @@ namespace fist
     float
     Transaction::progress() const
     {
+      if (this->is_final())
+        return 100.0f;
+      static QVector<gap_TransactionStatus> initial_statuses = {
+        gap_transaction_new,
+        gap_transaction_waiting_accept};
+      if (initial_statuses.contains(this->status()))
+        return 0.0f;
       return gap_transaction_progress(this->_state.state(), this->id());
     }
 
