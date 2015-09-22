@@ -139,14 +139,14 @@ namespace fist
           {
             static
             QString const
-            text("INVITE FRIENDS");
+            text("FREE UPGRADE");
           }
 
           namespace upgrade
           {
             static
             QString const
-            text("UPGRADE MY PLAN");
+            text("GET PRO");
           }
         }
       }
