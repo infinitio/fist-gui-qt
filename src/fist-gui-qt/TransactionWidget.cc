@@ -76,7 +76,7 @@ TransactionWidget::TransactionWidget(Model const& model):
     if (this->_transaction.sent_to_self())
     {
       auto const& to_your_self = [&] {
-        username->setText(QString("<a " GREY ">To</a> your self"));
+        username->setText(QString("<a " GREY ">To</a> yourself"));
       };
       if (this->_transaction.is_sender_device())
       {
@@ -102,7 +102,7 @@ TransactionWidget::TransactionWidget(Model const& model):
         }
         else
         {
-          username->setText(QString("<a " GREY ">From</a> your self"));
+          username->setText(QString("<a " GREY ">From</a> yourself"));
         }
       }
       else
