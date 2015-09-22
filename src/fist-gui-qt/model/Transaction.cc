@@ -244,6 +244,7 @@ namespace fist
         gap_transaction_rejected,
         gap_transaction_deleted,
         gap_transaction_cloud_buffered,
+        gap_transaction_ghost_uploaded,
       };
 
       static QVector<gap_TransactionStatus> recipient_final_states = {

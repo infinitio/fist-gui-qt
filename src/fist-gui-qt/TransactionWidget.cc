@@ -501,8 +501,7 @@ TransactionWidget::_on_status_updated()
       switch (status)
       {
         case gap_transaction_new:
-          return StatusUpdater(
-            QString(), false, "New");
+          return StatusUpdater(QString(), false, "New");
         case gap_transaction_waiting_accept:
           return StatusUpdater(
             QString(":/loading"), true, "Wait for user to accept");
@@ -520,6 +519,9 @@ TransactionWidget::_on_status_updated()
         case gap_transaction_cloud_buffered:
           return StatusUpdater(
             QString(":/transaction/sent"), false, "Cloud Buffered");
+        case gap_transaction_ghost_uploaded:
+          return StatusUpdater(
+            QString(":/transaction/sent"), false, "Ghost uploaded");
         case gap_transaction_failed:
           return StatusUpdater(QString(":/conversation/error"), false, "Failed");
         case gap_transaction_canceled:
