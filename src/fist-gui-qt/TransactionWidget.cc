@@ -504,7 +504,7 @@ TransactionWidget::_on_status_updated()
           return StatusUpdater(QString(), false, "New");
         case gap_transaction_waiting_accept:
           return StatusUpdater(
-            QString(":/loading"), true, "Wait for user to accept");
+            QString(), false, "Wait for user to accept");
         case gap_transaction_waiting_data:
           return StatusUpdater(
             QString(":/loading"), true, "Waiting for data");
