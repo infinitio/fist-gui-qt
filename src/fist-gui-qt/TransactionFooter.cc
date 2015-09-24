@@ -157,7 +157,12 @@ TransactionFooter::eventFilter(QObject *obj, QEvent *event)
     {
       this->setCursor(QCursor(Qt::ArrowCursor));
       this->_state.go_to_online_profile(
-        QString_from_utf8_string(elle::sprintf("panel_%s", this->mode())));
+        QString_from_utf8_string(
+          elle::sprintf("panel_%s",
+                        // Write a working pretty printer.
+                        this->mode() == fist::Mode::p2p
+                        ? std::string("p2p")
+                        : std::string("link"))));
     }
   }
   return Super::eventFilter(obj, event);
