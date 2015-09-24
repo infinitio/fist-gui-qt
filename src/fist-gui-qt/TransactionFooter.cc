@@ -102,8 +102,9 @@ TransactionFooter::_account_updated()
     case fist::Mode::link:
     {
       auto const& links = this->_state.account().quotas.value().links;
-      uint64_t quota = links.quota.get();
-      uint64_t remaining = quota - links.used;
+      int64_t quota = links.quota.get();
+      // Not cool...
+      int64_t remaining = std::max((int64_t) 0, quota - (int64_t) links.used);
       // To make sure we
       double remaining_ratio = 1.0 * remaining / quota;
       ELLE_DEBUG("quota: %s", quota);
