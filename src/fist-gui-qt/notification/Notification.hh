@@ -19,7 +19,7 @@ namespace fist
     {
       typedef QWidget Super;
     protected:
-      INotification(int duration = 2000,
+      INotification(int duration = 4000,
                     QWidget* parent = nullptr);
     private:
       ELLE_ATTRIBUTE(int, duration);
