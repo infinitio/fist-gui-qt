@@ -66,6 +66,10 @@ namespace fist
       void
       _cancel();
 
+    private:
+      void
+      _update_cancel_tooltip();
+
     signals:
       void
       transaction_canceled(uint32_t);

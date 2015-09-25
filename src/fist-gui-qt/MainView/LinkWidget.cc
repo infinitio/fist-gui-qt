@@ -78,7 +78,7 @@ namespace fist
         this->_go_to_website->setToolTip("Open the link");
         hlayout->addWidget(this->_cancel_link);
         this->_cancel_link->installEventFilter(this);
-        this->_cancel_link->setToolTip("Cancel");
+        this->_update_cancel_tooltip();
         {
           auto* vlayout = new QVBoxLayout;
           vlayout->addStretch();
@@ -125,6 +125,14 @@ namespace fist
     }
 
     void
+    LinkWidget::_update_cancel_tooltip()
+    {
+      this->_cancel_link->setToolTip(
+        this->_model.status() == gap_transaction_finished ?
+        "Free space": "Cancel");
+    }
+
+    void
     LinkWidget::_update(QString const& status)
     {
       ELLE_TRACE_SCOPE("%s: update (%s)", *this, status);
@@ -156,6 +164,7 @@ namespace fist
       }
       if (this->_name.text().isEmpty())
         this->_name.setText(this->_model.name());
+      this->_update_cancel_tooltip();
       this->_text_style(this->_name);
       this->repaint();
     }
