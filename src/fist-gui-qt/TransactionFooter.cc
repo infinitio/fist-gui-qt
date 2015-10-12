@@ -103,18 +103,26 @@ TransactionFooter::_account_updated()
     {
       auto const& links = this->_state.account().quotas.value().links;
       int64_t quota = links.quota.get();
-      // Not cool...
-      int64_t remaining = std::max((int64_t) 0, quota - (int64_t) links.used);
-      // To make sure we
-      double remaining_ratio = 1.0 * remaining / quota;
-      ELLE_DEBUG("quota: %s", quota);
-      ELLE_DEBUG("remaining: %s", remaining);
-      ELLE_DEBUG("remaining ratio: %s", remaining_ratio);
-      this->_usage_caption->setText(
-        QString_from_utf8_string(
-          elle::sprintf("%s storage left", readable_size(remaining))));
-      this->_usage_bar->setMaximum(100);
-      this->_usage_bar->setValue(100 * (1.0 - remaining_ratio));
+      if (quota == 0)
+      {
+        this->_usage_caption->hide();
+        this->_usage_bar->hide();
+      }
+      else
+      {
+        // Not cool...
+        int64_t remaining = std::max((int64_t) 0, quota - (int64_t) links.used);
+        // To make sure we
+        double remaining_ratio = 1.0 * remaining / quota;
+        ELLE_DEBUG("quota: %s", quota);
+        ELLE_DEBUG("remaining: %s", remaining);
+        ELLE_DEBUG("remaining ratio: %s", remaining_ratio);
+        this->_usage_caption->setText(
+          QString_from_utf8_string(
+            elle::sprintf("%i storage left", readable_size(remaining))));
+        this->_usage_bar->setMaximum(100);
+        this->_usage_bar->setValue(100 * (1.0 - remaining_ratio));
+      }
     }
   default:
     break;
